@@ -1,0 +1,53 @@
+h1{
+    font-size: 1.75rem!important;
+    font-weight: var(--p-font-weight-regular)!important;
+}
+.center-content{
+    text-align: center;
+}
+.justify-content{
+    justify-content: center;
+}
+.display-f{
+    display: flex;
+}
+.center-btn .Polaris-ButtonGroup{
+    justify-content: center;
+}
+.offer-table-footer .Polaris-ButtonGroup{
+    justify-content: center;
+}
+.space-1{
+    margin-bottom: var(--p-space-1);
+}
+.space-2{
+    margin-bottom: var(--p-space-2);
+}
+.space-3{
+    margin-bottom: var(--p-space-3);
+}
+.space-4{
+    margin-bottom: var(--p-space-4);
+}
+.space-10{
+    margin-bottom: var(--p-space-10);
+}
+.report-money{
+    margin-top: -15px;
+    font-size: 1.5em;
+}
+.mx-width{
+    max-width: 100px;
+}
+.min-width{
+    min-width: 100px;
+}
+
+#appearance input[type=number]{
+    max-width: 100px;
+}
+
+.flex-tab{
+    position: relative;
+    display: flex;
+}
