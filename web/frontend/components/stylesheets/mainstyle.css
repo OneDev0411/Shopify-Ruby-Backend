@@ -51,3 +51,7 @@ h1{
     position: relative;
     display: flex;
 }
+
+.auto-height .Polaris-Card{
+    min-height: 340px;
+}

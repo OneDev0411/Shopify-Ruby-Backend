@@ -31,7 +31,12 @@ export default function App() {
                 {
                   label: "Edit Offer",
                   destination: "/edit-offer",
-                },{
+                },
+                {
+                  label: "Subscription",
+                  destination: "/subscription",
+                },
+                {
                   label: "No Offer",
                   destination: "/no-offer-found",
                 },

@@ -1,9 +1,6 @@
-import {Grid,ButtonGroup, Button, MediaCard, VideoThumbnail,Card, Page, Layout, TextContainer, Image, Stack, Link, Heading, Subheading} from "@shopify/polaris";
-import { TitleBar } from "@shopify/app-bridge-react";
-import {trophyImage,homeImage} from "../assets";
-import { ProductsCard } from "../components";
+import {ButtonGroup, Button, MediaCard, VideoThumbnail,Card, Page, Layout, TextContainer, Image, Stack, Heading, Subheading} from "@shopify/polaris";
+import {homeImage} from "../assets";
 import "../components/stylesheets/mainstyle.css";
-import { render } from "react-dom";
 
 export default function HomePage() {
   return (
@@ -51,9 +48,6 @@ export default function HomePage() {
             />
           </MediaCard>
         </Layout.Section>
-        {/* <Layout.Section>
-          <ProductsCard />
-        </Layout.Section> */}
       </Layout>
     </Page>
   );
