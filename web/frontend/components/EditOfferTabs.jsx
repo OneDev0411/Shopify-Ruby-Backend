@@ -1,9 +1,39 @@
-import {Card,Stack,ButtonGroup,Button,TextField,Checkbox,Select, RangeSlider, Collapsible} from "@shopify/polaris";
-import {useState,useCallback} from "react";
+import {Card,Stack,ButtonGroup,Button,TextField,Checkbox,Select, RangeSlider, Collapsible, Modal} from "@shopify/polaris";
+import {ModalAddProduct} from "./ModalAddProduct";
+import {useState,useCallback,useRef} from "react";
 import React from "react";
 
 
 export function EditOfferTabs() {
+    const [offerTitle, setOfferTitle] = useState("");
+    const [offerText, setofferText] = useState("");
+    const [btnTitle, setBtnTitle] = useState("");
+    const handleTitleChange = useCallback((newValue) => setOfferTitle(newValue), []);
+    const handleTextChange = useCallback((newValue) => setofferText(newValue), []);
+    const handleBtnChange = useCallback((newValue) => setBtnTitle(newValue), []);
+    //checkbox controls
+    const [abTestCheck, setAbTestCheck] = useState(false);
+    const [removeImg, setRemoveImg] = useState(false);
+    const [removePriceCheck, setRemovePriceCheck] = useState(false);
+    const [removeComparePrice, setRemoveComparePrice] = useState(false);
+    const [removeProductPage, setRemoveProductPage] = useState(false);
+    const [removeQtySelector, setRemoveQtySelector] = useState(false);
+    const [autoDiscount, setAutoDiscount] = useState(false);
+    const [addCustomtext, setAddCustomtext] = useState(false);
+
+    const handleAbChange = useCallback((newChecked) => setAbTestCheck(newChecked), []);
+    const handleImageChange = useCallback((newChecked) => setRemoveImg(newChecked), []);
+    const handlePriceChange = useCallback((newChecked) => setRemovePriceCheck(newChecked), []);
+    const handleCompareChange = useCallback((newChecked) => setRemoveComparePrice(newChecked), []);
+    const handleProductPageChange = useCallback((newChecked) => setRemoveProductPage(newChecked), []);
+    const handleQtySelectorChange = useCallback((newChecked) => setRemoveQtySelector(newChecked), []);
+    const handleDiscountChange = useCallback((newChecked) => setAutoDiscount(newChecked), []);
+    const handleCustomTextChange = useCallback((newChecked) => setAddCustomtext(newChecked), []);
+    //modal controls
+    const [productModal, setProductModal] = useState(false);
+    const handleModal = useCallback(() => setProductModal(!productModal), [productModal]);
+    const modalRef = useRef(null);
+    const activator = modalRef;
 
     return (
         <div>
@@ -12,8 +42,8 @@ export function EditOfferTabs() {
                 <Stack spacing="loose" vertical>
                     <p>What product would you like to have in the offer?</p>
                     <ButtonGroup>
-                        <Button>Select product manually</Button>
-                        <Button primary>Launch Autopilot</Button>
+                        <Button id={"btnSelectProduct"} onClick={handleModal} ref={modalRef}>Select product manually</Button>
+                        <Button id={"btnLaunchAI"} primary>Launch Autopilot</Button>
                     </ButtonGroup>
                 </Stack>
             </Card.Section>
@@ -24,6 +54,8 @@ export function EditOfferTabs() {
                     <TextField
                         label="Offer title"
                         placeholder='Offer #1'
+                        value={offerTitle}
+                        onChange={handleTitleChange}
                         autoComplete="off"
                         helpText="This title will only be visible to you so you can reference it internally"
                     />
@@ -31,42 +63,96 @@ export function EditOfferTabs() {
                         label="Offer text"
                         placeholder='Take advantage of this limited offer'
                         autoComplete="off" 
+                        value={offerText}
+                        onChange={handleTextChange}
                     />
                     <TextField
                         label="Button text"
                         placeholder='Add to cart'
+                        value={btnTitle}
+                        onChange={handleBtnChange}
                         autoComplete="off"   
                     />
-                    <Checkbox label="Enable A/B testing"/>
+                    <Checkbox id={"abTesting"} 
+                        label="Enable A/B testing"
+                        checked={abTestCheck}
+                        onChange={handleAbChange}
+                    />
                 </Stack>
             </Card.Section>
         </Card>
         <Card title="Display options" sectioned>
             <Card.Section>
             <Stack vertical>
-                <Checkbox label="Remove product image"/>
-                <Checkbox label="Remove price"/>
-                <Checkbox label="Remove compare at price"/>
-                <Checkbox label="Remove link to product page"/>
-                <Checkbox label="Remove quantity selector"/>
-                <Checkbox label="Automatically apply  discount code"/>
-                <Checkbox label="Remove quantity selector"/>
-                <Checkbox label="Add custom textbox"/>
+                <Checkbox id={"removeImg"} 
+                    checked={removeImg}
+                    onChange={handleImageChange}
+                    label="Remove product image"
+                />
+                <Checkbox id={"removePrice"} 
+                    checked={removePriceCheck}
+                    onChange={handlePriceChange}
+                    label="Remove price"
+                />
+                <Checkbox id={"removeComparePrice"} 
+                    checked={removeComparePrice}
+                    onChange={handleCompareChange}
+                    label="Remove compare at price"
+                />
+                <Checkbox id={"removeProductPage"} 
+                    checked={removeProductPage}
+                    onChange={handleProductPageChange}
+                    label="Remove link to product page"
+                />
+                <Checkbox id={"autoDiscount"} 
+                    label="Automatically apply  discount code"
+                    checked={autoDiscount}
+                    onChange={handleDiscountChange}
+                />
+                <Checkbox id={"removeQtySelector"}
+                    checked={removeQtySelector}
+                    onChange={handleQtySelectorChange} 
+                    label="Remove quantity selector"
+                />
+                <Checkbox id={"addCustomtext"}
+                    checked={addCustomtext}
+                    onChange={handleCustomTextChange} 
+                    label="Add custom textbox"
+                />
             </Stack>
             </Card.Section>
         </Card>
         <div className="space-4"></div>
         <Stack distribution="center">
-            <Button>Add product</Button>
+            <Button id={"btnAddProduct"} onClick={handleModal} ref={modalRef}>Add product</Button>
         </Stack>
         <div className="space-10"></div>
+        {/* Modal */}
+        <Modal
+        activator={activator}
+        open={productModal}
+        onClose={handleModal}
+        title="Reach more shoppers with Instagram product tags"
+        primaryAction={{
+          content: 'Add Instagram',
+          
+        }}
+        secondaryActions={[
+          {
+            content: 'Learn more',
+          },
+        ]}
+      >
+        <Modal.Section>
+            <ModalAddProduct/>
+        </Modal.Section>
+      </Modal>
     </div>
   );
 }
 
 export function SecondTab(){
     const [selected, setSelected] = useState('Cart page');
-
     const handleSelectChange = useCallback((value) => setSelected(value), []);
   
     const options = [
