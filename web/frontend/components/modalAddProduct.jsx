@@ -1,9 +1,7 @@
 import {
     TextField,
     IndexTable,
-    Card,
     Filters,
-    Select,
     useIndexResourceState,
   } from '@shopify/polaris';
   import {useState, useCallback} from 'react';
@@ -32,16 +30,9 @@ import {
       plural: 'customers',
     };
   
-    const {selectedResources, allResourcesSelected, handleSelectionChange} =
-      useIndexResourceState(customers);
-    const [taggedWith, setTaggedWith] = useState(null);
+    const {selectedResources, allResourcesSelected, handleSelectionChange} = useIndexResourceState(customers);
     const [queryValue, setQueryValue] = useState(null);
-    const [sortValue, setSortValue] = useState('today');
   
-    const handleTaggedWithChange = useCallback(
-      (value) => setTaggedWith(value),
-      [],
-    );
     const handleTaggedWithRemove = useCallback(() => setTaggedWith(null), []);
     const handleQueryValueRemove = useCallback(() => setQueryValue(null), []);
     const handleClearAll = useCallback(() => {
@@ -99,21 +90,4 @@ import {
         </IndexTable>
       </div>
     );
-  
-    function disambiguateLabel(key, value) {
-      switch (key) {
-        case 'taggedWith':
-          return `Tagged with ${value}`;
-        default:
-          return value;
-      }
-    }
-  
-    function isEmpty(value) {
-      if (Array.isArray(value)) {
-        return value.length === 0;
-      } else {
-        return value === '' || value == null;
-      }
-    }
   }
