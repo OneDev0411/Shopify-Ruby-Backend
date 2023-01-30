@@ -163,6 +163,13 @@ export function SecondTab(){
       {label: 'AJAX and cart page', value: 'ajaxcartpage'}
       
     ];
+
+
+    const [disableCheckoutBtn, setDisableCheckoutBtn] = useState(false);
+    const [removeItiem, setRemoveItiem] = useState(false);
+    const handleDisableCheckoutBtn = useCallback((newChecked) => setDisableCheckoutBtn(newChecked), []);
+    const handleRemoveItiem = useCallback((newChecked) => setRemoveItiem(newChecked), []);
+    
     return(
         <div>
             <Card title="Choose placement" sectioned>
@@ -184,9 +191,17 @@ export function SecondTab(){
                 </Card.Section>
                 <Card.Section title="Condition options">
                     <Stack vertical>
-                        <Checkbox label="Disable checkout button until offer is accepted" 
-                            helpText="This is useful for products that can only be purchased in pairs."/>
-                        <Checkbox label="If the offer requirements are no longer met. Remove the item from the cart."/>
+                        <Checkbox 
+                            label="Disable checkout button until offer is accepted" 
+                            helpText="This is useful for products that can only be purchased in pairs."
+                            checked={disableCheckoutBtn}
+                            onChange={handleDisableCheckoutBtn}
+                        />
+                        <Checkbox 
+                            label="If the offer requirements are no longer met. Remove the item from the cart."
+                            checked={removeItiem}
+                            onChange={handleRemoveItiem}
+                        />
                     </Stack>
                 </Card.Section>
             </Card>
@@ -200,48 +215,166 @@ export function SecondTab(){
 }
 
 export function ThirdTab(){
+    const [layout, setLayout] = useState('Cart page');
     const [selected, setSelected] = useState('Cart page');
-    const handleSelectChange = useCallback((value) => setSelected(value), []);
     const options = [
-      {label: 'Cart page', value: 'cartpage'},
-      {label: 'Product page', value: 'productpage'},
-      {label: 'Product and cart page', value: 'cartpageproductpage'},
-      {label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax'},
-      {label: 'AJAX and cart page', value: 'ajaxcartpage'}
-    ];
+        {label: 'Cart page', value: 'cartpage'},
+        {label: 'Product page', value: 'productpage'},
+        {label: 'Product and cart page', value: 'cartpageproductpage'},
+        {label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax'},
+        {label: 'AJAX and cart page', value: 'ajaxcartpage'}
+      ];
+      
+    const handleLayout = useCallback((value) => setLayout(value), []);
+    const handleSelectChange = useCallback((value) => setSelected(value), []);
 
+    // Space above the offer
+    const [aboveSpace, setAboveSpace] = useState('10');
+    const handleAboveSpace = useCallback(
+        (value) => setAboveSpace(value),
+        [],
+    );
+    // Space below the offer
+    const [belowSpace, setBelowSpace] = useState('10');
+    const handleBelowSpace = useCallback(
+        (value) => setBelowSpace(value),
+        [],
+    );
+    //Border style drop-down menu
+    const [borderStyle, setBorderStyle] = useState("No border")
+    const handleBorderStyle = useCallback((value) => setBorderStyle(value), []);
+    const BorderOptions = [
+        {label: 'No border', value: 'No border'},
+        {label: 'Dotted lines', value: 'Dotted lines'},
+        {label: 'Straight line', value: 'Straight line'},
+      ];
+
+    //Border width
+    const [borderWidth, setBorderWidth] = useState('10');
+    const handleBorderWidth = useCallback(
+        (value) => setBorderWidth(value),
+        [],
+    );
+
+    //Border range slider
+    const [borderRange, setBorderRange] = useState(10);
+    const handlesetBorderRange = useCallback(
+        (value) => setBorderRange(value),
+        [],
+    );
+ 
+    // Toggle for manually added color
+    const [open, setOpen] = useState(false);
+    const handleToggle = useCallback(() => setOpen((open) => !open), []);
+
+    //Font options
+    const [fontSelect, setFontSelect] = useState("Dummy font 1");
+    const handleFontSelect = useCallback((value)=> setFontSelect(value),[]);
+    const fontOptions = [
+        {label: 'Dummy font 1', value: 'Dummy font 1'},
+        {label: 'Dummy font 2', value: 'Dummy font 2'},
+        {label: 'Dummy font 3', value: 'Dummy font 3'},
+        {label: 'Dummy font 4', value: 'Dummy font 4'},
+        {label: 'Dummy font 5', value: 'Dummy font 5'},
+      ];
+
+    //Font weight
+    const [fontWeight, setFontWeight] = useState('10');
+    const handleFontWeight = useCallback(
+        (value) => setFontWeight(value),
+        [],
+    );
+
+    //Font size
+    const [fontsize, setFontSize] = useState('10');
+    const handleFontSize = useCallback(
+        (value) => setFontSize(value),
+        [],
+    );
+
+
+    //Button options
+    const [btnSelect, setBtnSelect] = useState("Dummy font 1");
+    const handleBtnSelect = useCallback((value)=> setBtnSelect(value),[]);
+    const btnOptions = [
+        {label: 'Dummy font 1', value: 'Dummy font 1'},
+        {label: 'Dummy font 2', value: 'Dummy font 2'},
+        {label: 'Dummy font 3', value: 'Dummy font 3'},
+        {label: 'Dummy font 4', value: 'Dummy font 4'},
+        {label: 'Dummy font 5', value: 'Dummy font 5'},
+      ];
+
+    //Button weight
+    const [btnWeight, setBtnWeight] = useState('10');
+    const handleBtnWeight = useCallback(
+        (value) => setBtnWeight(value),
+        [],
+    );
+
+    //Button size
+    const [btnSize, setBtnSize] = useState('10');
+    const handleBtnSize = useCallback(
+        (value) => setBtnSize(value),
+        [],
+    );
+    
+    // Btn radius
     const [rangeValue, setRangeValue] = useState(20);
     const handleRangeSliderChange = useCallback(
         (value) => setRangeValue(value),
         [],
     );
-    // Toggle for manually added color
-    const [open, setOpen] = useState(false);
-    const handleToggle = useCallback(() => setOpen((open) => !open), []);
-
+   
     return(
         <div>
             <Card title="Offer box" sectioned>
                 <Card.Section>
                     <Stack>
-                        <Select label="Layout" options={options} onChange={handleSelectChange} value={selected}/>
+                        <Select 
+                            label="Layout" 
+                            options={options} 
+                            onChange={handleLayout} 
+                            value={layout}
+                        />
                     </Stack>
                     <br/>
                     <Stack>
-                        <Select label="Space above offer" options={options} onChange={handleSelectChange} value={selected}/>
-                        <Select label="Space below offer" options={options} onChange={handleSelectChange} value={selected}/>
+                        <TextField 
+                            label="Space above offer" 
+                            type="number"
+                            onChange={handleAboveSpace} 
+                            value={aboveSpace}
+                            suffix="px"
+                        />
+                        <TextField 
+                            label="Space below offer" 
+                            type="number"
+                            onChange={handleBelowSpace} 
+                            value={belowSpace}
+                            suffix="px"
+                        />
                     </Stack>
                     <br/>
                     <Stack>
-                        <Select label="Border style" options={options} onChange={handleSelectChange} value={selected}/>
-                        <Select label="Border width" options={options} onChange={handleSelectChange} value={selected}/>
+                        <Select label="Border style" 
+                            options={BorderOptions} 
+                            onChange={handleBorderStyle} 
+                            value={borderStyle}
+                        />
+                        <TextField 
+                            label="Border width" 
+                            type="number"
+                            onChange={handleBorderWidth} 
+                            value={borderWidth}
+                            suffix="px"
+                        />
                     </Stack>
                     <br/>
                     <Stack>
                         <RangeSlider
                             label="Border Radius"
-                            value={rangeValue}
-                            onChange={handleRangeSliderChange}
+                            value={borderRange}
+                            onChange={handlesetBorderRange}
                             output
                         />   
                     </Stack>
@@ -274,16 +407,54 @@ export function ThirdTab(){
             <Card  title="Offer text" className="input-box" sectioned>
                 <Card.Section>
                     <Stack>
-                        <Select label="Font" options={options} onChange={handleSelectChange} value={selected}/>
-                        <TextField label="Weight" type="number" suffix="px" autoComplete="off" value="12"/>
-                        <TextField label="Size" type="number" suffix="px" autoComplete="off" value="10"/>
+                        <Select 
+                            label="Font" 
+                            options={fontOptions} 
+                            onChange={handleFontSelect} 
+                            value={fontSelect}
+                        />
+                        <TextField 
+                            label="Weight" 
+                            type="number" 
+                            suffix="px" 
+                            autoComplete="off"
+                            onChange={handleFontWeight}
+                            value={fontWeight}
+                        />
+                        <TextField 
+                            label="Size" 
+                            type="number" 
+                            suffix="px" 
+                            autoComplete="off"
+                            onChange={handleFontSize}
+                            value={fontsize}
+                        />
                     </Stack>
                 </Card.Section>
                 <Card.Section title="Button text">
                     <Stack>
-                        <Select label="Font" options={options} onChange={handleSelectChange} value={selected}/>
-                        <TextField label="Weight" type="number" suffix="px" autoComplete="off" value="12"/>
-                        <TextField label="Size" type="number" suffix="px" autoComplete="off" value="10"/>
+                        <Select 
+                            label="Font" 
+                            options={btnOptions} 
+                            onChange={handleBtnSelect} 
+                            value={btnSelect}
+                        />
+                        <TextField 
+                            label="Weight" 
+                            type="number" 
+                            suffix="px" 
+                            autoComplete="off"
+                            onChange={handleBtnWeight}
+                            value={btnWeight}
+                        />
+                        <TextField 
+                            label="Size" 
+                            type="number" 
+                            suffix="px" 
+                            autoComplete="off"
+                            onChange={handleBtnSize}
+                            value={btnSize}
+                        />
                     </Stack>
                     <br/>
                     <Stack>
@@ -310,6 +481,10 @@ export function ThirdTab(){
 
 // Advanced Tab
 export function FourthTab(){
+
+    const [checked, setChecked] = useState(false);
+    const handleChange = useCallback((newChecked) => setChecked(newChecked), []);
+
     return(
         <>
             <Card sectioned title="Offer placement - advanced settings" actions={[{content: 'View help doc'}]}>
@@ -331,9 +506,10 @@ export function FourthTab(){
                     <br/>
                     <Checkbox
                         label="Save as default settings"
-                        checked={false}
                         helpText="This placement will apply to all offers created in the future.
                          They can be edited in the Settings section."
+                        checked={checked}
+                        onChange={handleChange}
                     />
                 </Card.Section>
             </Card>
