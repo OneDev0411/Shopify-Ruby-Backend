@@ -43,7 +43,7 @@ h1{
     min-width: 100px;
 }
 
-#appearance input[type=number]{
+/* #appearance input[type=number]{
     max-width: 100px;
     min-width: 100px;
 }
@@ -51,7 +51,7 @@ h1{
 #appearance select, #appearance select option{
     max-width: 100px;
     min-width: 100px;
-}
+} */
 
 .flex-tab{
     position: relative;

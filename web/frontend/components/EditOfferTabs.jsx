@@ -1,5 +1,19 @@
-import {Card,Stack,ButtonGroup,Button,TextField,Checkbox,Select, RangeSlider, Collapsible, Modal} from "@shopify/polaris";
-import {ModalAddProduct} from "./ModalAddProduct";
+import {
+    Card,
+    Stack,
+    ButtonGroup,
+    Button,
+    TextField,
+    Checkbox,
+    Select, 
+    RangeSlider, 
+    Collapsible, 
+    Modal, 
+    Grid, 
+    ColorPicker
+} from "@shopify/polaris";
+import {ModalAddProduct} from "./modal_AddProduct";
+import {ModalAddConditions} from "./modal_AddConditions"; 
 import {useState,useCallback,useRef} from "react";
 import React from "react";
 
@@ -132,16 +146,10 @@ export function EditOfferTabs() {
         activator={activator}
         open={productModal}
         onClose={handleModal}
-        title="Reach more shoppers with Instagram product tags"
+        title="Select products from your store"
         primaryAction={{
-          content: 'Add Instagram',
-          
+          content: 'Save',
         }}
-        secondaryActions={[
-          {
-            content: 'Learn more',
-          },
-        ]}
       >
         <Modal.Section>
             <ModalAddProduct/>
@@ -164,30 +172,36 @@ export function SecondTab(){
       
     ];
 
-
     const [disableCheckoutBtn, setDisableCheckoutBtn] = useState(false);
     const [removeItiem, setRemoveItiem] = useState(false);
     const handleDisableCheckoutBtn = useCallback((newChecked) => setDisableCheckoutBtn(newChecked), []);
     const handleRemoveItiem = useCallback((newChecked) => setRemoveItiem(newChecked), []);
-    
+    //Modal controllers
+    const [conditionModal, setConditionModal] = useState(false);
+    const handleModal = useCallback(() => setConditionModal(!conditionModal), [conditionModal]);
+    const modalCon = useRef(null);
+    const activatorCon = modalCon;
+
     return(
         <div>
             <Card title="Choose placement" sectioned>
                 <Card.Section>
-                <Stack vertical>
-                    <Select
-                        options={options}
-                        onChange={handleSelectChange}
-                        value={selected}
-                    />
-                </Stack>
+                <Grid>
+                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Select
+                            options={options}
+                            onChange={handleSelectChange}
+                            value={selected}
+                        />
+                    </Grid.Cell>
+                </Grid>
                 </Card.Section>
             </Card>
             <Card title="Display Conditions" sectioned>
                 <Card.Section>
                     <p>None selected (show offer to all customer)</p>
                     <br/>
-                    <Button>Add condition</Button>
+                    <Button onClick={handleModal} ref={modalCon}>Add condition</Button>
                 </Card.Section>
                 <Card.Section title="Condition options">
                     <Stack vertical>
@@ -210,6 +224,19 @@ export function SecondTab(){
                     <Button disabled="true">Continue to Appearance</Button>
                 </Stack>
             <div className="space-10"></div>
+            <Modal
+                activator={activatorCon}
+                open={conditionModal}
+                onClose={handleModal}
+                title="Select products from your store"
+                primaryAction={{
+                content: 'Save',
+                }}
+            >
+                <Modal.Section>
+                   <ModalAddConditions/> 
+                </Modal.Section>
+            </Modal>
         </div>
     );
 }
@@ -266,6 +293,14 @@ export function ThirdTab(){
     // Toggle for manually added color
     const [open, setOpen] = useState(false);
     const handleToggle = useCallback(() => setOpen((open) => !open), []);
+
+    //Color picker
+    const [color, setColor] = useState({
+        hue: 300,
+        brightness: 1,
+        saturation: 0.7,
+        alpha: 0.7,
+      });
 
     //Font options
     const [fontSelect, setFontSelect] = useState("Dummy font 1");
@@ -329,55 +364,67 @@ export function ThirdTab(){
         <div>
             <Card title="Offer box" sectioned>
                 <Card.Section>
-                    <Stack>
-                        <Select 
-                            label="Layout" 
-                            options={options} 
-                            onChange={handleLayout} 
-                            value={layout}
-                        />
-                    </Stack>
+                    <Grid>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <Select 
+                                label="Layout" 
+                                options={options} 
+                                onChange={handleLayout} 
+                                value={layout}
+                            />
+                        </Grid.Cell>
+                    </Grid>
                     <br/>
-                    <Stack>
-                        <TextField 
-                            label="Space above offer" 
-                            type="number"
-                            onChange={handleAboveSpace} 
-                            value={aboveSpace}
-                            suffix="px"
-                        />
-                        <TextField 
-                            label="Space below offer" 
-                            type="number"
-                            onChange={handleBelowSpace} 
-                            value={belowSpace}
-                            suffix="px"
-                        />
-                    </Stack>
+                    <Grid>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <TextField 
+                                label="Space above offer" 
+                                type="number"
+                                onChange={handleAboveSpace} 
+                                value={aboveSpace}
+                                suffix="px"
+                            />
+                        </Grid.Cell>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <TextField 
+                                label="Space below offer" 
+                                type="number"
+                                onChange={handleBelowSpace} 
+                                value={belowSpace}
+                                suffix="px"
+                            />
+                        </Grid.Cell>    
+                    </Grid>
                     <br/>
-                    <Stack>
-                        <Select label="Border style" 
-                            options={BorderOptions} 
-                            onChange={handleBorderStyle} 
-                            value={borderStyle}
-                        />
-                        <TextField 
-                            label="Border width" 
-                            type="number"
-                            onChange={handleBorderWidth} 
-                            value={borderWidth}
-                            suffix="px"
-                        />
-                    </Stack>
+                    <Grid>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <Select label="Border style" 
+                                options={BorderOptions} 
+                                onChange={handleBorderStyle} 
+                                value={borderStyle}
+                            />
+                        </Grid.Cell>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <TextField 
+                                label="Border width" 
+                                type="number"
+                                onChange={handleBorderWidth} 
+                                value={borderWidth}
+                                suffix="px"
+                            />
+                        </Grid.Cell>
+                    </Grid>
                     <br/>
-                    <Stack>
-                        <RangeSlider
-                            label="Border Radius"
-                            value={borderRange}
-                            onChange={handlesetBorderRange}
-                            output
-                        />   
-                    </Stack>
+                    <Grid>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <RangeSlider
+                                label="Border Radius"
+                                value={borderRange}
+                                onChange={handlesetBorderRange}
+                                output
+                            />  
+                        </Grid.Cell> 
+                    </Grid>
                 </Card.Section>
             </Card>
             <Card title="Color" sectioned>
@@ -397,74 +444,86 @@ export function ThirdTab(){
                             transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
                             expandOnPrint
                         >  
-                            <p>
-                               Add color picker options here
-                            </p>
+                           <br/><ColorPicker onChange={setColor} color={color} allowAlpha />
                         </Collapsible>
                     </Stack>
                 </Card.Section>
             </Card>
             <Card  title="Offer text" className="input-box" sectioned>
                 <Card.Section>
-                    <Stack>
-                        <Select 
-                            label="Font" 
-                            options={fontOptions} 
-                            onChange={handleFontSelect} 
-                            value={fontSelect}
-                        />
-                        <TextField 
-                            label="Weight" 
-                            type="number" 
-                            suffix="px" 
-                            autoComplete="off"
-                            onChange={handleFontWeight}
-                            value={fontWeight}
-                        />
-                        <TextField 
-                            label="Size" 
-                            type="number" 
-                            suffix="px" 
-                            autoComplete="off"
-                            onChange={handleFontSize}
-                            value={fontsize}
-                        />
-                    </Stack>
+                    <Grid>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <Select 
+                                label="Font" 
+                                options={fontOptions} 
+                                onChange={handleFontSelect} 
+                                value={fontSelect}
+                            />
+                        </Grid.Cell>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <TextField 
+                                label="Weight" 
+                                type="number" 
+                                suffix="px" 
+                                autoComplete="off"
+                                onChange={handleFontWeight}
+                                value={fontWeight}
+                            />
+                        </Grid.Cell>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <TextField 
+                                label="Size" 
+                                type="number" 
+                                suffix="px" 
+                                autoComplete="off"
+                                onChange={handleFontSize}
+                                value={fontsize}
+                            />
+                        </Grid.Cell>                                
+                    </Grid>
                 </Card.Section>
                 <Card.Section title="Button text">
-                    <Stack>
-                        <Select 
-                            label="Font" 
-                            options={btnOptions} 
-                            onChange={handleBtnSelect} 
-                            value={btnSelect}
-                        />
-                        <TextField 
-                            label="Weight" 
-                            type="number" 
-                            suffix="px" 
-                            autoComplete="off"
-                            onChange={handleBtnWeight}
-                            value={btnWeight}
-                        />
-                        <TextField 
-                            label="Size" 
-                            type="number" 
-                            suffix="px" 
-                            autoComplete="off"
-                            onChange={handleBtnSize}
-                            value={btnSize}
-                        />
-                    </Stack>
+                    <Grid>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <Select 
+                                label="Font" 
+                                options={btnOptions} 
+                                onChange={handleBtnSelect} 
+                                value={btnSelect}
+                            />
+                        </Grid.Cell>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <TextField 
+                                label="Weight" 
+                                type="number" 
+                                suffix="px" 
+                                autoComplete="off"
+                                onChange={handleBtnWeight}
+                                value={btnWeight}
+                            />
+                        </Grid.Cell>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <TextField 
+                                label="Size" 
+                                type="number" 
+                                suffix="px" 
+                                autoComplete="off"
+                                onChange={handleBtnSize}
+                                value={btnSize}
+                            />
+                        </Grid.Cell>
+                    </Grid>
                     <br/>
-                    <Stack>
-                        <RangeSlider
-                            label="Button Radius"
-                            value={rangeValue}
-                            onChange={handleRangeSliderChange}
-                            output
-                        />   
-                    </Stack>
+                    <Grid>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <RangeSlider
+                                label="Button Radius"
+                                value={rangeValue}
+                                onChange={handleRangeSliderChange}
+                                output
+                            /> 
+                        </Grid.Cell>   
+                    </Grid>
                 </Card.Section>
             </Card>
             <div className="space-4"></div>
@@ -473,7 +532,7 @@ export function ThirdTab(){
                     <Button>Save dratf</Button>
                     <Button primary>Publish</Button>
                 </ButtonGroup>
-            </Stack>
+            </Stack> 
             <div className="space-10"></div>
         </div>
     );
