@@ -37,6 +37,14 @@ export default function App() {
                   destination: "/subscription",
                 },
                 {
+                  label: "Analytics",
+                  destination: "/analytics",
+                },
+                {
+                  label: "Help",
+                  destination: "/help-page",
+                },
+                {
                   label: "No Offer",
                   destination: "/no-offer-found",
                 },
