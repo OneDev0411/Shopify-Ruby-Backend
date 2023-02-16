@@ -12,9 +12,11 @@
     "deploy": "shopify app deploy"
   },
   "dependencies": {
-    "@shopify/app": "^3.40.1",
-    "@shopify/cli": "^3.40.1",
-    "charts.css": "^0.9.0"
+    "@shopify/app": "^3.23.0",
+    "@shopify/cli": "^3.23.0",
+    "charts.css": "^0.9.0",
+    "react-slick": "^0.29.0",
+    "slick-carousel": "^1.8.1"
   },
   "author": "JevonHylton"
 }

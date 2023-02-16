@@ -61,3 +61,18 @@ h1{
 .help-articles ul{
     list-style-type: none;
 }
+
+#no-bg-card .Polaris-Card{
+    background-color: transparent;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+.Polaris-Heading {
+    font-size: var(--p-font-size-5)!important;
+}
+
+.slick-list{
+    padding: 10px;
+}

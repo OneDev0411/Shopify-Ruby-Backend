@@ -7,7 +7,7 @@ import {useState, useCallback} from 'react';
 import React from 'react';
   
 export default function AnalyticsOffers() { 
-    const [active, setActive] = useState(true);
+    const [active, setActive] = useState(false);
 
     const toggleActive = useCallback(() => setActive((active) => !active), []);
   
