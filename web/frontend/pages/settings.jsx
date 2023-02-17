@@ -25,7 +25,7 @@ export default class Settings extends Component{
     render(){
 
         const settings = {
-            dots: true,
+            dots: false,
             infinite: true,
             speed: 500,
             slidesToShow: 3,
@@ -65,7 +65,7 @@ export default class Settings extends Component{
                     </Grid.Cell>
                 </Grid>
                 <div className="space-4"></div>
-                <Card sectioned title="Recommended Apps">
+                <Card sectioned title="Recommended Apps" id={"cardYpadding"}>
                     <p>Check out our partners below.</p>
                     <div className="space-4"></div>
                     <Grid>

@@ -21,10 +21,14 @@ import React from "react";
 export function EditOfferTabs() {
     const [offerTitle, setOfferTitle] = useState("");
     const [offerText, setofferText] = useState("");
+    const [altOfferText, setAltOfferText] = useState("");
     const [btnTitle, setBtnTitle] = useState("");
+    const [altBtnTitle, setAltBtnTitle] = useState("");
     const handleTitleChange = useCallback((newValue) => setOfferTitle(newValue), []);
     const handleTextChange = useCallback((newValue) => setofferText(newValue), []);
+    const handleAltTextChange = useCallback((newValue) => setAltOfferText(newValue), []);
     const handleBtnChange = useCallback((newValue) => setBtnTitle(newValue), []);
+    const handleAltBtnChange = useCallback((newValue) => setAltBtnTitle(newValue), []);
     //checkbox controls
     const [abTestCheck, setAbTestCheck] = useState(false);
     const [removeImg, setRemoveImg] = useState(false);
@@ -48,6 +52,10 @@ export function EditOfferTabs() {
     const handleModal = useCallback(() => setProductModal(!productModal), [productModal]);
     const modalRef = useRef(null);
     const activator = modalRef;
+
+    //Collapsible controls
+    const [open, setOpen] = useState(false);
+    const handleToggle = useCallback(() => setOpen((open) => !open), []);
 
     return (
         <div>
@@ -91,7 +99,29 @@ export function EditOfferTabs() {
                         label="Enable A/B testing"
                         checked={abTestCheck}
                         onChange={handleAbChange}
+                        onFocus={handleToggle}
                     />
+                    <Collapsible
+                        open={open}
+                        id="basic-collapsible"
+                        transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
+                        expandOnPrint
+                    >
+                        <TextField
+                            label="Alternative offer text"
+                            placeholder='Take advantage of this limited offer'
+                            autoComplete="off" 
+                            value={altOfferText}
+                            onChange={handleAltTextChange}
+                        />
+                        <TextField
+                            label="Alternative button text"
+                            placeholder='Add to cart'
+                            autoComplete="off" 
+                            value={altBtnTitle}
+                            onChange={handleAltBtnChange}
+                        />
+                    </Collapsible>
                 </Stack>
             </Card.Section>
         </Card>
