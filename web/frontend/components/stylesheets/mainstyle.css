@@ -76,3 +76,7 @@ h1{
 .slick-list{
     padding: 10px;
 }
+
+#graphs .Polaris-Card{
+    min-height: 345px;
+}

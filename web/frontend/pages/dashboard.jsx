@@ -12,6 +12,8 @@ import {
     Pagination,
     Grid
   } from '@shopify/polaris';
+  import { TotalSalesData, ConversionRate,OrderOverTimeData} from "../components";
+  
   import { TitleBar } from "@shopify/app-bridge-react";
   import {useState, useCallback} from 'react';
   import React from 'react';
@@ -265,11 +267,8 @@ import {
               <h3 className="report-money"><strong>$100.00</strong></h3>
               <div className="space-4"></div>
               <p>SALES OVER TIME</p>
-              <table id={"column-example-1"} class={"charts-css column"}>
-                <caption> Column Example #1 </caption>
-                <tbody>
-                </tbody>
-              </table>
+              <br/>
+              <TotalSalesData/>
             </Card>
           </Grid.Cell>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
@@ -277,11 +276,8 @@ import {
               <h3 className="report-money"><strong>12%</strong></h3>
               <div className="space-4"></div>
               <p>CONVERSION FUNNEL</p>
-              <table id={"column-example-1"} class={"charts-css column"}>
-                <caption> Column Example #1 </caption>
-                <tbody>
-                </tbody>
-              </table>
+              <br/>
+              <ConversionRate/>
             </Card>
           </Grid.Cell>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
@@ -289,11 +285,8 @@ import {
               <h3 className="report-money"><strong>40</strong></h3>
               <div className="space-4"></div>
               <p>ORDERS OVER TIME</p>
-              <table id={"column-example-1"} class={"charts-css column"}>
-                <caption> Column Example #1 </caption>
-                <tbody>
-                </tbody>
-              </table> 
+              <br/>
+              <OrderOverTimeData/>
             </Card>
           </Grid.Cell>
         </Grid>
