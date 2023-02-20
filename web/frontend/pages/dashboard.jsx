@@ -1,5 +1,5 @@
 import {
-    TextField,
+    ChoiceList,
     IndexTable,
     Card,
     Filters,
@@ -12,6 +12,8 @@ import {
     Pagination,
     Grid
   } from '@shopify/polaris';
+  import { TotalSalesData, ConversionRate,OrderOverTimeData} from "../components";
+  
   import { TitleBar } from "@shopify/app-bridge-react";
   import {useState, useCallback} from 'react';
   import React from 'react';
@@ -91,17 +93,26 @@ import {
     const [taggedWith, setTaggedWith] = useState('');
     const [queryValue, setQueryValue] = useState(null);
     const [sortValue, setSortValue] = useState('today');
+    const [availability, setAvailability] = useState(null);
+
+    const handleAvailabilityChange = useCallback(
+      (value) => setAvailability(value),
+      [],
+    );
   
     const handleTaggedWithChange = useCallback(
       (value) => setTaggedWith(value),
       [],
     );
+
+    const handleAvailabilityRemove = useCallback(() => setAvailability(null), []);
     const handleTaggedWithRemove = useCallback(() => setTaggedWith(null), []);
     const handleQueryValueRemove = useCallback(() => setQueryValue(null), []);
     const handleClearAll = useCallback(() => {
       handleTaggedWithRemove();
       handleQueryValueRemove();
-    }, [handleQueryValueRemove, handleTaggedWithRemove]);
+      handleAvailabilityRemove();
+    }, [handleQueryValueRemove, handleTaggedWithRemove, handleAvailabilityRemove]);
     const handleSortChange = useCallback((value) => setSortValue(value), []);
   
     const promotedBulkActions = [
@@ -127,19 +138,27 @@ import {
   
     const filters = [
       {
-        key: 'taggedWith',
-        label: 'Filter',
+        key:'filterOptions',
+        label:'Filter by',
         filter: (
-          <TextField
-            label="Filter by "
-            value={taggedWith}
-            onChange={handleTaggedWithChange}
-            autoComplete="off"
-            labelHidden
+          <ChoiceList
+            title="Availability"
+            titleHidden
+            choices={[
+              {label: 'Published', value: 'published'},
+              {label: 'Unpublished', value: 'unpublished'},
+              {label: 'Revenue', value: 'revenue'},
+              {label: 'Clicks', value: 'clicks'},
+              {label: 'Date', value: 'date'},
+            ]}
+            selected={availability || []}
+            onChange={handleAvailabilityChange}
+            allowMultiple
           />
         ),
         shortcut: true,
-      },
+        hideClearButton: true,
+      }
     ];
   
     const appliedFilters = !isEmpty(taggedWith)
@@ -153,10 +172,8 @@ import {
       : [];
   
     const sortOptions = [
-      {label: 'Date Asc', value: 'date_asc'},
-      {label: 'Date Desc', value: 'date_des'},
-      {label: 'Clicks', value: 'clicks'},
-      {label: 'Revenue', value: 'revenue'},
+      {label: 'Asc', value: 'asc'},
+      {label: 'Desc', value: 'des'},
     ];
   
     const rowMarkup = customers.map(
@@ -244,44 +261,36 @@ import {
           </div>
         </Card>
         <div className="space-10"></div>
-        <Grid>
-        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <Card title="Total sales" sectioned>
-              <h3 className="report-money"><strong>$100.00</strong></h3>
-              <div className="space-4"></div>
-              <p>SALES OVER TIME</p>
-              <table id={"column-example-1"} class={"charts-css column"}>
-                <caption> Column Example #1 </caption>
-                <tbody>
-                </tbody>
-              </table>
-            </Card>
-          </Grid.Cell>
-          <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <Card title="Conversion rate" sectioned>
-              <h3 className="report-money"><strong>12%</strong></h3>
-              <div className="space-4"></div>
-              <p>CONVERSION FUNNEL</p>
-              <table id={"column-example-1"} class={"charts-css column"}>
-                <caption> Column Example #1 </caption>
-                <tbody>
-                </tbody>
-              </table>
-            </Card>
-          </Grid.Cell>
-          <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <Card title="Total order" sectioned>
-              <h3 className="report-money"><strong>40</strong></h3>
-              <div className="space-4"></div>
-              <p>ORDERS OVER TIME</p>
-              <table id={"column-example-1"} class={"charts-css column"}>
-                <caption> Column Example #1 </caption>
-                <tbody>
-                </tbody>
-              </table> 
-            </Card>
-          </Grid.Cell>
-        </Grid>
+          <div id='graphs'>
+            <Grid>
+              <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
+                <Card title="Total sales" sectioned>
+                  <h3 className="report-money"><strong>$100.00</strong></h3>
+                  <div className="space-4"></div>
+                  <p>SALES OVER TIME</p>
+                  <br/>
+                  <TotalSalesData/>
+                </Card>
+              </Grid.Cell>
+              <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
+                <Card title="Conversion rate" sectioned>
+                  <h3 className="report-money"><strong>12%</strong></h3>
+                  <div className="space-4"></div>
+                  <p>CONVERSION FUNNEL</p>
+                  <ConversionRate/>
+                </Card>
+              </Grid.Cell>
+              <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
+                <Card title="Total order" sectioned>
+                  <h3 className="report-money"><strong>40</strong></h3>
+                  <div className="space-4"></div>
+                  <p>ORDERS OVER TIME</p>
+                  <br/>
+                  <OrderOverTimeData/>
+                </Card>
+              </Grid.Cell>
+            </Grid>
+          </div>
         <div className='space-10'></div>
         <FooterHelp>
           Learn more about{' '}
@@ -294,7 +303,7 @@ import {
   
     function disambiguateLabel(key, value) {
       switch (key) {
-        case 'taggedWith':
+        case 'filterOptions':
           return `Filter by ${value}`;
         default:
           return value;

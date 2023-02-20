@@ -1,10 +1,24 @@
-import {Link,Icon,ButtonGroup, Button, MediaCard, VideoThumbnail,Card, Page, Layout, TextContainer, Image, Stack, Grid, List} from "@shopify/polaris";
+import {Link,Icon,Modal, Button, MediaCard, VideoThumbnail,Card, Page, Layout, Image, Stack, Grid, List} from "@shopify/polaris";
 import {help} from "../assets";
 import {HintMajor,TroubleshootMajor} from '@shopify/polaris-icons';
 import { TitleBar } from "@shopify/app-bridge-react";
+import {useRef, useState, useCallback} from 'react';
 import "../components/stylesheets/mainstyle.css";
 
 export default function HelpPage() {
+    const [active, setActive] = useState(false);
+    const handleOpen = useCallback(() => setActive(true), []);
+    const handleClose = useCallback(() => {
+        setActive(false);
+      }, []);
+
+    const videoModal = useRef(null);
+    const activator = videoModal;
+
+    function OpenModal(){
+        {handleOpen};
+    }
+
   return (
     <Page>
         <TitleBar
@@ -62,13 +76,51 @@ export default function HelpPage() {
                 >
                 <Grid>
                     <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 12, lg: 12, xl: 6}}>
-                        <VideoThumbnail
-                        videoLength={80}
-                        thumbnailUrl="https://burst.shopifycdn.com/photos/business-woman-smiling-in-office.jpg?width=1850"
-                        />
+                        <div ref={activator}>
+                            <MediaCard
+                                title="Create Your First Upsell and Cross-Sell Offer"
+                                primaryAction={{
+                                    content: 'Learn more',
+                                    onAction: handleOpen,
+                                }}
+                                description={`A step by step guide on how to set up your first upsell and cross-sell offer in In Cart 
+                                Upsell, a Shopify app that helps you increase your average order value from the traffic you are 
+                                sending to your store.`}
+                                >
+                                <VideoThumbnail
+                                    onClick={handleOpen}
+                                    videoLength={318}
+                                    thumbnailUrl="https://i.ytimg.com/vi/NibJDu5YFdM/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLC4HMpCnoGPA-gWLRl8raAfbb4SeA"
+                                />
+                            </MediaCard>
+                        </div>
+                            
                     </Grid.Cell>
-                    </Grid>  
+                </Grid>  
                 </Card>
+                
+
+                <Modal
+                    activator={activator}
+                    open={active}
+                    onClose={handleClose}
+                    title="Create Your First Upsell and Cross-Sell Offer"
+                >
+                    <Modal.Section>
+                    <iframe 
+                        width="560" 
+                        height="315" 
+                        src="https://www.youtube-nocookie.com/embed/NibJDu5YFdM?rel=0" 
+                        title="YouTube video player" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen> 
+                    </iframe>
+                    </Modal.Section>
+                </Modal>
+
+
+
             </Layout.Section>
         </Layout>
     </Page>

@@ -1,4 +1,4 @@
-import {Page, Badge, Card,Layout,Tabs,Icon,Stack, ButtonGroup, Button,TextField,RadioButton} from '@shopify/polaris';
+import {Page, Card,Layout,Tabs,Icon} from '@shopify/polaris';
 import {DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
 import { TitleBar} from "@shopify/app-bridge-react";
 import "../components/stylesheets/mainstyle.css";

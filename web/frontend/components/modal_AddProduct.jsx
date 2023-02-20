@@ -104,7 +104,7 @@ import {
     );
   
     function renderItem(item) {
-      const {id, url, name, cost, latestOrderUrl} = item;
+      const {id, url, name, cost} = item;
       const media = <Avatar customer size="medium" name={name} />;
       return (
         <ResourceItem

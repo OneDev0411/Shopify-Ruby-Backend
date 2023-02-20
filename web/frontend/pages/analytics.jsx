@@ -1,13 +1,13 @@
-import {Card,Page,FooterHelp,Link,Grid,Popover, ActionList, Button,Stack} from '@shopify/polaris';
+import {Card,Page,FooterHelp,Link,Grid,Popover, ActionList, Button,Stack,Image} from '@shopify/polaris';
 import { TitleBar } from "@shopify/app-bridge-react";
 import {CalendarMinor} from '@shopify/polaris-icons';
 import "../components/stylesheets/mainstyle.css";
-import 'charts.css';
 import {useState, useCallback} from 'react';
 import React from 'react';
+import { TotalSalesData, ConversionRate,OrderOverTimeData, AbTestingData, ClickThroughtRateData} from "../components";
   
 export default function AnalyticsOffers() { 
-    const [active, setActive] = useState(true);
+    const [active, setActive] = useState(false);
 
     const toggleActive = useCallback(() => setActive((active) => !active), []);
   
@@ -16,7 +16,7 @@ export default function AnalyticsOffers() {
         Today
       </Button>
     );
-  
+
     return (
       <Page> 
         <TitleBar
@@ -43,18 +43,16 @@ export default function AnalyticsOffers() {
             />
         </Popover>
         <div className="space-10"></div>
+        <div id={"graphs"}>
         <Grid>
           {/* Total sales */}
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
             <Card title="Total sales" sectioned>
-              <h3 className="report-money"><strong>$100.00</strong></h3>
+              <h3 className="report-money"><strong>$10,00.00</strong></h3>
               <div className="space-4"></div>
               <p>SALES OVER TIME</p>
-              <table id={"column-example-1"} class={"charts-css column"}>
-                <caption> Column Example #1 </caption>
-                <tbody>
-                </tbody>
-              </table>
+              <br/>
+              <TotalSalesData/>
             </Card>
           </Grid.Cell>
           {/* Conversion rate */}
@@ -63,11 +61,8 @@ export default function AnalyticsOffers() {
               <h3 className="report-money"><strong>12%</strong></h3>
               <div className="space-4"></div>
               <p>CONVERSION FUNNEL</p>
-              <table id={"column-example-1"} class={"charts-css column"}>
-                <caption> Column Example #1 </caption>
-                <tbody>
-                </tbody>
-              </table>
+             
+              <ConversionRate/>
             </Card>
           </Grid.Cell>
           {/* Total order */}
@@ -76,11 +71,8 @@ export default function AnalyticsOffers() {
               <h3 className="report-money"><strong>40</strong></h3>
               <div className="space-4"></div>
               <p>ORDERS OVER TIME</p>
-              <table id={"column-example-1"} class={"charts-css column"}>
-                <caption> Column Example #1 </caption>
-                <tbody>
-                </tbody>
-              </table> 
+              <br/>
+              <OrderOverTimeData/>
             </Card>
           </Grid.Cell>
           {/* A/B testing report */}
@@ -89,11 +81,8 @@ export default function AnalyticsOffers() {
               <h3 className="report-money"><strong>$0.00</strong></h3>
               <div className="space-4"></div>
               <p>SALES OVER TIME</p>
-              <table id={"column-example-1"} class={"charts-css column"}>
-                <caption> Column Example #1 </caption>
-                <tbody>
-                </tbody>
-              </table> 
+              <br/>
+              <AbTestingData/>
             </Card>
             <div className={'space-4'}></div>
             <Stack distribution="center">
@@ -106,11 +95,8 @@ export default function AnalyticsOffers() {
               <h3 className="report-money"><strong>0</strong></h3>
               <div className="space-4"></div>
               <p>CLICK THROUGH RATE</p>
-              <table id={"column-example-1"} class={"charts-css column"}>
-                <caption> Column Example #1 </caption>
-                <tbody>
-                </tbody>
-              </table> 
+              <br/>
+              <ClickThroughtRateData/>
             </Card>
           </Grid.Cell>
           {/* top performing offers */}
@@ -118,19 +104,34 @@ export default function AnalyticsOffers() {
             <Card title="Top performing offers" sectioned>
               <h3 className="report-money"><strong>0</strong></h3>
               <div className="space-4"></div>
-              <p><strong>Offer name</strong></p>
-              <p><strong>Offer name</strong></p>
-              <p><strong>Offer name</strong></p>
+              <Stack distribution='equalSpacing'>
+                <Stack.Item>
+                  <p><strong>Offer name</strong></p>
+                  <p><strong>Offer name</strong></p>
+                  <p><strong>Offer name</strong></p>
+                  <p><strong>Offer name</strong></p>
+                  <p><strong>Offer name</strong></p>
+                  <p><strong>Offer name</strong></p>
+                </Stack.Item>
+                <Stack.Item>
+                  <Image 
+                    source={"./assets/Analytics.png"}
+                    width={"150px"}
+                    max-Width={"150px"}
+                  />
+                </Stack.Item>
+              </Stack>
             </Card>
           </Grid.Cell>
         </Grid>
+        </div>
         <div className='space-10'></div>
         <FooterHelp>
           Learn more about{' '}
           <Link url="#">
             analytics
           </Link>
-        </FooterHelp><div> </div>
+        </FooterHelp>
       </Page>
     );
   }

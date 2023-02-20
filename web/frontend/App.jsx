@@ -41,6 +41,10 @@ export default function App() {
                   destination: "/analytics",
                 },
                 {
+                  label: "Settings",
+                  destination: "/settings",
+                },
+                {
                   label: "Help",
                   destination: "/help-page",
                 },
