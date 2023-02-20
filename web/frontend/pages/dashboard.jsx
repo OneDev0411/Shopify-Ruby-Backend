@@ -261,35 +261,36 @@ import {
           </div>
         </Card>
         <div className="space-10"></div>
-        <Grid>
-        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <Card title="Total sales" sectioned>
-              <h3 className="report-money"><strong>$100.00</strong></h3>
-              <div className="space-4"></div>
-              <p>SALES OVER TIME</p>
-              <br/>
-              <TotalSalesData/>
-            </Card>
-          </Grid.Cell>
-          <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <Card title="Conversion rate" sectioned>
-              <h3 className="report-money"><strong>12%</strong></h3>
-              <div className="space-4"></div>
-              <p>CONVERSION FUNNEL</p>
-              <br/>
-              <ConversionRate/>
-            </Card>
-          </Grid.Cell>
-          <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <Card title="Total order" sectioned>
-              <h3 className="report-money"><strong>40</strong></h3>
-              <div className="space-4"></div>
-              <p>ORDERS OVER TIME</p>
-              <br/>
-              <OrderOverTimeData/>
-            </Card>
-          </Grid.Cell>
-        </Grid>
+          <div id='graphs'>
+            <Grid>
+              <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
+                <Card title="Total sales" sectioned>
+                  <h3 className="report-money"><strong>$100.00</strong></h3>
+                  <div className="space-4"></div>
+                  <p>SALES OVER TIME</p>
+                  <br/>
+                  <TotalSalesData/>
+                </Card>
+              </Grid.Cell>
+              <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
+                <Card title="Conversion rate" sectioned>
+                  <h3 className="report-money"><strong>12%</strong></h3>
+                  <div className="space-4"></div>
+                  <p>CONVERSION FUNNEL</p>
+                  <ConversionRate/>
+                </Card>
+              </Grid.Cell>
+              <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
+                <Card title="Total order" sectioned>
+                  <h3 className="report-money"><strong>40</strong></h3>
+                  <div className="space-4"></div>
+                  <p>ORDERS OVER TIME</p>
+                  <br/>
+                  <OrderOverTimeData/>
+                </Card>
+              </Grid.Cell>
+            </Grid>
+          </div>
         <div className='space-10'></div>
         <FooterHelp>
           Learn more about{' '}
