@@ -43,6 +43,10 @@ h1{
     min-width: 100px;
 }
 
+#appearance input[type=number]{
+    max-width: 100px;
+}
+
 .flex-tab{
     position: relative;
     display: flex;
@@ -50,33 +54,4 @@ h1{
 
 .auto-height .Polaris-Card{
     min-height: 340px;
-}
-
-#column-example-1 {
-    height: 200px;
-    max-width: 300px;
-    margin: 0 auto;
-}
-
-.help-articles ul{
-    list-style-type: none;
-}
-
-#no-bg-card .Polaris-Card{
-    background-color: transparent;
-    border: none;
-    outline: none;
-    box-shadow: none;
-}
-
-.Polaris-Heading {
-    font-size: var(--p-font-size-5)!important;
-}
-
-.slick-list{
-    padding: 10px;
-}
-
-#graphs .Polaris-Card{
-    min-height: 345px;
 }

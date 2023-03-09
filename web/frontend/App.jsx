@@ -33,12 +33,12 @@ export default function App() {
                   destination: "/edit-offer",
                 },
                 {
-                  label: "Subscription",
-                  destination: "/subscription",
-                },
-                {
                   label: "Analytics",
                   destination: "/analytics",
+                },
+                {
+                  label: "Subscription",
+                  destination: "/subscription",
                 },
                 {
                   label: "Settings",

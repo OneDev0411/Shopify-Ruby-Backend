@@ -10,7 +10,7 @@ import {
     FooterHelp,
     Link,
     Pagination,
-    ChoiceList,
+    Grid
   } from '@shopify/polaris';
   import { TitleBar } from "@shopify/app-bridge-react";
   import {useState, useCallback} from 'react';
@@ -91,26 +91,17 @@ import {
     const [taggedWith, setTaggedWith] = useState('');
     const [queryValue, setQueryValue] = useState(null);
     const [sortValue, setSortValue] = useState('today');
-    const [availability, setAvailability] = useState(null);
-
-    const handleAvailabilityChange = useCallback(
-      (value) => setAvailability(value),
-      [],
-    );
   
     const handleTaggedWithChange = useCallback(
       (value) => setTaggedWith(value),
       [],
     );
-
-    const handleAvailabilityRemove = useCallback(() => setAvailability(null), []);
     const handleTaggedWithRemove = useCallback(() => setTaggedWith(null), []);
     const handleQueryValueRemove = useCallback(() => setQueryValue(null), []);
     const handleClearAll = useCallback(() => {
-      handleAvailabilityRemove();
       handleTaggedWithRemove();
       handleQueryValueRemove();
-    }, [handleQueryValueRemove, handleTaggedWithRemove, handleAvailabilityRemove]);
+    }, [handleQueryValueRemove, handleTaggedWithRemove]);
     const handleSortChange = useCallback((value) => setSortValue(value), []);
   
     const promotedBulkActions = [
@@ -136,27 +127,19 @@ import {
   
     const filters = [
       {
-        key:'filterOptions',
-        label:'Filter by',
+        key: 'taggedWith',
+        label: 'Filter',
         filter: (
-          <ChoiceList
-            title="Availability"
-            titleHidden
-            choices={[
-              {label: 'Published', value: 'published'},
-              {label: 'Unpublished', value: 'unpublished'},
-              {label: 'Revenue', value: 'revenue'},
-              {label: 'Clicks', value: 'clicks'},
-              {label: 'Date', value: 'date'},
-            ]}
-            selected={availability || []}
-            onChange={handleAvailabilityChange}
-            allowMultiple
+          <TextField
+            label="Filter by "
+            value={taggedWith}
+            onChange={handleTaggedWithChange}
+            autoComplete="off"
+            labelHidden
           />
         ),
         shortcut: true,
-        hideClearButton: true,
-      }
+      },
     ];
   
     const appliedFilters = !isEmpty(taggedWith)
@@ -170,8 +153,10 @@ import {
       : [];
   
     const sortOptions = [
-      {label: 'Asc', value: 'asc'},
-      {label: 'Desc', value: 'des'},
+      {label: 'Date Asc', value: 'date_asc'},
+      {label: 'Date Desc', value: 'date_des'},
+      {label: 'Clicks', value: 'clicks'},
+      {label: 'Revenue', value: 'revenue'},
     ];
   
     const rowMarkup = customers.map(
@@ -270,7 +255,7 @@ import {
   
     function disambiguateLabel(key, value) {
       switch (key) {
-        case 'filterOptions':
+        case 'taggedWith':
           return `Filter by ${value}`;
         default:
           return value;
