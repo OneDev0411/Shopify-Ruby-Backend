@@ -14,7 +14,7 @@ import {
 } from "@shopify/polaris";
 import {ModalAddProduct} from "./modal_AddProduct";
 import {ModalAddConditions} from "./modal_AddConditions"; 
-import {useState,useCallback,useRef} from "react";
+import {useState,useCallback,useRef,useEffect} from "react";
 import React from "react";
 
 
@@ -52,6 +52,38 @@ export function EditOfferTabs() {
     const handleModal = useCallback(() => setProductModal(!productModal), [productModal]);
     const modalRef = useRef(null);
     const activator = modalRef;
+
+
+
+    const [query, setQuery] = useState("");
+    function handleToUpdate (childData) {
+        setQuery(childData);
+    }
+
+    useEffect(() => {
+        // let queryHash = { product: { shop_id: 21, query: query, type: 'product' },
+        //                   json: true }
+        debugger;
+        fetch(`https://saifshopifytestwebhook.in.ngrok.io/api/v2/element_search`, {
+            method: 'POST',
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify( { product: { shop_id: 21, query: query, type: 'product' },
+                        json: true } ),
+        }
+        )
+        .then(function (response) { 
+            return response.json()
+        })
+        .then(function(data) {
+        
+        })
+        .catch(function(error) {
+
+        })
+    }, [query])
 
     //Collapsible controls
     const [open, setOpen] = useState(false);
@@ -182,7 +214,7 @@ export function EditOfferTabs() {
         }}
       >
         <Modal.Section>
-            <ModalAddProduct/>
+            <ModalAddProduct handleToUpdate={handleToUpdate}/>
         </Modal.Section>
       </Modal>
     </div>

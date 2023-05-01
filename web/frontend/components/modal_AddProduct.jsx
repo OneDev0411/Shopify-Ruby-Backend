@@ -9,7 +9,7 @@ import {
   } from '@shopify/polaris';
   import {useState, useCallback} from 'react';
   
- export function ModalAddProduct() {
+ export function ModalAddProduct(props) {
     const [selectedItems, setSelectedItems] = useState([]);
     const [taggedWith, setTaggedWith] = useState(null);
     const [queryValue, setQueryValue] = useState(null);
@@ -18,9 +18,10 @@ import {
       (value) => setTaggedWith(value),
       [],
     );
-    const handleQueryValueChange = useCallback(
-      (value) => setQueryValue(value),
-      [],
+    const handleQueryValueChange = useCallback((value) => { 
+      setQueryValue(value);
+      props.handleToUpdate(value);
+    },[],
     );
     const handleTaggedWithRemove = useCallback(() => setTaggedWith(null), []);
     const handleQueryValueRemove = useCallback(() => setQueryValue(null), []);
