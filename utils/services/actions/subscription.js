@@ -19,3 +19,7 @@ export function confirmCharge(shop, charge_id){
     }
   });
 }
+
+export function isSubscriptionActive(subscription){
+  return subscription.status === "approved"
+}

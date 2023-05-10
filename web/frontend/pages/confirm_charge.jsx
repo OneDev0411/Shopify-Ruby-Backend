@@ -13,35 +13,38 @@ export default function ConfirmCharge() {
         <TitleBar></TitleBar>
         <div className="auto-height">
           <Layout>
-            <Layout.Section>
-              <Card>
-                {success ? (
-                  <>
+            {success ? (
+              <Layout.Section>
+                <Card>
                   <Stack distribution="center">
                     <Image 
                         source={woohoo}
-                        distribution="center"
                     />
-                    <div>
-                      The subscription was successful
-                    </div>
-                    <br/>
+                    </Stack>
+                    <Stack distribution="center">
+                      <div>
+                        The subscription was successful
+                      </div>
+                    </Stack>
+                    <Stack distribution="center">
                     <a href="/dashboard">Please click here</a>
-                    </Stack>                  
-                  </>
-                ) : (
-                <>
+                    </Stack>
+                  </Card>
+                </Layout.Section>
+              ) : (
+              <Layout.Section>
+                <Card>
                   <Stack distribution="center">
                     <div>
                       Ooops! Something went wrong
                     </div>
-                    <br/>
+                  </Stack> 
+                  <Stack distribution="center">    
                     <a href="/dashboard">Please contact our staff</a>
                   </Stack>    
-                </>
-                )}
-              </Card>
-            </Layout.Section>
+                </Card>
+              </Layout.Section>
+              )}
           </Layout>
         </div>
         <div className="space-10"></div>

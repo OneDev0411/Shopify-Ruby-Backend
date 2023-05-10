@@ -7,11 +7,12 @@ import { Reviews } from "../components";
 import "../components/stylesheets/mainstyle.css";
 import React from 'react';
 import { useEffect, useState } from "react";
-import { updateSubscription } from "../../../utils/services/actions/subscription";
+import { updateSubscription, isSubscriptionActive } from "../../../utils/services/actions/subscription";
 import axios from 'axios';
 
 export default function Subscription() {
     const [currentShop, setCurrentShop] = useState(null);
+    const [planName, setPlanName] = useState();
     const app = useAppBridge();
 
     async function handlePlanChange (internal_name) {
@@ -36,11 +37,12 @@ export default function Subscription() {
         axios.get('https://zeryab-icu-local.ngrok.dev/api/merchant/current_shop?shop=icu-dev-store.myshopify.com')
           .then(response => {
             // handle the response from the API
-            setCurrentShop(response.data);
+            setCurrentShop(response.data.shop);
+            setPlanName(response.data.plan)
           })
           .catch(error => {
             // handle errors
-            console.error(error);
+            console.error("error", error);
           });
       }, []);
     
@@ -55,12 +57,12 @@ export default function Subscription() {
                 </Layout.Section>
                 <Layout.Section>
                     <Card title="Paid"
-                        primaryFooterAction={(currentShop?.plan?.internal_name === 'plan_based_billing' && currentShop?.subscription?.status === 'approved') ? null : {content: 'Upgrade', onClick: () => handlePlanChange('plan_based_billing')}}
+                        primaryFooterAction={(planName==='flex' && isSubscriptionActive(currentShop?.subscription)) ? null : {content: 'Upgrade', onClick: () => handlePlanChange('plan_based_billing')}}
                         sectioned
                     >
                         <Stack>
                             <Stack.Item>
-                                {(currentShop?.plan?.internal_name === 'plan_based_billing' && currentShop?.subscription?.status === 'approved') ? (
+                                {(planName==='flex' && isSubscriptionActive(currentShop?.subscription)) ? (
                                     <p><small>Current Plan</small></p>
                                 ) : (
                                     <p><small>Recommended</small></p>
@@ -88,8 +90,8 @@ export default function Subscription() {
                     </Card>
                 </Layout.Section>
                 <Layout.Section secondary>
-                    <Card title="Free" sectioned primaryFooterAction={(currentShop?.plan?.internal_name === 'free_plan' && currentShop?.subscription?.status === 'approved') ? null : {content: 'Downgrade', onClick: () => handlePlanChange('free_plan'), id: 'btnf'}}>
-                        {(currentShop?.plan?.internal_name === 'free_plan' && currentShop?.subscription?.status === 'approved') ? (
+                    <Card title="Free" sectioned primaryFooterAction={(planName==='free' && isSubscriptionActive(currentShop?.subscription)) ? null : {content: 'Downgrade', onClick: () => handlePlanChange('free_plan'), id: 'btnf'}}>
+                        {(planName==='free' && isSubscriptionActive(currentShop?.subscription)) ? (
                              <p><small>Current Plan</small></p>
                         ) : (
                             <p><small>Not Recommended</small></p>
