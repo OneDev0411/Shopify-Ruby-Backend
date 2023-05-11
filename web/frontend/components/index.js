@@ -5,4 +5,4 @@ export {ModalAddProduct} from "./modal_AddProduct";
 export {ModalAddConditions} from "./modal_AddConditions"; 
 export {SettingTabs} from "./settingsTabs";
 export {OrderOverTimeData,TotalSalesData,AbTestingData,ClickThroughtRateData,ConversionRate} from "./analyticsGraphdata"
- 
+export { Reviews } from "./Reviews";
