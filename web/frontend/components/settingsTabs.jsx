@@ -1,29 +1,32 @@
-import {Tabs, Card, TextField,Select} from '@shopify/polaris';
-import {useState, useCallback} from 'react';
+import {Tabs, Card, TextField,Select, Button} from '@shopify/polaris';
+import {useState, useCallback, useEffect} from 'react';
+import { setShopSettings } from "../../../utils/services/actions/settings";
 import React from "react";
+import axios from 'axios';
 
 
-export function SettingTabs(){
+export function SettingTabs(props){
+    const [currentShop, setCurrentShop] = useState(props.shop);
     
     // TextFields
-    const [value, setValue] = useState(null);
-    const handleChange = useCallback((newValue) => setValue(newValue), []);
+    const [productDomSelector, setProductDomSelector] = useState(currentShop?.custom_product_page_dom_selector || "[class*='description']");
+    const handleProductDomSelectorChange = useCallback((newValue) => setProductDomSelector(newValue), []);
 
-    const [valueAjax, setAjaxValue] = useState(null);
-    const handleAjaxChange = useCallback((newValue) => setAjaxValue(newValue), []);
+    const [ajaxDomSelector, setAjaxDomSelector] = useState(currentShop?.custom_ajax_page_dom_selector || ".ajaxcart__row:first");
+    const handleAjaxDomSelectorChange = useCallback((newValue) => setAjaxDomSelector(newValue), []);
 
-    const [valueCart, setCartValue] = useState(null);
-    const handleCartChange = useCallback((newValue) => setCartValue(newValue), []);
+    const [cartDomSelector, setCartDomSelector] = useState(currentShop?.custom_cart_page_dom_selector || "form[action^='/cart']");
+    const handleCartDomSelectorChange = useCallback((newValue) => setCartDomSelector(newValue), []);
    
     //Select dropdown list
-   const [dropdown, setDropdown] = useState('today');
-   const handleDropdownChange = useCallback((value) => setDropdown(value), []);
+   const [productDomAction, setProductDomAction] = useState(currentShop?.custom_product_page_dom_action || 'prepend');
+   const handleProductDomActionChange = useCallback((value) => setProductDomAction(value), []);
 
-   const [dropdownAjax, setDropdownAjax] = useState('today');
-   const handleDropdownAjaxChange = useCallback((value) => setDropdownAjax(value), []);
+   const [ajaxDomAction, setAjaxDomAction] = useState(currentShop?.custom_ajax_page_dom_action || 'prepend');
+   const handleAjaxDomActionChange = useCallback((value) => setAjaxDomAction(value), []);
 
-   const [dropdownCart, setDropdownCart] = useState('today');
-   const handleDropdownCartChange = useCallback((value) => setDropdownCart(value), []);
+   const [cartDomAction, setCartDomAction] = useState(currentShop?.custom_cart_page_dom_selector || 'prepend');
+   const handleCartDomActionChange = useCallback((value) => setCartDomAction(value), []);
  
    const options = [
      {label: 'Prepend', value: 'prepend'},
@@ -48,15 +51,15 @@ export function SettingTabs(){
         panelID: 'all-customers-content-1',
         innerContent:<>
                 <TextField label="DOM selector"
-                    value={value}
-                    onChange={handleChange}
+                    value={productDomSelector}
+                    onChange={handleProductDomSelectorChange}
                     autoComplete="off"
                 ></TextField><br/>
                 <Select
                     label="DOM action"
                     options={options}
-                    onChange={handleDropdownChange}
-                    value={dropdown}
+                    onChange={handleProductDomActionChange}
+                    value={productDomAction}
                 />
             </>
       },
@@ -66,15 +69,15 @@ export function SettingTabs(){
         panelID: 'accepts-marketing-content-1',
         innerContent:<>
                 <TextField label="DOM selector"
-                    value={valueCart}
-                    onChange={handleCartChange}
+                    value={cartDomSelector}
+                    onChange={handleCartDomSelectorChange}
                     autoComplete="off"
                 ></TextField><br/>
                 <Select
                     label="DOM action"
                     options={options}
-                    onChange={handleDropdownCartChange}
-                    value={dropdownCart}
+                    onChange={handleCartDomActionChange}
+                    value={cartDomAction}
                 />
             </>
       },
@@ -84,24 +87,45 @@ export function SettingTabs(){
         panelID: 'repeat-customers-content-1',
         innerContent:<>
                 <TextField label="DOM selector"
-                    value={valueAjax}
-                    onChange={handleAjaxChange}
+                    value={ajaxDomSelector}
+                    onChange={handleAjaxDomSelectorChange}
                     autoComplete="off"
                 ></TextField><br/>
                 <Select
                     label="DOM action"
                     options={options}
-                    onChange={handleDropdownAjaxChange}
-                    value={dropdownAjax}
+                    onChange={handleAjaxDomActionChange}
+                    value={ajaxDomAction}
                 />
             </>
       }
     ];
 
+    async function saveShopSettings(){
+        const shop_params = {
+            custom_product_page_dom_selector: productDomSelector,
+            custom_product_page_dom_action: productDomAction,
+            custom_cart_page_dom_selector: cartDomSelector,
+            custom_cart_page_dom_action: cartDomAction,
+            custom_ajax_dom_selector: ajaxDomSelector,
+            custom_ajax_dom_action: ajaxDomAction,
+        }
+        const response = await setShopSettings(shop_params);
+        setCurrentShop(response.shop);        
+    }
+
+    useEffect(() => {
+        setProductDomSelector(currentShop?.custom_product_page_dom_selector || "[class*='description']");
+        setAjaxDomSelector(currentShop?.custom_ajax_page_dom_selector || ".ajaxcart__row:first");
+        setCartDomSelector(currentShop?.custom_cart_page_dom_selector || "form[action^='/cart']");
+      }, []);
+
     return(<>
         <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
             <Card.Section>
-            <p>{tabs[selected].innerContent}</p>
+            <div>{tabs[selected].innerContent}</div>
+            <div className="space-4"></div>
+            <Button primary onClick={ ()=> saveShopSettings() }>Save</Button>
             </Card.Section>
         </Tabs>
     </>);
