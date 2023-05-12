@@ -1,4 +1,4 @@
-import {Card, Page, Layout, Image, Stack} from "@shopify/polaris";
+import {Card, Page, Layout, Image, Stack, Banner} from "@shopify/polaris";
 import { useAppBridge } from '@shopify/app-bridge-react'
 import {Redirect, Toast} from '@shopify/app-bridge/actions';
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -13,6 +13,8 @@ import axios from 'axios';
 export default function Subscription() {
     const [currentShop, setCurrentShop] = useState(null);
     const [planName, setPlanName] = useState();
+    const [trialDays, setTrialDays] = useState();
+    const [activeOffersCount, setActiveOffersCount] = useState();
     const app = useAppBridge();
 
     async function handlePlanChange (internal_name) {
@@ -38,12 +40,13 @@ export default function Subscription() {
           .then(response => {
             // handle the response from the API
             setCurrentShop(response.data.shop);
-            setPlanName(response.data.plan)
+            setPlanName(response.data.plan);
+            setTrialDays(response.data.days_remaining_in_trial);
+            setActiveOffersCount(response.data.active_offers_count);
           })
           .catch(error => {
             // handle errors
-            console.error("error", error);
-          });
+        });
       }, []);
     
   return (
@@ -52,6 +55,23 @@ export default function Subscription() {
         <TitleBar></TitleBar>
         <div className="auto-height">
             <Layout>
+                <Layout.Section>
+                    {isSubscriptionActive(currentShop?.subscription) && planName!=='free' && trialDays>0 &&
+                        <Banner icon='none' status="info">
+                            <p>{ trialDays } days remaining for the trial period</p>
+                        </Banner>
+                    }
+                    {!isSubscriptionActive(currentShop?.subscription) &&
+                        <Banner icon='none' status="info">
+                            <p>Your Subscription Is Not Active: please confirm it on this page</p>
+                        </Banner>
+                    }
+                    {planName==='trial' && (currentShop?.unpublished_offer_ids?.lenght>0 || activeOffersCount) &&
+                        <Banner icon='none' status="info">
+                            <p>If you choose free plan after trial, offers will be unpublished</p>
+                        </Banner>
+                    }
+                </Layout.Section>
                 <Layout.Section>
                     Choose a Plan
                 </Layout.Section>
