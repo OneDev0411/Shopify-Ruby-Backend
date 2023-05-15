@@ -1,9 +1,7 @@
 import {Tabs, Card, TextField,Select, Button} from '@shopify/polaris';
-import {useState, useCallback, useEffect} from 'react';
+import {useState, useCallback} from 'react';
 import { setShopSettings } from "../../../utils/services/actions/settings";
 import React from "react";
-import axios from 'axios';
-
 
 export function SettingTabs(props){
     const [currentShop, setCurrentShop] = useState(props.shop);
@@ -25,7 +23,7 @@ export function SettingTabs(props){
    const [ajaxDomAction, setAjaxDomAction] = useState(currentShop?.custom_ajax_page_dom_action || 'prepend');
    const handleAjaxDomActionChange = useCallback((value) => setAjaxDomAction(value), []);
 
-   const [cartDomAction, setCartDomAction] = useState(currentShop?.custom_cart_page_dom_selector || 'prepend');
+   const [cartDomAction, setCartDomAction] = useState(currentShop?.custom_cart_page_dom_action || 'prepend');
    const handleCartDomActionChange = useCallback((value) => setCartDomAction(value), []);
  
    const options = [
@@ -113,12 +111,6 @@ export function SettingTabs(props){
         const response = await setShopSettings(shop_params);
         setCurrentShop(response.shop);        
     }
-
-    useEffect(() => {
-        setProductDomSelector(currentShop?.custom_product_page_dom_selector || "[class*='description']");
-        setAjaxDomSelector(currentShop?.custom_ajax_page_dom_selector || ".ajaxcart__row:first");
-        setCartDomSelector(currentShop?.custom_cart_page_dom_selector || "form[action^='/cart']");
-      }, []);
 
     return(<>
         <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
