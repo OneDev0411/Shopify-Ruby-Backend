@@ -5,11 +5,14 @@ import "../components/stylesheets/mainstyle.css";
 import { EditOfferTabs, SecondTab, ThirdTab, FourthTab } from "../components";
 import {useState, useCallback} from 'react';
 import React from 'react';
+import { offerActivate } from "../services/offers/actions/offer";
 
 
 export default function EditPage() {
     // Content section tab data
     const [selected, setSelected] = useState(0);
+    const [offer, setOffer] = useState({offerId: 1});
+    const [shop, setShop] = useState({shopID: 1})
     const handleTabChange = useCallback(
         (selectedTabIndex) => setSelected(selectedTabIndex),
         [],
@@ -68,12 +71,17 @@ export default function EditPage() {
         }
     ];
 
+    async function publishOffer() {
+        const response = await offerActivate(offer.offerId, shop.shopID);
+        
+    };
+
   return (
     <Page
-        breadcrumbs={[{content: 'Products', url: '#'}]}
+        breadcrumbs={[{content: 'Products', url: '/'}]}
         title="Create new offer"
         compactTitle
-        primaryAction={{content: 'Publish', disabled: true}}
+        primaryAction={{content: 'Publish', disabled: false, onClick: publishOffer}}
         secondaryActions={[{content: 'Save draft', disabled: false}]}
     >
         <TitleBar/>
