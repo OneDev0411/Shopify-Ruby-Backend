@@ -4,6 +4,8 @@ import {
     ButtonGroup,
     Button,
     TextField,
+    TextContainer,
+    Link,
     Checkbox,
     Select, 
     RangeSlider, 
@@ -13,26 +15,24 @@ import {
     ColorPicker
 } from "@shopify/polaris";
 import {ModalAddProduct} from "./modal_AddProduct";
-import {ModalAddConditions} from "./modal_AddConditions"; 
+import {ModalAddConditions} from "./modal_AddConditions";
+import HomePage from "../pages/subscription"
 import {useState,useCallback,useRef,useEffect} from "react";
 import React from "react";
 
 
-export function EditOfferTabs() {
-    const [offerTitle, setOfferTitle] = useState("");
-    const [offerText, setofferText] = useState("");
+export function EditOfferTabs(props) {
     const [altOfferText, setAltOfferText] = useState("");
-    const [btnTitle, setBtnTitle] = useState("");
     const [altBtnTitle, setAltBtnTitle] = useState("");
-    const handleTitleChange = useCallback((newValue) => setOfferTitle(newValue), []);
-    const handleTextChange = useCallback((newValue) => setofferText(newValue), []);
-    const handleAltTextChange = useCallback((newValue) => setAltOfferText(newValue), []);
-    const handleBtnChange = useCallback((newValue) => setBtnTitle(newValue), []);
-    const handleAltBtnChange = useCallback((newValue) => setAltBtnTitle(newValue), []);
+    const handleTitleChange = useCallback((newValue) => props.updateOffer("title", newValue), []);
+    const handleTextChange = useCallback((newValue) => props.updateOffer("text_a", newValue), []);
+    const handleAltTextChange = useCallback((newValue) => props.updateOffer("text_b", newValue), []);
+    const handleBtnChange = useCallback((newValue) => props.updateOffer("cta_a", newValue), []);
+    const handleAltBtnChange = useCallback((newValue) => props.updateOffer("cta_b", newValue), []);
     //checkbox controls
     const [abTestCheck, setAbTestCheck] = useState(false);
-    const [removeImg, setRemoveImg] = useState(false);
-    const [removePriceCheck, setRemovePriceCheck] = useState(false);
+    // const [removeImg, setRemoveImg] = useState(false);
+    // const [removePriceCheck, setRemovePriceCheck] = useState(false);
     const [removeComparePrice, setRemoveComparePrice] = useState(false);
     const [removeProductPage, setRemoveProductPage] = useState(false);
     const [removeQtySelector, setRemoveQtySelector] = useState(false);
@@ -40,30 +40,73 @@ export function EditOfferTabs() {
     const [addCustomtext, setAddCustomtext] = useState(false);
 
     const handleAbChange = useCallback((newChecked) => setAbTestCheck(newChecked), []);
-    const handleImageChange = useCallback((newChecked) => setRemoveImg(newChecked), []);
-    const handlePriceChange = useCallback((newChecked) => setRemovePriceCheck(newChecked), []);
-    const handleCompareChange = useCallback((newChecked) => setRemoveComparePrice(newChecked), []);
-    const handleProductPageChange = useCallback((newChecked) => setRemoveProductPage(newChecked), []);
-    const handleQtySelectorChange = useCallback((newChecked) => setRemoveQtySelector(newChecked), []);
-    const handleDiscountChange = useCallback((newChecked) => setAutoDiscount(newChecked), []);
-    const handleCustomTextChange = useCallback((newChecked) => setAddCustomtext(newChecked), []);
+    const handleImageChange = useCallback((newChecked) => props.updateOffer("show_product_image", !newChecked), []);
+    const handlePriceChange = useCallback((newChecked) => props.updateOffer("show_product_price", !newChecked), []);
+    const handleCompareChange = useCallback((newChecked) => props.updateOffer("show_compare_at_price", !newChecked), []);
+    const handleProductPageChange = useCallback((newChecked) => props.updateOffer("link_to_product", !newChecked), []);
+    const handleQtySelectorChange = useCallback((newChecked) => props.updateOffer("show_quantity_selector", !newChecked), []);
+    const handleDiscountChange = useCallback((newChecked) => {
+        if (newChecked) {
+            props.updateOffer("discount_target_type", "code");
+        }
+        else {
+            props.updateOffer("discount_target_type", "none");
+        }
+    },[]);
+    const handleCustomTextChange = useCallback((newChecked) => props.updateOffer("show_custom_field", newChecked), []);
     //modal controls
     const [productModal, setProductModal] = useState(false);
-    const handleModal = useCallback(() => setProductModal(!productModal), [productModal]);
+    const handleModal = useCallback(() => { 
+        setProductModal(!productModal);
+    }, [productModal]);
     const modalRef = useRef(null);
     const activator = modalRef;
 
-
-
+    //Available Products
     const [query, setQuery] = useState("");
-    function handleToUpdate (childData) {
-        setQuery(childData);
+    const [productData, setProductData] = useState("");
+    const [resourceListLoading, setResourceListLoading] = useState(false);
+    const [selectedProducts, setSelectedProducts] = useState([]);
+    const count = useRef(0);
+
+
+    //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
+    function updateQuery (childData) {
+        setResourceListLoading(true);
+        fetch(`https://saifshopifytestwebhook.in.ngrok.io/api/v2/element_search`, {
+        method: 'POST',
+        headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        },
+        body: JSON.stringify( { product: { shop_id: 21, query: childData, type: 'product' },
+                    json: true } ),
+        }
+        )
+        .then(function (response) { 
+            return response.json()
+        })
+        .then(function(data) {
+            setResourceListLoading(false);
+            setProductData(data);
+        })
+        .catch(function(error) {
+        })
+        setQuery(childData)
     }
 
-    useEffect(() => {
-        // let queryHash = { product: { shop_id: 21, query: query, type: 'product' },
-        //                   json: true }
-        debugger;
+    //Called when the selected product or variants of selected product changes in popup modal
+    function updateSelectedProduct(selectedItem, selectedVariants) {
+        if(Array.isArray(selectedItem)) {
+            setSelectedProducts(selectedItem);
+        }
+        props.updateIncludedVariants(selectedItem, selectedVariants);
+    }
+
+    //Called when "select product manually button clicked"
+    function getProducts() {
+        props.updateOffer("included_variants", {})
+        setResourceListLoading(true);
         fetch(`https://saifshopifytestwebhook.in.ngrok.io/api/v2/element_search`, {
             method: 'POST',
             headers: {
@@ -74,16 +117,39 @@ export function EditOfferTabs() {
                         json: true } ),
         }
         )
-        .then(function (response) { 
+        .then(function (response) {
             return response.json()
         })
         .then(function(data) {
-        
+            setResourceListLoading(false);
+            setProductData(data);
         })
         .catch(function(error) {
-
         })
-    }, [query])
+    }
+
+    //Called when the save button of popup modal is clicked
+    function updateProducts() {
+        props.updateOffer("offerable_product_details", []);
+        props.updateOffer("offerable_product_shopify_ids", [])
+        for(var i=0; i<selectedProducts.length; i++) {
+            fetch(`https://saifshopifytestwebhook.in.ngrok.io/api/v2/products/multi/${selectedProducts[i]}?shop_id=${21}`, {
+              method: 'GET'
+            }
+            )
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function(data) {
+                props.updateProductsOfOffer(data);
+                setProductData("");
+            })
+            .catch(function(error) {
+            })
+        }
+        handleModal();
+    }
+
 
     //Collapsible controls
     const [open, setOpen] = useState(false);
@@ -96,7 +162,7 @@ export function EditOfferTabs() {
                 <Stack spacing="loose" vertical>
                     <p>What product would you like to have in the offer?</p>
                     <ButtonGroup>
-                        <Button id={"btnSelectProduct"} onClick={handleModal} ref={modalRef}>Select product manually</Button>
+                        <Button id={"btnSelectProduct"} onClick={ () => { handleModal(); getProducts(); } } ref={modalRef}>Select product manually</Button>
                         <Button id={"btnLaunchAI"} primary>Launch Autopilot</Button>
                     </ButtonGroup>
                 </Stack>
@@ -108,7 +174,7 @@ export function EditOfferTabs() {
                     <TextField
                         label="Offer title"
                         placeholder='Offer #1'
-                        value={offerTitle}
+                        value={props.offer.title}
                         onChange={handleTitleChange}
                         autoComplete="off"
                         helpText="This title will only be visible to you so you can reference it internally"
@@ -117,13 +183,13 @@ export function EditOfferTabs() {
                         label="Offer text"
                         placeholder='Take advantage of this limited offer'
                         autoComplete="off" 
-                        value={offerText}
+                        value={props.offer.text_a}
                         onChange={handleTextChange}
                     />
                     <TextField
                         label="Button text"
                         placeholder='Add to cart'
-                        value={btnTitle}
+                        value={props.offer.cta_a}
                         onChange={handleBtnChange}
                         autoComplete="off"   
                     />
@@ -137,22 +203,41 @@ export function EditOfferTabs() {
                         open={open}
                         id="basic-collapsible"
                         transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
-                        expandOnPrint
+                        // expandOnPrint
                     >
-                        <TextField
-                            label="Alternative offer text"
-                            placeholder='Take advantage of this limited offer'
-                            autoComplete="off" 
-                            value={altOfferText}
-                            onChange={handleAltTextChange}
-                        />
-                        <TextField
-                            label="Alternative button text"
-                            placeholder='Add to cart'
-                            autoComplete="off" 
-                            value={altBtnTitle}
-                            onChange={handleAltBtnChange}
-                        />
+                        <Collapsible
+                            open={!props.shop.has_ab_testing}
+                            id="ab-testing-not-present-collapsible"
+                            transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
+                            expandOnPrint
+                        >
+                            <TextContainer>
+                                <p>
+                                    A/B testing is available on our Professional plan. Please <Link url="">upgrade your subscription</Link> to enable it.
+                                </p>
+                            </TextContainer>
+                        </Collapsible>
+                        <Collapsible
+                            open={props.shop.has_ab_testing}
+                            id="ab-testing-present-collapsible"
+                            transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
+                            expandOnPrint
+                        >
+                            <TextField
+                                label="Alternative offer text"
+                                placeholder='Take advantage of this limited offer'
+                                autoComplete="off" 
+                                value={props.offer.text_b}
+                                onChange={handleAltTextChange}
+                            />
+                            <TextField
+                                label="Alternative button text"
+                                placeholder='Add to cart'
+                                autoComplete="off" 
+                                value={props.offer.cta_b}
+                                onChange={handleAltBtnChange}
+                            />
+                        </Collapsible>
                     </Collapsible>
                 </Stack>
             </Card.Section>
@@ -161,37 +246,37 @@ export function EditOfferTabs() {
             <Card.Section>
             <Stack vertical>
                 <Checkbox id={"removeImg"} 
-                    checked={removeImg}
+                    checked={!props.offer.show_product_image}
                     onChange={handleImageChange}
                     label="Remove product image"
                 />
                 <Checkbox id={"removePrice"} 
-                    checked={removePriceCheck}
+                    checked={!props.offer.show_product_price}
                     onChange={handlePriceChange}
                     label="Remove price"
                 />
                 <Checkbox id={"removeComparePrice"} 
-                    checked={removeComparePrice}
+                    checked={!props.offer.show_compare_at_price}
                     onChange={handleCompareChange}
                     label="Remove compare at price"
                 />
                 <Checkbox id={"removeProductPage"} 
-                    checked={removeProductPage}
+                    checked={!props.offer.link_to_product}
                     onChange={handleProductPageChange}
                     label="Remove link to product page"
                 />
                 <Checkbox id={"autoDiscount"} 
-                    label="Automatically apply  discount code"
-                    checked={autoDiscount}
+                    label="Automatically apply discount code"
+                    checked={props.offer.discount_target_type == "code"}
                     onChange={handleDiscountChange}
                 />
                 <Checkbox id={"removeQtySelector"}
-                    checked={removeQtySelector}
+                    checked={!props.offer.show_quantity_selector}
                     onChange={handleQtySelectorChange} 
                     label="Remove quantity selector"
                 />
                 <Checkbox id={"addCustomtext"}
-                    checked={addCustomtext}
+                    checked={props.offer.show_custom_field}
                     onChange={handleCustomTextChange} 
                     label="Add custom textbox"
                 />
@@ -211,10 +296,11 @@ export function EditOfferTabs() {
         title="Select products from your store"
         primaryAction={{
           content: 'Save',
+          onAction: updateProducts,
         }}
       >
         <Modal.Section>
-            <ModalAddProduct handleToUpdate={handleToUpdate}/>
+            <ModalAddProduct updateQuery={updateQuery} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct}/>
         </Modal.Section>
       </Modal>
     </div>
