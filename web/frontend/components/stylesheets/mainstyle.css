@@ -55,3 +55,15 @@ h1{
 .auto-height .Polaris-Card{
     min-height: 340px;
 }
+
+.offer-header-img {
+    margin-right: 5px;
+    margin-left: 20px;
+    width: 40.43px;
+    height: 24px;
+    margin-top: 3px;
+}
+
+.offer-header-title {
+    font-family: Helvetica Neue;
+}

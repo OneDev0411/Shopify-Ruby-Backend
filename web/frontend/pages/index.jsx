@@ -1,10 +1,27 @@
-import {ButtonGroup, Button, MediaCard, VideoThumbnail,Card, Page, Layout, TextContainer, Image, Stack, Heading, Subheading} from "@shopify/polaris";
-import {homeImage} from "../assets";
+import {ButtonGroup, Button, MediaCard, VideoThumbnail, Card, Page, Layout, TextContainer, Image, Stack, Heading, Subheading, DisplayText} from "@shopify/polaris";
+import {homeImage, iculogo} from "../assets";
 import "../components/stylesheets/mainstyle.css";
+import { TitleBar } from "@shopify/app-bridge-react";
 
 export default function HomePage() {
   return (
-    <Page>
+    <Page
+      title={
+        <div style={{ display: 'flex', height: '24px'}}>
+          <Image
+            src={iculogo}
+            alt="Header Image"
+            className="offer-header-img"
+          />
+          <div className="offer-header-title">
+            <DisplayText element="h1">
+              In Cart Upsell & Cross Sell
+            </DisplayText>
+          </div>
+        </div>
+      }
+    >
+      <TitleBar />
       <Layout>
         <Layout.Section>
           {/* card for image and text */}
