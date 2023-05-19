@@ -27,7 +27,7 @@ export default function Subscription() {
             };
             const toastNotice = Toast.create(app, toastOptions);
             toastNotice.dispatch(Toast.Action.SHOW);
-            redirect.dispatch(Redirect.Action.APP, `/dashboard`);
+            redirect.dispatch(Redirect.Action.APP, `/`);
         } else {
             redirect.dispatch(Redirect.Action.REMOTE, response.url);
         }

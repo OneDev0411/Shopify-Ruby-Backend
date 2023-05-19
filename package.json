@@ -15,6 +15,7 @@
     "@shopify/app": "^3.29.0",
     "@shopify/cli": "^3.30.2",
     "@shopify/polaris-viz": "^8.1.1",
+    "axios": "^1.4.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-slick": "^0.29.0",
