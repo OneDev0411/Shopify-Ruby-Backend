@@ -19,6 +19,7 @@ import {ModalAddConditions} from "./modal_AddConditions";
 import HomePage from "../pages/subscription"
 import {useState,useCallback,useRef,useEffect} from "react";
 import React from "react";
+import { elementSearch, productsMulti } from "../services/products/actions/product";
 
 
 export function EditOfferTabs(props) {
@@ -73,20 +74,7 @@ export function EditOfferTabs(props) {
     //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
     function updateQuery (childData) {
         setResourceListLoading(true);
-        fetch(`https://saifshopifytestwebhook.in.ngrok.io/api/v2/element_search`, {
-        method: 'POST',
-        headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        },
-        body: JSON.stringify( { product: { shop_id: 21, query: childData, type: 'product' },
-                    json: true } ),
-        }
-        )
-        .then(function (response) { 
-            return response.json()
-        })
-        .then(function(data) {
+        elementSearch(55, childData).then(function(data) {
             setResourceListLoading(false);
             setProductData(data);
         })
@@ -107,20 +95,7 @@ export function EditOfferTabs(props) {
     function getProducts() {
         props.updateOffer("included_variants", {})
         setResourceListLoading(true);
-        fetch(`https://saifshopifytestwebhook.in.ngrok.io/api/v2/element_search`, {
-            method: 'POST',
-            headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify( { product: { shop_id: 21, query: query, type: 'product' },
-                        json: true } ),
-        }
-        )
-        .then(function (response) {
-            return response.json()
-        })
-        .then(function(data) {
+        elementSearch(55, query).then(function(data) {
             setResourceListLoading(false);
             setProductData(data);
         })
@@ -133,14 +108,7 @@ export function EditOfferTabs(props) {
         props.updateOffer("offerable_product_details", []);
         props.updateOffer("offerable_product_shopify_ids", [])
         for(var i=0; i<selectedProducts.length; i++) {
-            fetch(`https://saifshopifytestwebhook.in.ngrok.io/api/v2/products/multi/${selectedProducts[i]}?shop_id=${21}`, {
-              method: 'GET'
-            }
-            )
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function(data) {
+            productsMulti(selectedProducts[i], 55).then(function(data) {
                 props.updateProductsOfOffer(data);
                 setProductData("");
             })

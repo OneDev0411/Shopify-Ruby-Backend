@@ -9,6 +9,8 @@ import {
     OptionList
   } from '@shopify/polaris';
   import {useState, useCallback, useEffect, useRef} from 'react';
+  import { productShopify } from "../services/products/actions/product";
+
   
  export function ModalAddProduct(props) {
     const [resourceListLoading, setResourceListLoading] = useState(false);
@@ -187,14 +189,8 @@ import {
     function selectionChange (id) {
       if(selectedItems.length < id.length) {
         setResourceListLoading(true);
-        fetch(`https://saifshopifytestwebhook.in.ngrok.io/api/v2/products/shopify/${id[id.length-1]}?shop_id=${21}`, {
-          method: 'GET'
-        }
-        )
-        .then(function (response) {
-          return response.json()
-        })
-        .then(function(data) {
+        let shopifyId = id[id.length-1]
+        productShopify(shopifyId, 55).then(function(data) {
           for(var i=0; i<props.productData.length; i++)
           {
             if(props.productData[i].id == id[id.length-1]) {

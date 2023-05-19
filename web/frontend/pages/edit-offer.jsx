@@ -5,14 +5,12 @@ import "../components/stylesheets/mainstyle.css";
 import { EditOfferTabs, SecondTab, ThirdTab, FourthTab } from "../components";
 import {useState, useCallback, useEffect} from 'react';
 import React from 'react';
-import { offerActivate } from "../services/offers/actions/offer";
+import { offerActivate, loadOfferDetails, offerSettings } from "../services/offers/actions/offer";
 
 
 export default function EditPage() {
     // Content section tab data
     const [selected, setSelected] = useState(0);
-    const [offer, setOffer] = useState({offerId: 1});
-    const [shop, setShop] = useState({shopID: 1})
     const handleTabChange = useCallback(
         (selectedTabIndex) => setSelected(selectedTabIndex),
         [],
@@ -95,37 +93,14 @@ export default function EditPage() {
 
     //Call on initial render
     useEffect(() => {
-        let offerHash = { offer: {shop_id: 21, offer_id: 23}, json: true };
-        fetch('https://saifshopifytestwebhook.in.ngrok.io/api/v2/load_offer_details', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(offerHash),
-        })
-        .then(function (response) {
-            return response.json()
-        })
-        .then(function(data) {
+        loadOfferDetails(55, 31).then(function(data) {
             setOffer(data);
         })
         .catch(function(error) {
         })
 
-        
-        fetch('https://saifshopifytestwebhook.in.ngrok.io/api/v2/offer_settings', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ offer: {shop_id: 21, include_sample_products: 0}, json: true }),
-        })
-        .then(function (response) {
-            return response.json()
-        })
-        .then(function(data) {
+
+        offerSettings(55, 0).then(function(data) {
             setShop(data);
         })
         .catch(function(error) {
