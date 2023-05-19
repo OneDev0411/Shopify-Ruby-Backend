@@ -1,12 +1,12 @@
-import { BrowserRouter } from "react-router-dom";
-import { NavigationMenu } from "@shopify/app-bridge-react";
-import Routes from "./Routes";
+import { BrowserRouter } from 'react-router-dom';
+import { NavigationMenu } from '@shopify/app-bridge-react';
+import Routes from './Routes';
 
 import {
   AppBridgeProvider,
   QueryProvider,
   PolarisProvider,
-} from "./components";
+} from './components';
 
 export default function App() {
   // Any .tsx or .jsx files in /pages will become a route
@@ -21,36 +21,32 @@ export default function App() {
             <NavigationMenu
               navigationLinks={[
                 {
-                  label: "Dashboard",
-                  destination: "/dashboard",
+                  label: "Page name",
+                  destination: "/pagename",
                 },
                 {
                   label: "Offers",
-                  destination: "/offer",
+                  destination: "/pageoffers",
                 },
                 {
-                  label: "Edit Offer",
-                  destination: "/edit-offer",
+                  label: "Offer Settings",
+                  destination: "/offersettings",
                 },
                 {
-                  label: "Analytics",
-                  destination: "/analytics",
+                  label: "Stats",
+                  destination: "/stats",
+                },
+                                {
+                  label: "Partners",
+                  destination: "/stats",
                 },
                 {
-                  label: "Subscription",
-                  destination: "/subscription",
+                  label: "Support",
+                  destination: "/support",
                 },
                 {
-                  label: "Settings",
-                  destination: "/settings",
-                },
-                {
-                  label: "Help",
-                  destination: "/help-page",
-                },
-                {
-                  label: "No Offer",
-                  destination: "/no-offer-found",
+                  label: "Shop Settings",
+                  destination: "/shopsettings",
                 },
               ]}
             />

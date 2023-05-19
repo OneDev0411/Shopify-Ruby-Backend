@@ -1,0 +1,1 @@
+class UninstalledJob < DummyWebhookJob; end

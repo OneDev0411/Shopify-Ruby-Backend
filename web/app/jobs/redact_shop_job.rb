@@ -1,0 +1,1 @@
+class RedactShopJob < DummyWebhookJob; end

@@ -1,52 +1,85 @@
-import {ButtonGroup, Button, MediaCard, VideoThumbnail,Card, Page, Layout, TextContainer, Image, Stack, Heading, Subheading} from "@shopify/polaris";
-import {homeImage} from "../assets";
-import "../components/stylesheets/mainstyle.css";
+import {
+  Card,
+  Page,
+  Layout,
+  TextContainer,
+  Image,
+  Stack,
+  Link,
+  Heading,
+} from "@shopify/polaris";
+
+import { TitleBar } from "@shopify/app-bridge-react";
+
+import { trophyImage } from "../assets";
+
+import { ProductsCard } from "../components";
 
 export default function HomePage() {
   return (
-    <Page>
+    <Page narrowWidth>
+      <TitleBar title="Incart Upsell" primaryAction={null} />
       <Layout>
         <Layout.Section>
-          {/* card for image and text */}
           <Card sectioned>
-            <Stack distribution="center">
+            <Stack
+              wrap={false}
+              spacing="extraTight"
+              distribution="trailing"
+              alignment="center"
+            >
+              <Stack.Item fill>
+                <TextContainer spacing="loose">
+                  <Heading>Nice Perro LAKRA work on building a Shopify app 🎉</Heading>
+                  <p>
+                    Your app is ready to explore! It contains everything you
+                    need to get started including the{" "}
+                    <Link url="https://polaris.shopify.com/" external>
+                      Polaris design system
+                    </Link>
+                    ,{" "}
+                    <Link url="https://shopify.dev/api/admin-graphql" external>
+                      Shopify Admin API
+                    </Link>
+                    , and{" "}
+                    <Link
+                      url="https://shopify.dev/apps/tools/app-bridge"
+                      external
+                    >
+                      App Bridge
+                    </Link>{" "}
+                    UI library and components.
+                  </p>
+                  <p>
+                    Ready to go? Start populating your app with some sample
+                    products to view and test in your store.{" "}
+                  </p>
+                  <p>
+                    Learn more about building out your app in{" "}
+                    <Link
+                      url="https://shopify.dev/apps/getting-started/add-functionality"
+                      external
+                    >
+                      this Shopify tutorial
+                    </Link>{" "}
+                    📚{" "}
+                  </p>
+                </TextContainer>
+              </Stack.Item>
               <Stack.Item>
-                <div className="center-content">
+                <div style={{ padding: "0 20px" }}>
                   <Image
-                    source={homeImage}
-                    alt="Create your first offer"
-                    width={219}
+                    source={trophyImage}
+                    alt="Nice work on building a Shopify app"
+                    width={120}
                   />
-                  <TextContainer spacing="loose" style={"text-align:center"}>
-                    <Heading element="h1">Here is where you'll view your offers</Heading>
-                    <Subheading element="h3">Start by creating your first offer and publishing it to your store</Subheading>
-                  </TextContainer>
-                  <div className="space-10"></div>
-                  <div className="center-btn">
-                    <ButtonGroup>
-                      <Button primary>Create offer</Button>
-                      <Button>View help docs</Button>
-                    </ButtonGroup>
-                  </div>
                 </div>
               </Stack.Item>
             </Stack>
           </Card>
-          {/* Second section with video */}
-          <MediaCard
-            title="Need help creating your offer?"
-            primaryAction={{
-              content: 'Learn more',
-              onAction: () => {},
-            }}
-            description={"Our support team a can help walk you through it."+ "\n"+ "Chat support is open 5am to 10pm EST. Or you can send us an email anytime and we'll get back to you within 48hours."}
-            popoverActions={[{content: 'Dismiss', onAction: () => {}}]}
-          >
-            <VideoThumbnail
-              videoLength={80}
-              thumbnailUrl="https://burst.shopifycdn.com/photos/business-woman-smiling-in-office.jpg?width=1850"
-            />
-          </MediaCard>
+        </Layout.Section>
+        <Layout.Section>
+          <ProductsCard />
         </Layout.Section>
       </Layout>
     </Page>

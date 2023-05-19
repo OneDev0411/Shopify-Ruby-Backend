@@ -1,0 +1,2 @@
+class RequestCustomerJob < DummyWebhookJob; end
+

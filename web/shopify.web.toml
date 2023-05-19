@@ -1,4 +1,5 @@
 type="backend"
 
 [commands]
-dev = "npm run dev"
+dev = "bin/rails server"
+build = "rake build:all"

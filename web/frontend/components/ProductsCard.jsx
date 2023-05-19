@@ -8,7 +8,7 @@ import {
 } from "@shopify/polaris";
 import { Toast } from "@shopify/app-bridge-react";
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
-export function EditOffer() {""}
+
 export function ProductsCard() {
   const emptyToastProps = { content: null };
   const [isLoading, setIsLoading] = useState(true);

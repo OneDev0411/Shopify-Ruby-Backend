@@ -24,7 +24,9 @@ export default function PageName() {
             <TextContainer>
               <p>Body</p>
             </TextContainer>
-          </Card>
+           </Card>
+          </Layout.Section>
+          <Layout.Section>
           <Card sectioned>
             <Heading>Heading</Heading>
             <TextContainer>
