@@ -1,11 +1,32 @@
-import {ButtonGroup, Button, MediaCard, VideoThumbnail,Card, Page, Layout, TextContainer, Image, Stack, Heading, Subheading} from "@shopify/polaris";
+import {ButtonGroup, Button, MediaCard, VideoThumbnail,Card, Page, Layout, TextContainer, Image, Stack, Heading, Subheading, Banner} from "@shopify/polaris";
 import {homeImage} from "../assets";
 import "../components/stylesheets/mainstyle.css";
+import { isSubscriptionActive } from "../../../utils/services/actions/subscription";
+import { getShop } from "../../../utils/services/actions/shop";
+import { useEffect, useState } from "react";
+
 
 export default function HomePage() {
+  const [currentShop, setCurrentShop] = useState(null);
+  const [planName, setPlanName] = useState();
+  const [trialDays, setTrialDays] = useState();
+
+  useEffect(async()=>{
+    const response = await getShop('icu-dev-store.myshopify.com');
+    setCurrentShop(response.shop);
+    setPlanName(response.plan);
+    setTrialDays(response.days_remaining_in_trial);
+  }, [])
   return (
     <Page>
       <Layout>
+        <Layout.Section>
+          {isSubscriptionActive(currentShop?.subscription) && planName!=='free' && trialDays>0 &&
+            <Banner icon='none' status="info">
+              <p>{ trialDays } days remaining for the trial period</p>
+            </Banner>
+          }
+        </Layout.Section>
         <Layout.Section>
           {/* card for image and text */}
           <Card sectioned>

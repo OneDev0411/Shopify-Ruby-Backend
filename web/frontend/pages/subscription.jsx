@@ -7,8 +7,8 @@ import { Reviews } from "../components";
 import "../components/stylesheets/mainstyle.css";
 import React from 'react';
 import { useEffect, useState } from "react";
+import { getShop } from "../../../utils/services/actions/shop";
 import { updateSubscription, isSubscriptionActive } from "../../../utils/services/actions/subscription";
-import axios from 'axios';
 
 export default function Subscription() {
     const [currentShop, setCurrentShop] = useState(null);
@@ -35,18 +35,12 @@ export default function Subscription() {
         }
     }
 
-    useEffect(() => {
-        axios.get('https://zeryab-icu-local.ngrok.dev/api/merchant/current_shop?shop=icu-dev-store.myshopify.com')
-          .then(response => {
-            // handle the response from the API
-            setCurrentShop(response.data.shop);
-            setPlanName(response.data.plan);
-            setTrialDays(response.data.days_remaining_in_trial);
-            setActiveOffersCount(response.data.active_offers_count);
-          })
-          .catch(error => {
-            // handle errors
-        });
+    useEffect(async() => {
+        const response = await getShop("icu-dev-store.myshopify.com");
+        setCurrentShop(response.shop);
+        setPlanName(response.plan);
+        setTrialDays(response.days_remaining_in_trial);
+        setActiveOffersCount(response.active_offers_count);
       }, []);
     
   return (
