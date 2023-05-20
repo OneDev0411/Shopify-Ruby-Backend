@@ -67,7 +67,6 @@ export function EditOfferTabs(props) {
     const [productData, setProductData] = useState("");
     const [resourceListLoading, setResourceListLoading] = useState(false);
     const [selectedProducts, setSelectedProducts] = useState([]);
-    const count = useRef(0);
 
 
     //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
@@ -206,7 +205,7 @@ export function EditOfferTabs(props) {
                         // expandOnPrint
                     >
                         <Collapsible
-                            open={!props.shop.has_ab_testing}
+                            open={!props.offerSettings.has_ab_testing}
                             id="ab-testing-not-present-collapsible"
                             transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
                             expandOnPrint
@@ -218,7 +217,7 @@ export function EditOfferTabs(props) {
                             </TextContainer>
                         </Collapsible>
                         <Collapsible
-                            open={props.shop.has_ab_testing}
+                            open={props.offerSettings.has_ab_testing}
                             id="ab-testing-present-collapsible"
                             transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
                             expandOnPrint
@@ -307,28 +306,74 @@ export function EditOfferTabs(props) {
   );
 }
 
-export function SecondTab(){
-    const [selected, setSelected] = useState('Cart page');
-    const handleSelectChange = useCallback((value) => setSelected(value), []);
+export function SecondTab(props){
+    const [selected, setSelected] = useState('cartpage');
+    const handleSelectChange = useCallback((value) => {
+        if(value === "cartpage") {
+            props.updateOffer("in_cart_page", true);
+            props.updateOffer("in_product_page", false);
+            props.updateOffer("in_ajax_cart", false);
+        }
+        else if(value === "productpage") {
+            props.updateOffer("in_cart_page", false);
+            props.updateOffer("in_product_page", true);
+            props.updateOffer("in_ajax_cart", false);
+        }
+        else if(value === "cartpageproductpage") {
+            props.updateOffer("in_cart_page", true);
+            props.updateOffer("in_product_page", true);
+            props.updateOffer("in_ajax_cart", false);
+        }
+        else if(value === "ajax") {
+            props.updateOffer("in_cart_page", false);
+            props.updateOffer("in_product_page", false);
+            props.updateOffer("in_ajax_cart", true);
+        }
+        else if(value === "ajaxcartpage") {
+            props.updateOffer("in_cart_page", true);
+            props.updateOffer("in_product_page", false);
+            props.updateOffer("in_ajax_cart", true);
+        }
+        setSelected(value)
+    }, []);
   
     const options = [
       {label: 'Cart page', value: 'cartpage'},
-      {label: 'Product page', value: 'productpage'},
+      {label: 'Product page', value: 'productpage'}, 
       {label: 'Product and cart page', value: 'cartpageproductpage'},
       {label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax'},
       {label: 'AJAX and cart page', value: 'ajaxcartpage'}
       
     ];
 
-    const [disableCheckoutBtn, setDisableCheckoutBtn] = useState(false);
-    const [removeItiem, setRemoveItiem] = useState(false);
-    const handleDisableCheckoutBtn = useCallback((newChecked) => setDisableCheckoutBtn(newChecked), []);
-    const handleRemoveItiem = useCallback((newChecked) => setRemoveItiem(newChecked), []);
+    const handleDisableCheckoutBtn = useCallback((newChecked) => props.updateOffer("must_accept", newChecked), []);
+    const handleRemoveItiem = useCallback((newChecked) => props.updateOffer("remove_if_no_longer_valid", newChecked), []);
     //Modal controllers
     const [conditionModal, setConditionModal] = useState(false);
     const handleModal = useCallback(() => setConditionModal(!conditionModal), [conditionModal]);
     const modalCon = useRef(null);
     const activatorCon = modalCon;
+
+    useEffect(() => {
+        if(props.offer.in_product_page && props.offer.in_cart_page) {
+            setSelected("cartpageproductpage");
+        }
+        else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
+            setSelected("ajaxcartpage");
+        }
+        else if(props.offer.in_cart_page) {
+            setSelected("cartpage");
+        }
+        else if(props.offer.in_product_page) {
+            setSelected("productpage");
+        }
+        else if(props.offer.in_ajax_cart) {
+            setSelected("ajax");
+        }
+        else {
+            setSelected("cartpage");
+        }
+    }, [])
 
     return(
         <div>
@@ -347,7 +392,7 @@ export function SecondTab(){
             </Card>
             <Card title="Display Conditions" sectioned>
                 <Card.Section>
-                    <p>None selected (show offer to all customer)</p>
+                    <p>None selected (show offer to all customer)</p>  
                     <br/>
                     <Button onClick={handleModal} ref={modalCon}>Add condition</Button>
                 </Card.Section>
@@ -356,12 +401,12 @@ export function SecondTab(){
                         <Checkbox 
                             label="Disable checkout button until offer is accepted" 
                             helpText="This is useful for products that can only be purchased in pairs."
-                            checked={disableCheckoutBtn}
+                            checked={props.offer.must_accept}
                             onChange={handleDisableCheckoutBtn}
                         />
                         <Checkbox 
                             label="If the offer requirements are no longer met. Remove the item from the cart."
-                            checked={removeItiem}
+                            checked={props.offer.remove_if_no_longer_valid}
                             onChange={handleRemoveItiem}
                         />
                     </Stack>
@@ -687,29 +732,37 @@ export function ThirdTab(){
 }
 
 // Advanced Tab
-export function FourthTab(){
+export function FourthTab(props){
 
     const [checked, setChecked] = useState(false);
     const handleChange = useCallback((newChecked) => setChecked(newChecked), []);
+    const handleProductDomSelector = useCallback((newValue) => props.updateShop("custom_product_page_dom_selector", newValue), []);
+    const handleProductDomAction = useCallback((newValue) => props.updateShop("custom_product_page_dom_action", newValue), []);
+    const handleCartDomSelector = useCallback((newValue) => props.updateShop("custom_cart_page_dom_selector", newValue), []);
+    const handleCartDomAction = useCallback((newValue) => props.updateShop("custom_cart_page_dom_action", newValue), []);
+    const handleAjaxDomSelector = useCallback((newValue) => props.updateShop("custom_ajax_dom_selector", newValue), []);
+    const handleAjaxDomAction = useCallback((newValue) => props.updateShop("custom_ajax_dom_action", newValue), []);
+    const handleAjaxRefreshCode = useCallback((newValue) => props.updateShop("ajax_refresh_code", newValue), []);
+    const handleOfferCss = useCallback((newValue) => props.updateShop("offer_css", newValue), []);
 
     return(
         <>
             <Card sectioned title="Offer placement - advanced settings" actions={[{content: 'View help doc'}]}>
                 <Card.Section title="Product page">
-                    <TextField label="DOM Selector" type="text"></TextField>
-                    <TextField label="DOM Action"></TextField>
+                    <TextField label="DOM Selector" value={props.shop.custom_product_page_dom_selector} onChange={handleProductDomSelector} type="text"></TextField>
+                    <TextField label="DOM Action" value={props.shop.custom_product_page_dom_action} onChange={handleProductDomAction}></TextField>
                 </Card.Section>
                 <Card.Section title="Cart page">
-                    <TextField label="DOM Selector"></TextField>
-                    <TextField label="DOM Action"></TextField>
+                    <TextField label="DOM Selector" value={props.shop.custom_cart_page_dom_selector} onChange={handleCartDomSelector}></TextField>
+                    <TextField label="DOM Action" value={props.shop.custom_cart_page_dom_action} onChange={handleCartDomAction}></TextField>
                 </Card.Section>
                 <Card.Section title="AJAX/Slider cart">
-                    <TextField label="DOM Selector"></TextField>
-                    <TextField label="DOM Action"></TextField>
-                    <TextField label="AJAX refresh code" multiline={6}></TextField>
+                    <TextField label="DOM Selector" value={props.shop.custom_ajax_dom_selector} onChange={handleAjaxDomSelector}></TextField>
+                    <TextField label="DOM Action" value={props.shop.custom_ajax_dom_action} onChange={handleAjaxDomAction}></TextField>
+                    <TextField label="AJAX refresh code" value={props.shop.ajax_refresh_code} onChange={handleAjaxRefreshCode} multiline={6}></TextField>
                 </Card.Section>
                 <Card.Section title="Custom CSS">
-                    <TextField multiline={6}></TextField>
+                    <TextField value={props.shop.offer_css} onChange={handleOfferCss} multiline={6}></TextField>
                     <br/>
                     <Checkbox
                         label="Save as default settings"

@@ -178,12 +178,13 @@ import {
       props.updateSelectedProduct(id, selectedOptions);
     }
 
+    // Called on just first selection of popup modal products
     function selectedProduct(id) {
       let idToArray = [id];
       selectionChange(idToArray);
     }
 
-
+    // Called on every selection of popup modal products after first selected product
     function selectionChange (id) {
       if(selectedItems.length < id.length) {
         setResourceListLoading(true);
