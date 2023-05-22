@@ -4,6 +4,8 @@ import {
     ButtonGroup,
     Button,
     TextField,
+    TextContainer,
+    Link,
     Checkbox,
     Select,
     RangeSlider,
@@ -12,27 +14,26 @@ import {
     Grid,
     ColorPicker
 } from "@shopify/polaris";
-import {ModalAddProduct} from './modal_AddProduct';
-import {ModalAddConditions} from './modal_AddConditions';
-import {useState,useCallback,useRef} from "react";
-import React from 'react';
+import {ModalAddProduct} from "./modal_AddProduct";
+import {ModalAddConditions} from "./modal_AddConditions";
+import HomePage from "../pages/subscription";
+import {useState,useCallback,useRef,useEffect} from "react";
+import React from "react";
+import { elementSearch, productsMulti } from "../services/products/actions/product";
 
 
-export function EditOfferTabs() {
-    const [offerTitle, setOfferTitle] = useState("");
-    const [offerText, setofferText] = useState("");
+export function EditOfferTabs(props) {
     const [altOfferText, setAltOfferText] = useState("");
-    const [btnTitle, setBtnTitle] = useState("");
     const [altBtnTitle, setAltBtnTitle] = useState("");
-    const handleTitleChange = useCallback((newValue) => setOfferTitle(newValue), []);
-    const handleTextChange = useCallback((newValue) => setofferText(newValue), []);
-    const handleAltTextChange = useCallback((newValue) => setAltOfferText(newValue), []);
-    const handleBtnChange = useCallback((newValue) => setBtnTitle(newValue), []);
-    const handleAltBtnChange = useCallback((newValue) => setAltBtnTitle(newValue), []);
+    const handleTitleChange = useCallback((newValue) => props.updateOffer("title", newValue), []);
+    const handleTextChange = useCallback((newValue) => props.updateOffer("text_a", newValue), []);
+    const handleAltTextChange = useCallback((newValue) => props.updateOffer("text_b", newValue), []);
+    const handleBtnChange = useCallback((newValue) => props.updateOffer("cta_a", newValue), []);
+    const handleAltBtnChange = useCallback((newValue) => props.updateOffer("cta_b", newValue), []);
     //checkbox controls
     const [abTestCheck, setAbTestCheck] = useState(false);
-    const [removeImg, setRemoveImg] = useState(false);
-    const [removePriceCheck, setRemovePriceCheck] = useState(false);
+    // const [removeImg, setRemoveImg] = useState(false);
+    // const [removePriceCheck, setRemovePriceCheck] = useState(false);
     const [removeComparePrice, setRemoveComparePrice] = useState(false);
     const [removeProductPage, setRemoveProductPage] = useState(false);
     const [removeQtySelector, setRemoveQtySelector] = useState(false);
@@ -40,18 +41,82 @@ export function EditOfferTabs() {
     const [addCustomtext, setAddCustomtext] = useState(false);
 
     const handleAbChange = useCallback((newChecked) => setAbTestCheck(newChecked), []);
-    const handleImageChange = useCallback((newChecked) => setRemoveImg(newChecked), []);
-    const handlePriceChange = useCallback((newChecked) => setRemovePriceCheck(newChecked), []);
-    const handleCompareChange = useCallback((newChecked) => setRemoveComparePrice(newChecked), []);
-    const handleProductPageChange = useCallback((newChecked) => setRemoveProductPage(newChecked), []);
-    const handleQtySelectorChange = useCallback((newChecked) => setRemoveQtySelector(newChecked), []);
-    const handleDiscountChange = useCallback((newChecked) => setAutoDiscount(newChecked), []);
-    const handleCustomTextChange = useCallback((newChecked) => setAddCustomtext(newChecked), []);
+    const handleImageChange = useCallback((newChecked) => props.updateOffer("show_product_image", !newChecked), []);
+    const handlePriceChange = useCallback((newChecked) => props.updateOffer("show_product_price", !newChecked), []);
+    const handleCompareChange = useCallback((newChecked) => props.updateOffer("show_compare_at_price", !newChecked), []);
+    const handleProductPageChange = useCallback((newChecked) => props.updateOffer("link_to_product", !newChecked), []);
+    const handleQtySelectorChange = useCallback((newChecked) => props.updateOffer("show_quantity_selector", !newChecked), []);
+    const handleDiscountChange = useCallback((newChecked) => {
+        if (newChecked) {
+            props.updateOffer("discount_target_type", "code");
+        }
+        else {
+            props.updateOffer("discount_target_type", "none");
+        }
+    },[]);
+    const handleCustomTextChange = useCallback((newChecked) => props.updateOffer("show_custom_field", newChecked), []);
     //modal controls
     const [productModal, setProductModal] = useState(false);
-    const handleModal = useCallback(() => setProductModal(!productModal), [productModal]);
+    const handleModal = useCallback(() => {
+        setProductModal(!productModal);
+    }, [productModal]);
     const modalRef = useRef(null);
     const activator = modalRef;
+
+    //Available Products
+    const [query, setQuery] = useState("");
+    const [productData, setProductData] = useState("");
+    const [resourceListLoading, setResourceListLoading] = useState(false);
+    const [selectedProducts, setSelectedProducts] = useState([]);
+
+
+    //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
+    function updateQuery (childData) {
+        setResourceListLoading(true);
+        elementSearch(55, childData).then(function(data) {
+            setResourceListLoading(false);
+            setProductData(data);
+        })
+        .catch(function(error) {
+        });
+      setQuery(childData);
+    }
+
+    //Called when the selected product or variants of selected product changes in popup modal
+    function updateSelectedProduct(selectedItem, selectedVariants) {
+        if(Array.isArray(selectedItem)) {
+            setSelectedProducts(selectedItem);
+        }
+        props.updateIncludedVariants(selectedItem, selectedVariants);
+    }
+
+    //Called when "select product manually button clicked"
+    function getProducts() {
+        props.updateOffer("included_variants", {})
+        setResourceListLoading(true);
+        elementSearch(55, query).then(function(data) {
+            setResourceListLoading(false);
+            setProductData(data);
+        })
+        .catch(function(error) {
+        })
+    }
+
+    //Called when the save button of popup modal is clicked
+    function updateProducts() {
+        props.updateOffer("offerable_product_details", []);
+        props.updateOffer("offerable_product_shopify_ids", [])
+        for(var i=0; i<selectedProducts.length; i++) {
+            productsMulti(selectedProducts[i], 55).then(function(data) {
+                props.updateProductsOfOffer(data);
+                setProductData("");
+            })
+            .catch(function(error) {
+            });
+        }
+        handleModal();
+    }
+
 
     //Collapsible controls
     const [open, setOpen] = useState(false);
@@ -64,7 +129,7 @@ export function EditOfferTabs() {
                 <Stack spacing="loose" vertical>
                     <p>What product would you like to have in the offer?</p>
                     <ButtonGroup>
-                        <Button id={"btnSelectProduct"} onClick={handleModal} ref={modalRef}>Select product manually</Button>
+                        <Button id={"btnSelectProduct"} onClick={ () => { handleModal(); getProducts(); } } ref={modalRef}>Select product manually</Button>
                         <Button id={"btnLaunchAI"} primary>Launch Autopilot</Button>
                     </ButtonGroup>
                 </Stack>
@@ -76,7 +141,7 @@ export function EditOfferTabs() {
                     <TextField
                         label="Offer title"
                         placeholder='Offer #1'
-                        value={offerTitle}
+                        value={props.offer.title}
                         onChange={handleTitleChange}
                         autoComplete="off"
                         helpText="This title will only be visible to you so you can reference it internally"
@@ -85,13 +150,13 @@ export function EditOfferTabs() {
                         label="Offer text"
                         placeholder='Take advantage of this limited offer'
                         autoComplete="off" 
-                        value={offerText}
+                        value={props.offer.text_a}
                         onChange={handleTextChange}
                     />
                     <TextField
                         label="Button text"
                         placeholder='Add to cart'
-                        value={btnTitle}
+                        value={props.offer.cta_a}
                         onChange={handleBtnChange}
                         autoComplete="off"   
                     />
@@ -105,22 +170,41 @@ export function EditOfferTabs() {
                         open={open}
                         id="basic-collapsible"
                         transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
-                        expandOnPrint
+                        // expandOnPrint
                     >
-                        <TextField
-                            label="Alternative offer text"
-                            placeholder='Take advantage of this limited offer'
-                            autoComplete="off" 
-                            value={altOfferText}
-                            onChange={handleAltTextChange}
-                        />
-                        <TextField
-                            label="Alternative button text"
-                            placeholder='Add to cart'
-                            autoComplete="off" 
-                            value={altBtnTitle}
-                            onChange={handleAltBtnChange}
-                        />
+                        <Collapsible
+                            open={!props.offerSettings.has_ab_testing}
+                            id="ab-testing-not-present-collapsible"
+                            transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
+                            expandOnPrint
+                        >
+                            <TextContainer>
+                                <p>
+                                    A/B testing is available on our Professional plan. Please <Link url="">upgrade your subscription</Link> to enable it.
+                                </p>
+                            </TextContainer>
+                        </Collapsible>
+                        <Collapsible
+                            open={props.offerSettings.has_ab_testing}
+                            id="ab-testing-present-collapsible"
+                            transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
+                            expandOnPrint
+                        >
+                            <TextField
+                                label="Alternative offer text"
+                                placeholder='Take advantage of this limited offer'
+                                autoComplete="off" 
+                                value={props.offer.text_b}
+                                onChange={handleAltTextChange}
+                            />
+                            <TextField
+                                label="Alternative button text"
+                                placeholder='Add to cart'
+                                autoComplete="off" 
+                                value={props.offer.cta_b}
+                                onChange={handleAltBtnChange}
+                            />
+                        </Collapsible>
                     </Collapsible>
                 </Stack>
             </Card.Section>
@@ -129,37 +213,37 @@ export function EditOfferTabs() {
             <Card.Section>
             <Stack vertical>
                 <Checkbox id={"removeImg"} 
-                    checked={removeImg}
+                    checked={!props.offer.show_product_image}
                     onChange={handleImageChange}
                     label="Remove product image"
                 />
                 <Checkbox id={"removePrice"} 
-                    checked={removePriceCheck}
+                    checked={!props.offer.show_product_price}
                     onChange={handlePriceChange}
                     label="Remove price"
                 />
                 <Checkbox id={"removeComparePrice"} 
-                    checked={removeComparePrice}
+                    checked={!props.offer.show_compare_at_price}
                     onChange={handleCompareChange}
                     label="Remove compare at price"
                 />
                 <Checkbox id={"removeProductPage"} 
-                    checked={removeProductPage}
+                    checked={!props.offer.link_to_product}
                     onChange={handleProductPageChange}
                     label="Remove link to product page"
                 />
                 <Checkbox id={"autoDiscount"} 
-                    label="Automatically apply  discount code"
-                    checked={autoDiscount}
+                    label="Automatically apply discount code"
+                    checked={props.offer.discount_target_type == "code"}
                     onChange={handleDiscountChange}
                 />
                 <Checkbox id={"removeQtySelector"}
-                    checked={removeQtySelector}
+                    checked={!props.offer.show_quantity_selector}
                     onChange={handleQtySelectorChange} 
                     label="Remove quantity selector"
                 />
                 <Checkbox id={"addCustomtext"}
-                    checked={addCustomtext}
+                    checked={props.offer.show_custom_field}
                     onChange={handleCustomTextChange} 
                     label="Add custom textbox"
                 />
@@ -179,38 +263,85 @@ export function EditOfferTabs() {
         title="Select products from your store"
         primaryAction={{
           content: 'Save',
+          onAction: updateProducts,
         }}
       >
         <Modal.Section>
-            <ModalAddProduct/>
+            <ModalAddProduct updateQuery={updateQuery} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct}/>
         </Modal.Section>
       </Modal>
     </div>
   );
 }
 
-export function SecondTab(){
-    const [selected, setSelected] = useState('Cart page');
-    const handleSelectChange = useCallback((value) => setSelected(value), []);
+export function SecondTab(props){
+    const [selected, setSelected] = useState('cartpage');
+    const handleSelectChange = useCallback((value) => {
+        if(value === "cartpage") {
+            props.updateOffer("in_cart_page", true);
+            props.updateOffer("in_product_page", false);
+            props.updateOffer("in_ajax_cart", false);
+        }
+        else if(value === "productpage") {
+            props.updateOffer("in_cart_page", false);
+            props.updateOffer("in_product_page", true);
+            props.updateOffer("in_ajax_cart", false);
+        }
+        else if(value === "cartpageproductpage") {
+            props.updateOffer("in_cart_page", true);
+            props.updateOffer("in_product_page", true);
+            props.updateOffer("in_ajax_cart", false);
+        }
+        else if(value === "ajax") {
+            props.updateOffer("in_cart_page", false);
+            props.updateOffer("in_product_page", false);
+            props.updateOffer("in_ajax_cart", true);
+        }
+        else if(value === "ajaxcartpage") {
+            props.updateOffer("in_cart_page", true);
+            props.updateOffer("in_product_page", false);
+            props.updateOffer("in_ajax_cart", true);
+        }
+        setSelected(value)
+    }, []);
   
     const options = [
       {label: 'Cart page', value: 'cartpage'},
-      {label: 'Product page', value: 'productpage'},
+      {label: 'Product page', value: 'productpage'}, 
       {label: 'Product and cart page', value: 'cartpageproductpage'},
       {label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax'},
       {label: 'AJAX and cart page', value: 'ajaxcartpage'}
       
     ];
 
-    const [disableCheckoutBtn, setDisableCheckoutBtn] = useState(false);
-    const [removeItiem, setRemoveItiem] = useState(false);
-    const handleDisableCheckoutBtn = useCallback((newChecked) => setDisableCheckoutBtn(newChecked), []);
-    const handleRemoveItiem = useCallback((newChecked) => setRemoveItiem(newChecked), []);
+    const handleDisableCheckoutBtn = useCallback((newChecked) => props.updateOffer("must_accept", newChecked), []);
+    const handleRemoveItiem = useCallback((newChecked) => props.updateOffer("remove_if_no_longer_valid", newChecked), []);
     //Modal controllers
     const [conditionModal, setConditionModal] = useState(false);
     const handleModal = useCallback(() => setConditionModal(!conditionModal), [conditionModal]);
     const modalCon = useRef(null);
     const activatorCon = modalCon;
+
+    useEffect(() => {
+        if(props.offer.in_product_page && props.offer.in_cart_page) {
+            setSelected("cartpageproductpage");
+        }
+        else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
+            setSelected("ajaxcartpage");
+        }
+        else if(props.offer.in_cart_page) {
+            setSelected("cartpage");
+        }
+        else if(props.offer.in_product_page) {
+            setSelected("productpage");
+        }
+        else if(props.offer.in_ajax_cart) {
+            setSelected("ajax");
+        }
+        else {
+            setSelected("cartpage");
+        }
+    }, [])
 
     return(
         <div>
@@ -229,7 +360,7 @@ export function SecondTab(){
             </Card>
             <Card title="Display Conditions" sectioned>
                 <Card.Section>
-                    <p>None selected (show offer to all customer)</p>
+                    <p>None selected (show offer to all customer)</p>  
                     <br/>
                     <Button onClick={handleModal} ref={modalCon}>Add condition</Button>
                 </Card.Section>
@@ -238,12 +369,12 @@ export function SecondTab(){
                         <Checkbox 
                             label="Disable checkout button until offer is accepted" 
                             helpText="This is useful for products that can only be purchased in pairs."
-                            checked={disableCheckoutBtn}
+                            checked={props.offer.must_accept}
                             onChange={handleDisableCheckoutBtn}
                         />
                         <Checkbox 
                             label="If the offer requirements are no longer met. Remove the item from the cart."
-                            checked={removeItiem}
+                            checked={props.offer.remove_if_no_longer_valid}
                             onChange={handleRemoveItiem}
                         />
                     </Stack>
@@ -569,29 +700,37 @@ export function ThirdTab(){
 }
 
 // Advanced Tab
-export function FourthTab(){
+export function FourthTab(props){
 
     const [checked, setChecked] = useState(false);
     const handleChange = useCallback((newChecked) => setChecked(newChecked), []);
+    const handleProductDomSelector = useCallback((newValue) => props.updateShop("custom_product_page_dom_selector", newValue), []);
+    const handleProductDomAction = useCallback((newValue) => props.updateShop("custom_product_page_dom_action", newValue), []);
+    const handleCartDomSelector = useCallback((newValue) => props.updateShop("custom_cart_page_dom_selector", newValue), []);
+    const handleCartDomAction = useCallback((newValue) => props.updateShop("custom_cart_page_dom_action", newValue), []);
+    const handleAjaxDomSelector = useCallback((newValue) => props.updateShop("custom_ajax_dom_selector", newValue), []);
+    const handleAjaxDomAction = useCallback((newValue) => props.updateShop("custom_ajax_dom_action", newValue), []);
+    const handleAjaxRefreshCode = useCallback((newValue) => props.updateShop("ajax_refresh_code", newValue), []);
+    const handleOfferCss = useCallback((newValue) => props.updateShop("offer_css", newValue), []);
 
     return(
         <>
             <Card sectioned title="Offer placement - advanced settings" actions={[{content: 'View help doc'}]}>
                 <Card.Section title="Product page">
-                    <TextField label="DOM Selector" type="text"></TextField>
-                    <TextField label="DOM Action"></TextField>
+                    <TextField label="DOM Selector" value={props.shop.custom_product_page_dom_selector} onChange={handleProductDomSelector} type="text"></TextField>
+                    <TextField label="DOM Action" value={props.shop.custom_product_page_dom_action} onChange={handleProductDomAction}></TextField>
                 </Card.Section>
                 <Card.Section title="Cart page">
-                    <TextField label="DOM Selector"></TextField>
-                    <TextField label="DOM Action"></TextField>
+                    <TextField label="DOM Selector" value={props.shop.custom_cart_page_dom_selector} onChange={handleCartDomSelector}></TextField>
+                    <TextField label="DOM Action" value={props.shop.custom_cart_page_dom_action} onChange={handleCartDomAction}></TextField>
                 </Card.Section>
                 <Card.Section title="AJAX/Slider cart">
-                    <TextField label="DOM Selector"></TextField>
-                    <TextField label="DOM Action"></TextField>
-                    <TextField label="AJAX refresh code" multiline={6}></TextField>
+                    <TextField label="DOM Selector" value={props.shop.custom_ajax_dom_selector} onChange={handleAjaxDomSelector}></TextField>
+                    <TextField label="DOM Action" value={props.shop.custom_ajax_dom_action} onChange={handleAjaxDomAction}></TextField>
+                    <TextField label="AJAX refresh code" value={props.shop.ajax_refresh_code} onChange={handleAjaxRefreshCode} multiline={6}></TextField>
                 </Card.Section>
                 <Card.Section title="Custom CSS">
-                    <TextField multiline={6}></TextField>
+                    <TextField value={props.shop.offer_css} onChange={handleOfferCss} multiline={6}></TextField>
                     <br/>
                     <Checkbox
                         label="Save as default settings"
