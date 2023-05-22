@@ -6,3 +6,4 @@ export {ModalAddConditions} from "./modal_AddConditions";
 export {SettingTabs} from "./settingsTabs";
 export {OrderOverTimeData,TotalSalesData,AbTestingData,ClickThroughtRateData,ConversionRate} from "./analyticsGraphdata"
 export { Reviews } from "./Reviews";
+export { GenericTitleBar } from "./GenericTitleBar";
