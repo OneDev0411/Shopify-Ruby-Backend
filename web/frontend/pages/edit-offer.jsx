@@ -1,11 +1,11 @@
-import {Page, Badge, Card,Layout,Tabs,Icon,Stack, ButtonGroup, Button,TextField,RadioButton} from '@shopify/polaris';
+import {Page, LegacyCard,Layout,Tabs,Icon, LegacyStack, ButtonGroup, Button,TextField, RadioButton} from '@shopify/polaris';
 import {DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
 import { TitleBar} from "@shopify/app-bridge-react";
 import "../components/stylesheets/mainstyle.css";
 import { EditOfferTabs, SecondTab, ThirdTab, FourthTab } from "../components";
 import {useState, useCallback, useEffect} from 'react';
 import React from 'react';
-import { offerActivate, loadOfferDetails, offerSettings } from "../services/offers/actions/offer";
+import { offerActivate, loadOfferDetails } from "../services/offers/actions/offer";
 
 
 export default function EditPage() {
@@ -103,23 +103,23 @@ export default function EditPage() {
 
     //Call on initial render
     useEffect(() => {
-        loadOfferDetails(55, 31).then(function(data) {
+        loadOfferDetails(55, 31).then((data) => {
             setOffer(data);
         })
-        .catch(function(error) {
-        })
+        .catch((error) => {
+        });
 
-        offerSettings(55, 0).then(function(data) {
+        offerSettings(55, 0).then((data) => {
             setShop(data);
         })
-        .catch(function(error) {
-        })
-    },[])
+        .catch((error) => {
+        });
+    },[]);
 
     //Called whenever the offer changes in any child component
     function updateOffer(updatedKey, updatedValue) {
         setOffer(previousState => {
-            return { ...previousState, [updatedKey]: updatedValue }
+          return { ...previousState, [updatedKey]: updatedValue };
         });
     }
 
@@ -145,17 +145,17 @@ export default function EditPage() {
     // Called to update offerable_product_details and offerable_product_shopify_ids of offer
     function updateProductsOfOffer(data) {
         setOffer(previousState => {
-            return { ...previousState, offerable_product_details: [...previousState.offerable_product_details, data], }
+          return { ...previousState, offerable_product_details: [...previousState.offerable_product_details, data], };
         });
         setOffer(previousState => {
-            return { ...previousState, offerable_product_shopify_ids: [...previousState.offerable_product_shopify_ids, data.id], }
+          return { ...previousState, offerable_product_shopify_ids: [...previousState.offerable_product_shopify_ids, data.id], };
         });
     }
 
     //Called whenever the shop changes in any child component
     function updateShop(updatedKey, updatedValue) {
         setShop(previousState => {
-            return { ...previousState, [updatedKey]: updatedValue }
+          return { ...previousState, [updatedKey]: updatedValue };
         });
     }
 
@@ -203,7 +203,7 @@ export default function EditPage() {
                 <div className='flex-tab'>
                     <Icon source={DesktopMajor} />
                     <p>Desktop</p>
-                </div>    
+                </div>
               ),
             panelID: 'desktop',
         },
@@ -213,15 +213,14 @@ export default function EditPage() {
                 <div className='flex-tab'>
                     <Icon source={MobileMajor} />
                     <p>Mobile</p>
-                </div>    
+                </div>
               ),
             panelID: 'mobile',
         }
     ];
 
     async function publishOffer() {
-        const response = await offerActivate(offer.offerId, shop.shopID);
-        
+        return await offerActivate(offer.offerId, shop.shopID);
     };
 
   return (
@@ -240,25 +239,25 @@ export default function EditPage() {
                     onSelect={handleTabChange}
                     disclosureText="More views"
                     fitted
-                >   
+                >
                     <div className='space-4'></div>
 
-                    {selected == 0 ? 
+                    {selected == 0 ?
                         // page was imported from components folder
                         <EditOfferTabs offer={offer} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer}/>
                     : "" }
-                    {selected == 1 ? 
+                    {selected == 1 ?
                         // page was imported from components folder
                         <SecondTab offer={offer} offerSettings={offerSettings} updateOffer={updateOffer}/>
-                    : "" } 
-                    {selected == 2 ? 
+                    : "" }
+                    {selected == 2 ?
                         // page was imported from components folder
                         <ThirdTab/>
-                    : "" }    
-                    {selected == 3 ? 
+                    : "" }
+                    {selected == 3 ?
                         // page was imported from components folder
                         <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings}/>
-                    : "" }    
+                    : "" }
                 </Tabs>
             </Layout.Section>
             <Layout.Section secondary>
@@ -268,12 +267,11 @@ export default function EditPage() {
                     onSelect={handlePreTabChange}
                     disclosureText="More views"
                     fitted
-                >   
+                >
                     <div className='space-4'></div>
-                    {selectedPre == 0 ? 
-                        <Card sectioned>
-                    
-                        </Card>
+                    {selectedPre == 0 ?
+                        <LegacyCard sectioned>
+                        </LegacyCard>
                     : "" }
                 </Tabs>
             </Layout.Section>
