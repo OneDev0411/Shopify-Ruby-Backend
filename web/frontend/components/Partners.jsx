@@ -4,6 +4,8 @@ import {stars} from "../assets";
 import Slider from "react-slick";
 import React from "react";
 import { getPartners } from "../../../utils/services/actions/partners";
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 
 export function Partners(){
     const [expandedIndex, setExpandedIndex] = useState(null);

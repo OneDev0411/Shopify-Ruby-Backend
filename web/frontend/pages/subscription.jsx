@@ -34,7 +34,7 @@ export default function Subscription() {
     }
 
     useEffect(async () => {
-        const shopResponse = await getShop('icu-dev-store.myshopifycom'); 
+        const shopResponse = await getShop('icu-dev-store.myshopify.com'); 
         setCurrentShop(shopResponse.shop);
         setPlanName(shopResponse.plan)
       }, []);

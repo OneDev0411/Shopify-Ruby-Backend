@@ -117,7 +117,9 @@ export function SettingTabs(props){
             <Card.Section>
             <div>{tabs[selected].innerContent}</div>
             <div className="space-4"></div>
-            <Button primary onClick={ ()=> saveShopSettings() }>Save</Button>
+            <div style={{display: 'flex', justifyContent: 'end'}}>
+                <Button primary onClick={ ()=> saveShopSettings() }>Save</Button>
+            </div>
             </Card.Section>
         </Tabs>
     </>);

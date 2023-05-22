@@ -2,9 +2,7 @@ import{Card,Grid, Button, Page} from "@shopify/polaris";
 import{TitleBar} from "@shopify/app-bridge-react";
 import React, { Component } from "react";
 import {Partners, SettingTabs} from "../components";
-import { getShop } from "../../../utils/services/actions/shop";
-import "slick-carousel/slick/slick.css"; 
-import "slick-carousel/slick/slick-theme.css";
+import { getShop, toggleActivation } from "../../../utils/services/actions/shop";
 export default class Settings extends Component{
 
     constructor(props) {
@@ -21,6 +19,12 @@ export default class Settings extends Component{
         });
     }
 
+    async toggleActivation(){
+        console.log("Deactivate app");
+        const response = await toggleActivation(this.state.currentShop?.shopify_domain);
+        window.location.reload();
+    }
+
     render(){
         const {currentShop} = this.state
         return(
@@ -28,16 +32,28 @@ export default class Settings extends Component{
             <Page>
             <TitleBar/>
                 <Card sectioned>
+                    {(currentShop?.activated) ? (
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 10, xl: 4}}>
                             <p>This app is activated</p>
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 2, xl: 4}}>
                             <div style={{display: 'flex', justifyContent: 'end'}}> 
-                                <Button>Deactivate</Button>
+                                <Button onClick={()=>this.toggleActivation()}>Deactivate</Button>
+                            </div>
+                        </Grid.Cell>
+                    </Grid>) : (
+                    <Grid>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 10, xl: 4}}>
+                            <p>This app is deactivated</p>
+                        </Grid.Cell>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 2, xl: 4}}>
+                            <div style={{display: 'flex', justifyContent: 'end'}}> 
+                                <Button onClick={()=>this.toggleActivation()}>Activate</Button>
                             </div>
                         </Grid.Cell>
                     </Grid>
+                    )}
                 </Card>
                 <div className="space-4"></div>
                 <Grid>
