@@ -1,9 +1,9 @@
-import {Page, LegacyCard,Layout,Tabs,Icon, LegacyStack, ButtonGroup, Button,TextField, RadioButton} from '@shopify/polaris';
-import {DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
+import { Page, LegacyCard, Layout, Tabs, Icon } from '@shopify/polaris';
+import { DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
 import { TitleBar} from "@shopify/app-bridge-react";
 import "../components/stylesheets/mainstyle.css";
 import { EditOfferTabs, SecondTab, ThirdTab, FourthTab } from "../components";
-import {useState, useCallback, useEffect} from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import React from 'react';
 import { offerActivate, loadOfferDetails } from "../services/offers/actions/offer";
 
@@ -99,20 +99,22 @@ export default function EditPage() {
           text: {},
           button: {},
         }
-    })
+    });
 
     //Call on initial render
     useEffect(() => {
-        loadOfferDetails(55, 31).then((data) => {
-            setOffer(data);
-        })
+      loadOfferDetails(55, 31).then((data) => {
+        setOffer(data);
+      })
         .catch((error) => {
+          console.log("Error > ", JSON.stringify(error));
         });
 
-        offerSettings(55, 0).then((data) => {
-            setShop(data);
-        })
+      offerSettings(55, 0).then((data) => {
+        setShop(data);
+      })
         .catch((error) => {
+          console.log("Error > ", JSON.stringify(error));
         });
     },[]);
 
