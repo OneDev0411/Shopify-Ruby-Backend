@@ -12,11 +12,13 @@
     "node": ">=14.13.1"
   },
   "dependencies": {
+    "@shopify/polaris-viz": "^9.3.0",
     "@shopify/shopify-app-express": "^1.0.0",
     "@shopify/shopify-app-session-storage-sqlite": "^1.0.0",
     "compression": "^1.7.4",
     "cross-env": "^7.0.3",
-    "serve-static": "^1.14.1"
+    "serve-static": "^1.14.1",
+    "slick-carousel": "^1.8.1"
   },
   "devDependencies": {
     "jsonwebtoken": "^8.5.1",

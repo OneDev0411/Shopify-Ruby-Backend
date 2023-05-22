@@ -2,9 +2,9 @@ import {DataTable} from '@shopify/polaris';
 import React from 'react';
 import {PolarisVizProvider, StackedAreaChart } from '@shopify/polaris-viz';
 import '@shopify/polaris-viz/build/esm/styles.css';
-  
-export function TotalSalesData() { 
-    return ( 
+
+export function TotalSalesData() {
+    return (
         <PolarisVizProvider
         themes={{
             Default: {
@@ -59,7 +59,7 @@ export function TotalSalesData() {
             legendPosition="left"
             theme='Light'
         />
-        </PolarisVizProvider>     
+        </PolarisVizProvider>
     );
   }
 

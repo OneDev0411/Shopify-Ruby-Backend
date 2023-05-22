@@ -1,8 +1,8 @@
 import { useState } from "react";
 import {
-  Card,
+  LegacyCard,
   Heading,
-  TextContainer,
+  VerticalStack,
   DisplayText,
   TextStyle,
 } from "@shopify/polaris";
@@ -52,7 +52,7 @@ export function ProductsCard() {
   return (
     <>
       {toastMarkup}
-      <Card
+      <LegacyCard
         title="Product Counter"
         sectioned
         primaryFooterAction={{
@@ -61,7 +61,7 @@ export function ProductsCard() {
           loading: isLoading,
         }}
       >
-        <TextContainer spacing="loose">
+        <VerticalStack spacing="loose">
           <p>
             Sample products are created with a default title and price. You can
             remove them at any time.
@@ -70,12 +70,12 @@ export function ProductsCard() {
             TOTAL PRODUCTS
             <DisplayText size="medium">
               <TextStyle variation="strong">
-                {isLoadingCount ? "-" : data.count}
+                { isLoadingCount ? "-" : data.count }
               </TextStyle>
             </DisplayText>
           </Heading>
-        </TextContainer>
-      </Card>
+        </VerticalStack>
+      </LegacyCard>
     </>
   );
 }

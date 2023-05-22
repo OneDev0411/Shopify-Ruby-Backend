@@ -8,12 +8,12 @@ import {
     ResourceItem,
   } from '@shopify/polaris';
   import {useState, useCallback} from 'react';
-  
+
  export function ModalAddProduct() {
     const [selectedItems, setSelectedItems] = useState([]);
     const [taggedWith, setTaggedWith] = useState(null);
     const [queryValue, setQueryValue] = useState(null);
-  
+
     const handleTaggedWithChange = useCallback(
       (value) => setTaggedWith(value),
       [],
@@ -28,12 +28,12 @@ import {
       handleTaggedWithRemove();
       handleQueryValueRemove();
     }, [handleQueryValueRemove, handleTaggedWithRemove]);
-  
+
     const resourceName = {
       singular: 'product',
       plural: 'products',
     };
-  
+
     const items = [
       {
         id: 112,
@@ -52,14 +52,14 @@ import {
         latestOrderUrl: 'orders/1457',
       },
     ];
-  
+
     const bulkActions = [
       {
         content: 'Add products',
         onAction: () => console.log('Todo: implement bulk add tags'),
       }
     ];
-  
+
     const filters = [
       {
         key: 'taggedWith3',
@@ -68,7 +68,7 @@ import {
         shortcut: true,
       },
     ];
-  
+
     const appliedFilters = !isEmpty(taggedWith)
       ? [
           {
@@ -78,7 +78,7 @@ import {
           },
         ]
       : [];
-  
+
     const filterControl = (
       <Filters
         queryValue={queryValue}
@@ -89,8 +89,8 @@ import {
         onClearAll={handleClearAll}
       >
       </Filters>
-    );filters
-  
+    ); filters;
+
     return (
         <ResourceList
           resourceName={resourceName}
@@ -102,7 +102,7 @@ import {
           filterControl={filterControl}
         />
     );
-  
+
     function renderItem(item) {
       const {id, url, name, cost} = item;
       const media = <Avatar customer size="medium" name={name} />;
@@ -121,7 +121,7 @@ import {
         </ResourceItem>
       );
     }
-  
+
     function disambiguateLabel(key, value) {
       switch (key) {
         case 'taggedWith3':
@@ -130,7 +130,7 @@ import {
           return value;
       }
     }
-  
+
     function isEmpty(value) {
       if (Array.isArray(value)) {
         return value.length === 0;

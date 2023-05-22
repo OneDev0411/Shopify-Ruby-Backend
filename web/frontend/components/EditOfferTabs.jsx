@@ -5,17 +5,17 @@ import {
     Button,
     TextField,
     Checkbox,
-    Select, 
-    RangeSlider, 
-    Collapsible, 
-    Modal, 
-    Grid, 
+    Select,
+    RangeSlider,
+    Collapsible,
+    Modal,
+    Grid,
     ColorPicker
 } from "@shopify/polaris";
-import {ModalAddProduct} from "./modal_AddProduct";
-import {ModalAddConditions} from "./modal_AddConditions"; 
+import {ModalAddProduct} from './modal_AddProduct';
+import {ModalAddConditions} from './modal_AddConditions';
 import {useState,useCallback,useRef} from "react";
-import React from "react";
+import React from 'react';
 
 
 export function EditOfferTabs() {

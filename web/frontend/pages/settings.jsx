@@ -3,7 +3,7 @@ import{TitleBar} from "@shopify/app-bridge-react";
 import React, { Component, useState, useCallback } from "react";
 import {SettingTabs} from "../components";
 import Slider from "react-slick";
-import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import {stars} from "../assets";
 
@@ -97,7 +97,7 @@ export default class Settings extends Component{
                                                 source={stars}
                                             />
                                             <Button url="https://apps.shopify.com/content-translation">View on Shopify App Store</Button>
-                                            </Stack>  
+                                            </Stack>
                                         </Card>
                                     </Grid.Cell>
                                 </Grid>

@@ -15,7 +15,7 @@ const ConfirmFromOutside = () => {
     const response = await confirmCharge('icu-dev-store.myshopify.com', charge_id);
 
     if (window.top == window.self) {
-      // If the current window is the 'parent', change the URL by setting location.href  
+      // If the current window is the 'parent', change the URL by setting location.href
       redirect.dispatch(Redirect.Action.REMOTE, `/confirm_charge?success=${response.success}`);
 
     } else {

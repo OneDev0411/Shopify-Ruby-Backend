@@ -14,7 +14,8 @@
   "dependencies": {
     "@shopify/app": "3.45.4",
     "@shopify/cli": "3.45.4",
-    "@shopify/polaris": "^10.49.1"
+    "@shopify/polaris": "^10.49.1",
+    "axios": "^1.4.0"
   },
   "author": "xpsman"
 }
