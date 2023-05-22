@@ -1,4 +1,4 @@
-import { Card, Page, Layout, TextContainer, Heading } from "@shopify/polaris";
+import { Page, Layout, VerticalStack, Text } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { OffersList } from "../components";
 
@@ -31,28 +31,28 @@ export default function PageOffers() {
       </Layout.Section>
         <Layout.Section>
           <div>
-            <Heading>All Time Revenue</Heading>
-            <TextContainer>
+            <Text variant="headingMd" as="h2">All Time Revenue</Text>
+            <VerticalStack >
               <p>55%</p>
-            </TextContainer>
+            </VerticalStack >
           </div>
           <div>
-            <Heading>Offers Displayed</Heading>
-            <TextContainer>
+            <Text variant="headingMd" as="h2">Offers Displayed</Text>
+            <VerticalStack >
               <p> 33 % </p>
-            </TextContainer>
+            </VerticalStack>
           </div>
           <div>
-            <Heading>Offers Added To Cart</Heading>
-            <TextContainer>
+            <Text variant="headingMd" as="h2">Offers Added To Cart</Text>
+            <VerticalStack>
               <p>99%</p>
-            </TextContainer>
+            </VerticalStack>
           </div>
           <div>
-            <Heading>Offers Sales</Heading>
-            <TextContainer>
+            <Text variant="headingMd" as="h2">Offers Sales</Text>
+            <VerticalStack>
               <p>$124.89</p>
-            </TextContainer>
+            </VerticalStack>
           </div>
         </Layout.Section>
         <Layout.Section>

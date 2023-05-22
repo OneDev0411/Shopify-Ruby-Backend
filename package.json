@@ -12,9 +12,9 @@
     "info": "shopify app info"
   },
   "dependencies": {
-    "@shopify/app": "3.45.4",
-    "@shopify/cli": "3.45.4",
-    "@shopify/polaris": "^10.49.1",
+    "@shopify/app": "^3.46",
+    "@shopify/cli": "^3.46",
+    "@shopify/polaris": "^10.49",
     "axios": "^1.4.0"
   },
   "author": "xpsman"
