@@ -82,7 +82,7 @@ export default function EditPage() {
     custom_field_3_required: '',
     });
 
-    const [shop, setShop] = useState({
+    const [offerSettings, setOfferSettings] = useState({
         customTheme: "",
         css_options: {
             main: {},
@@ -91,6 +91,16 @@ export default function EditPage() {
         },
     });
 
+    const [shop, setShop] = useState({
+        shop_id: undefined,
+        offer_css: '',
+        css_options: {
+          main: {},
+          text: {},
+          button: {},
+        }
+    })
+
     //Call on initial render
     useEffect(() => {
         loadOfferDetails(55, 31).then(function(data) {
@@ -98,7 +108,6 @@ export default function EditPage() {
         })
         .catch(function(error) {
         })
-
 
         offerSettings(55, 0).then(function(data) {
             setShop(data);
@@ -114,9 +123,9 @@ export default function EditPage() {
         });
     }
 
-    //Called whenever the shop changes in any child component
-    function updateShop(updatedShop) {
-        setShop(updatedShop);
+    //Called whenever the offer settings for shop changes in any child component
+    function updateOfferSettings(updatedShop) {
+        setOfferSettings(updatedShop);
     }
 
     // Called to update the included variants in offer
@@ -142,6 +151,14 @@ export default function EditPage() {
             return { ...previousState, offerable_product_shopify_ids: [...previousState.offerable_product_shopify_ids, data.id], }
         });
     }
+
+    //Called whenever the shop changes in any child component
+    function updateShop(updatedKey, updatedValue) {
+        setShop(previousState => {
+            return { ...previousState, [updatedKey]: updatedValue }
+        });
+    }
+
 
     // Called when save button is clicked
     function save() {
@@ -228,11 +245,11 @@ export default function EditPage() {
 
                     {selected == 0 ? 
                         // page was imported from components folder
-                        <EditOfferTabs offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer}/>
+                        <EditOfferTabs offer={offer} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer}/>
                     : "" }
                     {selected == 1 ? 
                         // page was imported from components folder
-                        <SecondTab/>
+                        <SecondTab offer={offer} offerSettings={offerSettings} updateOffer={updateOffer}/>
                     : "" } 
                     {selected == 2 ? 
                         // page was imported from components folder
@@ -240,7 +257,7 @@ export default function EditPage() {
                     : "" }    
                     {selected == 3 ? 
                         // page was imported from components folder
-                        <FourthTab/>
+                        <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings}/>
                     : "" }    
                 </Tabs>
             </Layout.Section>
