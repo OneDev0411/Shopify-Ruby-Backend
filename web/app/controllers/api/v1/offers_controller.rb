@@ -68,7 +68,7 @@ module V1
         end
       rescue ActiveRecord::RecordNotFound, StandardError => e
         Rails.logger.debug "Error Message: #{e.message}"
-        Rollbar.error("Error", e)
+        Rollbar.error('Error offer_activate', e)
       end
   end
 

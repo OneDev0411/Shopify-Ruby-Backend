@@ -1,22 +1,21 @@
 import {
-    Card,
-    Stack,
+    LegacyCard,
+    LegacyStack,
     ButtonGroup,
     Button,
     TextField,
-    TextContainer,
     Link,
     Checkbox,
-    Select, 
-    RangeSlider, 
-    Collapsible, 
-    Modal, 
-    Grid, 
+    Select,
+    RangeSlider,
+    Collapsible,
+    Modal,
+    Grid,
     ColorPicker
 } from "@shopify/polaris";
 import {ModalAddProduct} from "./modal_AddProduct";
 import {ModalAddConditions} from "./modal_AddConditions";
-import HomePage from "../pages/subscription"
+import HomePage from "../pages/subscription";
 import {useState,useCallback,useRef,useEffect} from "react";
 import React from "react";
 import { elementSearch, productsMulti } from "../services/products/actions/product";
@@ -57,7 +56,7 @@ export function EditOfferTabs(props) {
     const handleCustomTextChange = useCallback((newChecked) => props.updateOffer("show_custom_field", newChecked), []);
     //modal controls
     const [productModal, setProductModal] = useState(false);
-    const handleModal = useCallback(() => { 
+    const handleModal = useCallback(() => {
         setProductModal(!productModal);
     }, [productModal]);
     const modalRef = useRef(null);
@@ -73,18 +72,19 @@ export function EditOfferTabs(props) {
     //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
     function updateQuery (childData) {
         setResourceListLoading(true);
-        elementSearch(55, childData).then(function(data) {
+        elementSearch(55, childData).then((data) => {
             setResourceListLoading(false);
             setProductData(data);
         })
-        .catch(function(error) {
-        })
-        setQuery(childData)
+        .catch((error) => {
+        });
+
+      setQuery(childData);
     }
 
     //Called when the selected product or variants of selected product changes in popup modal
     function updateSelectedProduct(selectedItem, selectedVariants) {
-        if(Array.isArray(selectedItem)) {
+        if (Array.isArray(selectedItem)) {
             setSelectedProducts(selectedItem);
         }
         props.updateIncludedVariants(selectedItem, selectedVariants);
@@ -92,27 +92,30 @@ export function EditOfferTabs(props) {
 
     //Called when "select product manually button clicked"
     function getProducts() {
-        props.updateOffer("included_variants", {})
-        setResourceListLoading(true);
-        elementSearch(55, query).then(function(data) {
+      props.updateOffer("included_variants", {});
+
+      setResourceListLoading(true);
+      elementSearch(55, query).then((data) => {
             setResourceListLoading(false);
             setProductData(data);
         })
-        .catch(function(error) {
-        })
+        .catch((error) => {
+          console.log("# Error getProducts > ", JSON.stringify(error));
+        });
     }
 
     //Called when the save button of popup modal is clicked
     function updateProducts() {
         props.updateOffer("offerable_product_details", []);
-        props.updateOffer("offerable_product_shopify_ids", [])
+      props.updateOffer("offerable_product_shopify_ids", []);
         for(var i=0; i<selectedProducts.length; i++) {
-            productsMulti(selectedProducts[i], 55).then(function(data) {
+            productsMulti(selectedProducts[i], 55).then((data) => {
                 props.updateProductsOfOffer(data);
                 setProductData("");
             })
-            .catch(function(error) {
-            })
+            .catch((error) => {
+              console.log("# Error updateProducts > ", JSON.stringify(error));
+            });
         }
         handleModal();
     }
@@ -124,20 +127,20 @@ export function EditOfferTabs(props) {
 
     return (
         <div>
-        <Card title="Offer Product" actions={[{content: 'Learn about Autopilot'}]} sectioned >
-            <Card.Section>
-                <Stack spacing="loose" vertical>
+        <LegacyCard title="Offer Product" actions={[{content: 'Learn about Autopilot'}]} sectioned >
+            <LegacyCard.Section>
+                <LegacyStack spacing="loose" vertical>
                     <p>What product would you like to have in the offer?</p>
                     <ButtonGroup>
                         <Button id={"btnSelectProduct"} onClick={ () => { handleModal(); getProducts(); } } ref={modalRef}>Select product manually</Button>
                         <Button id={"btnLaunchAI"} primary>Launch Autopilot</Button>
                     </ButtonGroup>
-                </Stack>
-            </Card.Section>
-        </Card> 
-        <Card title="Text" sectioned >
-            <Card.Section>
-                <Stack spacing="loose" vertical>
+                </LegacyStack>
+            </LegacyCard.Section>
+        </LegacyCard>
+        <LegacyCard title="Text" sectioned >
+            <LegacyCard.Section>
+                <LegacyStack spacing="loose" vertical>
                     <TextField
                         label="Offer title"
                         placeholder='Offer #1'
@@ -149,7 +152,7 @@ export function EditOfferTabs(props) {
                     <TextField
                         label="Offer text"
                         placeholder='Take advantage of this limited offer'
-                        autoComplete="off" 
+                        autoComplete="off"
                         value={props.offer.text_a}
                         onChange={handleTextChange}
                     />
@@ -158,9 +161,9 @@ export function EditOfferTabs(props) {
                         placeholder='Add to cart'
                         value={props.offer.cta_a}
                         onChange={handleBtnChange}
-                        autoComplete="off"   
+                        autoComplete="off"
                     />
-                    <Checkbox id={"abTesting"} 
+                    <Checkbox id={"abTesting"}
                         label="Enable A/B testing"
                         checked={abTestCheck}
                         onChange={handleAbChange}
@@ -172,88 +175,88 @@ export function EditOfferTabs(props) {
                         transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
                         // expandOnPrint
                     >
-                        <Collapsible
-                            open={!props.offerSettings.has_ab_testing}
-                            id="ab-testing-not-present-collapsible"
-                            transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
-                            expandOnPrint
-                        >
-                            <TextContainer>
-                                <p>
+                    <Collapsible
+                      open={!props.offerSettings.has_ab_testing}
+                      id="ab-testing-not-present-collapsible"
+                      transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
+                      expandOnPrint
+                    >
+                      <VerticalStack>
+                        <p>
                                     A/B testing is available on our Professional plan. Please <Link url="">upgrade your subscription</Link> to enable it.
                                 </p>
-                            </TextContainer>
-                        </Collapsible>
-                        <Collapsible
+                      </VerticalStack>
+                    </Collapsible>
+                      <Collapsible
                             open={props.offerSettings.has_ab_testing}
                             id="ab-testing-present-collapsible"
                             transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
                             expandOnPrint
                         >
-                            <TextField
-                                label="Alternative offer text"
-                                placeholder='Take advantage of this limited offer'
-                                autoComplete="off" 
-                                value={props.offer.text_b}
-                                onChange={handleAltTextChange}
-                            />
+                        <TextField
+                          label="Alternative offer text"
+                          placeholder='Take advantage of this limited offer'
+                          autoComplete="off"
+                          value={props.offer.text_b}
+                          onChange={handleAltTextChange}
+                        />
                             <TextField
                                 label="Alternative button text"
                                 placeholder='Add to cart'
-                                autoComplete="off" 
+                                autoComplete="off"
                                 value={props.offer.cta_b}
                                 onChange={handleAltBtnChange}
                             />
                         </Collapsible>
                     </Collapsible>
-                </Stack>
-            </Card.Section>
-        </Card>
-        <Card title="Display options" sectioned>
-            <Card.Section>
-            <Stack vertical>
-                <Checkbox id={"removeImg"} 
+                </LegacyStack>
+            </LegacyCard.Section>
+        </LegacyCard>
+        <LegacyCard title="Display options" sectioned>
+            <LegacyCard.Section>
+            <LegacyStack vertical>
+                <Checkbox id={"removeImg"}
                     checked={!props.offer.show_product_image}
                     onChange={handleImageChange}
                     label="Remove product image"
                 />
-                <Checkbox id={"removePrice"} 
+                <Checkbox id={"removePrice"}
                     checked={!props.offer.show_product_price}
                     onChange={handlePriceChange}
                     label="Remove price"
                 />
-                <Checkbox id={"removeComparePrice"} 
+                <Checkbox id={"removeComparePrice"}
                     checked={!props.offer.show_compare_at_price}
                     onChange={handleCompareChange}
                     label="Remove compare at price"
                 />
-                <Checkbox id={"removeProductPage"} 
+                <Checkbox id={"removeProductPage"}
                     checked={!props.offer.link_to_product}
                     onChange={handleProductPageChange}
                     label="Remove link to product page"
                 />
-                <Checkbox id={"autoDiscount"} 
+                <Checkbox id={"autoDiscount"}
                     label="Automatically apply discount code"
                     checked={props.offer.discount_target_type == "code"}
                     onChange={handleDiscountChange}
                 />
                 <Checkbox id={"removeQtySelector"}
                     checked={!props.offer.show_quantity_selector}
-                    onChange={handleQtySelectorChange} 
+                    onChange={handleQtySelectorChange}
                     label="Remove quantity selector"
                 />
                 <Checkbox id={"addCustomtext"}
                     checked={props.offer.show_custom_field}
-                    onChange={handleCustomTextChange} 
+                    onChange={handleCustomTextChange}
                     label="Add custom textbox"
                 />
-            </Stack>
-            </Card.Section>
-        </Card>
+            </LegacyStack>
+            </LegacyCard.Section>
+        </LegacyCard>
         <div className="space-4"></div>
-        <Stack distribution="center">
+        <LegacyStack distribution="center">
             <Button id={"btnAddProduct"} onClick={handleModal} ref={modalRef}>Add product</Button>
-        </Stack>
+        </LegacyStack>
         <div className="space-10"></div>
         {/* Modal */}
         <Modal
@@ -302,16 +305,15 @@ export function SecondTab(props){
             props.updateOffer("in_product_page", false);
             props.updateOffer("in_ajax_cart", true);
         }
-        setSelected(value)
+      setSelected(value);
     }, []);
-  
-    const options = [
+
+  const options = [
       {label: 'Cart page', value: 'cartpage'},
-      {label: 'Product page', value: 'productpage'}, 
+      {label: 'Product page', value: 'productpage'},
       {label: 'Product and cart page', value: 'cartpageproductpage'},
       {label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax'},
       {label: 'AJAX and cart page', value: 'ajaxcartpage'}
-      
     ];
 
     const handleDisableCheckoutBtn = useCallback((newChecked) => props.updateOffer("must_accept", newChecked), []);
@@ -323,30 +325,30 @@ export function SecondTab(props){
     const activatorCon = modalCon;
 
     useEffect(() => {
-        if(props.offer.in_product_page && props.offer.in_cart_page) {
+        if (props.offer.in_product_page && props.offer.in_cart_page) {
             setSelected("cartpageproductpage");
         }
-        else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
+        else if (props.offer.in_ajax_cart && props.offer.in_cart_page) {
             setSelected("ajaxcartpage");
         }
-        else if(props.offer.in_cart_page) {
+        else if (props.offer.in_cart_page) {
             setSelected("cartpage");
         }
-        else if(props.offer.in_product_page) {
+        else if (props.offer.in_product_page) {
             setSelected("productpage");
         }
-        else if(props.offer.in_ajax_cart) {
+        else if (props.offer.in_ajax_cart) {
             setSelected("ajax");
         }
         else {
             setSelected("cartpage");
         }
-    }, [])
+    }, []);
 
     return(
         <div>
-            <Card title="Choose placement" sectioned>
-                <Card.Section>
+            <LegacyCard title="Choose placement" sectioned>
+                <LegacyCard.Section>
                 <Grid>
                     <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                         <Select
@@ -356,34 +358,34 @@ export function SecondTab(props){
                         />
                     </Grid.Cell>
                 </Grid>
-                </Card.Section>
-            </Card>
-            <Card title="Display Conditions" sectioned>
-                <Card.Section>
-                    <p>None selected (show offer to all customer)</p>  
+                </LegacyCard.Section>
+            </LegacyCard>
+            <LegacyCard title="Display Conditions" sectioned>
+                <LegacyCard.Section>
+                    <p>None selected (show offer to all customer)</p>
                     <br/>
                     <Button onClick={handleModal} ref={modalCon}>Add condition</Button>
-                </Card.Section>
-                <Card.Section title="Condition options">
-                    <Stack vertical>
-                        <Checkbox 
-                            label="Disable checkout button until offer is accepted" 
+                </LegacyCard.Section>
+                <LegacyCard.Section title="Condition options">
+                    <LegacyStack vertical>
+                        <Checkbox
+                            label="Disable checkout button until offer is accepted"
                             helpText="This is useful for products that can only be purchased in pairs."
                             checked={props.offer.must_accept}
                             onChange={handleDisableCheckoutBtn}
                         />
-                        <Checkbox 
+                        <Checkbox
                             label="If the offer requirements are no longer met. Remove the item from the cart."
                             checked={props.offer.remove_if_no_longer_valid}
                             onChange={handleRemoveItiem}
                         />
-                    </Stack>
-                </Card.Section>
-            </Card>
+                    </LegacyStack>
+                </LegacyCard.Section>
+            </LegacyCard>
             <div className="space-4"></div>
-                <Stack distribution="center">
+                <LegacyStack distribution="center">
                     <Button disabled="true">Continue to Appearance</Button>
-                </Stack>
+                </LegacyStack>
             <div className="space-10"></div>
             <Modal
                 activator={activatorCon}
@@ -395,7 +397,7 @@ export function SecondTab(props){
                 }}
             >
                 <Modal.Section>
-                   <ModalAddConditions/> 
+                   <ModalAddConditions/>
                 </Modal.Section>
             </Modal>
         </div>
@@ -403,46 +405,46 @@ export function SecondTab(props){
 }
 
 export function ThirdTab(){
-    const [layout, setLayout] = useState('Cart page');
-    const [selected, setSelected] = useState('Cart page');
-    const options = [
+  const [layout, setLayout] = useState('Cart page');
+  const [selected, setSelected] = useState('Cart page');
+  const options = [
         {label: 'Cart page', value: 'cartpage'},
         {label: 'Product page', value: 'productpage'},
         {label: 'Product and cart page', value: 'cartpageproductpage'},
         {label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax'},
         {label: 'AJAX and cart page', value: 'ajaxcartpage'}
-      ];
-      
-    const handleLayout = useCallback((value) => setLayout(value), []);
-    const handleSelectChange = useCallback((value) => setSelected(value), []);
+  ];
 
-    // Space above the offer
-    const [aboveSpace, setAboveSpace] = useState('10');
-    const handleAboveSpace = useCallback(
-        (value) => setAboveSpace(value),
-        [],
-    );
-    // Space below the offer
-    const [belowSpace, setBelowSpace] = useState('10');
-    const handleBelowSpace = useCallback(
-        (value) => setBelowSpace(value),
-        [],
-    );
-    //Border style drop-down menu
-    const [borderStyle, setBorderStyle] = useState("No border")
-    const handleBorderStyle = useCallback((value) => setBorderStyle(value), []);
-    const BorderOptions = [
+  const handleLayout = useCallback((value) => setLayout(value), []);
+  const handleSelectChange = useCallback((value) => setSelected(value), []);
+
+  // Space above the offer
+  const [aboveSpace, setAboveSpace] = useState('10');
+  const handleAboveSpace = useCallback(
+    (value) => setAboveSpace(value),
+    [],
+  );
+  // Space below the offer
+  const [belowSpace, setBelowSpace] = useState('10');
+  const handleBelowSpace = useCallback(
+    (value) => setBelowSpace(value),
+    [],
+  );
+  //Border style drop-down menu
+  const [borderStyle, setBorderStyle] = useState("No border");
+  const handleBorderStyle = useCallback((value) => setBorderStyle(value), []);
+  const BorderOptions = [
         {label: 'No border', value: 'No border'},
         {label: 'Dotted lines', value: 'Dotted lines'},
         {label: 'Straight line', value: 'Straight line'},
-      ];
+  ];
 
-    //Border width
-    const [borderWidth, setBorderWidth] = useState('10');
-    const handleBorderWidth = useCallback(
-        (value) => setBorderWidth(value),
-        [],
-    );
+  //Border width
+  const [borderWidth, setBorderWidth] = useState('10');
+  const handleBorderWidth = useCallback(
+    (value) => setBorderWidth(value),
+    [],
+  );
 
     //Border range slider
     const [borderRange, setBorderRange] = useState(10);
@@ -450,7 +452,7 @@ export function ThirdTab(){
         (value) => setBorderRange(value),
         [],
     );
- 
+
     // Toggle for manually added color
     const [open, setOpen] = useState(false);
     const handleToggle = useCallback(() => setOpen((open) => !open), []);
@@ -513,24 +515,24 @@ export function ThirdTab(){
         (value) => setBtnSize(value),
         [],
     );
-    
+
     // Btn radius
     const [rangeValue, setRangeValue] = useState(20);
     const handleRangeSliderChange = useCallback(
         (value) => setRangeValue(value),
         [],
     );
-   
+
     return(
         <div>
-            <Card title="Offer box" sectioned>
-                <Card.Section>
+            <LegacyCard title="Offer box" sectioned>
+                <LegacyCard.Section>
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <Select 
-                                label="Layout" 
-                                options={options} 
-                                onChange={handleLayout} 
+                            <Select
+                                label="Layout"
+                                options={options}
+                                onChange={handleLayout}
                                 value={layout}
                             />
                         </Grid.Cell>
@@ -538,38 +540,38 @@ export function ThirdTab(){
                     <br/>
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <TextField 
-                                label="Space above offer" 
+                            <TextField
+                                label="Space above offer"
                                 type="number"
-                                onChange={handleAboveSpace} 
+                                onChange={handleAboveSpace}
                                 value={aboveSpace}
                                 suffix="px"
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <TextField 
-                                label="Space below offer" 
+                            <TextField
+                                label="Space below offer"
                                 type="number"
-                                onChange={handleBelowSpace} 
+                                onChange={handleBelowSpace}
                                 value={belowSpace}
                                 suffix="px"
                             />
-                        </Grid.Cell>    
+                        </Grid.Cell>
                     </Grid>
                     <br/>
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <Select label="Border style" 
-                                options={BorderOptions} 
-                                onChange={handleBorderStyle} 
+                            <Select label="Border style"
+                                options={BorderOptions}
+                                onChange={handleBorderStyle}
                                 value={borderStyle}
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <TextField 
-                                label="Border width" 
+                            <TextField
+                                label="Border width"
                                 type="number"
-                                onChange={handleBorderWidth} 
+                                onChange={handleBorderWidth}
                                 value={borderWidth}
                                 suffix="px"
                             />
@@ -583,13 +585,13 @@ export function ThirdTab(){
                                 value={borderRange}
                                 onChange={handlesetBorderRange}
                                 output
-                            />  
-                        </Grid.Cell> 
+                            />
+                        </Grid.Cell>
                     </Grid>
-                </Card.Section>
-            </Card>
-            <Card title="Color" sectioned>
-                <Card.Section>
+                </LegacyCard.Section>
+            </LegacyCard>
+            <LegacyCard title="Color" sectioned>
+                <LegacyCard.Section>
                     <ButtonGroup>
                         <Button
                             onClick={handleToggle}
@@ -604,70 +606,70 @@ export function ThirdTab(){
                             id="basic-collapsible"
                             transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
                             expandOnPrint
-                        >  
-                           <br/><ColorPicker onChange={setColor} color={color} allowAlpha />
+                        >
+                          <br/><ColorPicker onChange={setColor} color={color} allowAlpha />
                         </Collapsible>
                     </Stack>
-                </Card.Section>
-            </Card>
-            <Card  title="Offer text" className="input-box" sectioned>
-                <Card.Section>
+                </LegacyCard.Section>
+            </LegacyCard>
+            <LegacyCard  title="Offer text" className="input-box" sectioned>
+                <LegacyCard.Section>
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <Select 
-                                label="Font" 
-                                options={fontOptions} 
-                                onChange={handleFontSelect} 
+                            <Select
+                                label="Font"
+                                options={fontOptions}
+                                onChange={handleFontSelect}
                                 value={fontSelect}
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <TextField 
-                                label="Weight" 
-                                type="number" 
-                                suffix="px" 
+                            <TextField
+                                label="Weight"
+                                type="number"
+                                suffix="px"
                                 autoComplete="off"
                                 onChange={handleFontWeight}
                                 value={fontWeight}
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <TextField 
-                                label="Size" 
-                                type="number" 
-                                suffix="px" 
+                            <TextField
+                                label="Size"
+                                type="number"
+                                suffix="px"
                                 autoComplete="off"
                                 onChange={handleFontSize}
                                 value={fontsize}
                             />
-                        </Grid.Cell>                                
+                        </Grid.Cell>
                     </Grid>
-                </Card.Section>
-                <Card.Section title="Button text">
+                </LegacyCard.Section>
+                <LegacyCard.Section title="Button text">
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <Select 
-                                label="Font" 
-                                options={btnOptions} 
-                                onChange={handleBtnSelect} 
+                            <Select
+                                label="Font"
+                                options={btnOptions}
+                                onChange={handleBtnSelect}
                                 value={btnSelect}
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <TextField 
-                                label="Weight" 
-                                type="number" 
-                                suffix="px" 
+                            <TextField
+                                label="Weight"
+                                type="number"
+                                suffix="px"
                                 autoComplete="off"
                                 onChange={handleBtnWeight}
                                 value={btnWeight}
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <TextField 
-                                label="Size" 
-                                type="number" 
-                                suffix="px" 
+                            <TextField
+                                label="Size"
+                                type="number"
+                                suffix="px"
                                 autoComplete="off"
                                 onChange={handleBtnSize}
                                 value={btnSize}
@@ -682,18 +684,18 @@ export function ThirdTab(){
                                 value={rangeValue}
                                 onChange={handleRangeSliderChange}
                                 output
-                            /> 
-                        </Grid.Cell>   
+                            />
+                        </Grid.Cell>
                     </Grid>
-                </Card.Section>
-            </Card>
+                </LegacyCard.Section>
+            </LegacyCard>
             <div className="space-4"></div>
-            <Stack distribution="center">
+            <LegacyStack distribution="center">
                 <ButtonGroup>
                     <Button>Save dratf</Button>
                     <Button primary>Publish</Button>
                 </ButtonGroup>
-            </Stack> 
+            </LegacyStack>
             <div className="space-10"></div>
         </div>
     );
@@ -715,21 +717,21 @@ export function FourthTab(props){
 
     return(
         <>
-            <Card sectioned title="Offer placement - advanced settings" actions={[{content: 'View help doc'}]}>
-                <Card.Section title="Product page">
+            <LegacyCard sectioned title="Offer placement - advanced settings" actions={[{content: 'View help doc'}]}>
+                <LegacyCard.Section title="Product page">
                     <TextField label="DOM Selector" value={props.shop.custom_product_page_dom_selector} onChange={handleProductDomSelector} type="text"></TextField>
                     <TextField label="DOM Action" value={props.shop.custom_product_page_dom_action} onChange={handleProductDomAction}></TextField>
-                </Card.Section>
-                <Card.Section title="Cart page">
+                </LegacyCard.Section>
+                <LegacyCard.Section title="Cart page">
                     <TextField label="DOM Selector" value={props.shop.custom_cart_page_dom_selector} onChange={handleCartDomSelector}></TextField>
                     <TextField label="DOM Action" value={props.shop.custom_cart_page_dom_action} onChange={handleCartDomAction}></TextField>
-                </Card.Section>
-                <Card.Section title="AJAX/Slider cart">
+                </LegacyCard.Section>
+                <LegacyCard.Section title="AJAX/Slider cart">
                     <TextField label="DOM Selector" value={props.shop.custom_ajax_dom_selector} onChange={handleAjaxDomSelector}></TextField>
                     <TextField label="DOM Action" value={props.shop.custom_ajax_dom_action} onChange={handleAjaxDomAction}></TextField>
                     <TextField label="AJAX refresh code" value={props.shop.ajax_refresh_code} onChange={handleAjaxRefreshCode} multiline={6}></TextField>
-                </Card.Section>
-                <Card.Section title="Custom CSS">
+                </LegacyCard.Section>
+                <LegacyCard.Section title="Custom CSS">
                     <TextField value={props.shop.offer_css} onChange={handleOfferCss} multiline={6}></TextField>
                     <br/>
                     <Checkbox
@@ -739,15 +741,15 @@ export function FourthTab(props){
                         checked={checked}
                         onChange={handleChange}
                     />
-                </Card.Section>
-            </Card>
+                </LegacyCard.Section>
+            </LegacyCard>
             <div className="space-4"></div>
-            <Stack distribution="center">
+            <LegacyStack distribution="center">
                 <ButtonGroup>
                     <Button>Save dratf</Button>
                     <Button primary>Publish</Button>
                 </ButtonGroup>
-            </Stack>
+            </LegacyStack>
             <div className="space-10"></div>
         </>
     );

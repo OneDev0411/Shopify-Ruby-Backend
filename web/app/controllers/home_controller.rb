@@ -3,12 +3,13 @@
 class HomeController < ApplicationController
   include ShopifyApp::EmbeddedApp
   include ShopifyApp::EnsureInstalled
-  #include ShopifyApp::ShopAccessScopesVerification
+  include ShopifyApp::ShopAccessScopesVerification
 
   DEV_INDEX_PATH = Rails.root.join('frontend')
   PROD_INDEX_PATH = Rails.public_path.join('dist')
 
   def index
+    # puts "##>>>>  SHOP  ##>>  #{request.headers['action_dispatch.request.parameters']['shop']}"
     if ShopifyAPI::Context.embedded? && (!params[:embedded].present? || params[:embedded] != '1')
       redirect_to(ShopifyAPI::Auth.embedded_app_url(params[:host]), allow_other_host: true)
     else

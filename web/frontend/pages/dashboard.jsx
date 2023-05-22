@@ -1,6 +1,6 @@
 import {
     IndexTable,
-    Card,
+    LegacyCard,
     Filters,
     Select,
     useIndexResourceState,
@@ -13,9 +13,40 @@ import {
   } from '@shopify/polaris';
   import { TotalSalesData, ConversionRate,OrderOverTimeData} from "../components";
   import { TitleBar } from '@shopify/app-bridge-react';
-  import { useState, useCallback } from 'react';
-  
-   export default function IndexTableWithAllElementsExample() {
+  import { useState, useEffect, useCallback } from 'react';
+
+  import { OffersList } from "../components";
+
+  const info = {offer: { shop_domain: window.location.host }};
+  const [offersData, setOffersData] = useState([]);
+  const [isLoading, setIsLoading]   = useState(true);
+
+  useEffect(()=>{
+    setIsLoading(true);
+    fetch('/api/v1/offers_list', {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      redirect: 'follow',
+      referrerPolicy: 'no-referrer',
+      body: JSON.stringify(info),
+    })
+      .then((response) => response.json())
+	    .then((data) => {
+        console.log('API Data >>> ', data);
+        localStorage.setItem('icushopify_domain', data.shopify_domain);
+        setOffersData(data.offers);
+        setIsLoading(false);
+      }).catch((error) => {
+        console.log('Fetch error >> ', error);
+      });
+  },[]);
+
+  export default function IndexTableWithAllElementsExample() {
        //Dummy data fo IndexTable
       const customers = [
         {
@@ -84,13 +115,13 @@ import {
         singular: 'customer',
         plural: 'customers',
       };
-  
+
       const {selectedResources, allResourcesSelected, handleSelectionChange} =
         useIndexResourceState(customers);
       const [taggedWith, setTaggedWith] = useState('');
       const [queryValue, setQueryValue] = useState(null);
       const [sortValue, setSortValue] = useState('today');
-  
+
       const handleTaggedWithChange = useCallback(
         (value) => setTaggedWith(value),
         [],
@@ -102,7 +133,7 @@ import {
         handleQueryValueRemove();
       }, [handleQueryValueRemove, handleTaggedWithRemove]);
       const handleSortChange = useCallback((value) => setSortValue(value), []);
-  
+
       const promotedBulkActions = [
         {
           content: 'Duplicate Offer',
@@ -123,7 +154,7 @@ import {
           onAction: () => console.log('Todo: implement bulk delete'),
         },
       ];
-  
+
       const filters = [
         {
           key: 'taggedWith',
@@ -140,7 +171,7 @@ import {
           shortcut: true,
         },
       ];
-  
+
       const appliedFilters = !isEmpty(taggedWith)
         ? [
             {
@@ -150,14 +181,14 @@ import {
             },
           ]
         : [];
-  
+
       const sortOptions = [
         {label: 'Date Asc', value: 'date_asc'},
         {label: 'Date Desc', value: 'date_des'},
         {label: 'Clicks', value: 'clicks'},
         {label: 'Revenue', value: 'revenue'},
       ];
-  
+
       const rowMarkup = customers.map(
         ({id, offer_name, status, clicks, views,revenue}, index) => (
           <IndexTable.Row
@@ -174,17 +205,17 @@ import {
           </IndexTable.Row>
         ),
       );
-  
+
       return (
-        <Page> 
+        <Page>
           <TitleBar
-              title="Offers"
+              title="Your Offers"
               primaryAction={{
               content: "Create Offer",
               onAction: () => console.log("create offer btn clicked"),
               }}
-          /> 
-          <Card sectioned>
+          />
+          <LegacyCard sectioned>
             <div style={{display: 'flex'}}>
               <div style={{flex: 1}}>
                 <Filters
@@ -241,35 +272,35 @@ import {
                 }}
               />
             </div>
-          </Card>
+          </LegacyCard>
           <div className="space-10"></div>
           <Grid>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <Card title="Total sales" sectioned>
+              <LegacyCard title="Total sales" sectioned>
                 <h3 className="report-money"><strong>$100.00</strong></h3>
                 <div className="space-4"></div>
                 <p>SALES OVER TIME</p>
                 <br/>
                 <TotalSalesData/>
-              </Card>
+              </LegacyCard>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <Card title="Conversion rate" sectioned>
+              <LegacyCard title="Conversion rate" sectioned>
                 <h3 className="report-money"><strong>12%</strong></h3>
                 <div className="space-4"></div>
                 <p>CONVERSION FUNNEL</p>
                 <br/>
                 <ConversionRate/>
-              </Card>
+              </LegacyCard>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <Card title="Total order" sectioned>
+              <LegacyCard title="Total order" sectioned>
                 <h3 className="report-money"><strong>40</strong></h3>
                 <div className="space-4"></div>
                 <p>ORDERS OVER TIME</p>
                 <br/>
                 <OrderOverTimeData/>
-              </Card>
+              </LegacyCard>
             </Grid.Cell>
           </Grid>
           <div className='space-10'></div>
@@ -281,8 +312,7 @@ import {
           </FooterHelp><div> </div>
         </Page>
       );
-  
-    
+
       function disambiguateLabel(key, value) {
         switch (key) {
           case 'taggedWith':
@@ -291,7 +321,7 @@ import {
             return value;
         }
       }
-  
+
       function isEmpty(value) {
         if (Array.isArray(value)) {
           return value.length === 0;
