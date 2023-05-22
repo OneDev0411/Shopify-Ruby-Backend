@@ -7,16 +7,16 @@ import {
     TextContainer,
     Link,
     Checkbox,
-    Select,
-    RangeSlider,
-    Collapsible,
-    Modal,
-    Grid,
+    Select, 
+    RangeSlider, 
+    Collapsible, 
+    Modal, 
+    Grid, 
     ColorPicker
 } from "@shopify/polaris";
 import {ModalAddProduct} from "./modal_AddProduct";
 import {ModalAddConditions} from "./modal_AddConditions";
-import HomePage from "../pages/subscription";
+import HomePage from "../pages/subscription"
 import {useState,useCallback,useRef,useEffect} from "react";
 import React from "react";
 import { elementSearch, productsMulti } from "../services/products/actions/product";
@@ -57,7 +57,7 @@ export function EditOfferTabs(props) {
     const handleCustomTextChange = useCallback((newChecked) => props.updateOffer("show_custom_field", newChecked), []);
     //modal controls
     const [productModal, setProductModal] = useState(false);
-    const handleModal = useCallback(() => {
+    const handleModal = useCallback(() => { 
         setProductModal(!productModal);
     }, [productModal]);
     const modalRef = useRef(null);
@@ -78,8 +78,8 @@ export function EditOfferTabs(props) {
             setProductData(data);
         })
         .catch(function(error) {
-        });
-      setQuery(childData);
+        })
+        setQuery(childData)
     }
 
     //Called when the selected product or variants of selected product changes in popup modal
@@ -112,7 +112,7 @@ export function EditOfferTabs(props) {
                 setProductData("");
             })
             .catch(function(error) {
-            });
+            })
         }
         handleModal();
     }

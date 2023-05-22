@@ -1,13 +1,13 @@
-import {Page, Layout, LegacyCard, LegacyStack, Image} from "@shopify/polaris";
+import {Page, Layout, Card, Stack, Image} from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
-import { woohoo } from "../assets";
+import {woohoo} from "../assets";
 import "../components/stylesheets/mainstyle.css";
 import React from 'react';
 
-const ConfirmCharge = () => {
+export default function ConfirmCharge() {
     const urlParams = new URLSearchParams(window.location.search);
     const success = JSON.parse(urlParams.get('success'));
-
+    
   return (
     <Page>
         <TitleBar></TitleBar>
@@ -15,34 +15,34 @@ const ConfirmCharge = () => {
           <Layout>
             {success ? (
               <Layout.Section>
-                <LegacyCard>
-                  <LegacyStack distribution="center">
-                    <Image
+                <Card>
+                  <Stack distribution="center">
+                    <Image 
                         source={woohoo}
                     />
-                    </LegacyStack>
-                    <LegacyStack distribution="center">
+                    </Stack>
+                    <Stack distribution="center">
                       <div>
                         The subscription was successful
                       </div>
-                    </LegacyStack>
-                    <LegacyStack distribution="center">
-                      <a href="/dashboard">Please click here</a>
-                    </LegacyStack>
-                  </LegacyCard>
+                    </Stack>
+                    <Stack distribution="center">
+                    <a href="/dashboard">Please click here</a>
+                    </Stack>
+                  </Card>
                 </Layout.Section>
               ) : (
               <Layout.Section>
-                <LegacyCard>
-                  <LegacyStack distribution="center">
+                <Card>
+                  <Stack distribution="center">
                     <div>
                       Ooops! Something went wrong
                     </div>
-                  </LegacyStack>
-                  <LegacyStack distribution="center">
+                  </Stack> 
+                  <Stack distribution="center">    
                     <a href="/dashboard">Please contact our staff</a>
-                  </LegacyStack>
-                </LegacyCard>
+                  </Stack>    
+                </Card>
               </Layout.Section>
               )}
           </Layout>
@@ -51,5 +51,3 @@ const ConfirmCharge = () => {
     </Page>
   );
 }
-
-export default ConfirmCharge;

@@ -1,6 +1,5 @@
-
 import {Link,Icon,Modal, Button, MediaCard, VideoThumbnail,Card, Page, Layout, Image, Stack, Grid, List} from "@shopify/polaris";
-import { Help } from '../assets';
+import {help} from "../assets";
 import {HintMajor,TroubleshootMajor} from '@shopify/polaris-icons';
 import { TitleBar } from "@shopify/app-bridge-react";
 import {useRef, useState, useCallback} from 'react';
@@ -24,7 +23,7 @@ export default function HelpPage() {
     <Page>
         <TitleBar
             title="Help"
-        />
+        /> 
       <Layout>
             <Layout.Section>
                 {/* card for image and text */}
@@ -65,7 +64,7 @@ export default function HelpPage() {
                     </Grid>
                 </Card>
                 {/* Second section with video */}
-                <Card
+                <Card 
                     title={
                         <Stack>
                             <Icon source={TroubleshootMajor} />
@@ -84,9 +83,8 @@ export default function HelpPage() {
                                     content: 'Learn more',
                                     onAction: handleOpen,
                                 }}
-                              description={`A step by step guide on how to set up your first upsell and
-                                            cross-sell offer in In Cart
-                                Upsell, a Shopify app that helps you increase your average order value from the traffic you are
+                                description={`A step by step guide on how to set up your first upsell and cross-sell offer in In Cart 
+                                Upsell, a Shopify app that helps you increase your average order value from the traffic you are 
                                 sending to your store.`}
                                 >
                                 <VideoThumbnail
@@ -96,9 +94,11 @@ export default function HelpPage() {
                                 />
                             </MediaCard>
                         </div>
+                            
                     </Grid.Cell>
-                </Grid>
+                </Grid>  
                 </Card>
+                
 
                 <Modal
                     activator={activator}
@@ -107,7 +107,7 @@ export default function HelpPage() {
                     title="Create Your First Upsell and Cross-Sell Offer"
                 >
                     <Modal.Section>
-                    <iframe
+                    <iframe 
                         width="560" 
                         height="315" 
                         src="https://www.youtube-nocookie.com/embed/NibJDu5YFdM?rel=0" 
