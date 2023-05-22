@@ -7,3 +7,4 @@ export {SettingTabs} from "./settingsTabs";
 export {OrderOverTimeData,TotalSalesData,AbTestingData,ClickThroughtRateData,ConversionRate} from "./analyticsGraphdata"
 export { Reviews } from "./Reviews";
 export { Partners } from "./Partners";
+export { GenericTitleBar } from "./GenericTitleBar";

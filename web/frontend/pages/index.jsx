@@ -1,10 +1,16 @@
-import {ButtonGroup, Button, MediaCard, VideoThumbnail,Card, Page, Layout, TextContainer, Image, Stack, Heading, Subheading} from "@shopify/polaris";
-import {homeImage} from "../assets";
+import {ButtonGroup, Button, MediaCard, VideoThumbnail, Card, Page, Layout, TextContainer, Image, Stack, Heading, Subheading} from "@shopify/polaris";
+import {homeImage, iculogo} from "../assets";
 import "../components/stylesheets/mainstyle.css";
+import { TitleBar } from "@shopify/app-bridge-react";
+import { GenericTitleBar } from "../components";
 
 export default function HomePage() {
   return (
-    <Page>
+    <Page
+      title={<GenericTitleBar image={iculogo} title={'In Cart Upsell & Cross Sell'} /> }
+      primaryAction={null}
+    >
+      <TitleBar />
       <Layout>
         <Layout.Section>
           {/* card for image and text */}
