@@ -17,9 +17,11 @@ import {
 
   import { OffersList } from "../components";
 
-  const info = {offer: { shop_domain: window.location.host }};
-  const [offersData, setOffersData] = useState([]);
-  const [isLoading, setIsLoading]   = useState(true);
+  export default function IndexTableWithAllElementsExample() {
+
+    const info = {offer: { shop_domain: window.location.host }};
+    const [offersData, setOffersData] = useState([]);
+    const [isLoading, setIsLoading]   = useState(true);
 
   useEffect(()=>{
     setIsLoading(true);
@@ -46,7 +48,6 @@ import {
       });
   },[]);
 
-  export default function IndexTableWithAllElementsExample() {
        //Dummy data fo IndexTable
       const customers = [
         {
