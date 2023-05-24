@@ -1,13 +1,20 @@
 import { api } from "../api";
-import { PUT, CONFIRM_CHARGE } from "../endpoints/subscription";
+import { PUT, CONFIRM_CHARGE, CURRENT_SUBSCRIPTION } from "../endpoints/subscription";
 
-export function updateSubscription(plan_internal_name, shop, shop_id) {
+export function getSubscription(shopify_domain) {
+  return api.get(CURRENT_SUBSCRIPTION, {
+    params:{
+      shop: shopify_domain
+    }
+  });
+}
+
+export function updateSubscription(plan_internal_name, shop) {
   return api.put(PUT, {
     subscription: {
       plan_internal_name: plan_internal_name
     },
     shop: shop,
-    shop_id: shop_id
   });
 }
 
