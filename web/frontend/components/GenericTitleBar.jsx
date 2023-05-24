@@ -19,7 +19,7 @@ export function GenericTitleBar(props) {
 				{props.buttonText ? (
 					<Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 2, xl: 4}}>
 						<div style={{display: 'flex', justifyContent: 'end'}}> 
-						<Button onClick={props?.handleButtonClick}>{props.buttonText}</Button>
+						<Button primary onClick={props?.handleButtonClick}>{props.buttonText}</Button>
 						</div>
 				</Grid.Cell>
 				): null}

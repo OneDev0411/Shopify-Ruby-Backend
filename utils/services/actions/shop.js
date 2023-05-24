@@ -9,17 +9,17 @@ export function getShop(shopify_domain) {
   });
 }
 
-export function setShopSettings(shop_params) {
+export function setShopSettings(shop_params, shop_id) {
   return api.patch(UPDATE_SHOP_SETTINGS, {
     shop: shop_params,
-    shop_id: 3
+    shop_id: shop_id
   });
 }
 
 export function toggleShopActivation(shopify_domain) {
   return api.get(UPDATE_ACTIVATION, {
     params:{
-      shop_id: shopify_domain
+      shop: shopify_domain
     }
   });
 }

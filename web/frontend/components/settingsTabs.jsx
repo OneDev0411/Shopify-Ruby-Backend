@@ -3,7 +3,6 @@ import {useState, useCallback} from 'react';
 import React from "react";
 
 export function SettingTabs(props){
-    const [currentShop, setCurrentShop] = useState(props.shop);
  
    const options = [
      {label: 'Prepend', value: 'prepend'},

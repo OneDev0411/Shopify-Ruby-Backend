@@ -5,9 +5,8 @@ import {
 import { useAppBridge } from '@shopify/app-bridge-react'
 import React, { useState, useEffect } from "react";
 import {Redirect} from '@shopify/app-bridge/actions';
-import {Partners, SettingTabs} from "../components";
+import {Partners, SettingTabs, GenericTitleBar} from "../components";
 import { getShop, toggleShopActivation, setShopSettings } from "../../../utils/services/actions/shop";
-import { GenericTitleBar } from "../components";
 
 export default function Settings() {
     const [currentShop, setCurrentShop] = useState(null);
@@ -39,7 +38,7 @@ export default function Settings() {
     };
 
     const toggleActivation = async ()=>{
-      const response = await toggleShopActivation(currentShop?.id);
+      const response = await toggleShopActivation(currentShop?.shopify_domain);
       window.location.reload();
     }
 
@@ -53,7 +52,7 @@ export default function Settings() {
           custom_ajax_dom_selector: data.ajaxDomSelector,
           custom_ajax_dom_action: data.ajaxDomAction,
       }
-      const response = await setShopSettings(shop_params);
+      const response = await setShopSettings(shop_params, currentShop?.id);
       setCurrentShop(response.shop);
     }
     
@@ -100,7 +99,7 @@ export default function Settings() {
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6, lg: 6, xl: 6}}>
                   <Card sectioned columnSpan={{ md: 6, lg: 6, xl: 6}}>
                       {/* Tabs */}
-                      {currentShop ?  <SettingTabs shop={currentShop} formData={formData} handleFormChange={handleFormChange} /> : 'Loading...'}
+                      {currentShop ?  <SettingTabs formData={formData} handleFormChange={handleFormChange} /> : 'Loading...'}
                   </Card>
               </Grid.Cell>
           </Grid>

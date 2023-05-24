@@ -1,9 +1,11 @@
 import {Card, Page, Layout, Image, Stack, Banner} from "@shopify/polaris";
 import { useAppBridge } from '@shopify/app-bridge-react'
 import {Redirect, Toast} from '@shopify/app-bridge/actions';
-import { TitleBar } from "@shopify/app-bridge-react";
 import {billingImg} from "../assets";
-import { Reviews } from "../components";
+import {
+	BillingStatementDollarMajor
+} from '@shopify/polaris-icons';
+import { Reviews, GenericTitleBar } from "../components";
 import "../components/stylesheets/mainstyle.css";
 import React from 'react';
 import { useEffect, useState } from "react";
@@ -24,7 +26,7 @@ export default function Subscription() {
         const response = await updateSubscription(internal_name, shop);
         if (response.payment == 'no') {
             const toastOptions = {
-                message: 'On '+ response.plan_name+' Plan now',
+                message: response.message,
                 duration: 3000,
                 isError: false,
             };
@@ -47,8 +49,7 @@ export default function Subscription() {
     
   return (
     <Page>
-        {/* No titlebar */}
-        <TitleBar></TitleBar>
+        <GenericTitleBar title='Billing' image={BillingStatementDollarMajor}/>
         <div className="auto-height">
             <Layout>
                 <Layout.Section>
@@ -57,7 +58,7 @@ export default function Subscription() {
                             <p>{ trialDays } days remaining for the trial period</p>
                         </Banner>
                     }
-                    {!isSubscriptionActive(currentSubscription) &&
+                    {!isSubscriptionActive(currentSubscription) && planName!='trial' &&
                         <Banner icon='none' status="info">
                             <p>Your Subscription Is Not Active: please confirm it on this page</p>
                         </Banner>
