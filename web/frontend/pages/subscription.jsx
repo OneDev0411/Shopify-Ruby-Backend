@@ -1,4 +1,4 @@
-import {Card, Page, Layout, Image, Stack} from "@shopify/polaris";
+import {Card, Page, Layout, Image, Stack, Banner} from "@shopify/polaris";
 import { useAppBridge } from '@shopify/app-bridge-react'
 import {Redirect, Toast} from '@shopify/app-bridge/actions';
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -7,18 +7,21 @@ import { Reviews } from "../components";
 import "../components/stylesheets/mainstyle.css";
 import React from 'react';
 import { useEffect, useState } from "react";
-import { updateSubscription, isSubscriptionActive } from "../../../utils/services/actions/subscription";
-import axios from 'axios';
+import { getSubscription, updateSubscription, isSubscriptionActive } from "../../../utils/services/actions/subscription";
 
 export default function Subscription() {
-    const [currentShop, setCurrentShop] = useState(null);
+    const shop = 'icu-dev-store.myshopify.com';
+    const [currentSubscription, setCurrentSubscription] = useState(null);
     const [planName, setPlanName] = useState();
+    const [trialDays, setTrialDays] = useState();
+    const [activeOffersCount, setActiveOffersCount] = useState();
+    const [unpublishedOfferIds, setUnpublishedOfferIds] = useState();
     const app = useAppBridge();
 
     async function handlePlanChange (internal_name) {
         let redirect = Redirect.create(app);
 
-        const response = await updateSubscription(internal_name, currentShop.shopify_domain, currentShop.id);
+        const response = await updateSubscription(internal_name, shop);
         if (response.payment == 'no') {
             const toastOptions = {
                 message: 'On '+ response.plan_name+' Plan now',
@@ -33,17 +36,13 @@ export default function Subscription() {
         }
     }
 
-    useEffect(() => {
-        axios.get('https://zeryab-icu-local.ngrok.dev/api/merchant/current_shop?shop=icu-dev-store.myshopify.com')
-          .then(response => {
-            // handle the response from the API
-            setCurrentShop(response.data.shop);
-            setPlanName(response.data.plan)
-          })
-          .catch(error => {
-            // handle errors
-            console.error("error", error);
-          });
+    useEffect(async () => {
+        const subResponse = await getSubscription(shop);
+        setCurrentSubscription(subResponse.subscription);
+        setPlanName(subResponse.plan);
+        setTrialDays(subResponse.days_remaining_in_trial);
+        setActiveOffersCount(subResponse.active_offers_count);
+        setUnpublishedOfferIds(subResponse.unpublished_offer_ids);
       }, []);
     
   return (
@@ -53,16 +52,33 @@ export default function Subscription() {
         <div className="auto-height">
             <Layout>
                 <Layout.Section>
+                    {isSubscriptionActive(currentSubscription) && planName!=='free' && trialDays>0 &&
+                        <Banner icon='none' status="info">
+                            <p>{ trialDays } days remaining for the trial period</p>
+                        </Banner>
+                    }
+                    {!isSubscriptionActive(currentSubscription) &&
+                        <Banner icon='none' status="info">
+                            <p>Your Subscription Is Not Active: please confirm it on this page</p>
+                        </Banner>
+                    }
+                    {planName==='trial' && (unpublishedOfferIds?.lenght>0 || activeOffersCount) &&
+                        <Banner icon='none' status="info">
+                            <p>If you choose free plan after trial, offers will be unpublished</p>
+                        </Banner>
+                    }
+                </Layout.Section>
+                <Layout.Section>
                     Choose a Plan
                 </Layout.Section>
                 <Layout.Section>
                     <Card title="Paid"
-                        primaryFooterAction={(planName==='flex' && isSubscriptionActive(currentShop?.subscription)) ? null : {content: 'Upgrade', onClick: () => handlePlanChange('plan_based_billing')}}
+                        primaryFooterAction={(planName==='flex' && isSubscriptionActive(currentSubscription)) ? null : {content: 'Upgrade', onClick: () => handlePlanChange('plan_based_billing')}}
                         sectioned
                     >
                         <Stack>
                             <Stack.Item>
-                                {(planName==='flex' && isSubscriptionActive(currentShop?.subscription)) ? (
+                                {(planName==='flex' && isSubscriptionActive(currentSubscription)) ? (
                                     <p><small>Current Plan</small></p>
                                 ) : (
                                     <p><small>Recommended</small></p>
@@ -90,8 +106,8 @@ export default function Subscription() {
                     </Card>
                 </Layout.Section>
                 <Layout.Section secondary>
-                    <Card title="Free" sectioned primaryFooterAction={(planName==='free' && isSubscriptionActive(currentShop?.subscription)) ? null : {content: 'Downgrade', onClick: () => handlePlanChange('free_plan'), id: 'btnf'}}>
-                        {(planName==='free' && isSubscriptionActive(currentShop?.subscription)) ? (
+                    <Card title="Free" sectioned primaryFooterAction={(planName==='free' && isSubscriptionActive(currentSubscription)) ? null : {content: 'Downgrade', onClick: () => handlePlanChange('free_plan'), id: 'btnf'}}>
+                        {(planName==='free' && isSubscriptionActive(currentSubscription)) ? (
                              <p><small>Current Plan</small></p>
                         ) : (
                             <p><small>Not Recommended</small></p>
