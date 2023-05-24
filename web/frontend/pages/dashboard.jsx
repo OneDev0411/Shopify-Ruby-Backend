@@ -88,7 +88,7 @@ import {
       const {selectedResources, allResourcesSelected, handleSelectionChange} =
         useIndexResourceState(customers);
       const [taggedWith, setTaggedWith] = useState('');
-      const [queryValue, setQueryValue] = useState(null);
+      const [queryValue, setQueryValue] = useState('');
       const [sortValue, setSortValue] = useState('today');
   
       const handleTaggedWithChange = useCallback(

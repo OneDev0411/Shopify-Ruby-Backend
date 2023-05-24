@@ -2,28 +2,8 @@ import {Tabs, Card, TextField,Select} from '@shopify/polaris';
 import {useState, useCallback} from 'react';
 import React from "react";
 
-
-export function SettingTabs(){
-    
-    // TextFields
-    const [value, setValue] = useState(null);
-    const handleChange = useCallback((newValue) => setValue(newValue), []);
-
-    const [valueAjax, setAjaxValue] = useState(null);
-    const handleAjaxChange = useCallback((newValue) => setAjaxValue(newValue), []);
-
-    const [valueCart, setCartValue] = useState(null);
-    const handleCartChange = useCallback((newValue) => setCartValue(newValue), []);
-   
-    //Select dropdown list
-   const [dropdown, setDropdown] = useState('today');
-   const handleDropdownChange = useCallback((value) => setDropdown(value), []);
-
-   const [dropdownAjax, setDropdownAjax] = useState('today');
-   const handleDropdownAjaxChange = useCallback((value) => setDropdownAjax(value), []);
-
-   const [dropdownCart, setDropdownCart] = useState('today');
-   const handleDropdownCartChange = useCallback((value) => setDropdownCart(value), []);
+export function SettingTabs(props){
+    const [currentShop, setCurrentShop] = useState(props.shop);
  
    const options = [
      {label: 'Prepend', value: 'prepend'},
@@ -48,15 +28,17 @@ export function SettingTabs(){
         panelID: 'all-customers-content-1',
         innerContent:<>
                 <TextField label="DOM selector"
-                    value={value}
-                    onChange={handleChange}
+                    id="productDomSelector"
+                    value={props.formData.productDomSelector}
+                    onChange={props.handleFormChange}
                     autoComplete="off"
                 ></TextField><br/>
                 <Select
                     label="DOM action"
+                    id="productDomAction"
                     options={options}
-                    onChange={handleDropdownChange}
-                    value={dropdown}
+                    onChange={props.handleFormChange}
+                    value={props.formData.productDomAction}
                 />
             </>
       },
@@ -66,15 +48,17 @@ export function SettingTabs(){
         panelID: 'accepts-marketing-content-1',
         innerContent:<>
                 <TextField label="DOM selector"
-                    value={valueCart}
-                    onChange={handleCartChange}
+                    id="cartDomSelector"
+                    value={props.formData.cartDomSelector}
+                    onChange={props.handleFormChange}
                     autoComplete="off"
                 ></TextField><br/>
                 <Select
                     label="DOM action"
+                    id="cartDomAction"
                     options={options}
-                    onChange={handleDropdownCartChange}
-                    value={dropdownCart}
+                    onChange={props.handleFormChange}
+                    value={props.formData.cartDomAction}
                 />
             </>
       },
@@ -84,15 +68,17 @@ export function SettingTabs(){
         panelID: 'repeat-customers-content-1',
         innerContent:<>
                 <TextField label="DOM selector"
-                    value={valueAjax}
-                    onChange={handleAjaxChange}
+                    id="ajaxDomSelector"
+                    value={props.formData.ajaxDomSelector}
+                    onChange={props.handleFormChange}
                     autoComplete="off"
                 ></TextField><br/>
                 <Select
                     label="DOM action"
+                    id="ajaxDomAction"
                     options={options}
-                    onChange={handleDropdownAjaxChange}
-                    value={dropdownAjax}
+                    onChange={props.handleFormChange}
+                    value={props.formData.ajaxDomAction}
                 />
             </>
       }
@@ -101,7 +87,8 @@ export function SettingTabs(){
     return(<>
         <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
             <Card.Section>
-            <p>{tabs[selected].innerContent}</p>
+            <div>{tabs[selected].innerContent}</div>
+            <div className="space-4"></div>
             </Card.Section>
         </Tabs>
     </>);
