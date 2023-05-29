@@ -1,5 +1,5 @@
 import { api } from "../api";
-import { PUT, CONFIRM_CHARGE, CURRENT_SUBSCRIPTION } from "../endpoints/subscription";
+import { PUT_SUBSCRIPTION, CONFIRM_CHARGE, CURRENT_SUBSCRIPTION } from "../endpoints/subscription";
 
 export function getSubscription(shopify_domain) {
   return api.get(CURRENT_SUBSCRIPTION, {
@@ -10,7 +10,7 @@ export function getSubscription(shopify_domain) {
 }
 
 export function updateSubscription(plan_internal_name, shopify_domain) {
-  return api.put(PUT, {
+  return api.put(PUT_SUBSCRIPTION, {
     subscription: {
       plan_internal_name: plan_internal_name
     },

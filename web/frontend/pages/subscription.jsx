@@ -8,7 +8,7 @@ import {
 import { Reviews, GenericTitleBar } from "../components";
 import "../components/stylesheets/mainstyle.css";
 import React from 'react';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getSubscription, updateSubscription, isSubscriptionActive } from "../../../utils/services/actions/subscription";
 
 export default function Subscription() {
@@ -38,14 +38,19 @@ export default function Subscription() {
         }
     }
 
-    useEffect(async () => {
+    const fetchSubscription = useCallback(async() => {
         const subResponse = await getSubscription(shop);
+
         setCurrentSubscription(subResponse.subscription);
         setPlanName(subResponse.plan);
         setTrialDays(subResponse.days_remaining_in_trial);
         setActiveOffersCount(subResponse.active_offers_count);
-        setUnpublishedOfferIds(subResponse.unpublished_offer_ids);
+        setUnpublishedOfferIds(subResponse.unpublished_offer_ids)
       }, []);
+
+    useEffect(() => {
+        fetchSubscription();
+      }, [fetchSubscription]);
     
   return (
     <Page>
@@ -53,20 +58,20 @@ export default function Subscription() {
         <div className="auto-height">
             <Layout>
                 <Layout.Section>
-                    {isSubscriptionActive(currentSubscription) && planName!=='free' && trialDays>0 &&
+                    {(isSubscriptionActive(currentSubscription) && planName!=='free' && trialDays>0) ? (
                         <Banner icon='none' status="info">
                             <p>{ trialDays } days remaining for the trial period</p>
-                        </Banner>
+                        </Banner>) : null
                     }
-                    {!isSubscriptionActive(currentSubscription) && planName!='trial' &&
+                    {!isSubscriptionActive(currentSubscription) ? (
                         <Banner icon='none' status="info">
                             <p>Your Subscription Is Not Active: please confirm it on this page</p>
-                        </Banner>
+                        </Banner> ) : null
                     }
-                    {planName==='trial' && (unpublishedOfferIds?.lenght>0 || activeOffersCount) &&
+                    {(planName==='trial' && (unpublishedOfferIds?.lenght>0 || activeOffersCount)) ? (
                         <Banner icon='none' status="info">
                             <p>If you choose free plan after trial, offers will be unpublished</p>
-                        </Banner>
+                        </Banner>) : null
                     }
                 </Layout.Section>
                 <Layout.Section>

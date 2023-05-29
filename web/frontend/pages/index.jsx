@@ -4,7 +4,7 @@ import "../components/stylesheets/mainstyle.css";
 import { GenericTitleBar } from "../components";
 import { isSubscriptionActive } from "../../../utils/services/actions/subscription";
 import { getShop } from "../../../utils/services/actions/shop";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 
 export default function HomePage() {
@@ -12,12 +12,17 @@ export default function HomePage() {
   const [planName, setPlanName] = useState();
   const [trialDays, setTrialDays] = useState();
 
-  useEffect(async()=>{
+  const fetchCurrentShop = useCallback(async () => {
     const response = await getShop('icu-dev-store.myshopify.com');
+
     setCurrentShop(response.shop);
     setPlanName(response.plan);
     setTrialDays(response.days_remaining_in_trial);
-  }, [])
+  }, [setCurrentShop, setPlanName, setTrialDays]);
+
+  useEffect(async()=>{
+    fetchCurrentShop();
+  }, [fetchCurrentShop])
   return (
     <Page
       title={<GenericTitleBar image={iculogo} title={'In Cart Upsell & Cross Sell'} /> }

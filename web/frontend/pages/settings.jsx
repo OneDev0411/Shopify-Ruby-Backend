@@ -3,7 +3,7 @@ import {
 	SettingsMajor
 } from '@shopify/polaris-icons';
 import { useAppBridge } from '@shopify/app-bridge-react'
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {Redirect} from '@shopify/app-bridge/actions';
 import {Partners, SettingTabs, GenericTitleBar} from "../components";
 import { getShop, toggleShopActivation, setShopSettings } from "../../../utils/services/actions/shop";
@@ -13,22 +13,26 @@ export default function Settings() {
     const [formData, setFormData] = useState({});
     const app = useAppBridge();
 
+    const fetchCurrentShop = useCallback(async () => {
+        let redirect = Redirect.create(app);
+        const response = await getShop('icu-dev-store.myshopify.com');
+        if(response.redirect_to){
+          redirect.dispatch(Redirect.Action.APP, response.redirect_to);
+        }
+        setCurrentShop(response.shop);
+        setFormData({
+            productDomSelector: response.shop?.custom_product_page_dom_selector || "[class*='description']",
+            productDomAction: response.shop?.custom_product_page_dom_action || 'prepend',
+            cartDomSelector: response.shop?.custom_cart_page_dom_selector || "form[action^='/cart']",
+            cartDomAction: response.shop?.custom_cart_page_dom_action || 'prepend',
+            ajaxDomSelector: response.shop?.custom_ajax_dom_selector || ".ajaxcart__row:first",
+            ajaxDomAction: response.shop?.custom_ajax_dom_action || 'prepend',
+        })
+      }, []);
+
     useEffect(async () => {
-      let redirect = Redirect.create(app);
-      const response = await getShop('icu-dev-store.myshopify.com');
-      if(response.redirect_to){
-        redirect.dispatch(Redirect.Action.APP, response.redirect_to);
-      }
-      setCurrentShop(response.shop);
-      setFormData({
-        productDomSelector: response.shop?.custom_product_page_dom_selector || "[class*='description']",
-        productDomAction: response.shop?.custom_product_page_dom_action || 'prepend',
-        cartDomSelector: response.shop?.custom_cart_page_dom_selector || "form[action^='/cart']",
-        cartDomAction: response.shop?.custom_cart_page_dom_action || 'prepend',
-        ajaxDomSelector: response.shop?.custom_ajax_dom_selector || ".ajaxcart__row:first",
-        ajaxDomAction: response.shop?.custom_ajax_dom_action || 'prepend',
-      })
-    }, []);
+        fetchCurrentShop()
+    }, [fetchCurrentShop]);
 
     const handleFormChange = (value, id) => {
       setFormData({

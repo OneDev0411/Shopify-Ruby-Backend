@@ -62,10 +62,10 @@ export function Partners(){
       slider.slickPrev();
     }
 
-    async function getAllPartners(){
+    const getAllPartners = useCallback(async ()=>{
       const response = await getPartners();
       setPartners(response.partners);
-    }
+     }, [])
 
     const handleToggleDescription = (index) => {
       setExpandedIndex(index === expandedIndex ? null : index);
@@ -73,7 +73,7 @@ export function Partners(){
 
     useEffect(() => {
       getAllPartners();
-    }, []);
+    }, [getAllPartners]);
 
     return(<>
       <Card sectioned title="Recommended Apps" id={"cardYpadding"}>
