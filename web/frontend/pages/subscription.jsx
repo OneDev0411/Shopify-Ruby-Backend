@@ -10,7 +10,7 @@ import "../components/stylesheets/mainstyle.css";
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useEffect, useState, useCallback } from "react";
-import { getSubscription, updateSubscription, isSubscriptionActive } from "../../../utils/services/actions/subscription";
+import { getSubscription, updateSubscription, isSubscriptionActive } from "../services/actions/subscription";
 
 export default function Subscription() {
     const shop = useSelector(state => state.shopAndHost.shop);

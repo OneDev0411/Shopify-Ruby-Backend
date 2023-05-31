@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import React, { useState, useEffect, useCallback } from "react";
 import {Redirect} from '@shopify/app-bridge/actions';
 import {Partners, SettingTabs, GenericTitleBar} from "../components";
-import { getShop, toggleShopActivation, setShopSettings } from "../../../utils/services/actions/shop";
+import { getShop, toggleShopActivation, setShopSettings } from "../services/actions/shop";
 
 export default function Settings() {
     const shop = useSelector(state => state.shopAndHost.shop);

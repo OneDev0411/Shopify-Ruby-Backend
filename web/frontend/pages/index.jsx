@@ -2,8 +2,8 @@ import {ButtonGroup, Button, MediaCard, VideoThumbnail, Card, Page, Layout, Text
 import {homeImage, iculogo} from "../assets";
 import "../components/stylesheets/mainstyle.css";
 import { GenericTitleBar } from "../components";
-import { isSubscriptionActive } from "../../../utils/services/actions/subscription";
-import { getShop } from "../../../utils/services/actions/shop";
+import { isSubscriptionActive } from "../services/actions/subscription";
+import { getShop } from "../services/actions/shop";
 import { useEffect, useState, useCallback } from "react";
 import { useSelector } from 'react-redux';
 
