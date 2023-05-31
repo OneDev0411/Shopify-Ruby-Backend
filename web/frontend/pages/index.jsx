@@ -5,15 +5,16 @@ import { GenericTitleBar } from "../components";
 import { isSubscriptionActive } from "../../../utils/services/actions/subscription";
 import { getShop } from "../../../utils/services/actions/shop";
 import { useEffect, useState, useCallback } from "react";
-
+import { useSelector } from 'react-redux';
 
 export default function HomePage() {
+  const shop = useSelector(state => state.shopAndHost.shop);
   const [currentShop, setCurrentShop] = useState(null);
   const [planName, setPlanName] = useState();
   const [trialDays, setTrialDays] = useState();
 
   const fetchCurrentShop = useCallback(async () => {
-    const response = await getShop('icu-dev-store.myshopify.com');
+    const response = await getShop(shop);
 
     setCurrentShop(response.shop);
     setPlanName(response.plan);

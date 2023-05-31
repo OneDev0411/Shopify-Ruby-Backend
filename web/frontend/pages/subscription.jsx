@@ -8,11 +8,12 @@ import {
 import { Reviews, GenericTitleBar } from "../components";
 import "../components/stylesheets/mainstyle.css";
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { useEffect, useState, useCallback } from "react";
 import { getSubscription, updateSubscription, isSubscriptionActive } from "../../../utils/services/actions/subscription";
 
 export default function Subscription() {
-    const shop = 'icu-dev-store.myshopify.com';
+    const shop = useSelector(state => state.shopAndHost.shop);
     const [currentSubscription, setCurrentSubscription] = useState(null);
     const [planName, setPlanName] = useState();
     const [trialDays, setTrialDays] = useState();
@@ -32,7 +33,7 @@ export default function Subscription() {
             };
             const toastNotice = Toast.create(app, toastOptions);
             toastNotice.dispatch(Toast.Action.SHOW);
-            redirect.dispatch(Redirect.Action.APP, `/`);
+            redirect.dispatch(Redirect.Action.APP, `/?shop=${shop}`);
         } else {
             redirect.dispatch(Redirect.Action.REMOTE, response.url);
         }

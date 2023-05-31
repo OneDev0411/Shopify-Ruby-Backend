@@ -3,19 +3,21 @@ import {
 	SettingsMajor
 } from '@shopify/polaris-icons';
 import { useAppBridge } from '@shopify/app-bridge-react'
+import { useSelector } from 'react-redux';
 import React, { useState, useEffect, useCallback } from "react";
 import {Redirect} from '@shopify/app-bridge/actions';
 import {Partners, SettingTabs, GenericTitleBar} from "../components";
 import { getShop, toggleShopActivation, setShopSettings } from "../../../utils/services/actions/shop";
 
 export default function Settings() {
+    const shop = useSelector(state => state.shopAndHost.shop);
     const [currentShop, setCurrentShop] = useState(null);
     const [formData, setFormData] = useState({});
     const app = useAppBridge();
 
     const fetchCurrentShop = useCallback(async () => {
         let redirect = Redirect.create(app);
-        const response = await getShop('icu-dev-store.myshopify.com');
+        const response = await getShop(shop);
         if(response.redirect_to){
           redirect.dispatch(Redirect.Action.APP, response.redirect_to);
         }
