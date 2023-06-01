@@ -1,12 +1,21 @@
 import {Page, Layout, Card, Stack, Image} from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
+import {Redirect, Toast} from '@shopify/app-bridge/actions';
+import { useAppBridge } from '@shopify/app-bridge-react'
 import {woohoo} from "../assets";
 import "../components/stylesheets/mainstyle.css";
 import React from 'react';
+import { useSelector } from 'react-redux';
 
 export default function ConfirmCharge() {
     const urlParams = new URLSearchParams(window.location.search);
+    const shopAndHost = useSelector(state => state.shopAndHost);
+    const app = useAppBridge();
     const success = JSON.parse(urlParams.get('success'));
+    const redirectToHome = ()=>{
+      let redirect = Redirect.create(app);
+      redirect.dispatch(Redirect.Action.APP, `/?shop=${shopAndHost.shop}&host=${shopAndHost.host}`);
+    }
     
   return (
     <Page>
@@ -27,7 +36,7 @@ export default function ConfirmCharge() {
                       </div>
                     </Stack>
                     <Stack distribution="center">
-                    <a href="/dashboard">Please click here</a>
+                    <a href="#" onClick={redirectToHome}>Please click here</a>
                     </Stack>
                   </Card>
                 </Layout.Section>
@@ -40,7 +49,7 @@ export default function ConfirmCharge() {
                     </div>
                   </Stack> 
                   <Stack distribution="center">    
-                    <a href="/dashboard">Please contact our staff</a>
+                    <a href="#" onClick={redirectToHome}>Please contact our staff</a>
                   </Stack>    
                 </Card>
               </Layout.Section>

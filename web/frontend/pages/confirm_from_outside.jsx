@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from '@shopify/app-bridge-react';
-import { confirmCharge } from "../../../utils/services/actions/subscription";
+import { confirmCharge } from "../services/actions/subscription";
 
 
 const ConfirmFromOutside = () => {
@@ -12,7 +12,7 @@ const ConfirmFromOutside = () => {
   const redirect = Redirect.create(app);
 
   async function renderConfirmCharge(){
-    const response = await confirmCharge('icu-dev-store.myshopify.com', charge_id);
+    const response = await confirmCharge(shopify_domain, charge_id);
 
     if (window.top == window.self) {
       // If the current window is the 'parent', change the URL by setting location.href  
