@@ -1,4 +1,4 @@
-import {Stack, Card, Image, Button, Grid, Pagination} from '@shopify/polaris';
+import {VerticalStack, LegacyCard, Image, Button, Grid, Pagination} from '@shopify/polaris';
 import {useState, useCallback, useEffect} from 'react';
 import {stars} from "../assets";
 import Slider from "react-slick";
@@ -48,9 +48,6 @@ export function Partners(){
             slidesToShow: 1,
             slidesToScroll: 1
           }
-        },
-        {
-          
         }
       ]
     };
@@ -76,7 +73,7 @@ export function Partners(){
     }, [getAllPartners]);
 
     return(<>
-      <Card sectioned title="Recommended Apps" id={"cardYpadding"}>
+      <LegacyCard sectioned title="Recommended Apps" id={"LegacyCardYpadding"}>
         <p>Check out our partners below.</p>
         <div className="space-4"></div>
         <Grid >
@@ -86,7 +83,7 @@ export function Partners(){
                     <Grid key={index}>
                       <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 12, lg: 12, xl: 12}}>
                         <div style={{margin: '10px'}}>
-                            <Card sectioned columnSpan={{ xs: 6, sm: 6, md: 12, lg: 12, xl: 12}}>
+                            <LegacyCard sectioned columnSpan={{ xs: 6, sm: 6, md: 12, lg: 12, xl: 12}}>
                             <div style={{ width: '200px', height: '200px', margin: 'auto', display: 'flex'}} >
                               <Image
                                 alt=""
@@ -107,13 +104,17 @@ export function Partners(){
                               {partner.description}
                             </p>
                             <br/>
-                            <Stack distribution="start">
+                            <VerticalStack distribution="start">
                             <Image 
-                                source={stars}
+                              style={{
+                              width:'60%',
+                              marginBottom:'15px',
+                              }}
+                              source={stars}
                             />
-                            <Button url={partner.app_url}>View on Shopify App Store</Button>
-                            </Stack>  
-                          </Card>
+                            <Button url={partner.app_url} target="blank">View on Shopify App Store</Button>
+                            </VerticalStack>  
+                          </LegacyCard>
                         </div>
                       </Grid.Cell>
                     </Grid>
@@ -128,6 +129,6 @@ export function Partners(){
             hasNext
             onNext={next}
         />
-    </Card>
+    </LegacyCard>
   </>);
 }

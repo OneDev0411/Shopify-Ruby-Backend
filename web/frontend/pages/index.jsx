@@ -1,4 +1,4 @@
-import {ButtonGroup, Button, MediaCard, VideoThumbnail, Card, Page, Layout, TextContainer, Image, Stack, Heading, Subheading, Banner} from "@shopify/polaris";
+import {ButtonGroup, Button, MediaCard, VideoThumbnail, LegacyCard, Page, Layout, Text, Image, LegacyStack, Heading, Subheading, Banner, VerticalStack} from "@shopify/polaris";
 import {homeImage, iculogo} from "../assets";
 import "../components/stylesheets/mainstyle.css";
 import { GenericTitleBar } from "../components";

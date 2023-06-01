@@ -1,1 +1,1 @@
-export const GET_ALL_PARTNERS = "/api/merchant/partners";
+export const GET_ALL_PARTNERS = "partners";

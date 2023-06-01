@@ -1049,7 +1049,12 @@ class Shop < ApplicationRecord
   #
   # Returns. String.
   def script_tag_body
-    assigns = { library_string: library_string, icushop: self, offers: active_and_valid_offers }
+    valid_offers = if self.activated?
+      active_and_valid_offers
+    else
+      []
+    end
+    assigns = { library_string: library_string, icushop: self, offers: valid_offers }
     JsController.render('js/library', assigns: assigns)
   end
 

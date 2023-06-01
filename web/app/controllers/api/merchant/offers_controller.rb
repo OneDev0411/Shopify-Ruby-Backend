@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 module Api
   module V2
-    class OffersController < ApiV2BaseController
+    class OffersController < ApiMerchantBaseController
       before_action :set_offer, only: [:load_offer_details]
-      before_action :set_shop, only: [:offer_settings]
+      before_action :find_shop, only: [:offer_settings]
 
       # GET /api/v2/shop_offers
       def shop_offers

@@ -1,4 +1,4 @@
-import{Card,Grid, Button, Page} from "@shopify/polaris";
+import{LegacyCard,Grid, Button, Page} from "@shopify/polaris";
 import {
 	SettingsMajor
 } from '@shopify/polaris-icons';
@@ -67,7 +67,7 @@ export default function Settings() {
       <Page>
       <GenericTitleBar title='Settings' image={SettingsMajor} buttonText='Save' handleButtonClick={handleSave} />
       {/* <TitleBar/> */}
-          <Card sectioned>
+          <LegacyCard sectioned>
               {(currentShop?.activated) ? (
               <Grid>
                   <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 10, xl: 4}}>
@@ -90,23 +90,23 @@ export default function Settings() {
                   </Grid.Cell>
               </Grid>
               )}
-          </Card>
+          </LegacyCard>
           <div className="space-4"></div>
           <Grid>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6, lg: 6, xl: 6}}>
-                  <div id="no-bg-card">
-                      <Card sectioned style={{backgroundColor: "transparent"}}>
+                  <div id="no-bg-LegacyCard">
+                      <LegacyCard sectioned style={{backgroundColor: "transparent"}}>
                           <h2><strong>Default offer placement settings</strong></h2>
                           <br/>
                           <p>Only edit these settings if you know HTML.</p>
-                      </Card>
+                      </LegacyCard>
                   </div>
               </Grid.Cell>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6, lg: 6, xl: 6}}>
-                  <Card sectioned columnSpan={{ md: 6, lg: 6, xl: 6}}>
+                  <LegacyCard sectioned columnSpan={{ md: 6, lg: 6, xl: 6}}>
                       {/* Tabs */}
                       {currentShop ?  <SettingTabs formData={formData} handleFormChange={handleFormChange} /> : 'Loading...'}
-                  </Card>
+                  </LegacyCard>
               </Grid.Cell>
           </Grid>
           <div className="space-4"></div>

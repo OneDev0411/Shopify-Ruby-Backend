@@ -1,7 +1,7 @@
 module Api
   module V2
-    class ProductsController < ApiV2BaseController
-      before_action :set_shop, only: [:element_search]
+    class ProductsController < ApiMerchantBaseController
+      before_action :find_shop, only: [:element_search]
 
       # POST /api/v2/element_search
       def element_search
