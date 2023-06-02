@@ -1,5 +1,3 @@
-puts "~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!~"
-puts @shop.name
 json.shop @shop.as_json(include: [:plan, :subscription])
 json.days_remaining_in_trial @shop.subscription&.days_remaining_in_trial
 json.active_offers_count @shop.active_offers.count

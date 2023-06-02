@@ -17,13 +17,20 @@ class Shop < ApplicationRecord
   has_many :shop_events, dependent: :destroy
 
   before_create :set_up_for_shopify
-  after_create :async_setup, :signup_for_referral_program, :track_installation
+  after_create :shop_setup
 
   include Shopifable
   include Graphable
 
   include ActionView::Helpers::DateHelper
   include ShopWorker
+  
+  def shop_setup
+    async_setup
+    signup_for_referral_program
+    select_plan('trial_plan')
+    track_installation
+  end
 
   def active_offers
     offers.active
@@ -1016,15 +1023,57 @@ class Shop < ApplicationRecord
   end
 
   def self.active
-    where(uninstalled_at: nil).where.not(shopify_token: nil).where.not(shopify_plan_name: %i[frozen dormant cancelled])
+    where(uninstalled_at: nil).where('shopify_token is not null').where("shopify_plan_name != 'frozen'").where("shopify_plan_name != 'dormant'").where("shopify_plan_name != 'cancelled'")
   end
 
   def self.inactive
-    where(shopify_token: nil).where.not(uninstalled_at: nil)
+    where('uninstalled_at is not null').where('shopify_token is null')
   end
 
   def api_version
     ShopifyApp.configuration.api_version
+  end
+
+  #Unpublish all offers except first when merchant switches to free plan
+  def unpublish_extra_offers
+    first_active_offer_id = self.unpublished_offer_ids? ? self.unpublished_offer_ids.last : self.offers.active.last&.id
+    if first_active_offer_id.present?
+      @offers = self.offers.where.not(id: first_active_offer_id)
+      @offers.update({ published_at: nil, active: false })
+      self.offers.find(first_active_offer_id).update({ published_at: Time.now.utc, deactivated_at: nil, active: true })
+      self.update(unpublished_offer_ids: nil)
+      self.publish_async
+    end
+  end
+
+  #Unpublish active offers
+  def unpublish_active_offers
+    active_ids = offers.active.pluck(:id)
+    self.offers.where(active: true).update_all({ published_at: nil, active: false })
+    self.publish_async
+    self.update(unpublished_offer_ids: active_ids)
+  end
+
+  def publish_offers
+    self.offers.where(id: self.unpublished_offer_ids).update_all({ published_at: Time.now.utc, deactivated_at: nil, active: true })
+    self.update(unpublished_offer_ids: nil)
+  end
+
+  def select_plan(plan_internal_name)
+    plan = Plan.find_by(internal_name: plan_internal_name)
+    old_shop = Shop.find_by(myshopify_domain: shopify_domain)
+    if (old_shop.present? && old_shop.id!=self.id && old_shop.in_trial_period?) || !old_shop.present?
+      subscription = self.subscription || Subscription.new
+      subscription.plan = plan
+      subscription.shop = self
+      subscription.status = 'approved'
+      subscription.update_subscription(plan)
+      subscription.save      
+    end
+    if plan.free_plan?
+      self.unpublish_extra_offers if self.offers.present?
+    end
+    # subscription.update_attribute(:free_plan_after_trial, false)
   end
 
   private
