@@ -11,6 +11,7 @@ Rails.application.routes.draw do
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
+  get '/confirm_from_outside', to: 'js#confirm_from_outside'
     # API V1
   namespace :api do
     namespace :v1, defaults: { format: 'json' } do

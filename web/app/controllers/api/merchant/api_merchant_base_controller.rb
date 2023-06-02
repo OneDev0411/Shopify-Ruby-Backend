@@ -30,7 +30,7 @@ module Api
                   else
                     'Your subscription is not active - please re-confirm your plan on this page.'
                   end
-        render "shops/ensure_plan.json.jbuilder"
+        render "shops/ensure_plan"
       end
   
     end # class ends

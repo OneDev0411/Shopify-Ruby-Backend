@@ -33,7 +33,7 @@ module Api
         @subscription.shop = @icushop if @subscription.shop.nil?
         if @plan.requires_payment?
           @icushop.activate_session
-          @redirect_url = @subscription.create_recurring_charge(@plan, @icushop, charge_return_url)
+          @redirect_url = @subscription.create_recurring_charge(@plan, @icushop, charge_return_url+'&host='+params[:host])
         else
           @subscription.remove_recurring_charge
         end

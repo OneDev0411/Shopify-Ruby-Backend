@@ -9,12 +9,13 @@ export function getSubscription(shopify_domain) {
   });
 }
 
-export function updateSubscription(plan_internal_name, shopify_domain) {
+export function updateSubscription(plan_internal_name, shopify_domain, host) {
   return api.put(PUT_SUBSCRIPTION, {
     subscription: {
       plan_internal_name: plan_internal_name
     },
     shop: shopify_domain,
+    host: host
   });
 }
 

@@ -13,7 +13,7 @@ import { useEffect, useState, useCallback } from "react";
 import { getSubscription, updateSubscription, isSubscriptionActive } from "../services/actions/subscription";
 
 export default function Subscription() {
-    const shop = useSelector(state => state.shopAndHost.shop);
+    const shopAndHost = useSelector(state => state.shopAndHost);
     const [currentSubscription, setCurrentSubscription] = useState(null);
     const [planName, setPlanName] = useState();
     const [trialDays, setTrialDays] = useState();
@@ -24,7 +24,7 @@ export default function Subscription() {
     async function handlePlanChange (internal_name) {
         let redirect = Redirect.create(app);
 
-        const response = await updateSubscription(internal_name, shop);
+        const response = await updateSubscription(internal_name, shopAndHost.shop, shopAndHost.host);
         if (response.payment == 'no') {
             const toastOptions = {
                 message: response.message,
@@ -33,14 +33,14 @@ export default function Subscription() {
             };
             const toastNotice = Toast.create(app, toastOptions);
             toastNotice.dispatch(Toast.Action.SHOW);
-            redirect.dispatch(Redirect.Action.APP, `/?shop=${shop}`);
+            redirect.dispatch(Redirect.Action.APP, `/?shop=${shopAndHost.shop}`);
         } else {
-            redirect.dispatch(Redirect.Action.REMOTE, response.url);
+            redirect.dispatch(Redirect.Action.REMOTE, response.url+'/?shop='+shopAndHost.shop);
         }
     }
 
     const fetchSubscription = useCallback(async() => {
-        const subResponse = await getSubscription(shop);
+        const subResponse = await getSubscription(shopAndHost.shop);
 
         setCurrentSubscription(subResponse.subscription);
         setPlanName(subResponse.plan);
