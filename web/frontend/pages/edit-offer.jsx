@@ -1,11 +1,13 @@
 import { Page, LegacyCard, Layout, Tabs, Icon } from '@shopify/polaris';
 import { DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
-import { TitleBar} from "@shopify/app-bridge-react";
+import { TitleBar } from "@shopify/app-bridge-react";
 import "../components/stylesheets/mainstyle.css";
 import { EditOfferTabs, SecondTab, ThirdTab, FourthTab } from "../components";
 import { useState, useCallback, useEffect } from 'react';
 import React from 'react';
-import { offerActivate, loadOfferDetails } from "../services/offers/actions/offer";
+import { offerUpdate, offerActivate, loadOfferDetails, getOfferSettings } from "../services/offers/actions/offer";
+import { shopSettings } from "../services/shop/actions/shop";
+import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 
 
 export default function EditPage() {
@@ -101,21 +103,57 @@ export default function EditPage() {
         }
     });
 
+    const shopId = 21;                                        // temp shopId, replaced by original shop id.
+    const offerID = 23;
+    const fetch = useAuthenticatedFetch();
+
     //Call on initial render
     useEffect(() => {
-      loadOfferDetails(55, 31).then((data) => {
-        setOffer(data);
-      })
+        fetch(`/api/v2/load_offer_details`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ offer: {shop_id: shopId, offer_id: offerID}}),
+        })
+        .then( (response) => { return response.json() })
+        .then( (data) => {
+            setOffer(data);
+        })
         .catch((error) => {
-          console.log("Error > ", JSON.stringify(error));
-        });
+            console.log("Error > ", error);
+        })
 
-      offerSettings(55, 0).then((data) => {
-        setShop(data);
-      })
+        fetch(`/api/v2/offer_settings`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ offer: {shop_id: shopId, include_sample_products: 0}}),
+        })
+        .then( (response) => { return response.json() })
+        .then( (data) => {
+            setOfferSettings(data);
+        })
         .catch((error) => {
-          console.log("Error > ", JSON.stringify(error));
-        });
+            console.log("Error > ", error);
+        })
+
+        fetch(`/api/v2/shop_settings`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ shop: { shop_id: shopId, admin: null }}),
+        })
+        .then( (response) => { return response.json() })
+        .then( (data) => {
+            setShop(data);
+        })
+        .catch((error) => {
+            console.log("Error > ", error);
+        })
+
     },[]);
 
     //Called whenever the offer changes in any child component
@@ -155,17 +193,120 @@ export default function EditPage() {
     }
 
     //Called whenever the shop changes in any child component
-    function updateShop(updatedKey, updatedValue) {
-        setShop(previousState => {
-          return { ...previousState, [updatedKey]: updatedValue };
-        });
+    function updateShop(updatedValue, ...updatedKey) {
+        if(updatedKey.length == 1) {
+            setShop(previousState => {
+                return { ...previousState, [updatedKey[0]]: updatedValue };
+            });
+        }
+        else if(updatedKey.length == 2) {
+            setShop(previousState => ({
+                ...previousState,
+                [updatedKey[0]]: {
+                    ...previousState[updatedKey[0]],
+                    [updatedKey[1]]: updatedValue 
+                }
+            }));
+        }
+        else if(updatedKey.length == 3) {
+            setShop(previousState => ({
+                ...previousState,
+                [updatedKey[0]]: {
+                    ...previousState[updatedKey[0]],
+                    [updatedKey[1]]: {
+                        ...previousState[updatedKey[0]][updatedKey[1]],
+                        [updatedKey[2]]: updatedValue
+                    }
+                }
+            }));
+        }
     }
 
 
     // Called when save button is clicked
     function save() {
-        console.log(offer);
-        debugger;
+        console.log("Shop >>",shop);
+        console.log("Offer >>", offer)
+        var ots = {
+            checkout_after_accepted: offer.checkout_after_accepted,
+            custom_field_name: offer.custom_field_name,
+            custom_field_placeholder: offer.custom_field_placeholder,
+            custom_field_required: offer.custom_field_required,
+            custom_field_2_name: offer.custom_field_2_name,
+            custom_field_2_placeholder: offer.custom_field_2_placeholder,
+            custom_field_2_required: offer.custom_field_2_required,
+            custom_field_3_name: offer.custom_field_3_name,
+            custom_field_3_placeholder: offer.custom_field_3_placeholder,
+            custom_field_3_required: offer.custom_field_3_required,
+            discount_target_type: offer.discount_target_type,
+            discount_code: offer.discount_code,
+            included_variants: offer.included_variants,
+            link_to_product: offer.link_to_product,
+            multi_layout: offer.multi_layout,
+            must_accept: offer.must_accept,
+            offerable_product_shopify_ids: offer.offerable_product_shopify_ids,
+            offerable_type: 'multi',
+            offer_css: offer.css,
+            offer_cta: offer.cta_a,
+            offer_cta_alt: offer.cta_b,
+            offer_text: offer.text_a,
+            offer_text_alt: offer.text_b,
+            product_image_size: offer.product_image_size,
+            products_to_remove: offer.products_to_remove,
+            publish_status: offer.publish_status,
+            remove_if_no_longer_valid: offer.remove_if_no_longer_valid,
+            redirect_to_product: offer.redirect_to_product,
+            rules_json: offer.rules_json,
+            ruleset_type: offer.ruleset_type,
+            show_variant_price: offer.show_variant_price,
+            show_product_image: offer.show_product_image,
+            show_product_title: offer.show_product_title,
+            show_product_price: offer.show_product_price,
+            show_compare_at_price: offer.show_compare_at_price,
+            show_nothanks: offer.show_nothanks,
+            show_quantity_selector: offer.show_quantity_selector,
+            show_custom_field: offer.show_custom_field,
+            stop_showing_after_accepted: offer.stop_showing_after_accepted,
+            theme: offer.theme,
+            title: offer.title,
+            in_cart_page: offer.in_cart_page,
+            in_ajax_cart: offer.in_ajax_cart,
+            in_product_page: offer.in_product_page,
+        };
+        if (shop.has_recharge && offer.recharge_subscription_id) {
+          ots.recharge_subscription_id = offer.recharge_subscription_id;
+          ots.interval_unit = offer.interval_unit;
+          ots.interval_frequency = offer.interval_frequency;
+        }
+        if(offer.id) {
+            fetch(`/api/offer/${offer.id}/update/${shopId}`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(ots),
+            })
+            .then( (response) => { return response.json(); })
+            .then( (data) => {
+            })
+            .catch((error) => {
+            })
+            // offerUpdate(fetch, offer.id, shopId, ots);
+        }
+
+        shop.shop_id = shopId;
+        fetch('/api/v2/update_shop_settings', {
+             method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify( {shop: shop, admin: shop.admin, json: true }),
+            })
+            .then( (response) => { return response.json(); })
+            .then( (data) => {
+            })
+            .catch((error) => {
+            })
     }
 
     const tabs = [
@@ -222,7 +363,7 @@ export default function EditPage() {
     ];
 
     async function publishOffer() {
-        return await offerActivate(offer.offerId, shop.shopID);
+        return await offerActivate(offer.id, 21);
     };
 
   return (
@@ -230,7 +371,7 @@ export default function EditPage() {
         breadcrumbs={[{content: 'Products', url: '/'}]}
         title="Create new offer"
         primaryAction={{content: 'Publish', disabled: false, onClick: publishOffer}}
-        secondaryActions={[{content: 'Save draft', disabled: false, onAction: () => save()}]}
+        secondaryActions={[{content: 'Save Draft', disabled: false, onAction: () => save()}]}
     >
         <TitleBar/>
         <Layout>
@@ -254,7 +395,7 @@ export default function EditPage() {
                     : "" }
                     {selected == 2 ?
                         // page was imported from components folder
-                        <ThirdTab/>
+                        <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop}/>
                     : "" }
                     {selected == 3 ?
                         // page was imported from components folder

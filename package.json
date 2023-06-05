@@ -15,7 +15,9 @@
     "@shopify/app": "^3.46",
     "@shopify/cli": "^3.46",
     "@shopify/polaris": "^10.49",
-    "axios": "^1.4.0"
+    "axios": "^1.4.0",
+    "react-color": "^2.19.3",
+    "tinycolor2": "^1.6.0"
   },
   "author": "xpsman"
 }

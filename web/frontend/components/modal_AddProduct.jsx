@@ -191,7 +191,16 @@ import {
       if(selectedItems.length < id.length) {
         setResourceListLoading(true);
         let shopifyId = id[id.length-1]
-        productShopify(shopifyId, 55).then(function(data) {
+        let shopId = 21;                                        // temp shopId, replaced by original shop id.
+
+        fetch(`/api/v2/products/shopify/${shopifyId}?shop_id=${shopId}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+        })
+        .then( (response) => { return response.json() })
+        .then( (data) => {
           for(var i=0; i<props.productData.length; i++)
           {
             if(props.productData[i].id == id[id.length-1]) {
@@ -209,7 +218,8 @@ import {
           setResourceListLoading(false);
           setSelectedItems(id);
         })
-        .catch(function(error) {
+        .catch((error) => {
+            console.log("Error > ", error);
         })
       }
       else {

@@ -251,8 +251,8 @@ module Shopifable
     res.parsed_response['data']['products']['edges'].map { |prod|
       {
         id: prod['node']['id'].gsub("gid://shopify/Product/","").to_i,
-        title: prod.get('node.title'),
-        image: prod.get('node.featuredImage.transformedSrc'),
+        title: prod.dig("node", "title"),
+        image: prod.dig("node", "featuredImage", "transformedSrc"),
         variants: []
         # variants: prod['node']['variants']['edges'].map { |variant|
         #   {

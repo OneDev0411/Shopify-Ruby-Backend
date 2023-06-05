@@ -27,8 +27,11 @@ Rails.application.routes.draw do
       get 'get_shop', to: 'shops#get_shop'
       get '/products/shopify/:shopify_id' => 'products#shopify_details'
       get '/products/multi/:shopify_id' => 'products#details_for_multi'
+      post 'update_shop_settings', to: 'shops#update_shop_settings'
     end
   end
+
+  post '/api/offer/:id/update/:shop_id', to: 'offers#update_from_builder'
 
   # Any other routes will just render the react app
   match '*path' => 'home#index', via: [:get, :post]

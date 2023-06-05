@@ -4,22 +4,26 @@ import {
     ButtonGroup,
     Button,
     TextField,
-    Link,
     Checkbox,
     Select,
     RangeSlider,
     Collapsible,
     Modal,
     Grid,
-    ColorPicker
+    ColorPicker,
+    Stack,
+    VerticalStack
 } from "@shopify/polaris";
 import {ModalAddProduct} from "./modal_AddProduct";
 import {ModalAddConditions} from "./modal_AddConditions";
 import HomePage from "../pages/subscription";
 import {useState,useCallback,useRef,useEffect} from "react";
+import { SketchPicker } from 'react-color';
 import React from "react";
 import { elementSearch, productsMulti } from "../services/products/actions/product";
-
+import Subscription from "../pages/subscription";
+import tinycolor from "tinycolor2";
+import { Link } from 'react-router-dom';
 
 export function EditOfferTabs(props) {
     const [altOfferText, setAltOfferText] = useState("");
@@ -72,12 +76,23 @@ export function EditOfferTabs(props) {
     //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
     function updateQuery (childData) {
         setResourceListLoading(true);
-        elementSearch(55, childData).then((data) => {
+        const shopId = 21;                                        // temp shopId, replaced by original shop id.
+    
+        fetch(`/api/v2/element_search`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ product: { shop_id: shopId, query: childData, type: 'product' }}),
+        })
+        .then( (response) => { return response.json() })
+        .then( (data) => {
             setResourceListLoading(false);
             setProductData(data);
         })
         .catch((error) => {
-        });
+            console.log("Error > ", error);
+        })
 
       setQuery(childData);
     }
@@ -92,30 +107,48 @@ export function EditOfferTabs(props) {
 
     //Called when "select product manually button clicked"
     function getProducts() {
-      props.updateOffer("included_variants", {});
+        props.updateOffer("included_variants", {});
 
-      setResourceListLoading(true);
-      elementSearch(55, query).then((data) => {
+        setResourceListLoading(true);
+        let shopId = 21;                                        // temp shopId, replaced by original shop id.
+
+        fetch(`/api/v2/element_search`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ product: { shop_id: shopId, query: query, type: 'product' }}),
+        })
+        .then( (response) => { return response.json() })
+        .then( (data) => {
             setResourceListLoading(false);
             setProductData(data);
         })
         .catch((error) => {
-          console.log("# Error getProducts > ", JSON.stringify(error));
-        });
+            console.log("# Error getProducts > ", JSON.stringify(error));
+        })
     }
 
     //Called when the save button of popup modal is clicked
     function updateProducts() {
         props.updateOffer("offerable_product_details", []);
-      props.updateOffer("offerable_product_shopify_ids", []);
+        props.updateOffer("offerable_product_shopify_ids", []);
+        let shopId = 21;                                        // temp shopId, replaced by original shop id.
         for(var i=0; i<selectedProducts.length; i++) {
-            productsMulti(selectedProducts[i], 55).then((data) => {
+            fetch(`/api/v2/products/multi/${selectedProducts[i]}?shop_id=${shopId}`, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+            })
+            .then( (response) => { return response.json() })
+            .then( (data) => {
                 props.updateProductsOfOffer(data);
                 setProductData("");
             })
             .catch((error) => {
-              console.log("# Error updateProducts > ", JSON.stringify(error));
-            });
+                console.log("# Error updateProducts > ", JSON.stringify(error));
+            })
         }
         handleModal();
     }
@@ -167,10 +200,9 @@ export function EditOfferTabs(props) {
                         label="Enable A/B testing"
                         checked={abTestCheck}
                         onChange={handleAbChange}
-                        onFocus={handleToggle}
                     />
                     <Collapsible
-                        open={open}
+                        open={abTestCheck}
                         id="basic-collapsible"
                         transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
                         // expandOnPrint
@@ -183,11 +215,11 @@ export function EditOfferTabs(props) {
                     >
                       <VerticalStack>
                         <p>
-                                    A/B testing is available on our Professional plan. Please <Link url="">upgrade your subscription</Link> to enable it.
-                                </p>
+                            A/B testing is available on our Professional plan. Please <Link to="/subscription">upgrade your subscription</Link> to enable it.
+                        </p>
                       </VerticalStack>
                     </Collapsible>
-                      <Collapsible
+                        <Collapsible
                             open={props.offerSettings.has_ab_testing}
                             id="ab-testing-present-collapsible"
                             transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
@@ -404,124 +436,143 @@ export function SecondTab(props){
     );
 }
 
-export function ThirdTab(){
-  const [layout, setLayout] = useState('Cart page');
-  const [selected, setSelected] = useState('Cart page');
-  const options = [
+export function ThirdTab(props){
+    const [layout, setLayout] = useState('Cart page');
+    const [selected, setSelected] = useState(props.shop.css_options.main.borderStyle);
+    const options = [
         {label: 'Cart page', value: 'cartpage'},
         {label: 'Product page', value: 'productpage'},
         {label: 'Product and cart page', value: 'cartpageproductpage'},
         {label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax'},
         {label: 'AJAX and cart page', value: 'ajaxcartpage'}
-  ];
+    ];
 
-  const handleLayout = useCallback((value) => setLayout(value), []);
-  const handleSelectChange = useCallback((value) => setSelected(value), []);
+    const handleLayout = useCallback((value) => setLayout(value), []);
+    const handleSelectChange = useCallback((value) => setSelected(value), []);
 
-  // Space above the offer
-  const [aboveSpace, setAboveSpace] = useState('10');
-  const handleAboveSpace = useCallback(
-    (value) => setAboveSpace(value),
-    [],
-  );
-  // Space below the offer
-  const [belowSpace, setBelowSpace] = useState('10');
-  const handleBelowSpace = useCallback(
-    (value) => setBelowSpace(value),
-    [],
-  );
-  //Border style drop-down menu
-  const [borderStyle, setBorderStyle] = useState("No border");
-  const handleBorderStyle = useCallback((value) => setBorderStyle(value), []);
-  const BorderOptions = [
-        {label: 'No border', value: 'No border'},
-        {label: 'Dotted lines', value: 'Dotted lines'},
-        {label: 'Straight line', value: 'Straight line'},
-  ];
+    // Space above the offer
+    const handleAboveSpace = useCallback((newValue) => props.updateShop(newValue, "css_options", "main", "marginTop"), []);
+    // Space below the offer
+    const handleBelowSpace = useCallback((newValue) => props.updateShop(newValue, "css_options", "main", "marginBottom"), []);
+    //Border style drop-down menu
+    const handleBorderStyle = useCallback((newValue) => { 
+        props.updateShop(newValue, "css_options", "main", "borderStyle");
+        setSelected(newValue);
+    }, []);
+    const BorderOptions = [
+        {label: 'No border', value: 'none'},
+        {label: 'Dotted lines', value: 'dotted'},
+        {label: 'Dashed line', value: 'dashed'},
+        {label: 'Solid line', value: 'solid'},
+        {label: 'Double line', value: 'double'},
+        {label: 'Groove line', value: 'groove'},
+        {label: 'Ridge line', value: 'ridge'},
+        {label: 'Inset line', value: 'inset'},
+        {label: 'Outset line', value: 'outset'},
+        {label: 'Hidden line', value: 'hidden'},
+    ];
 
-  //Border width
-  const [borderWidth, setBorderWidth] = useState('10');
-  const handleBorderWidth = useCallback(
-    (value) => setBorderWidth(value),
-    [],
-  );
+    //Border width
+    const handleBorderWidth = useCallback((newValue) => props.updateShop(newValue, "css_options", "main", "borderWidth"), []);
 
     //Border range slider
-    const [borderRange, setBorderRange] = useState(10);
-    const handlesetBorderRange = useCallback(
-        (value) => setBorderRange(value),
-        [],
-    );
+    const handlesetBorderRange = useCallback((newValue) => props.updateShop(newValue, "css_options", "main", "borderRadius"), []);
 
     // Toggle for manually added color
     const [open, setOpen] = useState(false);
     const handleToggle = useCallback(() => setOpen((open) => !open), []);
 
-    //Color picker
-    const [color, setColor] = useState({
-        hue: 300,
-        brightness: 1,
-        saturation: 0.7,
-        alpha: 0.7,
-      });
 
     //Font options
-    const [fontSelect, setFontSelect] = useState("Dummy font 1");
-    const handleFontSelect = useCallback((value)=> setFontSelect(value),[]);
+    // const [fontSelect, setFontSelect] = useState("Dummy font 1");
+    const handleFontSelect = useCallback((value)=> props.updateShop(value, "css_options", "text", "fontFamily"),[]);
     const fontOptions = [
-        {label: 'Dummy font 1', value: 'Dummy font 1'},
-        {label: 'Dummy font 2', value: 'Dummy font 2'},
-        {label: 'Dummy font 3', value: 'Dummy font 3'},
-        {label: 'Dummy font 4', value: 'Dummy font 4'},
-        {label: 'Dummy font 5', value: 'Dummy font 5'},
+        {label: 'None', value: 'None'},
+        {label: 'Arial', value: 'Arial'},
+        {label: 'Caveat', value: 'Caveat'},
+        {label: 'Confortaa', value: 'Confortaa'},
+        {label: 'Comic Sans MS', value: 'Comic Sans MS'},
+        {label: 'Courier New', value: 'Courier New'},
+        {label: 'EB Garamond', value: 'EB Garamond'},
+        {label: 'Georgia', value: 'Georgia'},
+        {label: 'Impact', value: 'Impact'},
+        {label: 'Lexend', value: 'Lexend'},
+        {label: 'Lobster', value: 'Lobster'},
+        {label: 'Lora', value: 'Lora'},
+        {label: 'Merriweather', value: 'Merriweather'},
+        {label: 'Montserrat', value: 'Montserrat'},
+        {label: 'Oswald', value: 'Oswald'},
+        {label: 'Pacifico', value: 'Pacifico'},
+        {label: 'Playfair Display', value: 'Playfair Display'},
+        {label: 'Roboto', value: 'Roboto'},
+        {label: 'Spectral', value: 'Spectral'},
+        {label: 'Trebuchet MS', value: 'Trebuchet MS'},
+        {label: 'Verdana', value: 'Verdana'},
       ];
 
     //Font weight
-    const [fontWeight, setFontWeight] = useState('10');
-    const handleFontWeight = useCallback(
-        (value) => setFontWeight(value),
-        [],
-    );
+    const handleFontWeight = useCallback((newValue) => {
+        if(parseInt(newValue) >= 0 && parseInt(newValue) <= 500) {
+            props.updateShop("Normal", "css_options", "text", "fontWeight");
+        }
+        else if(parseInt(newValue) > 500) {
+            props.updateShop("Bold", "css_options", "text", "fontWeight");
+        }
+        props.updateShop(newValue, "css_options", "text", "fontWeightInPixel");
+    }, []);
 
     //Font size
-    const [fontsize, setFontSize] = useState('10');
-    const handleFontSize = useCallback(
-        (value) => setFontSize(value),
-        [],
-    );
+    const handleFontSize = useCallback((newValue) => props.updateShop(newValue, "css_options", "text", "fontSize"), []);
 
 
     //Button options
-    const [btnSelect, setBtnSelect] = useState("Dummy font 1");
-    const handleBtnSelect = useCallback((value)=> setBtnSelect(value),[]);
+    const handleBtnSelect = useCallback((value)=> props.updateShop(value, "css_options", "button", "fontFamily"),[]);
     const btnOptions = [
-        {label: 'Dummy font 1', value: 'Dummy font 1'},
-        {label: 'Dummy font 2', value: 'Dummy font 2'},
-        {label: 'Dummy font 3', value: 'Dummy font 3'},
-        {label: 'Dummy font 4', value: 'Dummy font 4'},
-        {label: 'Dummy font 5', value: 'Dummy font 5'},
+        {label: 'None', value: 'None'},
+        {label: 'Arial', value: 'Arial'},
+        {label: 'Caveat', value: 'Caveat'},
+        {label: 'Confortaa', value: 'Confortaa'},
+        {label: 'Comic Sans MS', value: 'Comic Sans MS'},
+        {label: 'Courier New', value: 'Courier New'},
+        {label: 'EB Garamond', value: 'EB Garamond'},
+        {label: 'Georgia', value: 'Georgia'},
+        {label: 'Impact', value: 'Impact'},
+        {label: 'Lexend', value: 'Lexend'},
+        {label: 'Lobster', value: 'Lobster'},
+        {label: 'Lora', value: 'Lora'},
+        {label: 'Merriweather', value: 'Merriweather'},
+        {label: 'Montserrat', value: 'Montserrat'},
+        {label: 'Oswald', value: 'Oswald'},
+        {label: 'Pacifico', value: 'Pacifico'},
+        {label: 'Playfair Display', value: 'Playfair Display'},
+        {label: 'Roboto', value: 'Roboto'},
+        {label: 'Spectral', value: 'Spectral'},
+        {label: 'Trebuchet MS', value: 'Trebuchet MS'},
+        {label: 'Verdana', value: 'Verdana'},
       ];
 
     //Button weight
-    const [btnWeight, setBtnWeight] = useState('10');
-    const handleBtnWeight = useCallback(
-        (value) => setBtnWeight(value),
-        [],
-    );
+    const handleBtnWeight = useCallback((newValue) => {
+        if(parseInt(newValue) >= 0 && parseInt(newValue) <= 500) {
+            props.updateShop("Normal", "css_options", "button", "fontWeight");
+        }
+        else if(parseInt(newValue) > 500) {
+            props.updateShop("Bold", "css_options", "button", "fontWeight");
+        }
+        props.updateShop(newValue, "css_options", "button", "fontWeightInPixel");
+    }, []);
 
     //Button size
-    const [btnSize, setBtnSize] = useState('10');
-    const handleBtnSize = useCallback(
-        (value) => setBtnSize(value),
-        [],
-    );
+    const handleBtnSize = useCallback((newValue) => props.updateShop(newValue, "css_options", "button", "fontSize"), []);
 
     // Btn radius
     const [rangeValue, setRangeValue] = useState(20);
-    const handleRangeSliderChange = useCallback(
-        (value) => setRangeValue(value),
-        [],
-    );
+    const handleRangeSliderChange = useCallback((newValue) => props.updateShop(newValue, "css_options", "button", "borderRadius"), []);
+
+    //Sketch picker
+    const handleOfferBackgroundColor = useCallback((newValue) => {
+        props.updateShop(newValue.hex, "css_options", "main", "backgroundColor");
+    }, []);
 
     return(
         <div>
@@ -544,7 +595,7 @@ export function ThirdTab(){
                                 label="Space above offer"
                                 type="number"
                                 onChange={handleAboveSpace}
-                                value={aboveSpace}
+                                value={props.shop.css_options.main.marginTop}
                                 suffix="px"
                             />
                         </Grid.Cell>
@@ -553,7 +604,7 @@ export function ThirdTab(){
                                 label="Space below offer"
                                 type="number"
                                 onChange={handleBelowSpace}
-                                value={belowSpace}
+                                value={props.shop.css_options.main.marginBottom}
                                 suffix="px"
                             />
                         </Grid.Cell>
@@ -564,7 +615,7 @@ export function ThirdTab(){
                             <Select label="Border style"
                                 options={BorderOptions}
                                 onChange={handleBorderStyle}
-                                value={borderStyle}
+                                value={selected}
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
@@ -572,7 +623,7 @@ export function ThirdTab(){
                                 label="Border width"
                                 type="number"
                                 onChange={handleBorderWidth}
-                                value={borderWidth}
+                                value={props.shop.css_options.main.borderWidth}
                                 suffix="px"
                             />
                         </Grid.Cell>
@@ -582,7 +633,7 @@ export function ThirdTab(){
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                             <RangeSlider
                                 label="Border Radius"
-                                value={borderRange}
+                                value={props.shop.css_options.main.borderRadius}
                                 onChange={handlesetBorderRange}
                                 output
                             />
@@ -607,7 +658,8 @@ export function ThirdTab(){
                             transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
                             expandOnPrint
                         >
-                          <br/><ColorPicker onChange={setColor} color={color} allowAlpha />
+                        <br/><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main.backgroundColor} />
+                        {/*<br/><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main.backgroundColor} />*/}
                         </Collapsible>
                     </Stack>
                 </LegacyCard.Section>
@@ -620,7 +672,7 @@ export function ThirdTab(){
                                 label="Font"
                                 options={fontOptions}
                                 onChange={handleFontSelect}
-                                value={fontSelect}
+                                value={props.shop.css_options.text.fontFamily}
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
@@ -630,7 +682,7 @@ export function ThirdTab(){
                                 suffix="px"
                                 autoComplete="off"
                                 onChange={handleFontWeight}
-                                value={fontWeight}
+                                value={props.shop.css_options.text.fontWeightInPixel}
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
@@ -640,7 +692,7 @@ export function ThirdTab(){
                                 suffix="px"
                                 autoComplete="off"
                                 onChange={handleFontSize}
-                                value={fontsize}
+                                value={props.shop.css_options.text.fontSize}
                             />
                         </Grid.Cell>
                     </Grid>
@@ -652,7 +704,7 @@ export function ThirdTab(){
                                 label="Font"
                                 options={btnOptions}
                                 onChange={handleBtnSelect}
-                                value={btnSelect}
+                                value={props.shop.css_options.button.fontFamily}
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
@@ -662,7 +714,7 @@ export function ThirdTab(){
                                 suffix="px"
                                 autoComplete="off"
                                 onChange={handleBtnWeight}
-                                value={btnWeight}
+                                value={props.shop.css_options.button.fontWeightInPixel}
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
@@ -672,7 +724,7 @@ export function ThirdTab(){
                                 suffix="px"
                                 autoComplete="off"
                                 onChange={handleBtnSize}
-                                value={btnSize}
+                                value={props.shop.css_options.button.fontSize}
                             />
                         </Grid.Cell>
                     </Grid>
@@ -681,7 +733,7 @@ export function ThirdTab(){
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                             <RangeSlider
                                 label="Button Radius"
-                                value={rangeValue}
+                                value={props.shop.css_options.button.borderRadius}
                                 onChange={handleRangeSliderChange}
                                 output
                             />
@@ -692,7 +744,7 @@ export function ThirdTab(){
             <div className="space-4"></div>
             <LegacyStack distribution="center">
                 <ButtonGroup>
-                    <Button>Save dratf</Button>
+                    <Button>Save Draft</Button>
                     <Button primary>Publish</Button>
                 </ButtonGroup>
             </LegacyStack>
@@ -704,16 +756,16 @@ export function ThirdTab(){
 // Advanced Tab
 export function FourthTab(props){
 
-    const [checked, setChecked] = useState(false);
+     const [checked, setChecked] = useState(false);
     const handleChange = useCallback((newChecked) => setChecked(newChecked), []);
-    const handleProductDomSelector = useCallback((newValue) => props.updateShop("custom_product_page_dom_selector", newValue), []);
-    const handleProductDomAction = useCallback((newValue) => props.updateShop("custom_product_page_dom_action", newValue), []);
-    const handleCartDomSelector = useCallback((newValue) => props.updateShop("custom_cart_page_dom_selector", newValue), []);
-    const handleCartDomAction = useCallback((newValue) => props.updateShop("custom_cart_page_dom_action", newValue), []);
-    const handleAjaxDomSelector = useCallback((newValue) => props.updateShop("custom_ajax_dom_selector", newValue), []);
-    const handleAjaxDomAction = useCallback((newValue) => props.updateShop("custom_ajax_dom_action", newValue), []);
-    const handleAjaxRefreshCode = useCallback((newValue) => props.updateShop("ajax_refresh_code", newValue), []);
-    const handleOfferCss = useCallback((newValue) => props.updateShop("offer_css", newValue), []);
+    const handleProductDomSelector = useCallback((newValue) => props.updateShop(newValue,"custom_product_page_dom_selector"), []);
+    const handleProductDomAction = useCallback((newValue) => props.updateShop(newValue, "custom_product_page_dom_action"), []);
+    const handleCartDomSelector = useCallback((newValue) => props.updateShop(newValue,"custom_cart_page_dom_selector"), []);
+    const handleCartDomAction = useCallback((newValue) => props.updateShop(newValue,"custom_cart_page_dom_action"), []);
+    const handleAjaxDomSelector = useCallback((newValue) => props.updateShop(newValue,"custom_ajax_dom_selector"), []);
+    const handleAjaxDomAction = useCallback((newValue) => props.updateShop(newValue, "custom_ajax_dom_action"), []);
+    const handleAjaxRefreshCode = useCallback((newValue) => props.updateShop(newValue, "ajax_refresh_code"), []);
+    const handleOfferCss = useCallback((newValue) => props.updateShop(newValue, "offer_css"), []);
 
     return(
         <>
@@ -746,7 +798,7 @@ export function FourthTab(props){
             <div className="space-4"></div>
             <LegacyStack distribution="center">
                 <ButtonGroup>
-                    <Button>Save dratf</Button>
+                    <Button>Save draft</Button>
                     <Button primary>Publish</Button>
                 </ButtonGroup>
             </LegacyStack>
