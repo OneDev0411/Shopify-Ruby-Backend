@@ -20,7 +20,6 @@ import HomePage from "../pages/subscription";
 import {useState,useCallback,useRef,useEffect} from "react";
 import { SketchPicker } from 'react-color';
 import React from "react";
-import { elementSearch, productsMulti } from "../services/products/actions/product";
 import Subscription from "../pages/subscription";
 import tinycolor from "tinycolor2";
 import { Link } from 'react-router-dom';

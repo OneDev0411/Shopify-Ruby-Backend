@@ -9,7 +9,6 @@ import {
     OptionList
   } from '@shopify/polaris';
   import {useState, useCallback, useEffect, useRef} from 'react';
-  import { productShopify } from "../services/products/actions/product";
 
   
  export function ModalAddProduct(props) {

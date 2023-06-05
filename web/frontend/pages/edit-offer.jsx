@@ -5,8 +5,6 @@ import "../components/stylesheets/mainstyle.css";
 import { EditOfferTabs, SecondTab, ThirdTab, FourthTab } from "../components";
 import { useState, useCallback, useEffect } from 'react';
 import React from 'react';
-import { offerUpdate, offerActivate, loadOfferDetails, getOfferSettings } from "../services/offers/actions/offer";
-import { shopSettings } from "../services/shop/actions/shop";
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 
 
