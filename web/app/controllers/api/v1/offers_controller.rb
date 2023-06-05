@@ -32,7 +32,7 @@ module V1
         render json: @icushop.offer_settings(include_sample_products: incsamppro)
       rescue StandardError => e
         Rails.logger.debug "Error Message: #{e.message}"
-        Rollbar.error("Error", e)
+        Rollbar.error('Error', e)
       end
     end
 
@@ -43,7 +43,7 @@ module V1
         render json: @icushop.reorder_batch_offers(offer_params[:offers_ids])
       rescue StandardError => e
         Rails.logger.debug "Error Message: #{e.message}"
-        Rollbar.error("Error", e)
+        Rollbar.error('Error', e)
       end
     end
 
@@ -100,8 +100,9 @@ module V1
     end
 
     def set_shop
+      puts "###{__LINE__} VVVV #{File.basename(__FILE__)} : request.headers['jwt.shopify_domain']  ##>>  #{request.headers['jwt.shopify_domain'].inspect}"
       begin
-        @icushop = Shop.find_by shopify_domain: request.headers['jwt.shopify_domain']
+        @icushop = Shop.find_by shopify_domain: request.headers['action_dispatch.request.parameters']['shop']
       rescue ActiveRecord::RecordNotFound
         raise ApiException::NotFound
       end
