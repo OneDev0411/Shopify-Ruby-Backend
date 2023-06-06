@@ -7,14 +7,15 @@ import {
     useIndexResourceState,
     Page,
     Badge,
-    FooterHelp,
     Link,
+    FooterHelp,
     Pagination,
     Grid
   } from '@shopify/polaris';
   import { TitleBar } from "@shopify/app-bridge-react";
-  import {useState, useCallback} from 'react';
+  import {useState, useCallback, useEffect} from 'react';
   import React from 'react';
+  import { useNavigate } from 'react-router-dom';
   
   export default function IndexTableWithAllElementsExample() {
     // Dummy data fo IndexTable
@@ -175,6 +176,12 @@ import {
         </IndexTable.Row>
       ),
     );
+
+    const navigateTo = useNavigate();
+
+    const handleOpenOfferPage = () => {
+      navigateTo('/edit-offer', { state: { offerID: null } });
+    }
   
     return (
       <Page> 
@@ -182,9 +189,9 @@ import {
             title="Offers"
             primaryAction={{
             content: "Create Offer",
-            onAction: () => console.log("create offer btn clicked"),
+            onAction: handleOpenOfferPage,
             }}
-        /> 
+        />
         <Card sectioned>
           <div style={{display: 'flex'}}>
             <div style={{flex: 1}}>

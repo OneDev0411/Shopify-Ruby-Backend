@@ -21,6 +21,7 @@ gem 'turbo-rails' # Hotwire's SPA-like page accelerator [https://turbo.hotwired.
 gem 'tzinfo-data'
 gem 'liquid'
 gem 'httparty'
+gem 'customerio'           # A ruby client for the Customer.io event API
 
 group :development, :test do
   gem 'byebug'
