@@ -7,9 +7,10 @@ export function productShopify(shopify_id, shop_id) {
   });
 };
 
-export function elementSearch(shop_id, query) {
+export function elementSearch(shopify_domain, query) {
   return api.post(ELEMENT_SEARCH, {
-    product: { shop_id: shop_id, query: query, type: 'product' }
+    product: { query: query, type: 'product' },
+    shop: shopify_domain
   });
 };
 

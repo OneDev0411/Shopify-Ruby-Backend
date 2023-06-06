@@ -6,9 +6,13 @@ import { EditOfferTabs, SecondTab, ThirdTab, FourthTab } from "../components";
 import { useState, useCallback, useEffect } from 'react';
 import React from 'react';
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
+import { useSelector } from 'react-redux';
+import { offerActivate, loadOfferDetails, getOfferSettings } from "../services/offers/actions/offer";
 
 
 export default function EditPage() {
+    const shopAndHost = useSelector(state => state.shopAndHost);
+
     // Content section tab data
     const [selected, setSelected] = useState(0);
     const handleTabChange = useCallback(
@@ -107,17 +111,9 @@ export default function EditPage() {
 
     //Call on initial render
     useEffect(() => {
-        fetch(`/api/v2/load_offer_details`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ offer: {shop_id: shopId, offer_id: offerID}}),
-        })
-        .then( (response) => { return response.json() })
-        .then( (data) => {
-            setOffer(data);
-        })
+      loadOfferDetails(shopAndHost.shop, 5).then((data) => {
+        setOffer(data);
+      })
         .catch((error) => {
             console.log("Error > ", error);
         })
@@ -389,7 +385,7 @@ export default function EditPage() {
                     : "" }
                     {selected == 1 ?
                         // page was imported from components folder
-                        <SecondTab offer={offer} offerSettings={offerSettings} updateOffer={updateOffer}/>
+                        <SecondTab offer={offer} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} />
                     : "" }
                     {selected == 2 ?
                         // page was imported from components folder
