@@ -2,7 +2,7 @@
 module Api
   module Merchant
     class OffersController < ApiMerchantBaseController
-      before_action :find_shop, only: [:offer_settings]
+      before_action :find_shop, only: [:offer_settings, :update_from_builder]
       before_action :set_offer, only: [:load_offer_details]
 
       # GET /api/merchant/shop_offers
@@ -27,10 +27,53 @@ module Api
       end
 
 
+      # POST  /offers/:id/update/:shop_id(.:format)
+      # The CURRENT offer update method
+      def update_from_builder
+        offer = @icushop.offers.find_by(id: params[:id])
+        if offer.nil?
+          return render json: { message: "Offer #{params[:id]} not found for shop ##{@icushop.id}"},
+                                status: :not_found
+        end
+
+        publish_status = offer_params['publish_status']
+        my_params = offer_params
+        my_params.delete('publish_status')
+        if publish_status == 'published' && !offer.active
+          if @icushop.active_offers.count >= @icushop.subscription.offers_limit
+            # TODO: reject publish
+            render json: { message: 'Cannot activate offer' } and return
+          end
+
+          my_params['published_at'] = Time.now.utc
+          my_params['deactivated_at'] = nil
+          my_params['active'] = true
+        elsif publish_status == 'draft' && offer.active
+          my_params['published_at'] = nil
+          my_params['active'] = false
+        end
+
+        if offer.offerable_type == 'multi'
+          my_params['rules_json'] = offer_params['rules_json'].map { |rule| rule.except('uuid') }
+        end
+
+        if offer.update(my_params)
+          @icushop.publish_async
+          render json: { offer: offer.library_json }, status: :ok
+        else
+          render json: offer.errors, status: :bad_request
+        end
+      end
+
+
       private
 
+      def offer_params
+        params.require('offer').permit('offer_id', 'shop_id', 'include_sample_products', offers_ids: [])
+      end
+
       def set_offer
-        @offer = Offer.find(params[:offer][:offer_id])
+        @offer = Offer.find(offer_params[:offer_id])
       end
 
     end

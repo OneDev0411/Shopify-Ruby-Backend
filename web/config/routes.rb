@@ -37,6 +37,8 @@ Rails.application.routes.draw do
     end
   end
 
+  post '/api/offer/:id/update/:shop_id', to: 'offers#update_from_builder'
+
   # Any other routes will just render the react app
   match '*path' => 'home#index', via: [:get, :post]
 end

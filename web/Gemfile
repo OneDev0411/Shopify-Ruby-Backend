@@ -23,6 +23,8 @@ gem 'sprockets-rails'
 gem 'stimulus-rails' # Hotwire's modest JavaScript framework
 gem 'turbo-rails' # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem 'tzinfo-data'
+gem 'liquid'
+gem 'httparty'
 
 group :development, :test do
   gem 'byebug'
@@ -41,6 +43,7 @@ group :development do
   gem 'pry-rails'
   gem 'rubocop-shopify'
   gem 'web-console'
+  gem 'dotenv-rails'
 end
 
 group :test do
