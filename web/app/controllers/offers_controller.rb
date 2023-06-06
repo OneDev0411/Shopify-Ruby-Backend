@@ -4,7 +4,29 @@
 class OffersController < AuthenticatedController
 
   before_action :offer_params, only: [:update_from_builder]
-  before_action :set_shop, only: [:update_from_builder]
+  before_action :set_shop, only: [:update_from_builder, :create_from_builder]
+
+
+  # POST   /offers/:shop_id/builder(.:format)
+      # The current offer create  method
+      def create_from_builder
+        offer = Offer.new(offer_params.except('publish_status'))
+        offer.shop_id = @icushop.id
+        offer.offerable_type = 'multi'
+        offer.rules_json = offer_params['rules_json']
+        if offer_params['publish_status'] == 'published'
+          offer.published_at = Time.now.utc
+          offer.active = true
+        end
+
+        if offer.save
+          $customerio.track(@icushop.id, 'offer created')
+          @icushop.publish_async
+          render json: { message: 'success', offer_id: offer.id, offer: offer.library_json }
+        else
+          render json: { message: 'could not save', errors: offer.errors }
+        end
+      end
 
   # POST  api/offers/:id/update/:shop_id(.:format)
   # The CURRENT offer update method
@@ -52,7 +74,7 @@ class OffersController < AuthenticatedController
   end
 
   def offer_params
-    params.permit(:title, :theme, :published_at, :show_product_image, :autopilot_quantity,
+    params.require(:offer).permit(:title, :theme, :published_at, :show_product_image, :autopilot_quantity,
                                   :product_id, :offer_text, :custom_field_required, :custom_field_2_name,
                                   :custom_field_2_placeholder, :custom_field_2_required, :custom_field_3_name,
                                   :custom_field_3_placeholder, :custom_field_3_required, :discount_code,
