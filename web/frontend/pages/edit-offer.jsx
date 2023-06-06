@@ -101,8 +101,8 @@ export default function EditPage() {
         }
     });
 
-    const shopId = 21;                                        // temp shopId, replaced by original shop id.
-    const offerID = 23;
+    const shopId = 55;                                        // temp shopId, replaced by original shop id.
+    const offerID = 30;
     const fetch = useAuthenticatedFetch();
 
     //Call on initial render
