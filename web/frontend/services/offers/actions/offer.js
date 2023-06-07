@@ -8,14 +8,16 @@ export function offerActivate(offer_id, shop_id) {
   });
 };
 
-export function loadOfferDetails(shop_id, offer_id) {
+export function loadOfferDetails(shopify_domain, offer_id) {
   return api.post(LOAD_OFFER_DETAILS, {
-    offer: {shop_id: shop_id, offer_id: offer_id}
+    offer: { offer_id: offer_id},
+    shop: shopify_domain
   })
 };
 
-export function offerSettings(shop_id, include_sample_products) {
+export function getOfferSettings(shopify_domain, include_sample_products) {
   return api.post(OFFER_SETTINGS, {
-    offer: {shop_id: shop_id, include_sample_products: include_sample_products}
+    offer: {include_sample_products: include_sample_products},
+    shop: shopify_domain
   })
 }
