@@ -12,20 +12,81 @@ module Api
         render json: offers
       end
 
+      # POST /api/merchant/offers_list
+      def offers_list
+        render json: { shopify_domain: @icushop.shopify_domain, offers: @icushop.offers }
+      end
+
       # POST /api/merchant/load_offer_details
       def load_offer_details
-        library_json = @offer.library_json
-        library_json[:publish_status] = @offer.active ? 'published' : 'draft'
+        begin
+          library_json = @offer.library_json
+          library_json[:publish_status] = @offer.active ? 'published' : 'draft'
 
-        render json: library_json
+          render json: library_json
+        rescue StandardError => e
+          Rails.logger.debug "Error Message: #{e.message}"
+          Rollbar.error('Error', e)
+        end
       end
 
       # POST /api/merchant/offer_settings
       # Load the generic offer settings ( the whole shop config stuff )
       def offer_settings
-        render json: @icushop.offer_settings(include_sample_products: params[:offer][:include_sample_products] == 1)
+        begin
+          incsamppro = offer_params['include_sample_products'] == 1
+          render json: @icushop.offer_settings(include_sample_products: incsamppro)
+        rescue StandardError => e
+          Rails.logger.debug "Error Message: #{e.message}"
+          Rollbar.error('Error', e)
+        end
       end
 
+      def reorder_position_order
+        begin
+          render json: @icushop.reorder_batch_offers(offer_params[:offers_ids])
+        rescue StandardError => e
+          Rails.logger.debug "Error Message: #{e.message}"
+          Rollbar.error('Error', e)
+        end
+      end
+
+      def activate
+        begin
+          if @icushop.offers_limit_reached?
+            render json: { message: 'Offer limit reached' }, status: :ok and return
+          end
+
+          offer = @icushop.offers.find offer_params['offer_id']
+
+          if offer.update({ published_at: Time.now.utc, deactivated_at: nil, active: true })
+            @icushop.publish_async
+
+            render json: { message: 'Offer published', status: 'Active' }, status: :ok
+          else
+            render json: { message: "Error: #{offer.errors.full_messages.first}" },
+                        status: :internal_server_error
+          end
+        rescue ActiveRecord::RecordNotFound, StandardError => e
+          Rails.logger.debug "Error Message: #{e.message}"
+          Rollbar.error('Error offer_activate', e)
+        end
+    end
+
+      def deactivate
+        begin
+          offer = @icushop.offers.find(offer_params['offer_id'])
+          if offer.update({ published_at: nil, active: false })
+            @icushop.publish_async
+            render json: { message: 'Offer Saved As Draft',  status: 'Draft' }, status: :ok
+          else
+            render json: { message: "Error: #{offer.errors.full_messages.first}" }, status: :internal_server_error
+          end
+        rescue ActiveRecord::RecordNotFound, StandardError => e
+          Rails.logger.debug "Error Message: #{e.message}"
+          Rollbar.error("Error", e)
+        end
+      end
 
       # POST  /offers/:id/update/:shop_id(.:format)
       # The CURRENT offer update method
@@ -76,6 +137,14 @@ module Api
         @offer = Offer.find(offer_params[:offer_id])
       end
 
+      def set_shop
+        puts "###{__LINE__} VVVV #{File.basename(__FILE__)} : request.headers['jwt.shopify_domain']  ##>>  #{request.headers['jwt.shopify_domain'].inspect}"
+        begin
+          @icushop = Shop.find_by shopify_domain: request.headers['action_dispatch.request.parameters']['shop']
+        rescue ActiveRecord::RecordNotFound
+          raise ApiException::NotFound
+        end
+      end
     end
   end
 end

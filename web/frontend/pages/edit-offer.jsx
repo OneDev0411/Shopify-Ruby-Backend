@@ -103,19 +103,19 @@ export default function EditPage() {
         }
     });
 
-    const shopId = 55;                                        // temp shopId, replaced by original shop id.
-    const offerID = 30;
+    const shopId = 21;                                        // temp shopId, replaced by original shop id.
+    const offerID = 23;
     const fetch = useAuthenticatedFetch();
 
     //Call on initial render
     useEffect(() => {
         if(location.state?.offerId == null) {
-            fetch(`/api/v2/offer_settings`, {
+            fetch(`/api/merchant/offer_settings`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ offer: {shop_id: shopId, include_sample_products: 0}}),
+                body: JSON.stringify({ offer: {include_sample_products: 0}, shop_id: shopId }),
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
@@ -124,29 +124,31 @@ export default function EditPage() {
             .catch((error) => {
                 console.log("Error > ", error);
             })
-
-            fetch(`/api/v2/shop_settings`, {
+ 
+            fetch(`/api/merchant/shop_settings`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ shop: { shop_id: shopId, admin: null }}),
+                body: JSON.stringify({ shop: { admin: null }, shop_id: shopId}),
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
+                
                 setShop(data);
             })
             .catch((error) => {
+                
                 console.log("Error > ", error);
             })
         }
         else {
-            fetch(`/api/v2/load_offer_details`, {
+            fetch(`/api/merchant/load_offer_details`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ offer: {shop_id: shopId, offer_id: offerID}}),
+                body: JSON.stringify({ offer: {shop_id: shopId, offer_id: offerID} }),
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
@@ -156,33 +158,37 @@ export default function EditPage() {
                 console.log("Error > ", error);
             })
 
-            fetch(`/api/v2/offer_settings`, {
+            fetch(`/api/merchant/offer_settings`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ offer: {shop_id: shopId, include_sample_products: 0}}),
+                body: JSON.stringify({ offer: {include_sample_products: 0}, shop_id: shopId }),
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
+                debugger
                 setOfferSettings(data);
             })
             .catch((error) => {
+                debugger
                 console.log("Error > ", error);
             })
 
-            fetch(`/api/v2/shop_settings`, {
+            fetch(`/api/merchant/shop_settings`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ shop: { shop_id: shopId, admin: null }}),
+                body: JSON.stringify({ shop: { admin: null }, shop_id: shopId }),
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
+                debugger
                 setShop(data);
             })
             .catch((error) => {
+                debugger
                 console.log("Error > ", error);
             })
         }
@@ -343,13 +349,12 @@ export default function EditPage() {
             })
         }
 
-        shop.shop_id = shopId;
-        fetch('/api/v2/update_shop_settings', {
+        fetch('/api/merchant/update_shop_settings', {
              method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify( {shop: shop, admin: shop.admin, json: true }),
+                body: JSON.stringify( {shop: shop, admin: shop.admin, shop_id: shop.id, json: true }),
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {

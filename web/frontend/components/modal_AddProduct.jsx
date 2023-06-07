@@ -192,7 +192,7 @@ import {
         let shopifyId = id[id.length-1]
         let shopId = 21;                                        // temp shopId, replaced by original shop id.
 
-        fetch(`/api/v2/products/shopify/${shopifyId}?shop_id=${shopId}`, {
+        fetch(`/api/merchant/products/shopify/${shopifyId}?shop_id=${shopId}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

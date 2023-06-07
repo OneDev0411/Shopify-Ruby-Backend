@@ -75,14 +75,14 @@ export function EditOfferTabs(props) {
     //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
     function updateQuery (childData) {
         setResourceListLoading(true);
-        const shopId = 55;                                        // temp shopId, replaced by original shop id.
+        const shopId = 21;                                        // temp shopId, replaced by original shop id.
     
-        fetch(`/api/v2/element_search`, {
+        fetch(`/api/merchant/element_search`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ product: { shop_id: shopId, query: childData, type: 'product' }}),
+            body: JSON.stringify({ product: { shop_id: shopId, query: childData, type: 'product' }, shop_id: shopId}),
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
@@ -109,14 +109,14 @@ export function EditOfferTabs(props) {
         props.updateOffer("included_variants", {});
 
         setResourceListLoading(true);
-        let shopId = 55;                                        // temp shopId, replaced by original shop id.
+        let shopId = 21;                                        // temp shopId, replaced by original shop id.
 
-        fetch(`/api/v2/element_search`, {
+        fetch(`/api/merchant/element_search`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ product: { shop_id: shopId, query: query, type: 'product' }}),
+            body: JSON.stringify({ product: { shop_id: shopId, query: query, type: 'product' }, shop_id: shopId}),
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
@@ -132,9 +132,9 @@ export function EditOfferTabs(props) {
     function updateProducts() {
         props.updateOffer("offerable_product_details", []);
         props.updateOffer("offerable_product_shopify_ids", []);
-        let shopId = 55;                                        // temp shopId, replaced by original shop id.
+        let shopId = 21;                                        // temp shopId, replaced by original shop id.
         for(var i=0; i<selectedProducts.length; i++) {
-            fetch(`/api/v2/products/multi/${selectedProducts[i]}?shop_id=${shopId}`, {
+            fetch(`/api/merchant/products/multi/${selectedProducts[i]}?shop_id=${shopId}`, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
