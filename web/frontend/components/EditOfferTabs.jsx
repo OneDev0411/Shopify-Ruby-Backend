@@ -292,7 +292,7 @@ export function EditOfferTabs(props) {
 
 export function SecondTab(props){
     const [selected, setSelected] = useState('cartpage');
-    const [rule, setRule] = useState({quantity: 1, rule_selector: 'cart_at_least', item_type: 'product', item_shopify_id: null, item_name: null});
+    const [rule, setRule] = useState({quantity: null, rule_selector: 'cart_at_least', item_type: 'product', item_shopify_id: null, item_name: null});
     
     function upadteCondition () {
         props.setOffer(prev => ({ ...prev, rules_json: [...prev.rules_json, rule] }))
@@ -369,7 +369,7 @@ export function SecondTab(props){
     }, []);
 
     const setDefaultRule = ()=>{
-        setRule({quantity: 1, rule_selector: 'cart_at_least', item_type: 'product', item_shopify_id: null, item_name: null});
+        setRule({quantity: null, rule_selector: 'cart_at_least', item_type: 'product', item_shopify_id: null, item_name: null});
     }
 
     const condition_options = [
@@ -427,7 +427,7 @@ export function SecondTab(props){
                         <p>None selected (show offer to all customer)</p>
                     ): (
                         <>{Array.isArray(props.offer.rules_json) && props.offer.rules_json.map((rule, index) => (
-                        <li key={index} style={{ display: 'flex', alignItems: 'center'}}>{getLabelFromValue(rule.rule_selector)} {(rule.rule_selector==='cart_at_least' || rule.rule_selector==='cart_at_most' || rule.rule_selector==='cart_exactly') &&  rule.quantity} {rule.item_name}
+                        <li key={index} style={{ display: 'flex', alignItems: 'center'}}>{getLabelFromValue(rule.rule_selector)} {rule.quantity} {rule.item_name}
                             <p onClick={()=> deleteRule(index) }>
                                 <Icon source={CancelMajor} color="critical"/>
                             </p>

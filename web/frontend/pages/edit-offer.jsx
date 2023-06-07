@@ -105,25 +105,25 @@ export default function EditPage() {
         }
     });
 
-    const shopId = 21;                                        // temp shopId, replaced by original shop id.
-    const offerID = 23;
+    const shopId = 3;                                        // temp shopId, replaced by original shop id.
+    const offerID = 5;
     const fetch = useAuthenticatedFetch();
 
     //Call on initial render
     useEffect(() => {
-      loadOfferDetails(shopAndHost.shop, 5).then((data) => {
+      loadOfferDetails(shopAndHost.shop, offerID).then((data) => {
         setOffer(data);
       })
         .catch((error) => {
             console.log("Error > ", error);
         })
 
-        fetch(`/api/v2/offer_settings`, {
+        fetch(`/api/merchant/offer_settings`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ offer: {shop_id: shopId, include_sample_products: 0}}),
+            body: JSON.stringify({ shop: shopAndHost.shop, offer: { include_sample_products: 0}}),
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
@@ -133,12 +133,12 @@ export default function EditPage() {
             console.log("Error > ", error);
         })
 
-        fetch(`/api/v2/shop_settings`, {
+        fetch(`/api/merchant/shop_settings`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ shop: { shop_id: shopId, admin: null }}),
+            body: JSON.stringify({ shop: shopAndHost.shop, admin: null }),
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
@@ -289,12 +289,12 @@ export default function EditPage() {
         }
 
         shop.shop_id = shopId;
-        fetch('/api/v2/update_shop_settings', {
+        fetch('/api/merchant/update_shop_settings', {
              method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify( {shop: shop, admin: shop.admin, json: true }),
+                body: JSON.stringify( {shop_attr: shop, shop: shopAndHost.shop, admin: shop.admin, json: true }),
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {

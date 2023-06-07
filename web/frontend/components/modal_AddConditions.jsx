@@ -52,19 +52,11 @@ export function ModalAddConditions(props) {
   }
 
   function countryNames(){
-    var names = []
+    var names = ['Select a country']
     countriesList.map(([code, name]) => {
       names.push(name)
     })
     return names;
-  }
-
-  function countryCodes(){
-    var codes = []
-    countriesList.map(([code, name]) => {
-      codes.push(code)
-    })
-    return codes;
   }
 
   return (
@@ -89,6 +81,7 @@ export function ModalAddConditions(props) {
               onChange={handleChange}
               autoComplete="off"
               className={"qtyCon"}
+              min={0}
             />
           </LegacyStack.Item>
         ) : null}
@@ -131,7 +124,7 @@ export function ModalAddConditions(props) {
             options={countryNames()}
             id='item_name'
             onChange={handleChange}
-            value={countryCodes()}
+            value={props.rule.item_name}
           />
         </LegacyStack.Item>
         ) : null}
