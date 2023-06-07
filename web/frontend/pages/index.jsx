@@ -1,12 +1,42 @@
-import { ButtonGroup, Button, Image, Layout, LegacyCard, LegacyStack,
-          MediaCard, Page, Text, VerticalStack, VideoThumbnail } from "@shopify/polaris";
-import { homeImage } from "../assets";
+import {ButtonGroup, Button, MediaCard, VideoThumbnail, LegacyCard, Page, Layout, Text, Image, LegacyStack, Heading, Subheading, Banner, VerticalStack} from "@shopify/polaris";
+import {homeImage, iculogo} from "../assets";
 import "../components/stylesheets/mainstyle.css";
+import { GenericTitleBar } from "../components";
+import { isSubscriptionActive } from "../services/actions/subscription";
+import { getShop } from "../services/actions/shop";
+import { useEffect, useState, useCallback } from "react";
+import { useSelector } from 'react-redux';
 
-const HomePage = () => {
+export default function HomePage() {
+  const shop = useSelector(state => state.shopAndHost.shop);
+  const [currentShop, setCurrentShop] = useState(null);
+  const [planName, setPlanName] = useState();
+  const [trialDays, setTrialDays] = useState();
+
+  const fetchCurrentShop = useCallback(async () => {
+    const response = await getShop(shop);
+
+    setCurrentShop(response.shop);
+    setPlanName(response.plan);
+    setTrialDays(response.days_remaining_in_trial);
+  }, [setCurrentShop, setPlanName, setTrialDays]);
+
+  useEffect(async()=>{
+    fetchCurrentShop();
+  }, [fetchCurrentShop])
   return (
-    <Page>
+    <Page
+      title={<GenericTitleBar image={iculogo} title={'In Cart Upsell & Cross Sell'} /> }
+      primaryAction={null}
+    >
       <Layout>
+        <Layout.Section>
+          {isSubscriptionActive(currentShop?.subscription) && planName!=='free' && trialDays>0 &&
+            <Banner icon='none' status="info">
+              <p>{ trialDays } days remaining for the trial period</p>
+            </Banner>
+          }
+        </Layout.Section>
         <Layout.Section>
           {/* card for image and text */}
           <LegacyCard sectioned>
@@ -53,6 +83,3 @@ const HomePage = () => {
     </Page>
   );
 };
-
-export default HomePage;
-

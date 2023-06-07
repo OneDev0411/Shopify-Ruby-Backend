@@ -169,8 +169,9 @@ class Subscription < ApplicationRecord
     begin
       url = "https://#{icushop.shopify_domain}/admin/api/#{SHOPIFY_API_VERSION}/recurring_application_charges.json"
       res = HTTParty.post(url, body: opts.to_json, headers: icushop.api_headers)
-      update shopify_charge_id: res.get('recurring_application_charge.id'), status: 'pending_charge_approval'
-      res.get('recurring_application_charge.confirmation_url')
+      update shopify_charge_id: res['recurring_application_charge']['id'], status: 'pending_charge_approval'
+      # res.get('recurring_application_charge.confirmation_url')
+      res['recurring_application_charge']['confirmation_url']
     rescue StandardError => e
       Rollbar.error('Error new recurringApplicationCharge >> ', e)
       '/'
@@ -343,8 +344,8 @@ class Subscription < ApplicationRecord
     previous_plan = Plan.find plan_id_was
     new_plan = Plan.find plan_id
     if previous_plan.name == "Free"
-      $customerio.track(shop.id, 'plan_changed')
-      $customerio.identify(id: shop.id, email: shop.email, active: shop.active?, shopify_plan: shop.shopify_plan_name, app_plan_name: new_plan&.name, created_at: shop.created_at.to_i, updated_at: shop.updated_at.to_i, status: "installed")
+      # $customerio.track(shop.id, 'plan_changed')
+      # $customerio.identify(id: shop.id, email: shop.email, active: shop.active?, shopify_plan: shop.shopify_plan_name, app_plan_name: new_plan&.name, created_at: shop.created_at.to_i, updated_at: shop.updated_at.to_i, status: "installed")
     end
   end
 
@@ -362,5 +363,15 @@ class Subscription < ApplicationRecord
         mixpanel.track_plan_update_event(shop.shopify_id, 'Subscription Updated', plan)
       end
     end
+  end
+
+  def cancel_subscription
+    self.status = "cancelled"
+    self.save
+  end
+
+  def update_subscription(plan)
+    update_attribute(:offers_limit, plan.offers_limit)
+    update_attribute(:views_limit, plan.views_limit)
   end
 end

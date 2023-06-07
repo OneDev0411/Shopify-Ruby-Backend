@@ -170,8 +170,8 @@ class Product < ApplicationRecord
 
   def update_from_shopify
     shop.activate_session
-    remote = ShopifyAPI::Product.find(shopify_id)
-    self.update_with_data(JSON.parse(remote.attributes.to_json))
+    remote = ShopifyAPI::Product.find(id: shopify_id)
+    self.update_with_data(JSON.parse(remote.original_state.to_json))
   end
 
   # Public: Save "update/product" webhook.

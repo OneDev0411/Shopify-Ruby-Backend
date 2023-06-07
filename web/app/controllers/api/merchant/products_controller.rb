@@ -1,7 +1,7 @@
 module Api
-  module V2
-    class ProductsController < ApiV2BaseController
-      before_action :set_shop, only: [:element_search]
+  module Merchant
+    class ProductsController < ApiMerchantBaseController
+      before_action :find_shop, only: [:element_search]
 
       # POST /api/v2/element_search
       def element_search
@@ -45,10 +45,6 @@ module Api
       def product_params
         allowed = %w[id shop_id include_sample_products type query]
         params.require('product').permit(allowed)
-      end
-
-      def set_shop
-        @icushop = Shop.find(product_params['shop_id'])
       end
 
       def product_search

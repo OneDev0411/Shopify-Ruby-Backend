@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 module Api
-  module V2
-    class OffersController < ApiV2BaseController
+  module Merchant
+    class OffersController < ApiMerchantBaseController
+      before_action :find_shop, only: [:offer_settings, :update_from_builder]
       before_action :set_offer, only: [:load_offer_details]
-      before_action :set_shop, only: [:offer_settings, :update_from_builder]
 
-      # GET /api/v2/shop_offers
+      # GET /api/merchant/shop_offers
       def shop_offers
         shop_id = params[:shop_id].to_i
         offers = Offer.where(shop_id: shop_id)
         render json: offers
       end
 
-      # POST /api/v2/load_offer_details
+      # POST /api/merchant/load_offer_details
       def load_offer_details
         library_json = @offer.library_json
         library_json[:publish_status] = @offer.active ? 'published' : 'draft'
@@ -20,7 +20,7 @@ module Api
         render json: library_json
       end
 
-      # POST /api/v2/offer_settings
+      # POST /api/merchant/offer_settings
       # Load the generic offer settings ( the whole shop config stuff )
       def offer_settings
         render json: @icushop.offer_settings(include_sample_products: params[:offer][:include_sample_products] == 1)
@@ -74,10 +74,6 @@ module Api
 
       def set_offer
         @offer = Offer.find(offer_params[:offer_id])
-      end
-
-      def set_shop
-        @icushop = Shop.find(offer_params[:shop_id])
       end
 
     end

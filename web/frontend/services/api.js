@@ -2,7 +2,7 @@ import axios from "axios";
 // import BACKEND_APP_URL from "../config/backendUrl";
 
 const api = axios.create({
-  baseURL: "/api/v2/",
+  baseURL: "/api/merchant/",
 });
 
 api.interceptors.response.use(
