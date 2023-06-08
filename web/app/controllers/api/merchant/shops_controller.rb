@@ -3,8 +3,8 @@ module Api
   module Merchant
     class ShopsController < ApiMerchantBaseController
       before_action :find_shop
-      before_action :ensure_plan
       before_action :set_admin, only: [:shop_settings, :update_shop_settings]
+      before_action :ensure_plan
 
       # Get /api/merchant/current_shop
       def current_shop
@@ -87,7 +87,11 @@ module Api
       end
 
       def set_admin
-        @admin = shop_params['admin'] || params['admin']
+        if params['shop_attr']
+          @admin = shop_params['admin'] 
+        else
+          @admin = params['admin']
+        end
       end
 
       def css_options

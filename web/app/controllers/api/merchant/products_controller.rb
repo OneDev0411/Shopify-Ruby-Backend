@@ -1,7 +1,7 @@
 module Api
   module Merchant
     class ProductsController < ApiMerchantBaseController
-      before_action :find_shop, only: [:element_search]
+      before_action :find_shop, only: [:element_search, :shopify_details]
 
       # POST /api/merchant/element_search
       def element_search
@@ -13,8 +13,7 @@ module Api
       # GET       /products/shopify/:shopify_id(.:format)
       # Fetch current details about a product from Shopify API
       def shopify_details
-       shop = Shop.find params[:shop_id]
-       shop.activate_session
+       @icushop.activate_session
 
        # res = ShopifyAPI::Product.find(3995784710).attrs
        res = ShopifyAPI::Product.find(id: params[:shopify_id])

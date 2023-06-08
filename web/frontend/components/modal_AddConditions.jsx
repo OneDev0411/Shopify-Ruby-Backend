@@ -1,12 +1,12 @@
 import { Select, TextField, LegacyStack, ResourceList, ResourceItem, OptionList } from '@shopify/polaris';
 import { useState, useCallback, useEffect } from 'react';
-import { productShopify } from "../services/products/actions/product";
 import { useSelector } from 'react-redux';
 import { SearchProductsList } from './SearchProductsList';
-import { elementSearch } from "../services/products/actions/product";
-import { countriesList } from "../components/countries.js"
+import { countriesList } from "../components/countries.js";
+import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 
 export function ModalAddConditions(props) {
+  const fetch = useAuthenticatedFetch();
   const shopAndHost = useSelector(state => state.shopAndHost);
 
   const [queryValue, setQueryValue] = useState(null);
@@ -31,12 +31,20 @@ export function ModalAddConditions(props) {
 
   function updateQuery(childData) {
     setResourceListLoading(true);
-    elementSearch(shopAndHost.shop, childData).then((data) => {
-      setResourceListLoading(false);
-      setProductData(data);
-    })
-      .catch((error) => {
-      });
+    fetch('/api/merchant/element_search', {
+      method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify( {shop: shopAndHost.shop, product: { query: childData, type: 'product' }, json: true }),
+     })
+     .then( (response) => { return response.json(); })
+     .then( (data) => {
+        setResourceListLoading(false);
+        setProductData(data);
+     })
+     .catch((error) => {
+     })
   }
 
   const handleQueryValueChange = useCallback((value) => {
@@ -98,7 +106,7 @@ export function ModalAddConditions(props) {
             </LegacyStack.Item>
             {productData ? (
               <LegacyStack.Item>
-                <SearchProductsList updateQuery={updateQuery} productData={productData} resourceListLoading={resourceListLoading} setResourceListLoading={setResourceListLoading} updateSelectedProduct={updateSelectedProduct} />
+                <SearchProductsList shop={shopAndHost.shop} updateQuery={updateQuery} productData={productData} resourceListLoading={resourceListLoading} setResourceListLoading={setResourceListLoading} updateSelectedProduct={updateSelectedProduct} />
               </LegacyStack.Item>
             ) : null
             }

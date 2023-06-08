@@ -1,6 +1,5 @@
 import {ResourceList, ResourceItem, OptionList} from '@shopify/polaris';
 import {useState, useCallback} from 'react';
-import { productShopify } from "../services/products/actions/product";
 
 export function SearchProductsList(props) {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -97,7 +96,16 @@ export function SearchProductsList(props) {
     if(selectedItems.length < id.length) {
       props.setResourceListLoading(true);
       let shopifyId = id[id.length-1]
-      productShopify(shopifyId, 3).then(function(data) {
+      let url = `/api/merchant/products/shopify/${shopifyId}?shop=${props.shop}`
+
+      fetch(url, {
+        method: 'GET',
+           headers: {
+             'Content-Type': 'application/json',
+           },
+       })
+       .then( (response) => { return response.json(); })
+       .then( (data) => {
         for(var i=0; i<props.productData.length; i++)
         {
           if(props.productData[i].id == id[id.length-1]) {
@@ -114,9 +122,9 @@ export function SearchProductsList(props) {
         props.updateSelectedProduct(data.title, id, selectedVariants);
         props.setResourceListLoading(false);
         setSelectedItems(id);
-      })
-      .catch(function(error) {
-      })
+       })
+       .catch((error) => {
+       })
     }
     else {
       let uncheckedIndex;
