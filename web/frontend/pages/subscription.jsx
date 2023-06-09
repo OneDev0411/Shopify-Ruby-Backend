@@ -1,4 +1,4 @@
-import {Card, Page, Layout, Image, Stack, Banner} from "@shopify/polaris";
+import {LegacyCard, Page, Layout, Image, LegacyStack, Banner} from "@shopify/polaris";
 import { useAppBridge } from '@shopify/app-bridge-react'
 import {Redirect, Toast} from '@shopify/app-bridge/actions';
 import {billingImg} from "../assets";
@@ -10,9 +10,11 @@ import "../components/stylesheets/mainstyle.css";
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useEffect, useState, useCallback } from "react";
-import { getSubscription, updateSubscription, isSubscriptionActive } from "../services/actions/subscription";
+import { useAuthenticatedFetch } from "../hooks";
+import { isSubscriptionActive } from "../services/actions/subscription";
 
 export default function Subscription() {
+    const fetch = useAuthenticatedFetch();
     const shopAndHost = useSelector(state => state.shopAndHost);
     const [currentSubscription, setCurrentSubscription] = useState(null);
     const [planName, setPlanName] = useState();
@@ -24,29 +26,51 @@ export default function Subscription() {
     async function handlePlanChange (internal_name) {
         let redirect = Redirect.create(app);
 
-        const response = await updateSubscription(internal_name, shopAndHost.shop, shopAndHost.host);
-        if (response.payment == 'no') {
-            const toastOptions = {
-                message: response.message,
-                duration: 3000,
-                isError: false,
-            };
-            const toastNotice = Toast.create(app, toastOptions);
-            toastNotice.dispatch(Toast.Action.SHOW);
-            redirect.dispatch(Redirect.Action.APP, `/?shop=${shopAndHost.shop}`);
-        } else {
-            redirect.dispatch(Redirect.Action.REMOTE, response.url+'/?shop='+shopAndHost.shop);
-        }
+        fetch('/api/merchant/subscription', {
+            method: 'PUT',
+               headers: {
+                 'Content-Type': 'application/json',
+               },
+               body: JSON.stringify( {subscription: { plan_internal_name: internal_name }, shop: shopAndHost.shop, host: shopAndHost.host }),
+           })
+           .then( (response) => { return response.json(); })
+           .then( (data) => {
+                if (data.payment == 'no') {
+                    const toastOptions = {
+                        message: response.message,
+                        duration: 3000,
+                        isError: false,
+                    };
+                    const toastNotice = Toast.create(app, toastOptions);
+                    toastNotice.dispatch(Toast.Action.SHOW);
+                    redirect.dispatch(Redirect.Action.APP, `/?shop=${shopAndHost.shop}`);
+                } else {
+                    redirect.dispatch(Redirect.Action.REMOTE, response.url+'/?shop='+shopAndHost.shop);
+                }
+           })
+           .catch((error) => {
+            console.log("error", error);
+           })
     }
 
-    const fetchSubscription = useCallback(async() => {
-        const subResponse = await getSubscription(shopAndHost.shop);
-
-        setCurrentSubscription(subResponse.subscription);
-        setPlanName(subResponse.plan);
-        setTrialDays(subResponse.days_remaining_in_trial);
-        setActiveOffersCount(subResponse.active_offers_count);
-        setUnpublishedOfferIds(subResponse.unpublished_offer_ids)
+    const fetchSubscription = useCallback(() => {
+        fetch(`/api/merchant/current_subscription?shop=${shopAndHost.shop}`, {
+            method: 'GET',
+               headers: {
+                 'Content-Type': 'application/json',
+               },
+           })
+           .then( (response) => { return response.json(); })
+           .then( (data) => {
+                setCurrentSubscription(data.subscription);
+                setPlanName(data.plan);
+                setTrialDays(data.days_remaining_in_trial);
+                setActiveOffersCount(data.active_offers_count);
+                setUnpublishedOfferIds(data.unpublished_offer_ids)
+           })
+           .catch((error) => {
+            console.log("error", error);
+           })
       }, []);
 
     useEffect(() => {
@@ -79,12 +103,12 @@ export default function Subscription() {
                     Choose a Plan
                 </Layout.Section>
                 <Layout.Section>
-                    <Card title="Paid"
+                    <LegacyCard title="Paid"
                         primaryFooterAction={(planName==='flex' && isSubscriptionActive(currentSubscription)) ? null : {content: 'Upgrade', onClick: () => handlePlanChange('plan_based_billing')}}
                         sectioned
                     >
-                        <Stack>
-                            <Stack.Item>
+                        <LegacyStack>
+                            <LegacyStack.Item>
                                 {(planName==='flex' && isSubscriptionActive(currentSubscription)) ? (
                                     <p><small>Current Plan</small></p>
                                 ) : (
@@ -101,19 +125,19 @@ export default function Subscription() {
                                 Success manager support<br/>
                                 Remove "Power by In Cart Upsell" water mark on offer box
                                 </p>                                
-                            </Stack.Item>
-                            <Stack.Item>
+                            </LegacyStack.Item>
+                            <LegacyStack.Item>
                                 <Image
                                     source={billingImg}
                                     alt="upgrade subscription"
                                     width={200}
                                 />
-                            </Stack.Item>
-                        </Stack>
-                    </Card>
+                            </LegacyStack.Item>
+                        </LegacyStack>
+                    </LegacyCard>
                 </Layout.Section>
                 <Layout.Section secondary>
-                    <Card title="Free" sectioned primaryFooterAction={(planName==='free' && isSubscriptionActive(currentSubscription)) ? null : {content: 'Downgrade', onClick: () => handlePlanChange('free_plan'), id: 'btnf'}}>
+                    <LegacyCard title="Free" sectioned primaryFooterAction={(planName==='free' && isSubscriptionActive(currentSubscription)) ? null : {content: 'Downgrade', onClick: () => handlePlanChange('free_plan'), id: 'btnf'}}>
                         {(planName==='free' && isSubscriptionActive(currentSubscription)) ? (
                              <p><small>Current Plan</small></p>
                         ) : (
@@ -129,7 +153,7 @@ export default function Subscription() {
                             "Power by In Cart Upsell" water mark on offer box
                             <br/><br/>
                         </p>                
-                    </Card>
+                    </LegacyCard>
                 </Layout.Section>
             </Layout>
         </div>
@@ -137,11 +161,11 @@ export default function Subscription() {
         <div className="space-10"></div>
         <Layout>
             <Layout.Section>
-                <Card sectioned>
+                <LegacyCard sectioned>
                     <p>Need help, have some questions, or jus want to say hi? We're available for a live chat 7 days a week from 5 AM EST - 9 PM EST.</p>
                     <br/>
                     <p>Not anything urgent? Fire us an email, we usually respond with 24 hours Monday to Friday</p>
-                </Card>
+                </LegacyCard>
             </Layout.Section>
         </Layout>
         <div className="space-10"></div>

@@ -3,4 +3,4 @@ if @icushop.errors.full_messages.empty?
 else
   json.message @message+@icushop.errors.full_messages.first
 end
-json.shop @icushop
+json.shop @icushop.shop_settings(@admin)
