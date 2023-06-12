@@ -12,17 +12,28 @@ const ConfirmFromOutside = () => {
   const redirect = Redirect.create(app);
 
   async function renderConfirmCharge(){
-    const response = await confirmCharge(shopify_domain, charge_id);
 
-    if (window.top == window.self) {
-      // If the current window is the 'parent', change the URL by setting location.href  
-      redirect.dispatch(Redirect.Action.REMOTE, `/confirm_charge?success=${response.success}`);
-
-    } else {
-      // If the current window is the 'child', change the parent's URL with Shopify App Bridge's Redirect action
-      redirect.dispatch(Redirect.Action.APP, `/confirm_charge?success=${response.success}`);
-
-    }
+    fetch(`/api/merchant/subscription/confirm_charge?shop=${shopify_domain}&charge_id=${charge_id}`, {
+      method: 'GET',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+     })
+     .then( (response) => { return response.json(); })
+     .then( (data) => {
+      if (window.top == window.self) {
+        // If the current window is the 'parent', change the URL by setting location.href  
+        redirect.dispatch(Redirect.Action.REMOTE, `/confirm_charge?success=${data.success}`);
+  
+      } else {
+        // If the current window is the 'child', change the parent's URL with Shopify App Bridge's Redirect action
+        redirect.dispatch(Redirect.Action.APP, `/confirm_charge?success=${data.success}`);
+  
+      }
+     })
+     .catch((error) => {
+      console.log("error", error);
+     })
   }
 
   useEffect(async () => {

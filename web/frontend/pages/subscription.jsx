@@ -37,7 +37,7 @@ export default function Subscription() {
            .then( (data) => {
                 if (data.payment == 'no') {
                     const toastOptions = {
-                        message: response.message,
+                        message: data.message,
                         duration: 3000,
                         isError: false,
                     };
@@ -45,7 +45,7 @@ export default function Subscription() {
                     toastNotice.dispatch(Toast.Action.SHOW);
                     redirect.dispatch(Redirect.Action.APP, `/?shop=${shopAndHost.shop}`);
                 } else {
-                    redirect.dispatch(Redirect.Action.REMOTE, response.url+'/?shop='+shopAndHost.shop);
+                    redirect.dispatch(Redirect.Action.REMOTE, data.url+'/?shop='+shopAndHost.shop);
                 }
            })
            .catch((error) => {

@@ -65,10 +65,11 @@ module Api
         if @icushop.save
           @icushop.publish_async  # trigger update
 
-          render json: { shop: @icushop.shop_settings(@admin) }
+          @message = "Shop settings saved!"
         else
-          render json: { error: @icushop.errors.full_messages.first }, status: :bad_request
+          @message = @icushop.errors.full_messages.first
         end
+        render "shops/update_shop_settings"
       end
 
       #GET /api/merchant/toggle_activation
