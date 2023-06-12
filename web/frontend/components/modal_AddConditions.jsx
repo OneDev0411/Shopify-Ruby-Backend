@@ -12,6 +12,7 @@ export function ModalAddConditions(props) {
   const [queryValue, setQueryValue] = useState(null);
   const [productData, setProductData] = useState("");
   const [resourceListLoading, setResourceListLoading] = useState(false);
+  const [errorText, setErrorText] = useState(null);
 
   function findProduct() {
     return (props.rule.rule_selector === 'cart_at_least' || props.rule.rule_selector === 'cart_at_most' || props.rule.rule_selector === 'cart_exactly' || props.rule.rule_selector === 'cart_does_not_contain' || props.rule.rule_selector === 'cart_contains_variant' || props.rule.rule_selector === 'cart_does_not_contain_variant' || props.rule.rule_selector === 'cart_contains_item_from_vendor' || props.rule.rule_selector === 'on_product_this_product_or_in_collection' || props.rule.rule_selector === 'on_product_not_this_product_or_not_in_collection')
@@ -90,6 +91,7 @@ export function ModalAddConditions(props) {
               autoComplete="off"
               className={"qtyCon"}
               min={0}
+              error={props.quantityErrorText}
             />
           </LegacyStack.Item>
         ) : null}
@@ -102,6 +104,7 @@ export function ModalAddConditions(props) {
                 onChange={handleQueryValueChange}
                 autoComplete="off"
                 placeholder='Search product or collection'
+                error={props.itemErrorText}
               />
             </LegacyStack.Item>
             {productData ? (
@@ -122,6 +125,7 @@ export function ModalAddConditions(props) {
               onChange={handleChange}
               autoComplete="off"
               className={"qtyCon"}
+              error={props.itemErrorText}
             />
           </LegacyStack.Item>
         ) : null}
@@ -133,6 +137,7 @@ export function ModalAddConditions(props) {
             id='item_name'
             onChange={handleChange}
             value={props.rule.item_name}
+            error={props.itemErrorText}
           />
         </LegacyStack.Item>
         ) : null}
@@ -145,6 +150,7 @@ export function ModalAddConditions(props) {
               value={props.rule.item_name}
               onChange={handleChange}
               autoComplete="off"
+              error={props.itemErrorText}
             />
           </LegacyStack.Item>
         ) : null}

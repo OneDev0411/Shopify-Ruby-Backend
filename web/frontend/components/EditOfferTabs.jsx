@@ -30,7 +30,6 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { elementSearch, productsMulti } from "../services/products/actions/product";
 
-
 export function EditOfferTabs(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
 
@@ -293,9 +292,37 @@ export function EditOfferTabs(props) {
 export function SecondTab(props){
     const [selected, setSelected] = useState('cartpage');
     const [rule, setRule] = useState({quantity: null, rule_selector: 'cart_at_least', item_type: 'product', item_shopify_id: null, item_name: null});
-    
+    const [quantityErrorText, setQuantityErrorText] = useState(null);
+    const [itemErrorText, setItemErrorText] = useState(null);
+    const quantityArray = ['cart_at_least', 'cart_at_most', 'cart_exactly'];
+    const orderArray = ['total_at_least', 'total_at_most']
+
     function upadteCondition () {
-        props.setOffer(prev => ({ ...prev, rules_json: [...prev.rules_json, rule] }))
+        if(quantityArray.includes(rule.rule_selector)){
+            if(!rule.quantity){
+                setQuantityErrorText("Required filed");
+                return;
+            }
+            else if(rule.quantity<1){
+                setQuantityErrorText("Quantity can't be less than 1");
+                return;
+            }
+        }
+        if(orderArray.includes(rule.rule_selector)){
+            if(!rule.item_name){
+                setItemErrorText("Required filed");
+                return;
+            }
+            else if(rule.item_name<1){
+                setItemErrorText("Amount can't be less than 1");
+                return;
+            }
+        }
+        else if(!rule.item_name){
+            setItemErrorText("Required field");
+            return;
+        }
+        props.setOffer(prev => ({ ...prev, rules_json: [...prev.rules_json, rule] }));
         handleModal();
     }
 
@@ -370,6 +397,8 @@ export function SecondTab(props){
 
     const setDefaultRule = ()=>{
         setRule({quantity: null, rule_selector: 'cart_at_least', item_type: 'product', item_shopify_id: null, item_name: null});
+        setQuantityErrorText(null);
+        setItemErrorText(null);
     }
 
     const condition_options = [
@@ -469,7 +498,7 @@ export function SecondTab(props){
                 }}
             >
                 <Modal.Section>
-                   <ModalAddConditions condition_options={condition_options} updateOffer={props.updateOffer} rule={rule} setRule={setRule} />
+                   <ModalAddConditions quantityErrorText={quantityErrorText} itemErrorText={itemErrorText} condition_options={condition_options} updateOffer={props.updateOffer} rule={rule} setRule={setRule} />
                 </Modal.Section>
             </Modal>
         </div>
