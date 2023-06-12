@@ -9,3 +9,4 @@ export {SettingTabs} from "./settingsTabs";
 export { Reviews } from "./Reviews";
 export { Partners } from "./Partners";
 export { GenericTitleBar } from "./GenericTitleBar";
+export { TotalSalesData, ConversionRate, OrderOverTimeData } from "./analyticsGraphdata";
