@@ -4,7 +4,7 @@ import { CURRENT_SHOP, UPDATE_ACTIVATION, UPDATE_SHOP_SETTINGS } from "../endpoi
 export function getShop(shopify_domain) {
   return api.get(CURRENT_SHOP, {
     params:{
-      shopify_domain: shopify_domain
+      shop: shopify_domain
     }
   });
 }

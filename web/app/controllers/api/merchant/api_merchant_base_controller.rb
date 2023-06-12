@@ -14,8 +14,8 @@ module Api
       end
 
       def find_shop
-        if params[:shopify_domain].present? && params[:shopify_domain].class == String
-          @icushop = Shop.find_by(shopify_domain: params['shopify_domain'])
+        if params[:shop].present? && params[:shop].class == String
+          @icushop = Shop.find_by(shopify_domain: params['shop'])
         else
           @icushop = Shop.find(params['shop_id'])
         end
