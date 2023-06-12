@@ -11,7 +11,6 @@ import {
     Pagination,
     Grid, TextField
   } from '@shopify/polaris';
-  import { TotalSalesData, ConversionRate,OrderOverTimeData} from "../components";
   import { TitleBar } from '@shopify/app-bridge-react';
   import { useState, useCallback } from 'react';
   
@@ -250,7 +249,7 @@ import {
                 <div className="space-4"></div>
                 <p>SALES OVER TIME</p>
                 <br/>
-                <TotalSalesData/>
+                <p>placeholder for TotalSalesData component</p>
               </Card>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
@@ -259,7 +258,7 @@ import {
                 <div className="space-4"></div>
                 <p>CONVERSION FUNNEL</p>
                 <br/>
-                <ConversionRate/>
+                <p>placeholder for ConversionRate component</p>
               </Card>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
@@ -268,7 +267,7 @@ import {
                 <div className="space-4"></div>
                 <p>ORDERS OVER TIME</p>
                 <br/>
-                <OrderOverTimeData/>
+                <p>placeholder for OrderOverTimeData component</p>
               </Card>
             </Grid.Cell>
           </Grid>
