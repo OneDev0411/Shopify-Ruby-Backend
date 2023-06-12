@@ -8,12 +8,14 @@ import React from 'react';
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 import { useSelector } from 'react-redux';
 import { offerActivate, loadOfferDetails, getOfferSettings } from "../services/offers/actions/offer";
+import { useLocation } from 'react-router-dom';
 
 
 export default function EditPage() {
     const shopAndHost = useSelector(state => state.shopAndHost);
 
     // Content section tab data
+    const location = useLocation();
     const [selected, setSelected] = useState(0);
     const handleTabChange = useCallback(
         (selectedTabIndex) => setSelected(selectedTabIndex),
@@ -111,45 +113,91 @@ export default function EditPage() {
 
     //Call on initial render
     useEffect(() => {
-      loadOfferDetails(shopAndHost.shop, offerID).then((data) => {
-        setOffer(data);
-      })
-        .catch((error) => {
-            console.log("Error > ", error);
-        })
+        if(location.state?.offerId == null) {
+            fetch(`/api/merchant/offer_settings`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ offer: {include_sample_products: 0}, shop_id: shopId }),
+            })
+            .then( (response) => { return response.json() })
+            .then( (data) => {
+                setOfferSettings(data);
+            })
+            .catch((error) => {
+                console.log("Error > ", error);
+            })
+ 
+            fetch(`/api/merchant/shop_settings`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ shop: { admin: null }, shop_id: shopId}),
+            })
+            .then( (response) => { return response.json() })
+            .then( (data) => {
+                
+                setShop(data);
+            })
+            .catch((error) => {
+                
+                console.log("Error > ", error);
+            })
+        }
+        else {
+            fetch(`/api/merchant/load_offer_details`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ offer: {shop_id: shopId, offer_id: offerID} }),
+            })
+            .then( (response) => { return response.json() })
+            .then( (data) => {
+                setOffer(data);
+            })
+            .catch((error) => {
+                console.log("Error > ", error);
+            })
 
-        fetch(`/api/merchant/offer_settings`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ shop: shopAndHost.shop, offer: { include_sample_products: 0}}),
-        })
-        .then( (response) => { return response.json() })
-        .then( (data) => {
-            setOfferSettings(data);
-        })
-        .catch((error) => {
-            console.log("Error > ", error);
-        })
+            fetch(`/api/merchant/offer_settings`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ offer: {include_sample_products: 0}, shop_id: shopId }),
+            })
+            .then( (response) => { return response.json() })
+            .then( (data) => {
+                debugger
+                setOfferSettings(data);
+            })
+            .catch((error) => {
+                debugger
+                console.log("Error > ", error);
+            })
 
-        fetch(`/api/merchant/shop_settings`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ shop: shopAndHost.shop, admin: null }),
-        })
-        .then( (response) => { return response.json() })
-        .then( (data) => {
-            setShop(data);
-        })
-        .catch((error) => {
-            console.log("Error > ", error);
-        })
+            fetch(`/api/merchant/shop_settings`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ shop: { admin: null }, shop_id: shopId }),
+            })
+            .then( (response) => { return response.json() })
+            .then( (data) => {
+                debugger
+                setShop(data);
+            })
+            .catch((error) => {
+                debugger
+                console.log("Error > ", error);
+            })
+        }
 
     },[]);
-
     //Called whenever the offer changes in any child component
     function updateOffer(updatedKey, updatedValue) {
         setOffer(previousState => {
@@ -220,7 +268,7 @@ export default function EditPage() {
     // Called when save button is clicked
     function save() {
         console.log("Shop >>",shop);
-        console.log("Offer >>", offer)
+        console.log("Offer >>", offerSettings)
         var ots = {
             checkout_after_accepted: offer.checkout_after_accepted,
             custom_field_name: offer.custom_field_name,
@@ -272,13 +320,14 @@ export default function EditPage() {
           ots.interval_unit = offer.interval_unit;
           ots.interval_frequency = offer.interval_frequency;
         }
-        if(offer.id) {
-            fetch(`/api/offer/${offer.id}/update/${shopId}`, {
+        if(location.state?.offerId) {
+            debugger;
+            fetch(`/api/offers/${offer.id}/update/${shopId}`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(ots),
+                body: JSON.stringify({offer: ots}),
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
@@ -286,6 +335,22 @@ export default function EditPage() {
             .catch((error) => {
             })
             // offerUpdate(fetch, offer.id, shopId, ots);
+        }
+        else {
+            debugger;
+            fetch(`/api/offers/create/${shopId}`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({offer: ots}),
+            })
+            .then( (response) => { return response.json(); })
+            .then( (data) => {
+                debugger;
+            })
+            .catch((error) => {
+            })
         }
 
         shop.shop_id = shopId;

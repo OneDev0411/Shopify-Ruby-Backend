@@ -63,12 +63,11 @@ module Api
         end
         if @icushop.save
           @icushop.publish_async  # trigger update
-  
-          @message = "Shop Settings Saved"
+
+          render json: { shop: @icushop.shop_settings(@admin) }
         else
-          @message = "Error! "
+          render json: { error: @icushop.errors.full_messages.first }, status: :bad_request
         end
-        render "shops/update_shop_settings"
       end
 
       #GET /api/merchant/toggle_activation
@@ -80,7 +79,7 @@ module Api
       private
 
       def shop_params
-        all_names = Shop.column_names + ['date_min', 'date_max', 'shop_id', 'canonical_domain',
+        all_names = Shop.column_names + ['date_min', 'date_max', 'canonical_domain',
                                          'path_to_cart', 'has_branding', 'custom_theme_css',
                                          'image', 'stats_from', css_options]
         params.require('shop_attr').permit(all_names)
@@ -92,6 +91,15 @@ module Api
         else
           @admin = params['admin']
         end
+      end
+
+      def css_options
+        opts = %w[backgroundColor color marginTop marginBottom marginLeft marginRight borderColor
+                  borderStyle width paddingLeft borderRadius paddingTop paddingRight
+                  paddingBottom paddingLeft fontSize fontFamily fontWeight
+                  borderWidth justifyContent letterSpacing textTransform fontWeightInPixel]
+        { 'css_options' => { 'main' => opts, 'button' => opts, 'text' => opts,
+                             'image' => opts, 'custom' => opts } }
       end
 
       def css_options
