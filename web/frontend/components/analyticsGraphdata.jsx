@@ -271,4 +271,4 @@ export function TotalSalesData() {
         </PolarisVizProvider>  
     );
 
-  } 
+  }

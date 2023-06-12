@@ -4,7 +4,7 @@ import { PUT_SUBSCRIPTION, CONFIRM_CHARGE, CURRENT_SUBSCRIPTION } from "../endpo
 export function getSubscription(shopify_domain) {
   return api.get(CURRENT_SUBSCRIPTION, {
     params:{
-      shop: shopify_domain
+      shopify_domain: shopify_domain
     }
   });
 }
@@ -14,15 +14,15 @@ export function updateSubscription(plan_internal_name, shopify_domain, host) {
     subscription: {
       plan_internal_name: plan_internal_name
     },
-    shop: shopify_domain,
+    shopify_domain: shopify_domain,
     host: host
   });
 }
 
-export function confirmCharge(shop, charge_id){
+export function confirmCharge(shopify_domain, charge_id){
   return api.get(CONFIRM_CHARGE, {
     params:{
-      shop: shop,
+      shopify_domain: shopify_domain,
       charge_id: charge_id
     }
   });

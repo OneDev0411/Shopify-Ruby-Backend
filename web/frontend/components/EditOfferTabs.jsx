@@ -77,12 +77,12 @@ export function EditOfferTabs(props) {
         setResourceListLoading(true);
         const shopId = 21;                                        // temp shopId, replaced by original shop id.
     
-        fetch(`/api/v2/element_search`, {
+        fetch(`/api/merchant/element_search`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ product: { shop_id: shopId, query: childData, type: 'product' }}),
+            body: JSON.stringify({ product: { shop_id: shopId, query: childData, type: 'product' }, shop_id: shopId}),
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
@@ -111,12 +111,12 @@ export function EditOfferTabs(props) {
         setResourceListLoading(true);
         let shopId = 21;                                        // temp shopId, replaced by original shop id.
 
-        fetch(`/api/v2/element_search`, {
+        fetch(`/api/merchant/element_search`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ product: { shop_id: shopId, query: query, type: 'product' }}),
+            body: JSON.stringify({ product: { shop_id: shopId, query: query, type: 'product' }, shop_id: shopId}),
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
@@ -134,7 +134,7 @@ export function EditOfferTabs(props) {
         props.updateOffer("offerable_product_shopify_ids", []);
         let shopId = 21;                                        // temp shopId, replaced by original shop id.
         for(var i=0; i<selectedProducts.length; i++) {
-            fetch(`/api/v2/products/multi/${selectedProducts[i]}?shop_id=${shopId}`, {
+            fetch(`/api/merchant/products/multi/${selectedProducts[i]}?shop_id=${shopId}`, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
@@ -450,9 +450,9 @@ export function ThirdTab(props){
     const handleSelectChange = useCallback((value) => setSelected(value), []);
 
     // Space above the offer
-    const handleAboveSpace = useCallback((newValue) => props.updateShop(newValue, "css_options", "main", "marginTop"), []);
+    const handleAboveSpace = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "main", "marginTop"), []);
     // Space below the offer
-    const handleBelowSpace = useCallback((newValue) => props.updateShop(newValue, "css_options", "main", "marginBottom"), []);
+    const handleBelowSpace = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "main", "marginBottom"), []);
     //Border style drop-down menu
     const handleBorderStyle = useCallback((newValue) => { 
         props.updateShop(newValue, "css_options", "main", "borderStyle");
@@ -472,10 +472,10 @@ export function ThirdTab(props){
     ];
 
     //Border width
-    const handleBorderWidth = useCallback((newValue) => props.updateShop(newValue, "css_options", "main", "borderWidth"), []);
+    const handleBorderWidth = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "main", "borderWidth"), []);
 
     //Border range slider
-    const handlesetBorderRange = useCallback((newValue) => props.updateShop(newValue, "css_options", "main", "borderRadius"), []);
+    const handlesetBorderRange = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "main", "borderRadius"), []);
 
     // Toggle for manually added color
     const [open, setOpen] = useState(false);
@@ -511,17 +511,11 @@ export function ThirdTab(props){
 
     //Font weight
     const handleFontWeight = useCallback((newValue) => {
-        if(parseInt(newValue) >= 0 && parseInt(newValue) <= 500) {
-            props.updateShop("Normal", "css_options", "text", "fontWeight");
-        }
-        else if(parseInt(newValue) > 500) {
-            props.updateShop("Bold", "css_options", "text", "fontWeight");
-        }
-        props.updateShop(newValue, "css_options", "text", "fontWeightInPixel");
+        props.updateShop(`${newValue}px`, "css_options", "text", "fontWeightInPixel");
     }, []);
 
-    //Font size
-    const handleFontSize = useCallback((newValue) => props.updateShop(newValue, "css_options", "text", "fontSize"), []);
+    //Font sizes
+    const handleFontSize = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "text", "fontSize"), []);
 
 
     //Button options
@@ -552,17 +546,11 @@ export function ThirdTab(props){
 
     //Button weight
     const handleBtnWeight = useCallback((newValue) => {
-        if(parseInt(newValue) >= 0 && parseInt(newValue) <= 500) {
-            props.updateShop("Normal", "css_options", "button", "fontWeight");
-        }
-        else if(parseInt(newValue) > 500) {
-            props.updateShop("Bold", "css_options", "button", "fontWeight");
-        }
-        props.updateShop(newValue, "css_options", "button", "fontWeightInPixel");
+        props.updateShop(`${newValue}px`, "css_options", "button", "fontWeightInPixel");
     }, []);
 
     //Button size
-    const handleBtnSize = useCallback((newValue) => props.updateShop(newValue, "css_options", "button", "fontSize"), []);
+    const handleBtnSize = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "button", "fontSize"), []);
 
     // Btn radius
     const [rangeValue, setRangeValue] = useState(20);
@@ -594,7 +582,7 @@ export function ThirdTab(props){
                                 label="Space above offer"
                                 type="number"
                                 onChange={handleAboveSpace}
-                                value={props.shop.css_options.main.marginTop}
+                                value={parseInt(props.shop.css_options.main.marginTop)}
                                 suffix="px"
                             />
                         </Grid.Cell>
@@ -603,7 +591,7 @@ export function ThirdTab(props){
                                 label="Space below offer"
                                 type="number"
                                 onChange={handleBelowSpace}
-                                value={props.shop.css_options.main.marginBottom}
+                                value={parseInt(props.shop.css_options.main.marginBottom)}
                                 suffix="px"
                             />
                         </Grid.Cell>
@@ -622,7 +610,7 @@ export function ThirdTab(props){
                                 label="Border width"
                                 type="number"
                                 onChange={handleBorderWidth}
-                                value={props.shop.css_options.main.borderWidth}
+                                value={parseInt(props.shop.css_options.main.borderWidth)}
                                 suffix="px"
                             />
                         </Grid.Cell>
@@ -632,7 +620,7 @@ export function ThirdTab(props){
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                             <RangeSlider
                                 label="Border Radius"
-                                value={props.shop.css_options.main.borderRadius}
+                                value={parseInt(props.shop.css_options.main.borderRadius)}
                                 onChange={handlesetBorderRange}
                                 output
                             />
@@ -681,7 +669,7 @@ export function ThirdTab(props){
                                 suffix="px"
                                 autoComplete="off"
                                 onChange={handleFontWeight}
-                                value={props.shop.css_options.text.fontWeightInPixel}
+                                value={parseInt(props.shop.css_options.text.fontWeightInPixel)}
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
@@ -691,7 +679,7 @@ export function ThirdTab(props){
                                 suffix="px"
                                 autoComplete="off"
                                 onChange={handleFontSize}
-                                value={props.shop.css_options.text.fontSize}
+                                value={parseInt(props.shop.css_options.text.fontSize)}
                             />
                         </Grid.Cell>
                     </Grid>
@@ -713,7 +701,7 @@ export function ThirdTab(props){
                                 suffix="px"
                                 autoComplete="off"
                                 onChange={handleBtnWeight}
-                                value={props.shop.css_options.button.fontWeightInPixel}
+                                value={parseInt(props.shop.css_options.button.fontWeightInPixel)}
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
@@ -723,7 +711,7 @@ export function ThirdTab(props){
                                 suffix="px"
                                 autoComplete="off"
                                 onChange={handleBtnSize}
-                                value={props.shop.css_options.button.fontSize}
+                                value={parseInt(props.shop.css_options.button.fontSize)}
                             />
                         </Grid.Cell>
                     </Grid>
