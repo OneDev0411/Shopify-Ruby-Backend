@@ -3,7 +3,6 @@ import {useState, useCallback, useEffect} from 'react';
 import {stars} from "../assets";
 import Slider from "react-slick";
 import React from "react";
-import { getPartners } from "../services/actions/partners";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 
@@ -60,8 +59,20 @@ export function Partners(){
     }
 
     const getAllPartners = useCallback(async ()=>{
-      const response = await getPartners();
-      setPartners(response.partners);
+      partners
+      fetch("/api/merchant/partners", {
+        method: 'GET',
+           headers: {
+             'Content-Type': 'application/json',
+           },
+       })
+       .then( (response) => { return response.json(); })
+       .then( (data) => {
+        setPartners(data.partners);
+       })
+       .catch((error) => {
+        console.log("error", error);
+       })
      }, [])
 
     const handleToggleDescription = (index) => {

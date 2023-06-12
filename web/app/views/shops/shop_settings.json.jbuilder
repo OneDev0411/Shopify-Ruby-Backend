@@ -1,0 +1,1 @@
+json.shop_settings @shop_settings

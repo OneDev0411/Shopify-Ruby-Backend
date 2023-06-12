@@ -14,7 +14,8 @@ module Api
 
       #POST /api/merchant/shop_settings
       def shop_settings
-        render json: @icushop.shop_settings(@admin)
+        @shop_settings = @icushop.shop_settings(@admin)
+        render "shops/shop_settings"
       end
 
       #PATCH /api/merchant/update_shop_settings
@@ -74,6 +75,7 @@ module Api
       def toggle_activation
         @icushop.update_attribute(:activated, !@icushop.activated)
         @icushop.force_purge_cache
+        render "shops/toggle_activation"
       end
 
       private
