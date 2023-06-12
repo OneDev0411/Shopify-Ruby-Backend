@@ -756,6 +756,7 @@ class Shop < ApplicationRecord
       custom_product_page_dom_selector: product_page_dom_selector,
       custom_product_page_dom_action: product_page_dom_action,
       ajax_refresh_code: ajax_refresh_code,
+      activated: activated,
       canonical_domain: canonical_domain,
       can_run_on_checkout_page: can_run_on_checkout_page,
       custom_theme_css: custom_theme_css,

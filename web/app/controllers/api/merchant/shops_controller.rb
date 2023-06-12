@@ -13,7 +13,8 @@ module Api
 
       #POST /api/merchant/shop_settings
       def shop_settings
-        render json: @icushop.shop_settings(@admin)
+        @shop_settings = @icushop.shop_settings(@admin)
+        render "shops/shop_settings"
       end
 
       #PATCH /api/merchant/update_shop_settings
@@ -29,10 +30,10 @@ module Api
         @icushop.custom_product_page_dom_selector = opts['custom_product_page_dom_selector']
         @icushop.custom_product_page_dom_action = opts['custom_product_page_dom_action']
         @icushop.css_options = opts['css_options']
-        @icushop.custom_bg_color = opts['css_options']['main']['backgroundColor']
-        @icushop.custom_button_bg_color = opts['css_options']['button']['backgroundColor']
-        @icushop.custom_button_text_color = opts['css_options']['button']['color']
-        @icushop.custom_text_color = opts['css_options']['main']['color']
+        @icushop.custom_bg_color = opts['css_options']['main']['backgroundColor'] || opts['custom_bg_color']
+        @icushop.custom_button_bg_color = opts['css_options']['button']['backgroundColor'] || opts['custom_button_bg_color']
+        @icushop.custom_button_text_color = opts['css_options']['button']['color'] || opts['custom_button_text_color']
+        @icushop.custom_text_color = opts['css_options']['main']['color'] || opts['custom_text_color']
         @icushop.custom_theme_template = opts['custom_theme_template']
         @icushop.offer_css = opts['offer_css']
         @icushop.tax_percentage = opts['tax_percentage']
@@ -73,6 +74,7 @@ module Api
       def toggle_activation
         @icushop.update_attribute(:activated, !@icushop.activated)
         @icushop.force_purge_cache
+        render "shops/toggle_activation"
       end
 
       private
@@ -81,7 +83,7 @@ module Api
         all_names = Shop.column_names + ['date_min', 'date_max', 'canonical_domain',
                                          'path_to_cart', 'has_branding', 'custom_theme_css',
                                          'image', 'stats_from', css_options]
-        params.require('shop').permit(all_names)
+        params.require('shop_attr').permit(all_names)
       end
 
       def set_admin
