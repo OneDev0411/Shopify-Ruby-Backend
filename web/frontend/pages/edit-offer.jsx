@@ -6,10 +6,14 @@ import { EditOfferTabs, SecondTab, ThirdTab, FourthTab } from "../components";
 import { useState, useCallback, useEffect } from 'react';
 import React from 'react';
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
+import { useSelector } from 'react-redux';
+import { offerActivate, loadOfferDetails, getOfferSettings } from "../services/offers/actions/offer";
 import { useLocation } from 'react-router-dom';
 
 
 export default function EditPage() {
+    const shopAndHost = useSelector(state => state.shopAndHost);
+
     // Content section tab data
     const location = useLocation();
     const [selected, setSelected] = useState(0);
@@ -103,8 +107,8 @@ export default function EditPage() {
         }
     });
 
-    const shopId = 21;                                        // temp shopId, replaced by original shop id.
-    const offerID = 23;
+    const shopId = 3;                                        // temp shopId, replaced by original shop id.
+    const offerID = 5;
     const fetch = useAuthenticatedFetch();
 
     //Call on initial render
@@ -167,11 +171,9 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
-                debugger
                 setOfferSettings(data);
             })
             .catch((error) => {
-                debugger
                 console.log("Error > ", error);
             })
 
@@ -184,11 +186,9 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
-                debugger
-                setShop(data);
+                setShop(data.shop_settings);
             })
             .catch((error) => {
-                debugger
                 console.log("Error > ", error);
             })
         }
@@ -317,7 +317,6 @@ export default function EditPage() {
           ots.interval_frequency = offer.interval_frequency;
         }
         if(location.state?.offerId) {
-            debugger;
             fetch(`/api/offers/${offer.id}/update/${shopId}`, {
                 method: 'POST',
                 headers: {
@@ -333,7 +332,6 @@ export default function EditPage() {
             // offerUpdate(fetch, offer.id, shopId, ots);
         }
         else {
-            debugger;
             fetch(`/api/offers/create/${shopId}`, {
                 method: 'POST',
                 headers: {
@@ -343,18 +341,18 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
-                debugger;
             })
             .catch((error) => {
             })
         }
 
+        shop.shop_id = shopId;
         fetch('/api/merchant/update_shop_settings', {
-             method: 'POST',
+             method: 'PATCH',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify( {shop: shop, admin: shop.admin, shop_id: shop.id, json: true }),
+                body: JSON.stringify( {shop: shop, shopify_domain: shopAndHost.shop, admin: shop.admin, json: true }),
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
@@ -445,7 +443,7 @@ export default function EditPage() {
                     : "" }
                     {selected == 1 ?
                         // page was imported from components folder
-                        <SecondTab offer={offer} offerSettings={offerSettings} updateOffer={updateOffer}/>
+                        <SecondTab offer={offer} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} />
                     : "" }
                     {selected == 2 ?
                         // page was imported from components folder

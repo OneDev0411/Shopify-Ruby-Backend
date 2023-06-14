@@ -3,11 +3,12 @@ module Api
   module Merchant
     class ShopsController < ApiMerchantBaseController
       before_action :find_shop
+      before_action :set_admin, only: [:shop_settings, :update_shop_settings]
       before_action :ensure_plan
 
       # Get /api/merchant/current_shop
       def current_shop
-        @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shop]) if @icushop.present?
+        @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shopify_domain]) if @icushop.present?
         render "shops/current_shop"
       end
 
@@ -40,7 +41,7 @@ module Api
         @icushop.money_format = opts['money_format']
         @icushop.show_spinner = opts['show_spinner']
         @icushop.stats_from = opts['stats_from'].present? ? Time.parse(opts['stats_from']) : nil
-
+  
         # ADMIN OPTS
         if @admin
           @icushop.review = opts['review']
@@ -64,10 +65,11 @@ module Api
         if @icushop.save
           @icushop.publish_async  # trigger update
 
-          render json: { shop: @icushop.shop_settings(@admin) }
+          @message = "Shop settings saved!"
         else
-          render json: { error: @icushop.errors.full_messages.first }, status: :bad_request
+          @message = @icushop.errors.full_messages.first
         end
+        render "shops/update_shop_settings"
       end
 
       #GET /api/merchant/toggle_activation
@@ -83,11 +85,24 @@ module Api
         all_names = Shop.column_names + ['date_min', 'date_max', 'canonical_domain',
                                          'path_to_cart', 'has_branding', 'custom_theme_css',
                                          'image', 'stats_from', css_options]
-        params.require('shop_attr').permit(all_names)
+        params.require('shop').permit(all_names)
       end
 
       def set_admin
-        @admin = shop_params['admin'] || params['admin']
+        if params['shop']
+          @admin = shop_params['admin'] 
+        else
+          @admin = params['admin']
+        end
+      end
+
+      def css_options
+        opts = %w[backgroundColor color marginTop marginBottom marginLeft marginRight borderColor
+                  borderStyle width paddingLeft borderRadius paddingTop paddingRight
+                  paddingBottom paddingLeft fontSize fontFamily fontWeight
+                  borderWidth justifyContent letterSpacing textTransform fontWeightInPixel]
+        { 'css_options' => { 'main' => opts, 'button' => opts, 'text' => opts,
+                             'image' => opts, 'custom' => opts } }
       end
 
       def css_options
