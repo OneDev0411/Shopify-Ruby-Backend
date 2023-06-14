@@ -16,6 +16,7 @@ import {
   import {useState, useCallback, useEffect} from 'react';
   import React from 'react';
   import { useNavigate } from 'react-router-dom';
+  import { GenericFooter } from '../components';
   
   export default function IndexTableWithAllElementsExample() {
     // Dummy data fo IndexTable
@@ -251,12 +252,7 @@ import {
           </div>
         </Card>
         <div className="space-10"></div>
-        <FooterHelp>
-          Learn more about{' '}
-          <Link url="#">
-            Offers
-          </Link>
-        </FooterHelp><div> </div>
+        <GenericFooter text='Learn more about ' linkUrl='#' linkText='offers'></GenericFooter>
       </Page>
     );
   

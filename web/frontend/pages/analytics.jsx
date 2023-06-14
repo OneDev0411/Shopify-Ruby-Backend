@@ -4,6 +4,7 @@ import {CalendarMinor} from '@shopify/polaris-icons';
 import "../components/stylesheets/mainstyle.css";
 import {useState, useCallback} from 'react';
 import React from 'react';
+import { GenericFooter } from '../components/GenericFooter';
   
 export default function AnalyticsOffers() { 
     const [active, setActive] = useState(false);
@@ -125,12 +126,7 @@ export default function AnalyticsOffers() {
         </Grid>
         </div>
         <div className='space-10'></div>
-        <FooterHelp>
-          Learn more about{' '}
-          <Link url="#">
-            analytics
-          </Link>
-        </FooterHelp>
+        <GenericFooter text='Learn more about ' linkUrl='#' linkText='analytics'></GenericFooter>
       </Page>
     );
   }
