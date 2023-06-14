@@ -13,7 +13,7 @@ const ConfirmFromOutside = () => {
 
   async function renderConfirmCharge(){
 
-    fetch(`/api/merchant/subscription/confirm_charge?shop=${shopify_domain}&charge_id=${charge_id}`, {
+    fetch(`/api/merchant/subscription/confirm_charge?shopify_domain=${shopify_domain}&charge_id=${charge_id}`, {
       method: 'GET',
          headers: {
            'Content-Type': 'application/json',

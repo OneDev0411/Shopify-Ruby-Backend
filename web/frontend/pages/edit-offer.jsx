@@ -171,11 +171,9 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
-                debugger
                 setOfferSettings(data);
             })
             .catch((error) => {
-                debugger
                 console.log("Error > ", error);
             })
 
@@ -188,11 +186,9 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
-                debugger
-                setShop(data);
+                setShop(data.shop_settings);
             })
             .catch((error) => {
-                debugger
                 console.log("Error > ", error);
             })
         }
@@ -321,7 +317,6 @@ export default function EditPage() {
           ots.interval_frequency = offer.interval_frequency;
         }
         if(location.state?.offerId) {
-            debugger;
             fetch(`/api/offers/${offer.id}/update/${shopId}`, {
                 method: 'POST',
                 headers: {
@@ -337,7 +332,6 @@ export default function EditPage() {
             // offerUpdate(fetch, offer.id, shopId, ots);
         }
         else {
-            debugger;
             fetch(`/api/offers/create/${shopId}`, {
                 method: 'POST',
                 headers: {
@@ -347,7 +341,6 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
-                debugger;
             })
             .catch((error) => {
             })
@@ -359,7 +352,7 @@ export default function EditPage() {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify( {shop_attr: shop, shop: shopAndHost.shop, admin: shop.admin, json: true }),
+                body: JSON.stringify( {shop: shop, shopify_domain: shopAndHost.shop, admin: shop.admin, json: true }),
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {

@@ -96,7 +96,7 @@ export function SearchProductsList(props) {
     if(selectedItems.length < id.length) {
       props.setResourceListLoading(true);
       let shopifyId = id[id.length-1]
-      let url = `/api/merchant/products/shopify/${shopifyId}?shop=${props.shop}`
+      let url = `/api/merchant/products/shopify/${shopifyId}?shopify_domain=${props.shop}`
 
       fetch(url, {
         method: 'GET',
