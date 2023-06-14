@@ -7,6 +7,7 @@ import { useState, useCallback, useEffect } from 'react';
 import React from 'react';
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 import { useLocation } from 'react-router-dom';
+import { OfferPreview } from "../components/OfferPreview";
 
 
 export default function EditPage() {
@@ -109,7 +110,7 @@ export default function EditPage() {
 
     //Call on initial render
     useEffect(() => {
-        if(location.state?.offerId == null) {
+        if(location.state?.offerId != null) {
             fetch(`/api/merchant/offer_settings`, {
                 method: 'POST',
                 headers: {
@@ -152,6 +153,11 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
+                data.text = data.text_a.replace("{{ product_title }}", data.offerable_product_details[0].title)
+                data.cta = data.cta_a;
+                for(var i=0; i<data.offerable_product_details.length; i++) {
+                    data.offerable_product_details[i].preview_mode = true;
+                }
                 setOffer(data);
             })
             .catch((error) => {
@@ -167,11 +173,9 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
-                debugger
                 setOfferSettings(data);
             })
             .catch((error) => {
-                debugger
                 console.log("Error > ", error);
             })
 
@@ -184,16 +188,30 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
-                debugger
                 setShop(data);
             })
             .catch((error) => {
-                debugger
                 console.log("Error > ", error);
             })
         }
 
     },[]);
+
+    //Called when the 
+    function checkCssValidity() {
+        if(offer.css_options.main.marginTop && parseInt(props.css_options.main.marginTop) > 0) {
+            setCheckKeysValidity(previousState => {
+                return { ...previousState, mainMargintop: true };
+            });
+        }
+        else {
+            setCheckKeysValidity(previousState => {
+                return { ...previousState, mainMargintop: false };
+            });
+        }
+    }
+
+
     //Called whenever the offer changes in any child component
     function updateOffer(updatedKey, updatedValue) {
         setOffer(previousState => {
@@ -232,6 +250,7 @@ export default function EditPage() {
 
     //Called whenever the shop changes in any child component
     function updateShop(updatedValue, ...updatedKey) {
+        debugger;
         if(updatedKey.length == 1) {
             setShop(previousState => {
                 return { ...previousState, [updatedKey[0]]: updatedValue };
@@ -264,103 +283,104 @@ export default function EditPage() {
     // Called when save button is clicked
     function save() {
         console.log("Shop >>",shop);
-        console.log("Offer >>", offerSettings)
-        var ots = {
-            checkout_after_accepted: offer.checkout_after_accepted,
-            custom_field_name: offer.custom_field_name,
-            custom_field_placeholder: offer.custom_field_placeholder,
-            custom_field_required: offer.custom_field_required,
-            custom_field_2_name: offer.custom_field_2_name,
-            custom_field_2_placeholder: offer.custom_field_2_placeholder,
-            custom_field_2_required: offer.custom_field_2_required,
-            custom_field_3_name: offer.custom_field_3_name,
-            custom_field_3_placeholder: offer.custom_field_3_placeholder,
-            custom_field_3_required: offer.custom_field_3_required,
-            discount_target_type: offer.discount_target_type,
-            discount_code: offer.discount_code,
-            included_variants: offer.included_variants,
-            link_to_product: offer.link_to_product,
-            multi_layout: offer.multi_layout,
-            must_accept: offer.must_accept,
-            offerable_product_shopify_ids: offer.offerable_product_shopify_ids,
-            offerable_type: 'multi',
-            offer_css: offer.css,
-            offer_cta: offer.cta_a,
-            offer_cta_alt: offer.cta_b,
-            offer_text: offer.text_a,
-            offer_text_alt: offer.text_b,
-            product_image_size: offer.product_image_size,
-            products_to_remove: offer.products_to_remove,
-            publish_status: offer.publish_status,
-            remove_if_no_longer_valid: offer.remove_if_no_longer_valid,
-            redirect_to_product: offer.redirect_to_product,
-            rules_json: offer.rules_json,
-            ruleset_type: offer.ruleset_type,
-            show_variant_price: offer.show_variant_price,
-            show_product_image: offer.show_product_image,
-            show_product_title: offer.show_product_title,
-            show_product_price: offer.show_product_price,
-            show_compare_at_price: offer.show_compare_at_price,
-            show_nothanks: offer.show_nothanks,
-            show_quantity_selector: offer.show_quantity_selector,
-            show_custom_field: offer.show_custom_field,
-            stop_showing_after_accepted: offer.stop_showing_after_accepted,
-            theme: offer.theme,
-            title: offer.title,
-            in_cart_page: offer.in_cart_page,
-            in_ajax_cart: offer.in_ajax_cart,
-            in_product_page: offer.in_product_page,
-        };
-        if (shop.has_recharge && offer.recharge_subscription_id) {
-          ots.recharge_subscription_id = offer.recharge_subscription_id;
-          ots.interval_unit = offer.interval_unit;
-          ots.interval_frequency = offer.interval_frequency;
-        }
-        if(location.state?.offerId) {
-            debugger;
-            fetch(`/api/offers/${offer.id}/update/${shopId}`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({offer: ots}),
-            })
-            .then( (response) => { return response.json(); })
-            .then( (data) => {
-            })
-            .catch((error) => {
-            })
-            // offerUpdate(fetch, offer.id, shopId, ots);
-        }
-        else {
-            debugger;
-            fetch(`/api/offers/create/${shopId}`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({offer: ots}),
-            })
-            .then( (response) => { return response.json(); })
-            .then( (data) => {
-                debugger;
-            })
-            .catch((error) => {
-            })
-        }
+        console.log("Offer >>", offer)
+        debugger;
+        // var ots = {
+        //     checkout_after_accepted: offer.checkout_after_accepted,
+        //     custom_field_name: offer.custom_field_name,
+        //     custom_field_placeholder: offer.custom_field_placeholder,
+        //     custom_field_required: offer.custom_field_required,
+        //     custom_field_2_name: offer.custom_field_2_name,
+        //     custom_field_2_placeholder: offer.custom_field_2_placeholder,
+        //     custom_field_2_required: offer.custom_field_2_required,
+        //     custom_field_3_name: offer.custom_field_3_name,
+        //     custom_field_3_placeholder: offer.custom_field_3_placeholder,
+        //     custom_field_3_required: offer.custom_field_3_required,
+        //     discount_target_type: offer.discount_target_type,
+        //     discount_code: offer.discount_code,
+        //     included_variants: offer.included_variants,
+        //     link_to_product: offer.link_to_product,
+        //     multi_layout: offer.multi_layout,
+        //     must_accept: offer.must_accept,
+        //     offerable_product_shopify_ids: offer.offerable_product_shopify_ids,
+        //     offerable_type: 'multi',
+        //     offer_css: offer.css,
+        //     offer_cta: offer.cta_a,
+        //     offer_cta_alt: offer.cta_b,
+        //     offer_text: offer.text_a,
+        //     offer_text_alt: offer.text_b,
+        //     product_image_size: offer.product_image_size,
+        //     products_to_remove: offer.products_to_remove,
+        //     publish_status: offer.publish_status,
+        //     remove_if_no_longer_valid: offer.remove_if_no_longer_valid,
+        //     redirect_to_product: offer.redirect_to_product,
+        //     rules_json: offer.rules_json,
+        //     ruleset_type: offer.ruleset_type,
+        //     show_variant_price: offer.show_variant_price,
+        //     show_product_image: offer.show_product_image,
+        //     show_product_title: offer.show_product_title,
+        //     show_product_price: offer.show_product_price,
+        //     show_compare_at_price: offer.show_compare_at_price,
+        //     show_nothanks: offer.show_nothanks,
+        //     show_quantity_selector: offer.show_quantity_selector,
+        //     show_custom_field: offer.show_custom_field,
+        //     stop_showing_after_accepted: offer.stop_showing_after_accepted,
+        //     theme: offer.theme,
+        //     title: offer.title,
+        //     in_cart_page: offer.in_cart_page,
+        //     in_ajax_cart: offer.in_ajax_cart,
+        //     in_product_page: offer.in_product_page,
+        // };
+        // if (shop.has_recharge && offer.recharge_subscription_id) {
+        //   ots.recharge_subscription_id = offer.recharge_subscription_id;
+        //   ots.interval_unit = offer.interval_unit;
+        //   ots.interval_frequency = offer.interval_frequency;
+        // }
+        // if(location.state?.offerId) {
+        //     debugger;
+        //     fetch(`/api/offers/${offer.id}/update/${shopId}`, {
+        //         method: 'POST',
+        //         headers: {
+        //           'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify({offer: ots}),
+        //     })
+        //     .then( (response) => { return response.json(); })
+        //     .then( (data) => {
+        //     })
+        //     .catch((error) => {
+        //     })
+        //     // offerUpdate(fetch, offer.id, shopId, ots);
+        // }
+        // else {
+        //     debugger;
+        //     fetch(`/api/offers/create/${shopId}`, {
+        //         method: 'POST',
+        //         headers: {
+        //           'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify({offer: ots}),
+        //     })
+        //     .then( (response) => { return response.json(); })
+        //     .then( (data) => {
+        //         debugger;
+        //     })
+        //     .catch((error) => {
+        //     })
+        // }
 
-        fetch('/api/merchant/update_shop_settings', {
-             method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify( {shop: shop, admin: shop.admin, shop_id: shop.id, json: true }),
-            })
-            .then( (response) => { return response.json(); })
-            .then( (data) => {
-            })
-            .catch((error) => {
-            })
+        // fetch('/api/merchant/update_shop_settings', {
+        //      method: 'POST',
+        //         headers: {
+        //           'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify( {shop: shop, admin: shop.admin, shop_id: shop.id, json: true }),
+        //     })
+        //     .then( (response) => { return response.json(); })
+        //     .then( (data) => {
+        //     })
+        //     .catch((error) => {
+        //     })
     }
 
     const tabs = [
@@ -467,9 +487,10 @@ export default function EditPage() {
                 >
                     <div className='space-4'></div>
                     {selectedPre == 0 ?
+                        <OfferPreview offer={offer} shop={shop}/>
+                    : 
                         <LegacyCard sectioned>
-                        </LegacyCard>
-                    : "" }
+                        </LegacyCard> }
                 </Tabs>
             </Layout.Section>
         </Layout>

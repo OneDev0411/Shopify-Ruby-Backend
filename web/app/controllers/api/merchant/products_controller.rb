@@ -3,7 +3,7 @@ module Api
     class ProductsController < ApiMerchantBaseController
       before_action :find_shop, only: [:element_search]
 
-      # POST /api/v2/element_search
+      # POST /api/merchant/element_search
       def element_search
         result = product_params['type'] == 'product' ? product_search : collection_search
         render json: result
