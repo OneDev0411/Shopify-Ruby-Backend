@@ -14,18 +14,24 @@ import {
   import { TotalSalesData, ConversionRate,OrderOverTimeData} from "../components";
   import { TitleBar } from '@shopify/app-bridge-react';
   import { useState, useEffect, useCallback } from 'react';
-
   import { OffersList } from "../components";
+  import { useAppQuery, useAuthenticatedFetch } from "../hooks";
+  import { useAppBridge } from "@shopify/app-bridge-react";
+  import { useSelector } from "react-redux";
 
   export default function IndexTableWithAllElementsExample() {
-
-    const info = {offer: { shop_domain: window.location.host }};
+    
+    const [queryValue, setQueryValue] = useState(null);
     const [offersData, setOffersData] = useState([]);
     const [isLoading, setIsLoading]   = useState(true);
+    const [filteredData, setFilteredData] = useState([]);
+    const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch();
+    const app = useAppBridge();
 
   useEffect(()=>{
     setIsLoading(true);
-    fetch('/api/v1/offers_list', {
+    fetch('/api/merchant/offers_list', {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
@@ -35,82 +41,20 @@ import {
       },
       redirect: 'follow',
       referrerPolicy: 'no-referrer',
-      body: JSON.stringify(info),
+      body: JSON.stringify({shopify_domain: shopAndHost.shop}),
     })
       .then((response) => response.json())
-	    .then((data) => {
+      .then((data) => {
         console.log('API Data >>> ', data);
         localStorage.setItem('icushopify_domain', data.shopify_domain);
         setOffersData(data.offers);
+        setFilteredData(data.offers);
         setIsLoading(false);
       }).catch((error) => {
         console.log('Fetch error >> ', error);
       });
   },[]);
 
-       //Dummy data fo IndexTable
-      const customers = [
-        {
-          id: '341',
-          url: 'http://offer-example.com',
-          offer_name: 'Easter Upsell',
-           //The badge should change based on status
-          status:<Badge status="success">Published</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue: '$2019.10'
-        },
-        {
-          id: '348',
-          url: 'http://offer-example.com',
-          offer_name: 'Valentine Upsell',
-          // The badge should change based on status
-          status:<Badge>Unpublished</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue:'$1,123.23'
-        },
-        {
-          id: '349',
-          url: 'http: offer-example.com',
-          offer_name: 'Valentine Upsell',
-          //The badge should change based on status
-          status:<Badge>Unpublished</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue:'$1,123.23'
-        },
-        {
-          id: '3417',
-          url: 'http: offer-example.com',
-          offer_name: 'Easter Upsell',
-          //The badge should change based on status
-          status:<Badge status="success">Published</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue: '$2019.10'
-        },
-        {
-          id: '3418',
-          url: 'http: offer-example.com',
-          offer_name: 'Valentine Upsell',
-          //The badge should change based on status
-          status:<Badge>Unpublished</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue:'$1,123.23'
-        },
-        {
-          id: '3419',
-          url: 'http: offer-example.com',
-          offer_name: 'Valentine Upsell',
-          //The badge should change based on status
-          status:<Badge>Unpublished</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue:'$1,123.23'
-        },
-      ];
 
       const resourceName = {
         singular: 'customer',
@@ -118,9 +62,8 @@ import {
       };
 
       const {selectedResources, allResourcesSelected, handleSelectionChange} =
-        useIndexResourceState(customers);
+        useIndexResourceState(filteredData);
       const [taggedWith, setTaggedWith] = useState('');
-      const [queryValue, setQueryValue] = useState('');
       const [sortValue, setSortValue] = useState('today');
 
       const handleTaggedWithChange = useCallback(
@@ -134,25 +77,28 @@ import {
         handleQueryValueRemove();
       }, [handleQueryValueRemove, handleTaggedWithRemove]);
       const handleSortChange = useCallback((value) => setSortValue(value), []);
+      const handleQueryValueChange = useCallback((value) => {
+        setFilteredData(offersData.filter((o) => o.title.includes(value)));
+      });
 
       const promotedBulkActions = [
         {
           content: 'Duplicate Offer',
-          onAction: () => console.log('Todo: implement bulk edit'),
+          onAction: () => createDuplicateOffer(),
         },
       ];
       const bulkActions = [
         {
           content: 'Publish',
-          onAction: () => console.log('Todo: implement bulk add tags'),
+          onAction: () => activateSelectedOffer(),
         },
         {
           content: 'Draft',
-          onAction: () => console.log('Todo: implement bulk remove tags'),
+          onAction: () => deactivateSelectedOffer(),
         },
         {
           content: 'Delete',
-          onAction: () => console.log('Todo: implement bulk delete'),
+          onAction: () => deleteSelectedOffer(),
         },
       ];
 
@@ -190,22 +136,102 @@ import {
         {label: 'Revenue', value: 'revenue'},
       ];
 
-      const rowMarkup = customers.map(
-        ({id, offer_name, status, clicks, views,revenue}, index) => (
+      const rowMarkup = filteredData.map(
+        ({id, title, status, clicks, views,revenue}, index) => (
           <IndexTable.Row
             id={id}
             key={id}
             selected={selectedResources.includes(id)}
             position={index}
           >
-            <IndexTable.Cell>{offer_name}</IndexTable.Cell>
-            <IndexTable.Cell>{status}</IndexTable.Cell>
+            <IndexTable.Cell>{title}</IndexTable.Cell>
+            <IndexTable.Cell>{status ? (<Badge status="success">Published</Badge>) : (<Badge>Unpublished</Badge>)}</IndexTable.Cell>
             <IndexTable.Cell>{clicks}</IndexTable.Cell>
             <IndexTable.Cell>{views}</IndexTable.Cell>
-            <IndexTable.Cell>{revenue}</IndexTable.Cell>
+            <IndexTable.Cell>{`$${revenue}`}</IndexTable.Cell>
           </IndexTable.Row>
         ),
       );
+
+      function createDuplicateOffer() {
+        let url = `/api/offers/${selectedResources[0]}/duplicate`;
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({offer_id: selectedResources[0], shopify_domain: shopAndHost.shop})
+        })
+          .then((response) => response.json())
+          .then( (data) => {
+            setFilteredData(data.offers);
+            setOffersData(data.offers);
+            selectedResources.shift();
+          })
+            .catch((error) => {
+          })
+      }
+
+      function deleteSelectedOffer() {
+        let url = `/api/offers/${selectedResources[0]}`;
+        fetch(url, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({offer_id: selectedResources[0], shopify_domain: shopAndHost.shop})
+        })
+          .then((response) => response.json())
+          .then( (data) => {
+            setFilteredData(data.offers);
+            setOffersData(data.offers);
+            selectedResources.shift();
+          })
+            .catch((error) => {
+          })
+      }
+
+      function activateSelectedOffer() {
+        let url = '/api/merchant/offer_activate';
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({offer: {offer_id: selectedResources[0]}, shopify_domain: shopAndHost.shop})
+        })
+          .then((response) => response.json())
+          .then( (data) => {
+            const filteredDataDup = [...filteredData];
+            filteredDataDup.find((o) => o.id == selectedResources[0]).status = true;
+
+            setFilteredData([...filteredDataDup]);
+            selectedResources.shift();
+          })
+            .catch((error) => {
+          })
+      }
+
+      function deactivateSelectedOffer() {
+        let url = '/api/merchant/offer_deactivate';
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({offer: {offer_id: selectedResources[0]}, shopify_domain: shopAndHost.shop})
+        })
+          .then((response) => response.json())
+          .then( (data) => {
+            const filteredDataDup = [...filteredData];
+            filteredDataDup.find((o) => o.id == selectedResources[0]).status = false;
+            setFilteredData([...filteredDataDup]);
+            selectedResources.shift();
+          })
+            .catch((error) => {
+          })
+      }
+
 
       return (
         <Page>
@@ -223,7 +249,7 @@ import {
                   queryValue={queryValue}
                   filters={filters}
                   appliedFilters={appliedFilters}
-                  onQueryChange={setQueryValue}
+                  onQueryChange={handleQueryValueChange}
                   onQueryClear={handleQueryValueRemove}
                   onClearAll={handleClearAll}
                 />
@@ -240,7 +266,7 @@ import {
             </div>
             <IndexTable
               resourceName={resourceName}
-              itemCount={customers.length}
+              itemCount={offersData.length}
               selectedItemsCount={
                 allResourcesSelected ? 'All' : selectedResources.length
               }
@@ -282,7 +308,7 @@ import {
                 <div className="space-4"></div>
                 <p>SALES OVER TIME</p>
                 <br/>
-                <TotalSalesData/>
+                <c/>
               </LegacyCard>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>

@@ -83,14 +83,12 @@ export function EditOfferTabs(props) {
     //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
     function updateQuery (childData) {
         setResourceListLoading(true);
-        const shopId = 21;                                        // temp shopId, replaced by original shop id.
-    
         fetch(`/api/merchant/element_search`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ product: { shop_id: shopId, query: childData, type: 'product' }, shop_id: shopId}),
+            body: JSON.stringify({ product: { query: childData, type: 'product' }, shopify_domain: shopAndHost.shop}),
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
@@ -117,14 +115,12 @@ export function EditOfferTabs(props) {
         props.updateOffer("included_variants", {});
 
         setResourceListLoading(true);
-        let shopId = 21;                                        // temp shopId, replaced by original shop id.
-
         fetch(`/api/merchant/element_search`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ product: { shop_id: shopId, query: query, type: 'product' }, shop_id: shopId}),
+            body: JSON.stringify({ product: { query: query, type: 'product' }, shopify_domain: shopAndHost.shop}),
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
@@ -140,9 +136,8 @@ export function EditOfferTabs(props) {
     function updateProducts() {
         props.updateOffer("offerable_product_details", []);
         props.updateOffer("offerable_product_shopify_ids", []);
-        let shopId = 21;                                        // temp shopId, replaced by original shop id.
         for(var i=0; i<selectedProducts.length; i++) {
-            fetch(`/api/merchant/products/multi/${selectedProducts[i]}?shop_id=${shopId}`, {
+            fetch(`/api/merchant/products/multi/${selectedProducts[i]}?shop_id=${props.shop.shop_id}`, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
@@ -309,7 +304,7 @@ export function EditOfferTabs(props) {
         }}
       >
         <Modal.Section>
-            <ModalAddProduct updateQuery={updateQuery} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct}/>
+            <ModalAddProduct updateQuery={updateQuery} shop_id={props.shop.shop_id} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct}/>
         </Modal.Section>
       </Modal>
     </div>

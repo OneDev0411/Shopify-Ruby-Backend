@@ -756,7 +756,7 @@ class Shop < ApplicationRecord
       custom_product_page_dom_selector: product_page_dom_selector,
       custom_product_page_dom_action: product_page_dom_action,
       ajax_refresh_code: ajax_refresh_code,
-      activated: activated,
+      activated: active?,
       canonical_domain: canonical_domain,
       can_run_on_checkout_page: can_run_on_checkout_page,
       custom_theme_css: custom_theme_css,
@@ -777,7 +777,8 @@ class Shop < ApplicationRecord
       custom_button_text_color: custom_button_text_color,
       tax_percentage: tax_percentage,
       money_format: money_format,
-      stats_from: stats_date_for_UI
+      stats_from: stats_date_for_UI,
+      shop_id: id
     }
     admin ? std_settings.merge(admin_settings) : std_settings
   end
@@ -1075,6 +1076,21 @@ class Shop < ApplicationRecord
       self.unpublish_extra_offers if self.offers.present?
     end
     # subscription.update_attribute(:free_plan_after_trial, false)
+  end
+
+  def offer_data_with_stats
+    data = []
+    offers.includes(:daily_stats, :offer_events).each do |offer|
+      data << {
+        id: offer.id,
+        title: offer.title,
+        status: offer.active,
+        clicks: offer.daily_stats.map(&:times_clicked).sum,
+        views: offer.daily_stats.map(&:times_loaded).sum,
+        revenue: offer.offer_events&.where(action: 'sale')&.pluck(:amount).sum
+      }
+    end
+    return data
   end
 
   private

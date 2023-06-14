@@ -144,7 +144,7 @@ import {
               <OptionList
               options={option}
               selected={selectedVariants[id]}
-              onChange={(selectedOptions) => handleSelectedVariant(selectedOptions, id)}
+              onChange={(selectedOptions) =>  (selectedOptions, id)}
               allowMultiple
               >
               </OptionList>
@@ -190,9 +190,8 @@ import {
       if(selectedItems.length < id.length) {
         setResourceListLoading(true);
         let shopifyId = id[id.length-1]
-        let shopId = 21;                                        // temp shopId, replaced by original shop id.
 
-        fetch(`/api/merchant/products/shopify/${shopifyId}?shop_id=${shopId}`, {
+        fetch(`/api/merchant/products/shopify/${shopifyId}?shop_id=${props.shop_id}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
