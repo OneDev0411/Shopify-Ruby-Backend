@@ -1,4 +1,5 @@
 import {
+    VerticalStack,
     LegacyCard,
     LegacyStack,
     ButtonGroup,
@@ -12,8 +13,11 @@ import {
     Grid,
     ColorPicker,
     Stack,
-    VerticalStack
+    Icon
 } from "@shopify/polaris";
+import {
+    CancelMajor
+  } from '@shopify/polaris-icons';
 import {ModalAddProduct} from "./modal_AddProduct";
 import {ModalAddConditions} from "./modal_AddConditions";
 import HomePage from "../pages/subscription";
@@ -23,8 +27,12 @@ import React from "react";
 import Subscription from "../pages/subscription";
 import tinycolor from "tinycolor2";
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { elementSearch, productsMulti } from "../services/products/actions/product";
 
 export function EditOfferTabs(props) {
+    const shopAndHost = useSelector(state => state.shopAndHost);
+
     const [altOfferText, setAltOfferText] = useState("");
     const [altBtnTitle, setAltBtnTitle] = useState("");
     const handleTitleChange = useCallback((newValue) => props.updateOffer("title", newValue), []);
@@ -75,14 +83,12 @@ export function EditOfferTabs(props) {
     //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
     function updateQuery (childData) {
         setResourceListLoading(true);
-        const shopId = 21;                                        // temp shopId, replaced by original shop id.
-    
         fetch(`/api/merchant/element_search`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ product: { shop_id: shopId, query: childData, type: 'product' }, shop_id: shopId}),
+            body: JSON.stringify({ product: { query: childData, type: 'product' }, shopify_domain: shopAndHost.shop}),
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
@@ -109,14 +115,12 @@ export function EditOfferTabs(props) {
         props.updateOffer("included_variants", {});
 
         setResourceListLoading(true);
-        let shopId = 21;                                        // temp shopId, replaced by original shop id.
-
         fetch(`/api/merchant/element_search`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ product: { shop_id: shopId, query: query, type: 'product' }, shop_id: shopId}),
+            body: JSON.stringify({ product: { query: query, type: 'product' }, shopify_domain: shopAndHost.shop}),
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
@@ -132,9 +136,8 @@ export function EditOfferTabs(props) {
     function updateProducts() {
         props.updateOffer("offerable_product_details", []);
         props.updateOffer("offerable_product_shopify_ids", []);
-        let shopId = 21;                                        // temp shopId, replaced by original shop id.
         for(var i=0; i<selectedProducts.length; i++) {
-            fetch(`/api/merchant/products/multi/${selectedProducts[i]}?shop_id=${shopId}`, {
+            fetch(`/api/merchant/products/multi/${selectedProducts[i]}?shop_id=${props.shop.shop_id}`, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
@@ -301,7 +304,7 @@ export function EditOfferTabs(props) {
         }}
       >
         <Modal.Section>
-            <ModalAddProduct updateQuery={updateQuery} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct}/>
+            <ModalAddProduct updateQuery={updateQuery} shop_id={props.shop.shop_id} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct}/>
         </Modal.Section>
       </Modal>
     </div>
@@ -310,6 +313,41 @@ export function EditOfferTabs(props) {
 
 export function SecondTab(props){
     const [selected, setSelected] = useState('cartpage');
+    const [rule, setRule] = useState({quantity: null, rule_selector: 'cart_at_least', item_type: 'product', item_shopify_id: null, item_name: null});
+    const [quantityErrorText, setQuantityErrorText] = useState(null);
+    const [itemErrorText, setItemErrorText] = useState(null);
+    const quantityArray = ['cart_at_least', 'cart_at_most', 'cart_exactly'];
+    const orderArray = ['total_at_least', 'total_at_most']
+
+    function upadteCondition () {
+        if(quantityArray.includes(rule.rule_selector)){
+            if(!rule.quantity){
+                setQuantityErrorText("Required filed");
+                return;
+            }
+            else if(rule.quantity<1){
+                setQuantityErrorText("Quantity can't be less than 1");
+                return;
+            }
+        }
+        if(orderArray.includes(rule.rule_selector)){
+            if(!rule.item_name){
+                setItemErrorText("Required filed");
+                return;
+            }
+            else if(rule.item_name<1){
+                setItemErrorText("Amount can't be less than 1");
+                return;
+            }
+        }
+        else if(!rule.item_name){
+            setItemErrorText("Required field");
+            return;
+        }
+        props.setOffer(prev => ({ ...prev, rules_json: [...prev.rules_json, rule] }));
+        handleModal();
+    }
+
     const handleSelectChange = useCallback((value) => {
         if(value === "cartpage") {
             props.updateOffer("in_cart_page", true);
@@ -351,7 +389,10 @@ export function SecondTab(props){
     const handleRemoveItiem = useCallback((newChecked) => props.updateOffer("remove_if_no_longer_valid", newChecked), []);
     //Modal controllers
     const [conditionModal, setConditionModal] = useState(false);
-    const handleModal = useCallback(() => setConditionModal(!conditionModal), [conditionModal]);
+    const handleModal = useCallback(() => {
+        setConditionModal(!conditionModal), [conditionModal]
+        setDefaultRule();
+    });
     const modalCon = useRef(null);
     const activatorCon = modalCon;
 
@@ -376,6 +417,46 @@ export function SecondTab(props){
         }
     }, []);
 
+    const setDefaultRule = ()=>{
+        setRule({quantity: null, rule_selector: 'cart_at_least', item_type: 'product', item_shopify_id: null, item_name: null});
+        setQuantityErrorText(null);
+        setItemErrorText(null);
+    }
+
+    const condition_options = [
+        { label: 'Cart contains at least', value: 'cart_at_least' },
+        { label: 'Cart contains at most', value: 'cart_at_most' },
+        { label: 'Cart contains exactly', value: 'cart_exactly' },
+        { label: 'Cart does not contain any', value: 'cart_does_not_contain' },
+        { label: 'Cart contains variant', value: 'cart_contains_variant' },
+        { label: 'Cart does not contain variant', value: 'cart_does_not_contain_variant' },
+        { label: 'Cart contains a product from vendor', value: 'cart_contains_item_from_vendor' },
+        { label: 'Cart does not contain any product from vendor', value: 'cart_does_not_contain_item_from_vendor' },
+        { label: 'Order Total Is At Least', value: 'total_at_least' },
+        { label: 'Order Total Is At Most', value: 'total_at_most' },
+        { label: 'Cookie is set', value: 'cookie_is_set' },
+        { label: 'Cookie is not set', value: 'cookie_is_not_set' },
+        { label: 'Customer is tagged', value: 'customer_is_tagged' },
+        { label: 'Customer is not tagged', value: 'customer_is_not_tagged' },
+        { label: 'Product/Cart URL contains', value: 'url_contains' },
+        { label: 'Product/Cart URL does not contain', value: 'url_does_not_contain' },
+        { label: 'Customer is located in', value: 'in_location' },
+        { label: 'Customer is not located in', value: 'not_in_location' },
+        { label: 'Customer is viewing this product/collection', value: 'on_product_this_product_or_in_collection' },
+        { label: 'Customer is not viewing this product/collection', value: 'on_product_not_this_product_or_not_in_collection' },
+    ];
+
+    function getLabelFromValue(value) {
+        const condition = condition_options.find(option => option.value === value);
+        return condition ? condition.label : null;
+    }
+
+    function deleteRule(index){
+        const updatedRules = [...props.offer.rules_json];
+        updatedRules.splice(index, 1);
+        props.updateOffer('rules_json', updatedRules);
+    }
+
     return(
         <div>
             <LegacyCard title="Choose placement" sectioned>
@@ -393,7 +474,17 @@ export function SecondTab(props){
             </LegacyCard>
             <LegacyCard title="Display Conditions" sectioned>
                 <LegacyCard.Section>
-                    <p>None selected (show offer to all customer)</p>
+                    {props.offer.rules_json.length===0 ? (
+                        <p>None selected (show offer to all customer)</p>
+                    ): (
+                        <>{Array.isArray(props.offer.rules_json) && props.offer.rules_json.map((rule, index) => (
+                        <li key={index} style={{ display: 'flex', alignItems: 'center'}}>{getLabelFromValue(rule.rule_selector)} {rule.quantity} {rule.item_name}
+                            <p onClick={()=> deleteRule(index) }>
+                                <Icon source={CancelMajor} color="critical"/>
+                            </p>
+                        </li>
+                        ))}</>
+                    )}
                     <br/>
                     <Button onClick={handleModal} ref={modalCon}>Add condition</Button>
                 </LegacyCard.Section>
@@ -425,10 +516,11 @@ export function SecondTab(props){
                 title="Select products from your store"
                 primaryAction={{
                 content: 'Save',
+                onAction: upadteCondition,
                 }}
             >
                 <Modal.Section>
-                   <ModalAddConditions/>
+                   <ModalAddConditions quantityErrorText={quantityErrorText} itemErrorText={itemErrorText} condition_options={condition_options} updateOffer={props.updateOffer} rule={rule} setRule={setRule} />
                 </Modal.Section>
             </Modal>
         </div>
