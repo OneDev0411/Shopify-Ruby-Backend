@@ -1,24 +1,30 @@
 {
-  "name": "icu-redesign",
-  "version": "1.0.0",
-  "main": "web/index.js",
+  "name": "incartupsell",
+  "version": "0.0.1",
   "license": "UNLICENSED",
   "scripts": {
     "shopify": "shopify",
     "build": "shopify app build",
     "dev": "shopify app dev",
-    "info": "shopify app info",
+    "push": "shopify app push",
     "generate": "shopify app generate",
-    "deploy": "shopify app deploy"
+    "deploy": "shopify app deploy",
+    "info": "shopify app info"
   },
   "dependencies": {
-    "@shopify/app": "^3.29.0",
-    "@shopify/cli": "^3.30.2",
-    "@shopify/polaris-viz": "^8.1.1",
+    "@shopify/app": "^3.46",
+    "@shopify/cli": "^3.46",
+    "@shopify/polaris": "^10.49",
     "axios": "^1.4.0",
+    "@reduxjs/toolkit": "^1.9.5",
+    "@shopify/polaris-viz": "^8.1.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "slick-carousel": "^1.8.1"
+    "react-redux": "^8.0.7",
+    "react-slick": "^0.29.0",
+    "slick-carousel": "^1.8.1",
+    "react-color": "^2.19.3",
+    "tinycolor2": "^1.6.0"
   },
-  "author": "JevonHylton"
+  "author": "xpsman"
 }

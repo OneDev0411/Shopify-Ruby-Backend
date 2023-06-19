@@ -1,6 +1,6 @@
 import {
     IndexTable,
-    Card,
+    LegacyCard,
     Filters,
     Select,
     useIndexResourceState,
@@ -12,84 +12,60 @@ import {
     Grid, TextField
   } from '@shopify/polaris';
   import { TitleBar } from '@shopify/app-bridge-react';
-  import { useState, useCallback } from 'react';
-  
-   export default function IndexTableWithAllElementsExample() {
-       //Dummy data fo IndexTable
-      const customers = [
-        {
-          id: '341',
-          url: 'http://offer-example.com',
-          offer_name: 'Easter Upsell',
-           //The badge should change based on status
-          status:<Badge status="success">Published</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue: '$2019.10'
-        },
-        {
-          id: '348',
-          url: 'http://offer-example.com',
-          offer_name: 'Valentine Upsell',
-          // The badge should change based on status
-          status:<Badge>Unpublished</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue:'$1,123.23'
-        },
-        {
-          id: '349',
-          url: 'http: offer-example.com',
-          offer_name: 'Valentine Upsell',
-          //The badge should change based on status
-          status:<Badge>Unpublished</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue:'$1,123.23'
-        },
-        {
-          id: '3417',
-          url: 'http: offer-example.com',
-          offer_name: 'Easter Upsell',
-          //The badge should change based on status
-          status:<Badge status="success">Published</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue: '$2019.10'
-        },
-        {
-          id: '3418',
-          url: 'http: offer-example.com',
-          offer_name: 'Valentine Upsell',
-          //The badge should change based on status
-          status:<Badge>Unpublished</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue:'$1,123.23'
-        },
-        {
-          id: '3419',
-          url: 'http: offer-example.com',
-          offer_name: 'Valentine Upsell',
-          //The badge should change based on status
-          status:<Badge>Unpublished</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue:'$1,123.23'
-        },
-      ];
+  import { useState, useEffect, useCallback } from 'react';
+  import { OffersList } from "../components";
+  import { useAppQuery, useAuthenticatedFetch } from "../hooks";
+  import { useAppBridge } from "@shopify/app-bridge-react";
+  import { useSelector } from "react-redux";
+  import { TotalSalesData, ConversionRate, OrderOverTimeData } from "../components"
+
+  export default function IndexTableWithAllElementsExample() {
+    
+    const [queryValue, setQueryValue] = useState(null);
+    const [offersData, setOffersData] = useState([]);
+    const [isLoading, setIsLoading]   = useState(true);
+    const [filteredData, setFilteredData] = useState([]);
+    const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch();
+    const app = useAppBridge();
+
+  useEffect(()=>{
+    setIsLoading(true);
+    fetch('/api/merchant/offers_list', {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      redirect: 'follow',
+      referrerPolicy: 'no-referrer',
+      body: JSON.stringify({shopify_domain: shopAndHost.shop}),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('API Data >>> ', data);
+        localStorage.setItem('icushopify_domain', data.shopify_domain);
+        setOffersData(data.offers);
+        setFilteredData(data.offers);
+        setIsLoading(false);
+      }).catch((error) => {
+        console.log('Fetch error >> ', error);
+      });
+  },[]);
+
 
       const resourceName = {
         singular: 'customer',
         plural: 'customers',
       };
-  
+
       const {selectedResources, allResourcesSelected, handleSelectionChange} =
-        useIndexResourceState(customers);
+        useIndexResourceState(filteredData);
       const [taggedWith, setTaggedWith] = useState('');
-      const [queryValue, setQueryValue] = useState(null);
       const [sortValue, setSortValue] = useState('today');
-  
+
       const handleTaggedWithChange = useCallback(
         (value) => setTaggedWith(value),
         [],
@@ -101,28 +77,31 @@ import {
         handleQueryValueRemove();
       }, [handleQueryValueRemove, handleTaggedWithRemove]);
       const handleSortChange = useCallback((value) => setSortValue(value), []);
-  
+      const handleQueryValueChange = useCallback((value) => {
+        setFilteredData(offersData.filter((o) => o.title.includes(value)));
+      });
+
       const promotedBulkActions = [
         {
           content: 'Duplicate Offer',
-          onAction: () => console.log('Todo: implement bulk edit'),
+          onAction: () => createDuplicateOffer(),
         },
       ];
       const bulkActions = [
         {
           content: 'Publish',
-          onAction: () => console.log('Todo: implement bulk add tags'),
+          onAction: () => activateSelectedOffer(),
         },
         {
           content: 'Draft',
-          onAction: () => console.log('Todo: implement bulk remove tags'),
+          onAction: () => deactivateSelectedOffer(),
         },
         {
           content: 'Delete',
-          onAction: () => console.log('Todo: implement bulk delete'),
+          onAction: () => deleteSelectedOffer(),
         },
       ];
-  
+
       const filters = [
         {
           key: 'taggedWith',
@@ -139,7 +118,7 @@ import {
           shortcut: true,
         },
       ];
-  
+
       const appliedFilters = !isEmpty(taggedWith)
         ? [
             {
@@ -149,48 +128,128 @@ import {
             },
           ]
         : [];
-  
+
       const sortOptions = [
         {label: 'Date Asc', value: 'date_asc'},
         {label: 'Date Desc', value: 'date_des'},
         {label: 'Clicks', value: 'clicks'},
         {label: 'Revenue', value: 'revenue'},
       ];
-  
-      const rowMarkup = customers.map(
-        ({id, offer_name, status, clicks, views,revenue}, index) => (
+
+      const rowMarkup = filteredData.map(
+        ({id, title, status, clicks, views,revenue}, index) => (
           <IndexTable.Row
             id={id}
             key={id}
             selected={selectedResources.includes(id)}
             position={index}
           >
-            <IndexTable.Cell>{offer_name}</IndexTable.Cell>
-            <IndexTable.Cell>{status}</IndexTable.Cell>
+            <IndexTable.Cell>{title}</IndexTable.Cell>
+            <IndexTable.Cell>{status ? (<Badge status="success">Published</Badge>) : (<Badge>Unpublished</Badge>)}</IndexTable.Cell>
             <IndexTable.Cell>{clicks}</IndexTable.Cell>
             <IndexTable.Cell>{views}</IndexTable.Cell>
-            <IndexTable.Cell>{revenue}</IndexTable.Cell>
+            <IndexTable.Cell>{`$${revenue}`}</IndexTable.Cell>
           </IndexTable.Row>
         ),
       );
-  
+
+      function createDuplicateOffer() {
+        let url = `/api/offers/${selectedResources[0]}/duplicate`;
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({offer_id: selectedResources[0], shopify_domain: shopAndHost.shop})
+        })
+          .then((response) => response.json())
+          .then( (data) => {
+            setFilteredData(data.offers);
+            setOffersData(data.offers);
+            selectedResources.shift();
+          })
+            .catch((error) => {
+          })
+      }
+
+      function deleteSelectedOffer() {
+        let url = `/api/offers/${selectedResources[0]}`;
+        fetch(url, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({offer_id: selectedResources[0], shopify_domain: shopAndHost.shop})
+        })
+          .then((response) => response.json())
+          .then( (data) => {
+            setFilteredData(data.offers);
+            setOffersData(data.offers);
+            selectedResources.shift();
+          })
+            .catch((error) => {
+          })
+      }
+
+      function activateSelectedOffer() {
+        let url = '/api/merchant/offer_activate';
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({offer: {offer_id: selectedResources[0]}, shopify_domain: shopAndHost.shop})
+        })
+          .then((response) => response.json())
+          .then( (data) => {
+            const filteredDataDup = [...filteredData];
+            filteredDataDup.find((o) => o.id == selectedResources[0]).status = true;
+
+            setFilteredData([...filteredDataDup]);
+            selectedResources.shift();
+          })
+            .catch((error) => {
+          })
+      }
+
+      function deactivateSelectedOffer() {
+        let url = '/api/merchant/offer_deactivate';
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({offer: {offer_id: selectedResources[0]}, shopify_domain: shopAndHost.shop})
+        })
+          .then((response) => response.json())
+          .then( (data) => {
+            const filteredDataDup = [...filteredData];
+            filteredDataDup.find((o) => o.id == selectedResources[0]).status = false;
+            setFilteredData([...filteredDataDup]);
+            selectedResources.shift();
+          })
+            .catch((error) => {
+          })
+      }
+
+
       return (
-        <Page> 
+        <Page>
           <TitleBar
-              title="Offers"
+              title="Your Offers"
               primaryAction={{
               content: "Create Offer",
               onAction: () => console.log("create offer btn clicked"),
               }}
-          /> 
-          <Card sectioned>
+          />
+          <LegacyCard sectioned>
             <div style={{display: 'flex'}}>
               <div style={{flex: 1}}>
                 <Filters
                   queryValue={queryValue}
                   filters={filters}
                   appliedFilters={appliedFilters}
-                  onQueryChange={setQueryValue}
+                  onQueryChange={handleQueryValueChange}
                   onQueryClear={handleQueryValueRemove}
                   onClearAll={handleClearAll}
                 />
@@ -207,7 +266,7 @@ import {
             </div>
             <IndexTable
               resourceName={resourceName}
-              itemCount={customers.length}
+              itemCount={offersData.length}
               selectedItemsCount={
                 allResourcesSelected ? 'All' : selectedResources.length
               }
@@ -240,35 +299,35 @@ import {
                 }}
               />
             </div>
-          </Card>
+          </LegacyCard>
           <div className="space-10"></div>
           <Grid>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <Card title="Total sales" sectioned>
+              <LegacyCard title="Total sales" sectioned>
                 <h3 className="report-money"><strong>$100.00</strong></h3>
                 <div className="space-4"></div>
                 <p>SALES OVER TIME</p>
                 <br/>
-                <p>placeholder for TotalSalesData component</p>
-              </Card>
+                <c/>
+              </LegacyCard>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <Card title="Conversion rate" sectioned>
+              <LegacyCard title="Conversion rate" sectioned>
                 <h3 className="report-money"><strong>12%</strong></h3>
                 <div className="space-4"></div>
                 <p>CONVERSION FUNNEL</p>
                 <br/>
-                <p>placeholder for ConversionRate component</p>
-              </Card>
+                <ConversionRate/>
+              </LegacyCard>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <Card title="Total order" sectioned>
+              <LegacyCard title="Total order" sectioned>
                 <h3 className="report-money"><strong>40</strong></h3>
                 <div className="space-4"></div>
                 <p>ORDERS OVER TIME</p>
                 <br/>
-                <p>placeholder for OrderOverTimeData component</p>
-              </Card>
+                <OrderOverTimeData/>
+              </LegacyCard>
             </Grid.Cell>
           </Grid>
           <div className='space-10'></div>
@@ -280,8 +339,7 @@ import {
           </FooterHelp><div> </div>
         </Page>
       );
-  
-    
+
       function disambiguateLabel(key, value) {
         switch (key) {
           case 'taggedWith':
@@ -290,7 +348,7 @@ import {
             return value;
         }
       }
-  
+
       function isEmpty(value) {
         if (Array.isArray(value)) {
           return value.length === 0;

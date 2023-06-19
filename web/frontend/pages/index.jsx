@@ -1,32 +1,57 @@
-import {ButtonGroup, Button, MediaCard, VideoThumbnail, Card, Page, Layout, TextContainer, Image, Stack, Heading, Subheading} from "@shopify/polaris";
+import {ButtonGroup, Button, MediaCard, VideoThumbnail, LegacyCard, Page, Layout, Text, Image, LegacyStack, Heading, Subheading, Banner, VerticalStack} from "@shopify/polaris";
 import {homeImage, iculogo} from "../assets";
 import "../components/stylesheets/mainstyle.css";
-import { TitleBar } from "@shopify/app-bridge-react";
 import { GenericTitleBar } from "../components";
+import { isSubscriptionActive } from "../services/actions/subscription";
+import { getShop } from "../services/actions/shop";
+import { useEffect, useState, useCallback } from "react";
+import { useSelector } from 'react-redux';
 
 export default function HomePage() {
+  const shop = useSelector(state => state.shopAndHost.shop);
+  const [currentShop, setCurrentShop] = useState(null);
+  const [planName, setPlanName] = useState();
+  const [trialDays, setTrialDays] = useState();
+
+  const fetchCurrentShop = useCallback(async () => {
+    const response = await getShop(shop);
+
+    setCurrentShop(response.shop);
+    setPlanName(response.plan);
+    setTrialDays(response.days_remaining_in_trial);
+  }, [setCurrentShop, setPlanName, setTrialDays]);
+
+  useEffect(async()=>{
+    fetchCurrentShop();
+  }, [fetchCurrentShop])
   return (
     <Page
       title={<GenericTitleBar image={iculogo} title={'In Cart Upsell & Cross Sell'} /> }
       primaryAction={null}
     >
-      <TitleBar />
       <Layout>
         <Layout.Section>
+          {isSubscriptionActive(currentShop?.subscription) && planName!=='free' && trialDays>0 &&
+            <Banner icon='none' status="info">
+              <p>{ trialDays } days remaining for the trial period</p>
+            </Banner>
+          }
+        </Layout.Section>
+        <Layout.Section>
           {/* card for image and text */}
-          <Card sectioned>
-            <Stack distribution="center">
-              <Stack.Item>
+          <LegacyCard sectioned>
+            <LegacyStack distribution="center">
+              <LegacyStack.Item>
                 <div className="center-content">
                   <Image
                     source={homeImage}
                     alt="Create your first offer"
                     width={219}
                   />
-                  <TextContainer spacing="loose" style={"text-align:center"}>
-                    <Heading element="h1">Here is where you'll view your offers</Heading>
-                    <Subheading element="h3">Start by creating your first offer and publishing it to your store</Subheading>
-                  </TextContainer>
+                  <VerticalStack gap="5">
+                    <Text variant="headingMd" as="h2" element="h1">Here is where you'll view your offers</Text>
+                    <Text as="h3">Start by creating your first offer and publishing it to your store</Text>
+                  </VerticalStack>
                   <div className="space-10"></div>
                   <div className="center-btn">
                     <ButtonGroup>
@@ -35,9 +60,9 @@ export default function HomePage() {
                     </ButtonGroup>
                   </div>
                 </div>
-              </Stack.Item>
-            </Stack>
-          </Card>
+              </LegacyStack.Item>
+            </LegacyStack>
+          </LegacyCard>
           {/* Second section with video */}
           <MediaCard
             title="Need help creating your offer?"
@@ -57,4 +82,4 @@ export default function HomePage() {
       </Layout>
     </Page>
   );
-}
+};
