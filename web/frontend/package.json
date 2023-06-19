@@ -12,6 +12,7 @@
     "node": ">= 12.16"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^1.9.5",
     "@shopify/app-bridge": "^3.7",
     "@shopify/app-bridge-react": "^3.7",
     "@shopify/app-bridge-utils": "^3.5.1",
@@ -20,6 +21,7 @@
     "react": "^18.2",
     "react-dom": "^18.2",
     "react-query": "^3.36",
+    "react-redux": "^8.1.0",
     "react-router-dom": "^6.4",
     "vite": "^4.3"
   },
