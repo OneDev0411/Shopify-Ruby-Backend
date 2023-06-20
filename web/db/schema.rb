@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
+ActiveRecord::Schema[7.0].define(version: 2023_05_19_132005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "intarray"
+  enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
 
   create_table "admins", force: :cascade do |t|
@@ -334,8 +335,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
   create_table "orders", id: :serial, force: :cascade do |t|
     t.integer "shop_id"
     t.bigint "shopify_id"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.jsonb "line_item_product_shopify_ids"
     t.text "product_shopify_ids", array: true
     t.decimal "total"
@@ -349,6 +350,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["cart_token"], name: "index_orders_on_cart_token"
     t.index ["created_at"], name: "index_orders_on_created_at"
     t.index ["shop_id"], name: "index_orders_on_shop_id"
+    t.index ["shopify_id"], name: "index_orders_on_shopify_id"
     t.index ["unique_product_ids"], name: "gin_unique_product_ids", using: :gin
   end
 
@@ -436,6 +438,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["orders_count"], name: "index_products_on_orders_count"
     t.index ["shop_id"], name: "index_products_on_shop_id"
     t.index ["shopify_id"], name: "index_products_on_shopify_id", unique: true
+    t.index ["variants_json"], name: "index_products_on_variants_json", using: :gin
   end
 
   create_table "refersions", id: :serial, force: :cascade do |t|
@@ -640,8 +643,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.string "access_scopes"
     t.datetime "shopify_token_updated_at", precision: nil
     t.datetime "stats_from", precision: nil
-    t.string "shop_domain"
     t.string "phone_number"
+    t.string "shop_domain"
+    t.integer "unpublished_offer_ids", array: true
+    t.boolean "activated", default: true
     t.index ["created_at"], name: "index_shops_on_created_at"
     t.index ["finder_token"], name: "index_shops_on_finder_token"
     t.index ["installed_at"], name: "index_shops_on_installed_at"
@@ -675,6 +680,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.integer "discount_percent"
     t.bigint "shopify_charge_id_bak"
     t.date "bill_on"
+    t.boolean "free_plan_after_trial"
     t.index ["plan_id"], name: "index_subscriptions_on_plan_id"
     t.index ["shop_id"], name: "index_subscriptions_on_shop_id"
   end
@@ -730,6 +736,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.bigint "shopify_id"
+  end
+
+  create_table "webhooks_passed_and_rejected_count", primary_key: "shopify_domain", id: :string, force: :cascade do |t|
+    t.bigint "passed_webhooks_count", default: 0, null: false
+    t.bigint "rejected_webhooks_count", default: 0, null: false
   end
 
   add_foreign_key "collections", "shops"

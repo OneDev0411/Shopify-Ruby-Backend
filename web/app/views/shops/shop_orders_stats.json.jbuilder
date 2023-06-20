@@ -1,0 +1,1 @@
+json.orders_stats @orders_stats

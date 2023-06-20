@@ -92,6 +92,70 @@ module Graphable
     end
   end
 
+  def sales_stats(period)
+    sales_value_first = []
+    sales_value_second = []
+    sales_value_third = []
+    sales_value_forth = []
+
+    if (period=='daily')
+      created_from = DateTime.now.beginning_of_day
+      created_to = created_from + 1.hours
+      interval = 8.hours
+      last = created_from + 3*interval-1.second
+    elsif (period=='monthly')
+      created_from = Date.today.beginning_of_month
+      created_to = created_from + 6.days
+      interval = 1.weeks
+      last = created_from.end_of_month
+    elsif (period=='yearly')
+      created_from = Date.today.beginning_of_year
+      created_to = created_from + (3.months-1.days)
+      interval = 3.months
+      last = created_from.end_of_year
+    end
+
+    offers.includes(:offer_events).each do |offer|
+      sales_value_first << offer.offer_events.where('action = ? and created_at >= ? and created_at < ?', "sale", created_from, created_to).sum(:amount)
+      sales_value_second << offer.offer_events.where('action = ? and created_at >= ? and created_at < ?', "sale", created_from + interval, created_to + interval).sum(:amount)
+      sales_value_third << offer.offer_events.where('action = ? and created_at >= ? and created_at < ?', "sale", created_from + 2*interval, created_to + 2*interval).sum(:amount)
+      sales_value_forth << offer.offer_events.where('action = ? and created_at >= ? and created_at < ?', "sale", created_from + 3*interval-(period=='daily'? (1.hours): 0), last).sum(:amount)
+    end
+    { "sales_value_first": sales_value_first.sum, "sales_value_second": sales_value_second.sum, "sales_value_third": sales_value_third.sum, 
+      "sales_value_forth": sales_value_forth.sum, sales_total: sales_value_first.sum+sales_value_second.sum+sales_value_third.sum+sales_value_forth.sum }
+  end
+
+  def orders_stats(period)
+    orders_value_first = []
+    orders_value_second = []
+    orders_value_third = []
+    orders_value_forth = []
+    if (period=='daily')
+      created_from = DateTime.now.beginning_of_day
+      created_to = created_from + 1.hours
+      interval = 8.hours
+      last = created_from + 3*interval-1.second
+    elsif (period=='monthly')
+      created_from = Date.today.beginning_of_month
+      created_to = created_from + 6.days
+      interval = 1.weeks
+      last = created_from.end_of_month
+    elsif (period=='yearly')
+      created_from = Date.today.beginning_of_year
+      created_to = created_from + (3.months-1.days)
+      interval = 3.months
+      last = created_from.end_of_year
+    end
+    if orders.present?
+      orders_value_first << orders.where('created_at >= ? and created_at < ?', created_from, created_to).count
+      orders_value_second << orders.where('created_at >= ? and created_at < ?', created_from + interval, created_to + interval).count
+      orders_value_third << orders.where('created_at >= ? and created_at < ?', created_from + 2*interval, created_to + 2*interval).count
+      orders_value_forth << orders.where('created_at >= ? and created_at < ?', created_from + 3*interval-(period=='daily'? (1.hours): 0), created_from + 3*interval-(period=='daily'? (1.second): 0)).count
+    end
+    { "orders_value_first": orders_value_first.sum, "orders_value_second": orders_value_second.sum, "orders_value_third": orders_value_third.sum, 
+      "orders_value_forth": orders_value_forth.sum, orders_total: orders_value_first.sum+orders_value_second.sum+orders_value_third.sum+orders_value_forth.sum }
+  end
+
   def sale_stats
     offer_sale_weekly_value = []
     offer_sale_daily_value = []

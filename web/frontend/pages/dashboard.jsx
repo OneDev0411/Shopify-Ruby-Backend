@@ -57,8 +57,8 @@ import {
 
 
       const resourceName = {
-        singular: 'customer',
-        plural: 'customers',
+        singular: 'offer',
+        plural: 'offers',
       };
 
       const {selectedResources, allResourcesSelected, handleSelectionChange} =
@@ -304,11 +304,8 @@ import {
           <Grid>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
               <LegacyCard title="Total sales" sectioned>
-                <h3 className="report-money"><strong>$100.00</strong></h3>
-                <div className="space-4"></div>
-                <p>SALES OVER TIME</p>
+                <TotalSalesData/>
                 <br/>
-                <c/>
               </LegacyCard>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
@@ -321,11 +318,7 @@ import {
               </LegacyCard>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <LegacyCard title="Total order" sectioned>
-                <h3 className="report-money"><strong>40</strong></h3>
-                <div className="space-4"></div>
-                <p>ORDERS OVER TIME</p>
-                <br/>
+              <LegacyCard title="Total orders" sectioned>
                 <OrderOverTimeData/>
               </LegacyCard>
             </Grid.Cell>
