@@ -19,8 +19,11 @@
     "@vitejs/plugin-react": "4.0",
     "react": "^18.2",
     "react-dom": "^18.2",
+    "react-mustache-template-component": "^2.0.3",
     "react-query": "^3.36",
     "react-router-dom": "^6.4",
+    "react-siema": "^1.0.1",
+    "siema": "^1.5.1",
     "vite": "^4.3"
   },
   "devDependencies": {

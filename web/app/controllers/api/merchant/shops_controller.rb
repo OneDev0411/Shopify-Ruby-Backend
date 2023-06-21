@@ -7,7 +7,7 @@ module Api
 
       # Get /api/merchant/current_shop
       def current_shop
-        @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shop]) if @icushop.present?
+        @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shopify_domain]) if @icushop.present?
         render "shops/current_shop"
       end
 

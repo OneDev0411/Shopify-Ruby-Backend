@@ -4,18 +4,39 @@ import {
 	LegacyCard,
 	Grid
 } from '@shopify/polaris';
-import TemplateComponent from 'react-mustache-template-component'
-import themeCss from '../assets/theme.css'
+import TemplateComponent from 'react-mustache-template-component';
+import themeCss from '../assets/theme.css';
+import Compact from './layouts/template_single_compact';
+import Stack from './layouts/template_multi_stack';
+import Carousel from './layouts/template_multi_carousel';
+import Flex from './layouts/template_multi_flex';
+import Siema from 'siema'
+
 
 export function OfferPreview(props) {
 
-	function disableSubmit(event) {
-		event.preventDefault();
-		console.log("Button is Clicked...");
-	}
 
 	const [checkKeysValidity, setCheckKeysValidity] = useState({});
 
+	function initCarousal() {
+		var mySiema, prev, next;
+		if (document.querySelector(".offer-collection") && document.querySelector('.js-prev')) {
+      debugger;
+      if (mySiema) {
+        mySiema.destroy(true);
+      }
+      mySiema = new Siema({
+        selector: '.offer-collection',
+        loop: true
+      });
+      prev = document.querySelector('.js-prev');
+      prev.addEventListener('click', function () { mySiema.prev() });
+      next = document.querySelector('.js-next');
+      next.addEventListener('click', function () { mySiema.next() });
+    }
+	}
+
+	// runs on first render and when shop attribute changes to apply checks on the attribute for the layout
 
 	useEffect(() => {
 		if(props.shop.css_options.main.marginTop && parseInt(props.shop.css_options.main.marginTop) > 0) {
@@ -92,6 +113,17 @@ export function OfferPreview(props) {
 		else {
 			setCheckKeysValidity(previousState => {
 	        	return { ...previousState, buttonFontFamily: false };
+	        });
+		}
+
+		if(props.shop.css_options.button.fontSize && parseInt(props.shop.css_options.button.fontSize) > 0) {
+			setCheckKeysValidity(previousState => {
+	        	return { ...previousState, buttonFontSize: true };
+	        });
+		}
+		else {
+			setCheckKeysValidity(previousState => {
+	        	return { ...previousState, buttonFontSize: false };
 	        });
 		}
 
@@ -188,130 +220,30 @@ export function OfferPreview(props) {
 	        	return { ...previousState, buttonPadding: false };
 	        });
 		}
-		debugger;
-	}, [props.shop]);
+			debugger;
+	},[props.shop]);
 
-	useEffect(() => {
+
+
+	if(props.offer.multi_layout == "compact") {
 		props.shop.checkKeysValidity = checkKeysValidity;
 		debugger;
-	}, [checkKeysValidity])
-
-
-	const template = `<div id="nudge-offer-{{ id }}" style="background-color: {{ css_options.main.backgroundColor }}; color: {{ css_options.main.color}}; {{#checkKeysValidity.mainMarginTop }} margin-top: {{css_options.main.marginTop}}; {{/checkKeysValidity.mainMarginTop}} {{#checkKeysValidity.mainMarginBottom }} margin-bottom: {{css_options.main.marginBottom}}; {{/checkKeysValidity.mainMarginBottom}} {{#checkKeysValidity.mainBorderWidth}} border: {{css_options.main.borderWidth}}px {{css_options.main.borderStyle}} {{css_options.main.borderColor}}; {{/checkKeysValidity.mainBorderWidth}} {{#checkKeysValidity.mainBorderRadius}} border-radius: {{css_options.main.borderRadius}}px; {{/checkKeysValidity.mainBorderRadius}}" class="nudge-offer  {{ theme }}{{#show_product_image}} with-image {{/show_product_image}} multi {{ multi_layout }}"
-     data-offerid="{{ id }}">
-  	{{#show_nothanks}}<a class="dismiss-button" onclick="InCartUpsell.dismissOffer({{ id }}); return false;">&times;</a>{{/show_nothanks}}
-    	{{#offerable_product_details}}
-     	{{#show_product_image}}
-        <div class="product-image-wrapper">
-          {{#link_to_product}}<a href="/products/{{ url }}">{{/link_to_product}}
-            <img src="//{{ medium_image_url }}" class="product-image {{ product_image_size }}">
-          {{#link_to_product}}</a>{{/link_to_product}}
-        </div>
-      {{/show_product_image}}
-      <div class="nudge-wrapper">
-        <div class="offer-text">{{{ text }}}</div>
-        
-        	<div class="product-title-wrapper">
-			  	{{#link_to_product }}
-			    	<a href="/products/{{ url }}">
-			  	{{/link_to_product}}
-			  	{{#show_product_title}}
-			    	<span class="product-title">
-			        	{{ title }}{{#show_product_price}}: {{/show_product_price}}
-			      	</span>
-			    {{/show_product_title}}
-			    {{#show_product_price}}
-
-		      		{{#show_compare_at_price}}
-		        		{{#available_json_variants.0.price_is_minor_than_compare_at_price}}
-		          			<span class='product-price-wrapper compare-at-price money'>
-		            			{{{ available_json_variants.0.compare_at_price }}}
-		          			</span>
-		        		{{/available_json_variants.0.price_is_minor_than_compare_at_price}}
-		      		{{/show_compare_at_price}}
-
-		    		<span class='product-price-wrapper money'>
-		    			{{{ available_json_variants.0.unparenthesized_price }}}
-		    		</span>
-		    	{{/show_product_price}}
-			  	{{#link_to_product }}
-			    	</a>
-			  	{{/link_to_product}}
-			</div>
-
-			<div class="variants" id="productform">
-			  {{#show_custom_field}}
-			  	<input class="custom-field {{#hide_variants_wrapper }} inline{{/hide_variants_wrapper }}" type="text" name="properties[{{custom_field_name}}]" id="icu-pcf1" placeholder="{{custom_field_placeholder}}" />
-			  {{#custom_field_2_name}}
-			  	<input class="custom-field" type="text" name="properties[{{custom_field_2_name}}]" id="icu-pcf2" placeholder="{{custom_field_2_placeholder}}" />
-			  {{/custom_field_2_name}}
-			  {{#custom_field_3_name}}
-			  <input class="custom-field" type="text" name="properties[{{custom_field_3_name}}]" id="icu-pcf3" placeholder="{{custom_field_3_placeholder}}" />
-			  {{/custom_field_3_name}}
-			  {{/show_custom_field}}
-			  <span class="variants-wrapper" {{#hide_variants_wrapper }} style="display: none" {{/hide_variants_wrapper }}>
-			    <select id="product-select-{{ offer_id }}" name="id-{{ offer_id }}" onchange="InCartUpsell.handleCollectionChange(this, {{ offer_id }})">
-			      {{#available_json_variants}}
-			      <option value="{{ id }}"
-			              data-image-url="{{ image_url }}"
-			              data-variant-compare-at-price="{{{ compare_at_price }}}"
-			              data-variant-price="{{{ unparenthesized_price }}}"
-			              {{#currencies}}
-			                data-variant-price-{{label}}="{{{ price }}}"
-			                data-variant-compare-at-price-{{label}}="{{{ compare_at_price }}}"
-			              {{/currencies}}>
-			        {{ title }} {{#show_variant_price}} {{{ price }}} {{/show_variant_price}}
-			      </option>
-			      {{/available_json_variants}}
-			    </select>
-			  </span>
-			  {{#show_variant_price}}
-			    {{#hide_variants_wrapper}}
-			      <span class="single-variant-price money">{{{ available_json_variants.0.price }}}</span>
-			    {{/hide_variants_wrapper }}
-			  {{/show_variant_price}}
-			  {{#show_quantity_selector}}
-			  <span class="quantity-wrapper">
-			    <select id="quantity-select" name="quantity">
-			      <option value="1">1</option>
-			      <option value="2">2</option>
-			      <option value="3">3</option>
-			      <option value="4">4</option>
-			      <option value="5">5</option>
-			      <option value="6">6</option>
-			      <option value="7">7</option>
-			      <option value="8">8</option>
-			      <option value="9">9</option>
-			      <option value="10">10</option>
-			    </select>
-			  </span>
-			  {{/show_quantity_selector}} {{^show_quantity_selector}}
-			  <input name="quantity" type="hidden" value="1"></input>
-			  {{/show_quantity_selector}}
-			  {{#recharge_subscription_id}}
-			  <input name="properties[interval_unit]" type="hidden" value="{{ interval_unit }}"></input>
-			  <input name="properties[interval_frequency]" type="hidden" value="{{ interval_frequency }}"></input>
-			  <input name="properties[recharge_subscription_id]" type="hidden" value="{{ recharge_subscription_id }}"></input>
-			  {{/recharge_subscription_id}}
-			  {{#show_spinner}}
-			  <button type="submit" name="add" class="bttn product-price" style="background-color: {{ css_options.button.backgroundColor }}; color: {{ css_options.button.color  }};">{{{ cta }}}</button>
-			  {{/show_spinner}}
-			  {{^show_spinner}}
-			  <input type="submit" name="add" class="bttn product-price" value="{{{ cta }}}" style="background-color: {{ css_options.button.backgroundColor }}; color: {{ css_options.button.color  }};" ></input>
-			  {{/show_spinner}}
-			</div>
-
-      </div>
-    {{/offerable_product_details}}
-      {{#show_powered_by }}
-        <div style="text-align: right; color: {{ powered_by_text_color }}; font-weight: normal; font-size: 11px; position: absolute; bottom: 0px; right: 5px;">Offer powered by
-        <a style="color: {{ powered_by_link_color }}; display: inline !important;" href="http://apps.shopify.com/in-cart-upsell?ref=app">In Cart Upsell</a>
-    </div>
-    {{/show_powered_by}}
-</div>`;
-	
-
-	return(
-			<TemplateComponent template={template} data={({...props.offer, ...props.shop,})} />
-	);
+		return <Compact offer={props.offer} shop={props.shop}/>;
+	}
+	else if(props.offer.multi_layout == "stack") {
+		props.shop.checkKeysValidity = checkKeysValidity;
+		debugger;
+		return <Stack offer={props.offer} shop={props.shop}/>
+	}
+	else if(props.offer.multi_layout == "carousel") {
+		initCarousal();
+		props.shop.checkKeysValidity = checkKeysValidity;
+		debugger;
+		return <Carousel offer={props.offer} shop={props.shop}/>
+	}
+	else if(props.offer.multi_layout == "flex") {
+		props.shop.checkKeysValidity = checkKeysValidity;
+		debugger;
+		return <Flex offer={props.offer} shop={props.shop}/>
+	}
 };
