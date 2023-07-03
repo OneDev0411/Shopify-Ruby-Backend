@@ -1,4 +1,4 @@
-import { Page, LegacyCard, Layout, Tabs, Icon, Grid } from '@shopify/polaris';
+import { Page, LegacyCard, Layout, Tabs, Icon, Grid, Spinner, Toast } from '@shopify/polaris';
 import { DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
 import { TitleBar } from "@shopify/app-bridge-react";
 import "../components/stylesheets/mainstyle.css";
@@ -18,6 +18,7 @@ export default function EditPage() {
         (selectedTabIndex) => setSelected(selectedTabIndex),
         [],
     );
+    const [checkKeysValidity, setCheckKeysValidity] = useState({});
 
     const [offer, setOffer] = useState({
     offerId: undefined,
@@ -104,14 +105,16 @@ export default function EditPage() {
         }
     });
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const shopId = 21;                                        // temp shopId, replaced by original shop id.
     const offerID = 23;
     const fetch = useAuthenticatedFetch();
 
     //Call on initial render
     useEffect(() => {
-        debugger;
         if(location.state != null && location.state?.offerId == null) {
+            setIsLoading(true);
             fetch(`/api/merchant/offer_settings`, {
                 method: 'POST',
                 headers: {
@@ -122,11 +125,12 @@ export default function EditPage() {
             .then( (response) => { return response.json() })
             .then( (data) => {
                 setOfferSettings(data);
+                setIsLoading(false);
             })
             .catch((error) => {
                 console.log("Error > ", error);
             })
- 
+            setIsLoading(true);
             fetch(`/api/merchant/shop_settings`, {
                 method: 'POST',
                 headers: {
@@ -135,16 +139,15 @@ export default function EditPage() {
                 body: JSON.stringify({ shop: { admin: null }, shop_id: shopId}),
             })
             .then( (response) => { return response.json() })
-            .then( (data) => {
-                
+            .then( (data) => { 
                 setShop(data);
             })
-            .catch((error) => {
-                
+            .catch((error) => {   
                 console.log("Error > ", error);
             })
         }
         else {
+            setIsLoading(true);
             fetch(`/api/merchant/load_offer_details`, {
                 method: 'POST',
                 headers: {
@@ -154,18 +157,18 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
-                debugger;
                 data.text = data.text_a.replace("{{ product_title }}", data.offerable_product_details[0].title)
                 data.cta = data.cta_a;
                 for(var i=0; i<data.offerable_product_details.length; i++) {
                     data.offerable_product_details[i].preview_mode = true;
                 }
                 setOffer(data);
+                setIsLoading(false);
             })
             .catch((error) => {
                 console.log("Error > ", error);
             })
-
+            setIsLoading(true);
             fetch(`/api/merchant/offer_settings`, {
                 method: 'POST',
                 headers: {
@@ -180,7 +183,7 @@ export default function EditPage() {
             .catch((error) => {
                 console.log("Error > ", error);
             })
-
+            setIsLoading(true);
             fetch(`/api/merchant/shop_settings`, {
                 method: 'POST',
                 headers: {
@@ -199,18 +202,12 @@ export default function EditPage() {
 
     },[]);
 
-    //Called when the 
-    function checkCssValidity() {
-        if(offer.css_options.main.marginTop && parseInt(props.css_options.main.marginTop) > 0) {
-            setCheckKeysValidity(previousState => {
-                return { ...previousState, mainMargintop: true };
-            });
-        }
-        else {
-            setCheckKeysValidity(previousState => {
-                return { ...previousState, mainMargintop: false };
-            });
-        }
+
+    //Called whenever the checkKeysValidity changes in any child component
+    function updateCheckKeysValidity(updatedKey, updatedValue) {
+        setCheckKeysValidity(previousState => {
+        return { ...previousState, [updatedKey]: updatedValue };
+        });
     }
 
 
@@ -285,7 +282,6 @@ export default function EditPage() {
     function save() {
         console.log("Shop >>",shop);
         console.log("Offer >>", offer)
-        debugger;
         var ots = {
             checkout_after_accepted: offer.checkout_after_accepted,
             custom_field_name: offer.custom_field_name,
@@ -347,12 +343,15 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
-                 debugger;
-                 location.state == null;
+                location.state = null;
+                data.text = data.text_a.replace("{{ product_title }}", data.offerable_product_details[0].title)
+                data.cta = data.cta_a;
+                for(var i=0; i<data.offerable_product_details.length; i++) {
+                    data.offerable_product_details[i].preview_mode = true;
+                }
                  setOffer(data.offer);
             })
             .catch((error) => {
-                debugger;
             })
             // offerUpdate(fetch, offer.id, shopId, ots);
         }
@@ -366,16 +365,18 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
-                debugger;
+                data.text = data.text_a.replace("{{ product_title }}", data.offerable_product_details[0].title)
+                data.cta = data.cta_a;
+                for(var i=0; i<data.offerable_product_details.length; i++) {
+                    data.offerable_product_details[i].preview_mode = true;
+                }
                 setOffer(data.offer);
             })
             .catch((error) => {
-                debugger;
             })
         }
 
         shop.id = shopId;
-
         fetch('/api/merchant/update_shop_settings', {
              method: 'POST',
                 headers: {
@@ -385,11 +386,9 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
-                debugger;
                 setShop(data.shop);
             })
             .catch((error) => {
-                debugger;
             })
     }
 
@@ -418,10 +417,19 @@ export default function EditPage() {
 
     // Preview section tab data
     const [selectedPre, setSelectedPre] = useState(0);
-    const handlePreTabChange = useCallback(
-        (selectedPreTabIndex) => setSelectedPre(selectedPreTabIndex),
-        [],
-    );
+    const handlePreTabChange = useCallback((selectedPreTabIndex) => { 
+        setSelectedPre(selectedPreTabIndex);
+        if (selectedPreTabIndex == 0) {
+            setShop(previousState => {
+                return { ...previousState, selectedView: 'desktop' };
+            });
+        }
+        else {
+            setShop(previousState => {
+                return { ...previousState, selectedView: 'mobile' };
+            });
+        }
+    },[]);
 
     const tabsPre = [
         {
@@ -450,67 +458,21 @@ export default function EditPage() {
         return await offerActivate(offer.id, 21);
     };
 
-  return (
-    // <div style={{ overflow: 'hidden' }}>
-        <Page
-            breadcrumbs={[{content: 'Products', url: '/'}]}
-            title="Create new offer"
-            primaryAction={{content: 'Publish', disabled: false, onClick: publishOffer}}
-            secondaryActions={[{content: 'Save Draft', disabled: false, onAction: () => save()}]}
-            style={{ overflow: 'hidden' }}
-        >
-            <TitleBar/>
-           {/* <Layout>
-                <Layout.Section>
-                    <Tabs
-                        tabs={tabs}
-                        selected={selected}
-                        onSelect={handleTabChange}
-                        disclosureText="More views"
-                        fitted
-                    >
-                        <div className='space-4'></div>
-
-                        {selected == 0 ?
-                            // page was imported from components folder
-                            <EditOfferTabs offer={offer} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer}/>
-                        : "" }
-                        {selected == 1 ?
-                            // page was imported from components folder
-                            <SecondTab offer={offer} offerSettings={offerSettings} updateOffer={updateOffer}/>
-                        : "" }
-                        {selected == 2 ?
-                            // page was imported from components folder
-                            <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop}/>
-                        : "" }
-                        {selected == 3 ?
-                            // page was imported from components folder
-                            <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings}/>
-                        : "" }
-                    </Tabs>
-                </Layout.Section>
-                <Layout.Section secondary>
-                    <Tabs
-                        tabs={tabsPre}
-                        selected={selectedPre}
-                        onSelect={handlePreTabChange}
-                        disclosureText="More views"
-                        fitted
-                    >
-                        <div className='space-4'></div>
-                        {selectedPre == 0 ?
-                            <OfferPreview offer={offer} shop={shop}/>
-                        : 
-                            <LegacyCard sectioned>
-                            </LegacyCard> }
-                    </Tabs>
-                </Layout.Section>
-            </Layout>*/}
-
-            <Layout>
-                <Layout.Section>
-                    <Grid>
-                        <Grid.Cell columnSpan={{xs: 6}}>
+    return (
+        <div style={{ overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', }}>
+            {isLoading ? (
+                <Spinner size="large" color="teal"/>
+            )   :   (
+                <Page
+                    breadcrumbs={[{content: 'Products', url: '/'}]}
+                    title="Create new offer"
+                    primaryAction={{content: 'Publish', disabled: false, onClick: publishOffer}}
+                    secondaryActions={[{content: 'Save Draft', disabled: false, onAction: () => save()}]}
+                    style={{ overflow: 'hidden' }}
+                >
+                    <TitleBar/>
+                    <Layout>
+                        <Layout.Section>
                             <Tabs
                                 tabs={tabs}
                                 selected={selected}
@@ -537,8 +499,8 @@ export default function EditPage() {
                                     <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings}/>
                                 : "" }
                             </Tabs>
-                        </Grid.Cell>
-                        <Grid.Cell columnSpan={{xs: 6}}>
+                        </Layout.Section>
+                        <Layout.Section secondary>
                             <Tabs
                                 tabs={tabsPre}
                                 selected={selectedPre}
@@ -548,18 +510,15 @@ export default function EditPage() {
                             >
                                 <div className='space-4'></div>
                                 {selectedPre == 0 ?
-                                    <OfferPreview offer={offer} shop={shop}/>
+                                    <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity}/>
                                 : 
-                                    <LegacyCard sectioned>
-                                    </LegacyCard> }
+                                    <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity}/>  }
                             </Tabs>
-                        </Grid.Cell>
-                    </Grid>
-
-                </Layout.Section>
-            </Layout>
-        </Page>
-    // </div>
-  );
+                        </Layout.Section>
+                    </Layout>
+                </Page>
+            )}
+        </div>
+    );
 }
 

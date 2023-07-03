@@ -11,7 +11,7 @@ import themeCss from '../../assets/theme.css';
 export default function Compact(props) {
 
 
-	const template = `<div id="nudge-offer-{{ id }}" style="background-color: {{ css_options.main.backgroundColor }}; color: {{ css_options.main.color}}; {{#checkKeysValidity.mainMarginTop }} margin-top: {{css_options.main.marginTop}}; {{/checkKeysValidity.mainMarginTop}} {{#checkKeysValidity.mainMarginBottom }} margin-bottom: {{css_options.main.marginBottom}}; {{/checkKeysValidity.mainMarginBottom}} {{#checkKeysValidity.mainBorderWidth}} border: {{css_options.main.borderWidth}}px {{css_options.main.borderStyle}}; {{/checkKeysValidity.mainBorderWidth}} {{#checkKeysValidity.mainBorderRadius}} border-radius: {{css_options.main.borderRadius}}px; {{/checkKeysValidity.mainBorderRadius}}" class="nudge-offer  {{ theme }}{{#show_product_image}} with-image {{/show_product_image}} multi {{ multi_layout }}"
+	const template = `<div id="nudge-offer-{{ id }}" style="background-color: {{ css_options.main.backgroundColor }}; color: {{ css_options.main.color}}; {{#mainMarginTop }} margin-top: {{css_options.main.marginTop}}; {{/mainMarginTop}} {{#mainMarginBottom }} margin-bottom: {{css_options.main.marginBottom}}; {{/mainMarginBottom}} {{#mainBorderWidth}} border: {{css_options.main.borderWidth}}px {{css_options.main.borderStyle}}; {{/mainBorderWidth}} {{#mainBorderRadius}} border-radius: {{css_options.main.borderRadius}}px; {{/mainBorderRadius}} {{ #mobileViewWidth }} width: 320px {{/ mobileViewWidth}}" class="nudge-offer  {{ theme }}{{#show_product_image}} with-image {{/show_product_image}} multi {{ multi_layout }}"
      data-offerid="{{ id }}">
   	{{#show_nothanks}}<a class="dismiss-button" onclick="InCartUpsell.dismissOffer({{ id }}); return false;">&times;</a>{{/show_nothanks}}
     	{{#offerable_product_details}}
@@ -21,7 +21,7 @@ export default function Compact(props) {
         </div>
       {{/show_product_image}}
       <div class="nudge-wrapper">
-        <div class="offer-text" style="{{#checkKeysValidity.textFontWeight}} font-weight: {{css_options.text.fontWeight}}; {{/checkKeysValidity.textFontWeight}}{{#checkKeysValidity.textFontFamily}} font-family: {{css_options.text.fontFamily}}; {{/checkKeysValidity.textFontFamily}} {{#checkKeysValidity.textFontSize}} font-size: {{css_options.text.fontSize}}; {{/checkKeysValidity.textFontSize}}">{{{ text }}}</div>
+        <div class="offer-text" style="{{#textFontWeight}} font-weight: {{css_options.text.fontWeight}}; {{/textFontWeight}}{{#textFontFamily}} font-family: {{css_options.text.fontFamily}}; {{/textFontFamily}} {{#textFontSize}} font-size: {{css_options.text.fontSize}}; {{/textFontSize}}">{{{ text }}}</div>
         
         <div class="product-title-wrapper">
 				  	{{#link_to_product }}
@@ -106,10 +106,10 @@ export default function Compact(props) {
 			  <input name="properties[recharge_subscription_id]" type="hidden" value="{{ recharge_subscription_id }}"></input>
 			  {{/recharge_subscription_id}}
 			  {{#show_spinner}}
-			  <button type="submit" name="add" class="bttn product-price" style="background-color: {{ css_options.button.backgroundColor }}; color: {{ css_options.button.color  }}; {{#checkKeysValidity.buttonBorderRadius}} border-radius: {{css_options.button.borderRadius}}px; {{/checkKeysValidity.buttonBorderRadius}} {{#checkKeysValidity.buttonFontWeight}} font-weight: {{css_options.button.fontWeight}}; {{/checkKeysValidity.buttonFontWeight}} {{#checkKeysValidity.buttonFontFamily}} font-family: {{css_options.button.fontFamily}}; {{/checkKeysValidity.buttonFontFamily}} {{#checkKeysValidity.button.fontSize}} {{css_options.button.fontSize}} {{/checkKeysValidity.button.fontSize}}">{{{ cta }}}</button>
+			  <button type="submit" name="add" class="bttn product-price" style="background-color: {{ css_options.button.backgroundColor }}; color: {{ css_options.button.color  }}; {{#buttonBorderRadius}} border-radius: {{css_options.button.borderRadius}}px; {{/buttonBorderRadius}} {{#buttonFontWeight}} font-weight: {{css_options.button.fontWeight}}; {{/buttonFontWeight}} {{#buttonFontFamily}} font-family: {{css_options.button.fontFamily}}; {{/buttonFontFamily}} {{#button.fontSize}} {{css_options.button.fontSize}} {{/button.fontSize}}">{{{ cta }}}</button>
 			  {{/show_spinner}}
 			  {{^show_spinner}}
-			  <input type="submit" name="add" class="bttn product-price" value="{{{ cta }}}" style="background-color: {{ css_options.button.backgroundColor }}; color: {{ css_options.button.color  }}; {{#checkKeysValidity.buttonBorderRadius}} border-radius: {{css_options.button.borderRadius}}px; {{/checkKeysValidity.buttonBorderRadius}} {{#checkKeysValidity.buttonFontWeight}} font-weight: {{css_options.button.fontWeight}}; {{/checkKeysValidity.buttonFontWeight}} {{#checkKeysValidity.buttonFontFamily}} font-family: {{css_options.button.fontFamily}}; {{/checkKeysValidity.buttonFontFamily}} {{#checkKeysValidity.buttonFontSize}} font-size: {{css_options.button.fontSize}} {{/checkKeysValidity.buttonFontSize}}" ></input>
+			  <input type="submit" name="add" class="bttn product-price" value="{{{ cta }}}" style="background-color: {{ css_options.button.backgroundColor }}; color: {{ css_options.button.color  }}; {{#buttonBorderRadius}} border-radius: {{css_options.button.borderRadius}}px; {{/buttonBorderRadius}} {{#buttonFontWeight}} font-weight: {{css_options.button.fontWeight}}; {{/buttonFontWeight}} {{#buttonFontFamily}} font-family: {{css_options.button.fontFamily}}; {{/buttonFontFamily}} {{#buttonFontSize}} font-size: {{css_options.button.fontSize}} {{/buttonFontSize}}" ></input>
 			  {{/show_spinner}}
 			</div>
 
@@ -124,6 +124,6 @@ export default function Compact(props) {
 	
 
 	return( 
-		<TemplateComponent template={template} data={({...props.offer, ...props.shop})}/>
+		<TemplateComponent template={template} data={({...props.offer, ...props.shop, ...props.checkKeysValidity})}/>
 	);
 };

@@ -15,235 +15,157 @@ import Siema from 'siema'
 
 export function OfferPreview(props) {
 
-
-	const [checkKeysValidity, setCheckKeysValidity] = useState({});
-
-	function initCarousal() {
-		var mySiema, prev, next;
-		if (document.querySelector(".offer-collection") && document.querySelector('.js-prev')) {
-      debugger;
-      if (mySiema) {
-        mySiema.destroy(true);
-      }
-      mySiema = new Siema({
-        selector: '.offer-collection',
-        loop: true
-      });
-      prev = document.querySelector('.js-prev');
-      prev.addEventListener('click', function () { mySiema.prev() });
-      next = document.querySelector('.js-next');
-      next.addEventListener('click', function () { mySiema.next() });
-    }
-	}
-
 	// runs on first render and when shop attribute changes to apply checks on the attribute for the layout
 
 	useEffect(() => {
+		combinedCss();
+	},[props.shop]);
+
+	function combinedCss () {
 		if(props.shop.css_options.main.marginTop && parseInt(props.shop.css_options.main.marginTop) > 0) {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, mainMarginTop: true };
-	        });
+			props.updateCheckKeysValidity("mainMarginTop", true );
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, mainMarginTop: false };
-	        });
+			props.updateCheckKeysValidity("mainMarginTop", false);
 		}
 
 		if(props.shop.css_options.main.marginBottom && parseInt(props.shop.css_options.main.marginBottom) > 0) {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, mainMarginBottom: true };
-	        });
+			props.updateCheckKeysValidity("mainMarginBottom", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, mainMarginbottom: false };
-	        });
+			props.updateCheckKeysValidity("mainMarginbottom", false);
 		}
 
 		if(props.shop.css_options.main.borderWidth && parseInt(props.shop.css_options.main.borderWidth) > 0) {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, mainBorderWidth: true };
-	        });
+			props.updateCheckKeysValidity("mainBorderWidth", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, mainBorderWidth: false };
-	        });
+			props.updateCheckKeysValidity("mainBorderWidth", false);
 		}
 
 		if(props.shop.css_options.main.borderRadius && parseInt(props.shop.css_options.main.borderRadius) != 4) {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, mainBorderRadius: true };
-	        });
+			props.updateCheckKeysValidity("mainBorderRadius", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, mainBorderRadius: false };
-	        });
+			props.updateCheckKeysValidity("mainBorderRadius", false);
 		}
 
 		if(props.shop.css_options.button.borderRadius && parseInt(props.shop.css_options.button.borderRadius) != 4) {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonBorderRadius: true };
-	        });
+			props.updateCheckKeysValidity("buttonBorderRadius", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonBorderRadius: false };
-	        });
+			props.updateCheckKeysValidity("buttonBorderRadius", false);
 		}
 
 		if(props.shop.css_options.button.fontWeight && props.shop.css_options.button.fontWeight != "bold") {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonFontWeight: true };
-	        });
+			props.updateCheckKeysValidity("buttonFontWeight", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonFontWeight: false };
-	        });
+			props.updateCheckKeysValidity("buttonFontWeight", false);
 		}
 
 		if(props.shop.css_options.button.fontFamily && (props.shop.css_options.button.fontFamily != "inherit" && props.shop.css_options.button.fontFamily != "")) {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonFontFamily: true };
-	        });
+			props.updateCheckKeysValidity("buttonFontFamily", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonFontFamily: false };
-	        });
+			props.updateCheckKeysValidity("buttonFontFamily", false);
 		}
 
 		if(props.shop.css_options.button.fontSize && parseInt(props.shop.css_options.button.fontSize) > 0) {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonFontSize: true };
-	        });
+			props.updateCheckKeysValidity("buttonFontSize", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonFontSize: false };
-	        });
+			props.updateCheckKeysValidity("buttonFontSize", false);
 		}
 
 		if(props.shop.css_options.button.width && (props.shop.css_options.button.width != "auto" && props.shop.css_options.button.width != "")) {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonWidth: true };
-	        });
+			props.updateCheckKeysValidity("buttonWidth", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonWidth: false };
-	        });
+			props.updateCheckKeysValidity("buttonWidth", false);
 		}
 
 		if(props.shop.css_options.button.textTransform && props.shop.css_options.button.textTransform != "inherit") {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonTextTransform: true };
-	        });
+			props.updateCheckKeysValidity("buttonTextTransform", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonTextTransform: false };
-	        });
+			props.updateCheckKeysValidity("buttonTextTransform", false);
 		}
 
 		if(props.shop.css_options.button.letterSpacing && props.shop.css_options.button.letterSpacing != "0") {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonLetterSpacing: true };
-	        });
+			props.updateCheckKeysValidity("buttonLetterSpacing", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonLetterSpacing: false };
-	        });
+			props.updateCheckKeysValidity("buttonLetterSpacing", false);
 		}
 
 		if(props.shop.css_options.text.fontWeight != "bold") {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, textFontWeight: true };
-	        });
+			props.updateCheckKeysValidity("textFontWeight", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, textFontWeight: false };
-	        });
+			props.updateCheckKeysValidity("textFontWeight", false);
 		}
 
 		if(props.shop.css_options.text.fontFamily != "inherit") {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, textFontFamily: true };
-	        });
+			props.updateCheckKeysValidity("textFontFamily", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, textFontFamily: false };
-	        });
+			props.updateCheckKeysValidity("textFontFamily", false);
 		}
 
 		if(props.shop.css_options.text.fontSize != "16px") {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, textFontSize: true };
-	        });
+			props.updateCheckKeysValidity("textFontSize", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, textFontSize: false };
-	        });
+			props.updateCheckKeysValidity("textFontSize", false);
 		}
 
 		if(props.shop.css_options.button.marginTop != "0px" || 
 			props.shop.css_options.button.marginRight != "0px" ||
         	props.shop.css_options.button.marginBottom != "5px" ||
         	props.shop.css_options.button.marginLeft != "0px") {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonMargin: true };
-	        });
+			props.updateCheckKeysValidity("buttonMargin", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonMargin: false };
-	        });
+			props.updateCheckKeysValidity("buttonMargin", false);
 		}
 
 		if(props.shop.css_options.button.paddingTop != "6px" || 
 			props.shop.css_options.button.paddingRight != "10px" ||
         	props.shop.css_options.button.paddingBottom != "6px" ||
         	props.shop.css_options.button.paddingLeft != "10px") {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonPadding: true };
-	        });
+			props.updateCheckKeysValidity("buttonPadding", true);
 		}
 		else {
-			setCheckKeysValidity(previousState => {
-	        	return { ...previousState, buttonPadding: false };
-	        });
+			props.updateCheckKeysValidity("buttonPadding", false);
 		}
-			debugger;
-	},[props.shop]);
+
+		if(props.shop.selectedView == "mobile") {
+			props.updateCheckKeysValidity("mobileViewWidth", true);
+			props.updateCheckKeysValidity("mainMarginTop", false);
+			props.updateCheckKeysValidity("mainMarginBottom", false);
+		}
+		else {
+			props.updateCheckKeysValidity("mobileViewWidth", false);
+		}
+	}
 
 
-
-	if(props.offer.multi_layout == "compact") {
-		props.shop.checkKeysValidity = checkKeysValidity;
-		debugger;
-		return <Compact offer={props.offer} shop={props.shop}/>;
-	}
-	else if(props.offer.multi_layout == "stack") {
-		props.shop.checkKeysValidity = checkKeysValidity;
-		debugger;
-		return <Stack offer={props.offer} shop={props.shop}/>
-	}
-	else if(props.offer.multi_layout == "carousel") {
-		initCarousal();
-		props.shop.checkKeysValidity = checkKeysValidity;
-		debugger;
-		return <Carousel offer={props.offer} shop={props.shop}/>
-	}
-	else if(props.offer.multi_layout == "flex") {
-		props.shop.checkKeysValidity = checkKeysValidity;
-		debugger;
-		return <Flex offer={props.offer} shop={props.shop}/>
-	}
+	return(
+		<div>
+			{
+				props.offer.multi_layout == "compact" ? (
+					<Compact offer={props.offer} shop={props.shop} checkKeysValidity={props.checkKeysValidity}/>
+				) : props.offer.multi_layout == "stack" ? (
+					<Stack offer={props.offer} shop={props.shop} checkKeysValidity={props.checkKeysValidity}/>
+				) : props.offer.multi_layout == "carousel" ? (
+					<Carousel offer={props.offer} shop={props.shop} checkKeysValidity={props.checkKeysValidity} updateCheckKeysValidity={props.updateCheckKeysValidity}/>
+				) : props.offer.multi_layout == "flex" ? (
+					<Flex offer={props.offer} shop={props.shop} checkKeysValidity={props.checkKeysValidity}/>
+				)	: (
+					<div></div>
+				)
+			}
+		</div>
+	);
 };
