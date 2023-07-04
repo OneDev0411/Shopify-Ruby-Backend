@@ -456,7 +456,20 @@ export default function EditPage() {
     ];
 
     async function publishOffer() {
-        return await offerActivate(offer.id, 21);
+        let url = '/api/merchant/offer_activate';
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({offer: {offer_id: offer.id}, shopify_domain: shopAndHost.shop})
+        })
+          .then((response) => response.json())
+          .then( (data) => {
+           offer.active = true;
+          })
+            .catch((error) => {
+          })
     };
 
     return (
