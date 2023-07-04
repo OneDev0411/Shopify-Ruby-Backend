@@ -4,7 +4,6 @@ import {CalendarMinor} from '@shopify/polaris-icons';
 import "../components/stylesheets/mainstyle.css";
 import {useState, useCallback} from 'react';
 import React from 'react';
-import { TotalSalesData, ConversionRate,OrderOverTimeData, AbTestingData, ClickThroughtRateData} from "../components";
   
 export default function AnalyticsOffers() { 
     const [active, setActive] = useState(false);
@@ -52,7 +51,7 @@ export default function AnalyticsOffers() {
               <div className="space-4"></div>
               <p>SALES OVER TIME</p>
               <br/>
-              <TotalSalesData/>
+              <p>placeholder for TotalSalesData component</p>
             </Card>
           </Grid.Cell>
           {/* Conversion rate */}
@@ -62,7 +61,7 @@ export default function AnalyticsOffers() {
               <div className="space-4"></div>
               <p>CONVERSION FUNNEL</p>
              
-              <ConversionRate/>
+              <p>placeholder for ConversionRate component</p>
             </Card>
           </Grid.Cell>
           {/* Total order */}
@@ -72,7 +71,7 @@ export default function AnalyticsOffers() {
               <div className="space-4"></div>
               <p>ORDERS OVER TIME</p>
               <br/>
-              <OrderOverTimeData/>
+              <p>placeholder for OrderOverTimeData component</p>
             </Card>
           </Grid.Cell>
           {/* A/B testing report */}
@@ -82,7 +81,7 @@ export default function AnalyticsOffers() {
               <div className="space-4"></div>
               <p>SALES OVER TIME</p>
               <br/>
-              <AbTestingData/>
+              <p>placeholder for AbTestingData component</p>
             </Card>
             <div className={'space-4'}></div>
             <Stack distribution="center">
@@ -96,7 +95,7 @@ export default function AnalyticsOffers() {
               <div className="space-4"></div>
               <p>CLICK THROUGH RATE</p>
               <br/>
-              <ClickThroughtRateData/>
+              <p>placeholder for ClickThroughtRateData component</p>
             </Card>
           </Grid.Cell>
           {/* top performing offers */}
