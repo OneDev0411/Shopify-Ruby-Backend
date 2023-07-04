@@ -1,4 +1,4 @@
-import { Page, LegacyCard, Layout, Tabs, Icon } from '@shopify/polaris';
+import { Page, LegacyCard, Layout, Tabs, Icon, Grid } from '@shopify/polaris';
 import { DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
 import { TitleBar } from "@shopify/app-bridge-react";
 import "../components/stylesheets/mainstyle.css";
@@ -9,6 +9,7 @@ import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 import { offerActivate, loadOfferDetails, getOfferSettings } from "../services/offers/actions/offer";
 import { useLocation } from 'react-router-dom';
 import { useSelector } from "react-redux";
+import { OfferPreview } from "../components/OfferPreview";
 
 
 export default function EditPage() {
@@ -108,12 +109,13 @@ export default function EditPage() {
         }
     });
                                         // temp shopId, replaced by original shop id.
-    const offerID = 23;
+    const offerID = 30;
     const fetch = useAuthenticatedFetch();
 
     //Call on initial render
     useEffect(() => {
-        if(location.state != null && location.state?.offerID == null) {
+        debugger;
+        if(location.state != null && location.state?.offerId == null) {
             fetch(`/api/merchant/offer_settings`, {
                 method: 'POST',
                 headers: {
@@ -155,6 +157,12 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
+                debugger;
+                data.text = data.text_a.replace("{{ product_title }}", data.offerable_product_details[0].title)
+                data.cta = data.cta_a;
+                for(var i=0; i<data.offerable_product_details.length; i++) {
+                    data.offerable_product_details[i].preview_mode = true;
+                }
                 setOffer(data);
             })
             .catch((error) => {
@@ -193,6 +201,22 @@ export default function EditPage() {
         }
 
     },[]);
+
+    //Called when the 
+    function checkCssValidity() {
+        if(offer.css_options.main.marginTop && parseInt(props.css_options.main.marginTop) > 0) {
+            setCheckKeysValidity(previousState => {
+                return { ...previousState, mainMargintop: true };
+            });
+        }
+        else {
+            setCheckKeysValidity(previousState => {
+                return { ...previousState, mainMargintop: false };
+            });
+        }
+    }
+
+
     //Called whenever the offer changes in any child component
     function updateOffer(updatedKey, updatedValue) {
         setOffer(previousState => {
@@ -263,7 +287,8 @@ export default function EditPage() {
     // Called when save button is clicked
     function save() {
         console.log("Shop >>",shop);
-        console.log("Offer >>", offerSettings)
+        console.log("Offer >>", offer)
+        debugger;
         var ots = {
             checkout_after_accepted: offer.checkout_after_accepted,
             custom_field_name: offer.custom_field_name,
@@ -342,9 +367,12 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
+                 setOffer(data.offer);
             })
             .catch((error) => {
+                debugger;
             })
+            // offerUpdate(fetch, offer.id, shopId, ots);
         }
 
         fetch('/api/merchant/update_shop_settings', {
@@ -356,8 +384,11 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
+                debugger;
+                setShop(data.shop);
             })
             .catch((error) => {
+                debugger;
             })
     }
 
@@ -415,63 +446,79 @@ export default function EditPage() {
     ];
 
     async function publishOffer() {
-        return await offerActivate(offer.id, 21);
+        let url = '/api/merchant/offer_activate';
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({offer: {offer_id: offer.id}, shopify_domain: shopAndHost.shop})
+        })
+          .then((response) => response.json())
+          .then( (data) => {
+           offer.active = true;
+          })
+            .catch((error) => {
+          })
     };
 
   return (
-    <Page
-        breadcrumbs={[{content: 'Products', url: '/'}]}
-        title="Create new offer"
-        primaryAction={{content: 'Publish', disabled: false, onClick: publishOffer}}
-        secondaryActions={[{content: 'Save Draft', disabled: false, onAction: () => save()}]}
-    >
-        <TitleBar/>
-        <Layout>
-            <Layout.Section>
-                <Tabs
-                    tabs={tabs}
-                    selected={selected}
-                    onSelect={handleTabChange}
-                    disclosureText="More views"
-                    fitted
-                >
-                    <div className='space-4'></div>
+    <div style={{ overflow: 'hidden' }}>
+        <Page
+            breadcrumbs={[{content: 'Products', url: '/'}]}
+            title="Create new offer"
+            primaryAction={{content: 'Publish', disabled: false, onClick: publishOffer}}
+            secondaryActions={[{content: 'Save Draft', disabled: false, onAction: () => save()}]}
+            style={{ overflow: 'hidden' }}
+        >
+            <TitleBar/>
+           <Layout>
+                <Layout.Section>
+                    <Tabs
+                        tabs={tabs}
+                        selected={selected}
+                        onSelect={handleTabChange}
+                        disclosureText="More views"
+                        fitted
+                    >
+                        <div className='space-4'></div>
 
-                    {selected == 0 ?
-                        // page was imported from components folder
-                        <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer}/>
-                    : "" }
-                    {selected == 1 ?
-                        // page was imported from components folder
-                        <SecondTab offer={offer} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} />
-                    : "" }
-                    {selected == 2 ?
-                        // page was imported from components folder
-                        <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop}/>
-                    : "" }
-                    {selected == 3 ?
-                        // page was imported from components folder
-                        <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings}/>
-                    : "" }
-                </Tabs>
-            </Layout.Section>
-            <Layout.Section secondary>
-                <Tabs
-                    tabs={tabsPre}
-                    selected={selectedPre}
-                    onSelect={handlePreTabChange}
-                    disclosureText="More views"
-                    fitted
-                >
-                    <div className='space-4'></div>
-                    {selectedPre == 0 ?
-                        <LegacyCard sectioned>
-                        </LegacyCard>
-                    : "" }
-                </Tabs>
-            </Layout.Section>
-        </Layout>
-    </Page>
+                        {selected == 0 ?
+                            // page was imported from components folder
+                            <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer}/>
+                        : "" }
+                        {selected == 1 ?
+                            // page was imported from components folder
+                            <SecondTab offer={offer} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} />
+                        : "" }
+                        {selected == 2 ?
+                            // page was imported from components folder
+                            <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop}/>
+                        : "" }
+                        {selected == 3 ?
+                            // page was imported from components folder
+                            <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings}/>
+                        : "" }
+                    </Tabs>
+                </Layout.Section>
+                <Layout.Section secondary>
+                    <Tabs
+                        tabs={tabsPre}
+                        selected={selectedPre}
+                        onSelect={handlePreTabChange}
+                        disclosureText="More views"
+                        fitted
+                    >
+                        <div className='space-4'></div>
+                        {selectedPre == 0 ?
+                            <LegacyCard sectioned>
+                            </LegacyCard>
+                        : "" }
+                    </Tabs>
+                </Layout.Section>
+            </Layout>
+        </Page>
+    </div>
   );
 }
 

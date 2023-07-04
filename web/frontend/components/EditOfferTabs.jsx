@@ -528,17 +528,17 @@ export function SecondTab(props){
 }
 
 export function ThirdTab(props){
-    const [layout, setLayout] = useState('Cart page');
     const [selected, setSelected] = useState(props.shop.css_options.main.borderStyle);
     const options = [
-        {label: 'Cart page', value: 'cartpage'},
-        {label: 'Product page', value: 'productpage'},
-        {label: 'Product and cart page', value: 'cartpageproductpage'},
-        {label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax'},
-        {label: 'AJAX and cart page', value: 'ajaxcartpage'}
+        {label: 'Compact', value: 'compact'},
+        {label: 'Stack', value: 'stack'},
+        {label: 'Carousel', value: 'carousel'},
+        {label: 'Flex', value: 'flex'},
     ];
 
-    const handleLayout = useCallback((value) => setLayout(value), []);
+    const handleLayout = useCallback((value) => {
+         props.updateOffer("multi_layout", value);
+    }, []);
     const handleSelectChange = useCallback((value) => setSelected(value), []);
 
     // Space above the offer
@@ -564,10 +564,10 @@ export function ThirdTab(props){
     ];
 
     //Border width
-    const handleBorderWidth = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "main", "borderWidth"), []);
+    const handleBorderWidth = useCallback((newValue) => props.updateShop(parseInt(newValue), "css_options", "main", "borderWidth"), []);
 
     //Border range slider
-    const handlesetBorderRange = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "main", "borderRadius"), []);
+    const handlesetBorderRange = useCallback((newValue) => props.updateShop(parseInt(newValue), "css_options", "main", "borderRadius"), []);
 
     // Toggle for manually added color
     const [open, setOpen] = useState(false);
@@ -604,6 +604,12 @@ export function ThirdTab(props){
     //Font weight
     const handleFontWeight = useCallback((newValue) => {
         props.updateShop(`${newValue}px`, "css_options", "text", "fontWeightInPixel");
+            if(parseInt(newValue) > 400 && props.shop.css_options.text.fontWeight != "bold") {
+                props.updateShop("bold", "css_options", "text", "fontWeight");
+            }
+            else if(parseInt(newValue) <= 400 && props.shop.css_options.text.fontWeight != "Normal" && props.shop.css_options.text.fontWeight != "inherit") {
+                props.updateShop("Normal", "css_options", "text", "fontWeight");
+            }
     }, []);
 
     //Font sizes
@@ -639,6 +645,12 @@ export function ThirdTab(props){
     //Button weight
     const handleBtnWeight = useCallback((newValue) => {
         props.updateShop(`${newValue}px`, "css_options", "button", "fontWeightInPixel");
+            if(parseInt(newValue) > 400 && props.shop.css_options.button.fontWeight != "bold") {
+                props.updateShop("bold", "css_options", "button", "fontWeight");
+            }
+            else if(parseInt(newValue) <= 400 && props.shop.css_options.button.fontWeight != "Normal" && props.shop.css_options.button.fontWeight != "inherit") {
+                props.updateShop("Normal", "css_options", "button", "fontWeight");
+            }
     }, []);
 
     //Button size
@@ -646,7 +658,7 @@ export function ThirdTab(props){
 
     // Btn radius
     const [rangeValue, setRangeValue] = useState(20);
-    const handleRangeSliderChange = useCallback((newValue) => props.updateShop(newValue, "css_options", "button", "borderRadius"), []);
+    const handleRangeSliderChange = useCallback((newValue) => props.updateShop(parseInt(newValue), "css_options", "button", "borderRadius"), []);
 
     //Sketch picker
     const handleOfferBackgroundColor = useCallback((newValue) => {
@@ -663,7 +675,7 @@ export function ThirdTab(props){
                                 label="Layout"
                                 options={options}
                                 onChange={handleLayout}
-                                value={layout}
+                                value={props.offer.multi_layout}
                             />
                         </Grid.Cell>
                     </Grid>

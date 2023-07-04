@@ -22,7 +22,7 @@ Rails.application.routes.draw do
       get 'shop_offers', to: 'offers#shop_offers'
       get '/products/shopify/:shopify_id' => 'products#shopify_details'
       get '/products/multi/:shopify_id' => 'products#details_for_multi'
-      patch 'update_shop_settings', to: 'shops#update_shop_settings'
+      post 'update_shop_settings', to: 'shops#update_shop_settings'
       get 'current_shop', to: 'shops#current_shop'
       get 'toggle_activation', to: 'shops#toggle_activation'
       put 'subscription', to: 'subscriptions#update'
