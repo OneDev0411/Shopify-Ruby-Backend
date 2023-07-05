@@ -111,7 +111,7 @@ export default function EditPage() {
 
     const [isLoading, setIsLoading] = useState(false);                                     // temp shopId, replaced by original shop id.
                                         // temp shopId, replaced by original shop id.
-    const offerID = 23;
+    const offerID = 30;
     const fetch = useAuthenticatedFetch();
 
     //Call on initial render
@@ -498,7 +498,7 @@ export default function EditPage() {
 
                                 {selected == 0 ?
                                     // page was imported from components folder
-                                    <EditOfferTabs offer={offer} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer}/>
+                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer}/>
                                 : "" }
                                 {selected == 1 ?
                                     // page was imported from components folder
