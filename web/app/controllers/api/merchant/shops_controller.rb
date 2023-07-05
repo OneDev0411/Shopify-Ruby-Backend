@@ -101,6 +101,17 @@ module Api
       end
     end
 
+    # Gets all Shops. POST  /api/merchant/shops_last_stats
+    def shop_offers_stats
+      begin
+        @offers_stats = @icushop.recent_stats
+        render "shops/shop_offers_stats"
+      rescue StandardError => e
+        Rails.logger.debug "Error Message: #{e.message}"
+        Rollbar.error("Error", e)
+      end
+    end
+
       private
 
       def shop_params

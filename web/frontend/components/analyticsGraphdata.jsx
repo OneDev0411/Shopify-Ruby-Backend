@@ -1,4 +1,4 @@
-import {DataTable} from '@shopify/polaris';
+import {LegacyCard, VerticalStack} from '@shopify/polaris';
 import React, { useEffect, useState, useCallback } from 'react';
 import {PolarisVizProvider, StackedAreaChart } from '@shopify/polaris-viz';
 import { useAuthenticatedFetch } from "../hooks";
@@ -22,7 +22,7 @@ export function TotalSalesData() {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const [period, setPeriod] = useState('daily');
     const [salesTotal, setSalesTotal] = useState(0);
-    const [salesData, setSalesData] = useState(null);
+    const [salesData, setSalesData] = useState(0);
     function getSalesData(period){
         let keys = setKeys(period);
         fetch(`/api/merchant/shop_sale_stats`, {
@@ -94,24 +94,57 @@ export function TotalSalesData() {
 
 
   export function ConversionRate(){
-    const rows = [
-        ['Emerald Silk Gown', 875],
-        ['Mauve Cashmere Scarf', 230],
-        ['Navy Merino Wool', 445],
-      ];
+    const fetch = useAuthenticatedFetch();
+    const shopAndHost = useSelector(state => state.shopAndHost);
+    const [conversionRate, setConversionRate] = useState(0);
+    const [addedToCart, setAddedToCart] = useState(0);
+    const [reachedCheckout, setReachedCheckout] = useState(0);
+    const [converted, setConverted] = useState(0);
+    const [totalDisplayed, setTotalDisplayed] = useState(0);
+
+    function getOffersStats(){
+        fetch(`/api/merchant/shop_offers_stats`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify( {shopify_domain: shopAndHost.shop }),
+        })
+        .then( (response) => { return response.json(); })
+        .then( (data) => {
+            setAddedToCart(data.offers_stats.times_clicked_total);
+            setTotalDisplayed(data.offers_stats.times_loaded_total);
+            setReachedCheckout(data.offers_stats.times_checkedout_total);
+            setConverted(data.orders_through_offers_count);
+        })
+        .catch((error) => {
+            console.log("error", error);
+        })
+    }
+    useEffect(()=>{
+        getOffersStats();
+    }, [])
     
     return(
-        <DataTable
-          columnContentTypes={[
-            'text',
-            'numeric',
-          ]}
-          headings={[
-            'Product',
-            'Price',
-          ]}
-          rows={rows}
-        />
+        <LegacyCard title="Conversion rate" sectioned>
+            <h3 className="report-money"><strong>{conversionRate}%</strong></h3>
+            <div className="space-4"></div>
+            <p>CONVERSION FUNNEL</p><br/>
+            <VerticalStack gap="5">
+                <div height="50px">
+                    <span>Added to cart</span><span style={{float: 'right'}}>{totalDisplayed>0 ? ((addedToCart/totalDisplayed)*100).toFixed(2) : 0}%</span>
+                    <div style={{color: 'grey'}}>{addedToCart>=0? addedToCart : 0} sessions</div>
+                </div>
+                <div height="50px">
+                    <span>Reached Checkout</span><span style={{float: 'right'}}>{totalDisplayed>0 ? ((reachedCheckout/totalDisplayed)*100).toFixed(2) : 0}%</span>
+                    <div style={{color: 'grey'}}>{reachedCheckout>=0? reachedCheckout : 0} sessions</div>
+                </div>
+                <div height="50px">
+                    <span>Sessions converted</span><span style={{float: 'right'}}>{totalDisplayed>0 ? ((converted/totalDisplayed)*100).toFixed(2) : 0}%</span>
+                    <div style={{color: 'grey'}}>{converted>=0? converted : 0} sessions</div>
+                </div>
+            </VerticalStack>
+        </LegacyCard>
     );
   }
 

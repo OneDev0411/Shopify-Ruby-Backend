@@ -34,6 +34,7 @@ Rails.application.routes.draw do
       post 'offer_deactivate', to: 'offers#deactivate'
       post 'shop_sale_stats', to: 'shops#shop_sale_stats'
       post 'shop_orders_stats', to: 'shops#shop_orders_stats'
+      post 'shop_offers_stats', to: 'shops#shop_offers_stats'
     end
   end
 

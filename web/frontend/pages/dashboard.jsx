@@ -11,7 +11,7 @@ import {
     Pagination,
     Grid, TextField
   } from '@shopify/polaris';
-  import { TotalSalesData, ConversionRate,OrderOverTimeData} from "../components";
+  import { TotalSalesData, ConversionRate, OrderOverTimeData} from "../components";
   import { TitleBar } from '@shopify/app-bridge-react';
   import { useState, useEffect, useCallback } from 'react';
   import { OffersList } from "../components";
@@ -309,13 +309,7 @@ import {
               </LegacyCard>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <LegacyCard title="Conversion rate" sectioned>
-                <h3 className="report-money"><strong>12%</strong></h3>
-                <div className="space-4"></div>
-                <p>CONVERSION FUNNEL</p>
-                <br/>
-                <ConversionRate/>
-              </LegacyCard>
+              <ConversionRate/>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
               <LegacyCard title="Total orders" sectioned>

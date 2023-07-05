@@ -185,7 +185,7 @@ module Graphable
   #
   # Returns Array of hashes.
   def gather_recent_stats
-    [:click_revenue, :times_loaded, :times_clicked].map do |field|
+    [:click_revenue, :times_loaded, :times_clicked, :times_checkedout].map do |field|
       total        = daily_stats.sum(field)
       current_week = daily_stats.where(last_weeks_range).sum(field)
       last_week    = daily_stats.where(last_weeks_range(false)).sum(field)
