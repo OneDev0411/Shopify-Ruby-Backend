@@ -96,7 +96,6 @@ export function TotalSalesData() {
   export function ConversionRate(){
     const fetch = useAuthenticatedFetch();
     const shopAndHost = useSelector(state => state.shopAndHost);
-    const [conversionRate, setConversionRate] = useState(0);
     const [addedToCart, setAddedToCart] = useState(0);
     const [reachedCheckout, setReachedCheckout] = useState(0);
     const [converted, setConverted] = useState(0);
@@ -127,7 +126,7 @@ export function TotalSalesData() {
     
     return(
         <LegacyCard title="Conversion rate" sectioned>
-            <h3 className="report-money"><strong>{conversionRate}%</strong></h3>
+            <h3 className="report-money"><strong>{totalDisplayed>0 ? ((converted/totalDisplayed)*100).toFixed(2) : 0}%</strong></h3>
             <div className="space-4"></div>
             <p>CONVERSION FUNNEL</p><br/>
             <VerticalStack gap="5">
