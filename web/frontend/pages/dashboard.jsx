@@ -303,18 +303,13 @@ import {
           <div className="space-10"></div>
           <Grid>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <LegacyCard title="Total sales" sectioned>
-                <TotalSalesData/>
-                <br/>
-              </LegacyCard>
+              <TotalSalesData/>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
               <ConversionRate/>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <LegacyCard title="Total orders" sectioned>
-                <OrderOverTimeData/>
-              </LegacyCard>
+              <OrderOverTimeData/>
             </Grid.Cell>
           </Grid>
           <div className='space-10'></div>

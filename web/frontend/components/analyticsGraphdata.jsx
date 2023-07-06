@@ -70,24 +70,26 @@ export function TotalSalesData() {
             }
         }}
         >
-        {salesData ? (<h3 className="report-money"><strong>${salesTotal}</strong></h3>):null}
-        <div className="space-4"></div>
-        <p>SALES OVER TIME</p><br/>
-        {salesData ? (<StackedAreaChart
-            comparisonMetric={{
-            accessibilityLabel: 'trending up 6%',
-            metric: '6%',
-            trend: 'positive'
-            }}
-            data={[
-            {
-                "name": "Revenue",
-                "data": salesData
-            },
-            ]}
-            legendPosition="left"
-            theme='Light'
-        />) : null}
+            <LegacyCard title="Total sales" sectioned>
+                {salesData ? (<h3 className="report-money"><strong>${salesTotal}</strong></h3>):null}
+                <div className="space-4"></div>
+                <p>SALES OVER TIME</p><br/>
+                {salesData ? (<StackedAreaChart
+                    comparisonMetric={{
+                    accessibilityLabel: 'trending up 6%',
+                    metric: '6%',
+                    trend: 'positive'
+                    }}
+                    data={[
+                    {
+                        "name": "Revenue",
+                        "data": salesData
+                    },
+                    ]}
+                    legendPosition="left"
+                    theme='Light'
+                />) : null}
+            </LegacyCard>
         </PolarisVizProvider>     
     );
   }
@@ -202,22 +204,24 @@ export function TotalSalesData() {
             }
         }}
         >
-        {ordersData? (<h3 className="report-money"><strong>{ordersTotal}</strong></h3>):null}
-        <div className="space-4"></div>
-        <p>ORDERS OVER TIME</p><br/>
-        {ordersData? (<StackedAreaChart
-            comparisonMetric={{
-            accessibilityLabel: 'trending up 6%',
-            metric: '6%',
-            trend: 'positive'
-            }}
-            data={[{
-                "name": "Orders",
-                "data": ordersData
-            }]}
-            legendPosition="left"
-            theme='Light'
-        />):null}
+            <LegacyCard title="Total orders" sectioned>
+                {ordersData? (<h3 className="report-money"><strong>{ordersTotal}</strong></h3>):null}
+                <div className="space-4"></div>
+                <p>ORDERS OVER TIME</p><br/>
+                {ordersData? (<StackedAreaChart
+                    comparisonMetric={{
+                    accessibilityLabel: 'trending up 6%',
+                    metric: '6%',
+                    trend: 'positive'
+                    }}
+                    data={[{
+                        "name": "Orders",
+                        "data": ordersData
+                    }]}
+                    legendPosition="left"
+                    theme='Light'
+                />):null}
+            </LegacyCard>
         </PolarisVizProvider>  
     );
 
