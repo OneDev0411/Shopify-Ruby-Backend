@@ -109,9 +109,9 @@ export default function EditPage() {
         }
     });
 
-    const [isLoading, setIsLoading] = useState(false);                                     // temp shopId, replaced by original shop id.
-                                        // temp shopId, replaced by original shop id.
-    const offerID = 30;
+    const [isLoading, setIsLoading] = useState(false);
+                                      
+    const offerID = location.state.offerID;
     const fetch = useAuthenticatedFetch();
 
     //Call on initial render
