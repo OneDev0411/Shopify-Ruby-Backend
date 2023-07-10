@@ -1,22 +1,68 @@
 import { forwardRef, useState, useEffect, useRef } from "react";
 import TemplateComponent from 'react-mustache-template-component';
 import themeCss from '../../assets/theme.css';
+import Siema from 'siema';
+import { Spinner } from '@shopify/polaris';
 
 export default function Carousel(props) {
-	const template = `<div id="nudge-offer-{{ id }}" style="background-color: {{ css_options.main.backgroundColor }}; color: {{ css_options.main.color}}; {{#checkKeysValidity.mainMarginTop }} margin-top: {{css_options.main.marginTop}}; {{/checkKeysValidity.mainMarginTop}} {{#checkKeysValidity.mainMarginBottom }} margin-bottom: {{css_options.main.marginBottom}}; {{/checkKeysValidity.mainMarginBottom}} {{#checkKeysValidity.mainBorderWidth}} border: {{css_options.main.borderWidth}}px {{css_options.main.borderStyle}}; {{/checkKeysValidity.mainBorderWidth}} {{#checkKeysValidity.mainBorderRadius}} border-radius: {{css_options.main.borderRadius}}px; {{/checkKeysValidity.mainBorderRadius}}" class="nudge-offer {{ theme }} {{#show_product_image}} with-image {{/show_product_image}} multi {{ multi_layout }} {{shop.extra_css_classes}}"
+
+	const [isLoading, setIsLoading] = useState(false)
+
+	let mySiema, prev, next;
+
+	useEffect(() => {
+		reinitCarousel();
+	}, []);
+
+
+	useEffect(() => {
+		setIsLoading(true);
+		if (document.querySelector(".offer-collection") && document.querySelector('.js-prev')) {
+		  if (mySiema) {
+		    mySiema.destroy(true);
+		  }
+		  mySiema = new Siema({
+		    selector: '.offer-collection',
+		    loop: true
+		  })
+		  prev = document.querySelector('.js-prev');
+		  prev.addEventListener('click', function () { mySiema.prev() });
+		  next = document.querySelector('.js-next');
+		  next.addEventListener('click', function () { mySiema.next() });
+		}
+		setIsLoading(false);
+	}, [props.checkKeysValidity])
+
+	
+	// Called everytime frequently to update the JS.
+	function reinitCarousel() {
+		if (document.querySelector(".offer-collection") && document.querySelector('.js-prev')) {
+		  if (mySiema) {
+		    mySiema.destroy(true);
+		  }
+		  mySiema = new Siema({
+		    selector: '.offer-collection',
+		    loop: true
+		  })
+		  props.updateCheckKeysValidity("carouselWidth", mySiema.selectorWidth);
+		  props.updateCheckKeysValidity("selectedCarouselWidth", true);
+		}
+	}
+
+	const template = `<div id="nudge-offer-{{ id }}" style="background-color: {{ css_options.main.backgroundColor }}; color: {{ css_options.main.color}}; {{#mainMarginTop }} margin-top: {{css_options.main.marginTop}}; {{/mainMarginTop}} {{#mainMarginBottom }} margin-bottom: {{css_options.main.marginBottom}}; {{/mainMarginBottom}} {{#mainBorderWidth}} border: {{css_options.main.borderWidth}}px {{css_options.main.borderStyle}}; {{/mainBorderWidth}} {{#mainBorderRadius}} border-radius: {{css_options.main.borderRadius}}px; {{/mainBorderRadius}} {{ #mobileViewWidth }} width: 320px {{/ mobileViewWidth}}" class="nudge-offer {{ theme }} {{#show_product_image}} with-image {{/show_product_image}} multi {{ multi_layout }} {{shop.extra_css_classes}}"
      data-offerid="{{ id }}">
   {{#show_nothanks}}
   <a class="dismiss-button" onclick="InCartUpsell.dismissOffer({{ id }}); return false;">
     &times;
   </a>
   {{/show_nothanks}}
-  <div class="offer-text" style="{{#checkKeysValidity.textFontWeight}} font-weight: {{css_options.text.fontWeight}}; {{/checkKeysValidity.textFontWeight}}{{#checkKeysValidity.textFontFamily}} font-family: {{css_options.text.fontFamily}}; {{/checkKeysValidity.textFontFamily}} {{#checkKeysValidity.textFontSize}} font-size: {{css_options.text.fontSize}}; {{/checkKeysValidity.textFontSize}}">{{{ text }}}</div>
-  <div class="offer-collection">
+  <div class="offer-text" style="{{#textFontWeight}} font-weight: {{css_options.text.fontWeight}}; {{/textFontWeight}}{{#textFontFamily}} font-family: {{css_options.text.fontFamily}}; {{/textFontFamily}} {{#textFontSize}} font-size: {{css_options.text.fontSize}}; {{/textFontSize}}">{{{ text }}}</div>
+  <div class="offer-collection" style="{{#selectedCarouselWidth}} width: {{carouselWidth}}px; {{/selectedCarouselWidth}}">
     {{#offerable_product_details}}
     <div class="product-wrapper">
       {{#show_product_image}}
       <div class="product-image-wrapper">
-          <img src="//{{ medium_image_url }}" class="product-image {{ product_image_size }}">
+          <img src="//{{ medium_image_url }}" class="product-image medium">
       </div>
       {{/show_product_image}}
       <div class="details">
@@ -107,10 +153,10 @@ export default function Carousel(props) {
 		  <input name="properties[recharge_subscription_id]" type="hidden" value="{{ recharge_subscription_id }}"></input>
 		  {{/recharge_subscription_id}}
 		  {{#show_spinner}}
-		  <button type="submit" name="add" class="bttn product-price" style="background-color: {{ css_options.button.backgroundColor }}; color: {{ css_options.button.color  }}; {{#checkKeysValidity.buttonBorderRadius}} border-radius: {{css_options.button.borderRadius}}px; {{/checkKeysValidity.buttonBorderRadius}} {{#checkKeysValidity.buttonFontWeight}} font-weight: {{css_options.button.fontWeight}}; {{/checkKeysValidity.buttonFontWeight}} {{#checkKeysValidity.buttonFontFamily}} font-family: {{css_options.button.fontFamily}}; {{/checkKeysValidity.buttonFontFamily}} {{#checkKeysValidity.button.fontSize}} {{css_options.button.fontSize}} {{/checkKeysValidity.button.fontSize}}">{{{ cta }}}</button>
+		  <button type="submit" name="add" class="bttn product-price" style="background-color: {{ css_options.button.backgroundColor }}; color: {{ css_options.button.color  }}; {{#buttonBorderRadius}} border-radius: {{css_options.button.borderRadius}}px; {{/buttonBorderRadius}} {{#buttonFontWeight}} font-weight: {{css_options.button.fontWeight}}; {{/buttonFontWeight}} {{#buttonFontFamily}} font-family: {{css_options.button.fontFamily}}; {{/buttonFontFamily}} {{#button.fontSize}} {{css_options.button.fontSize}} {{/button.fontSize}}">{{{ cta }}}</button>
 		  {{/show_spinner}}
 		  {{^show_spinner}}
-		  <input type="submit" name="add" class="bttn product-price" value="{{{ cta }}}" style="background-color: {{ css_options.button.backgroundColor }}; color: {{ css_options.button.color  }}; {{#checkKeysValidity.buttonBorderRadius}} border-radius: {{css_options.button.borderRadius}}px; {{/checkKeysValidity.buttonBorderRadius}} {{#checkKeysValidity.buttonFontWeight}} font-weight: {{css_options.button.fontWeight}}; {{/checkKeysValidity.buttonFontWeight}} {{#checkKeysValidity.buttonFontFamily}} font-family: {{css_options.button.fontFamily}}; {{/checkKeysValidity.buttonFontFamily}} {{#checkKeysValidity.buttonFontSize}} font-size: {{css_options.button.fontSize}} {{/checkKeysValidity.buttonFontSize}}" ></input>
+		  <input type="submit" name="add" class="bttn product-price" value="{{{ cta }}}" style="background-color: {{ css_options.button.backgroundColor }}; color: {{ css_options.button.color  }}; {{#buttonBorderRadius}} border-radius: {{css_options.button.borderRadius}}px; {{/buttonBorderRadius}} {{#buttonFontWeight}} font-weight: {{css_options.button.fontWeight}}; {{/buttonFontWeight}} {{#buttonFontFamily}} font-family: {{css_options.button.fontFamily}}; {{/buttonFontFamily}} {{#buttonFontSize}} font-size: {{css_options.button.fontSize}} {{/buttonFontSize}}" ></input>
 		  {{/show_spinner}}
 		</div>
 
@@ -131,6 +177,12 @@ export default function Carousel(props) {
 	
 
 	return( 
-		<TemplateComponent template={template} data={({...props.offer, ...props.shop})}/>
+		<>
+		{isLoading ? (
+				<Spinner/>
+			) : (
+				<TemplateComponent template={template} data={({...props.offer, ...props.shop, ...props.checkKeysValidity})}/>
+			)}
+		</>
 	);
 }

@@ -923,3 +923,66 @@
 }
 
 /*# sourceMappingURL=themes.css.map */
+
+
+
+
+
+
+
+
+
+.icu-offer-items{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        padding: 10px 0
+    }
+    
+    .icu-offer-items > .nudge-wrapper{
+        margin: 10px;
+        text-align: center;
+    }
+    
+/*    *******************************/
+    .nudge-offer.custom.multi.flex, .nudge-offer.custom{ 
+        color: #2B3D51;
+        background-color: #F1F1F1;
+    }
+    .nudge-offer.custom input.bttn, .nudge-offer.custom button.bttn, .nudge-offer.custom.multi.flex input.bttn, .nudge-offer.custom.multi.flex button.bttn {
+        color: #FFFFFF;
+        background-color: #1EAFBC;
+    }
+    .nudge-offer{ margin-bottom: 10px; }
+    .nudge-offer, .nudge-offer.multi.flex{
+        border-radius: 0px;
+    } 
+    .nudge-offer input.bttn, .nudge-offer button.bttn, nudge-offer.multi.flex input.bttn, .nudge-offer.multi.flex button.bttn{
+        border-radius: 2px; 
+        margin: 0px 0px 0px 0px; 
+    } 
+    .nudge-offer .offer-text, .nudge-offer .product-title{ } 
+    .nudge-offer.custom{ 
+        background-color: #F1F1F1;
+        color: #2B3D51; 
+    } .nudge-offer.custom input.bttn,.nudge-offer.custom button.bttn{
+        background-color: #1EAFBC;
+        color: #FFFFFF;
+    }.nudge-offer button {
+        visibility: visible !important;
+    }
+
+@media screen and (max-width: 600px){
+  .nudge-offer span.variants-wrapper select {
+      max-width: 190px !important;
+      padding: 0px 10px 0px 10px !important;
+      background-image: none !important;
+  }
+}
+
+@media screen and (max-width: 600px){
+  .nudge-offer.multi img{
+      max-width: 124px !important;
+      width: 124px !important;
+  }
+}
