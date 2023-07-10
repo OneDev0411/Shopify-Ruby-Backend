@@ -2,7 +2,7 @@
 module Api
   module Merchant
     class OffersController < ApiMerchantBaseController
-      before_action :find_shop, only: [:offer_settings, :update_from_builder, :offers_list, :activate, :deactivate]
+      before_action :find_shop, only: [:offer_settings, :update_from_builder, :offers_list, :activate, :deactivate, :duplicate, :destroy]
       before_action :set_offer, only: [:load_offer_details]
 
       # GET /api/merchant/shop_offers
@@ -124,6 +124,25 @@ module Api
         else
           render json: offer.errors, status: :bad_request
         end
+      end
+
+      def duplicate
+        offer = @icushop.offers.find(params[:id])
+        if offer.duplicate
+          render json: {offers: @icushop.offer_data_with_stats}
+        else
+          render json: {message: "Could not duplicate #{offer.id}"}, status: 400
+        end
+      end
+
+      def destroy
+        offer = @icushop.offers.find(params[:id])
+        offer.destroy
+        old_offer_ids = @icushop.old_offers || []
+        old_offer_ids << params[:id]
+        @icushop.update_attribute(:old_offers, old_offer_ids.uniq)
+        @icushop.publish_async
+        render json: { message: "Offer Deleted", offers: @icushop.offer_data_with_stats}
       end
 
 

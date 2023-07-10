@@ -107,8 +107,8 @@ export default function EditPage() {
           button: {},
         }
     });
-                                        // temp shopId, replaced by original shop id.
-    const offerID = 23;
+
+    const offerID = location.state.offerID;
     const fetch = useAuthenticatedFetch();
 
     //Call on initial render

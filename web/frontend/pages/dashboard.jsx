@@ -29,31 +29,6 @@ import {
     const fetch = useAuthenticatedFetch();
     const app = useAppBridge();
 
-  useEffect(()=>{
-    setIsLoading(true);
-    fetch('/api/merchant/offers_list', {
-      method: 'POST',
-      mode: 'cors',
-      cache: 'no-cache',
-      credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      redirect: 'follow',
-      referrerPolicy: 'no-referrer',
-      body: JSON.stringify({shopify_domain: shopAndHost.shop}),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('API Data >>> ', data);
-        localStorage.setItem('icushopify_domain', data.shopify_domain);
-        setOffersData(data.offers);
-        setFilteredData(data.offers);
-        setIsLoading(false);
-      }).catch((error) => {
-        console.log('Fetch error >> ', error);
-      });
-  },[]);
 
 
       const resourceName = {
@@ -80,27 +55,6 @@ import {
       const handleQueryValueChange = useCallback((value) => {
         setFilteredData(offersData.filter((o) => o.title.includes(value)));
       });
-
-      const promotedBulkActions = [
-        {
-          content: 'Duplicate Offer',
-          onAction: () => createDuplicateOffer(),
-        },
-      ];
-      const bulkActions = [
-        {
-          content: 'Publish',
-          onAction: () => activateSelectedOffer(),
-        },
-        {
-          content: 'Draft',
-          onAction: () => deactivateSelectedOffer(),
-        },
-        {
-          content: 'Delete',
-          onAction: () => deleteSelectedOffer(),
-        },
-      ];
 
       const filters = [
         {
@@ -152,155 +106,18 @@ import {
           </IndexTable.Row>
         ),
       );
-
-      function createDuplicateOffer() {
-        let url = `/api/offers/${selectedResources[0]}/duplicate`;
-        fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({offer_id: selectedResources[0], shopify_domain: shopAndHost.shop})
-        })
-          .then((response) => response.json())
-          .then( (data) => {
-            setFilteredData(data.offers);
-            setOffersData(data.offers);
-            selectedResources.shift();
-          })
-            .catch((error) => {
-          })
-      }
-
-      function deleteSelectedOffer() {
-        let url = `/api/offers/${selectedResources[0]}`;
-        fetch(url, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({offer_id: selectedResources[0], shopify_domain: shopAndHost.shop})
-        })
-          .then((response) => response.json())
-          .then( (data) => {
-            setFilteredData(data.offers);
-            setOffersData(data.offers);
-            selectedResources.shift();
-          })
-            .catch((error) => {
-          })
-      }
-
-      function activateSelectedOffer() {
-        let url = '/api/merchant/offer_activate';
-        fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({offer: {offer_id: selectedResources[0]}, shopify_domain: shopAndHost.shop})
-        })
-          .then((response) => response.json())
-          .then( (data) => {
-            const filteredDataDup = [...filteredData];
-            filteredDataDup.find((o) => o.id == selectedResources[0]).status = true;
-
-            setFilteredData([...filteredDataDup]);
-            selectedResources.shift();
-          })
-            .catch((error) => {
-          })
-      }
-
-      function deactivateSelectedOffer() {
-        let url = '/api/merchant/offer_deactivate';
-        fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({offer: {offer_id: selectedResources[0]}, shopify_domain: shopAndHost.shop})
-        })
-          .then((response) => response.json())
-          .then( (data) => {
-            const filteredDataDup = [...filteredData];
-            filteredDataDup.find((o) => o.id == selectedResources[0]).status = false;
-            setFilteredData([...filteredDataDup]);
-            selectedResources.shift();
-          })
-            .catch((error) => {
-          })
-      }
-
-
       return (
         <Page>
           <TitleBar
-              title="Your Offers"
+              title="Dashboard"
               primaryAction={{
               content: "Create Offer",
               onAction: () => console.log("create offer btn clicked"),
               }}
           />
-          <LegacyCard sectioned>
-            <div style={{display: 'flex'}}>
-              <div style={{flex: 1}}>
-                <Filters
-                  queryValue={queryValue}
-                  filters={filters}
-                  appliedFilters={appliedFilters}
-                  onQueryChange={handleQueryValueChange}
-                  onQueryClear={handleQueryValueRemove}
-                  onClearAll={handleClearAll}
-                />
-              </div>
-              <div style={{paddingLeft: '0.25rem'}}>
-                <Select
-                  labelInline
-                  label="Sort"
-                  options={sortOptions}
-                  value={sortValue}
-                  onChange={handleSortChange}
-                />
-              </div>
-            </div>
-            <IndexTable
-              resourceName={resourceName}
-              itemCount={offersData.length}
-              selectedItemsCount={
-                allResourcesSelected ? 'All' : selectedResources.length
-              }
-              onSelectionChange={handleSelectionChange}
-              hasMoreItems
-              bulkActions={bulkActions}
-              promotedBulkActions={promotedBulkActions}
-              lastColumnSticky
-              headings={[
-                {title: 'Offer'},
-                {title: 'Status'},
-                {title: 'Clicks'},
-                {title: 'Views'},
-                {title: 'Revenue', hidden: false},
-              ]}
-            >
-              {rowMarkup}
-            </IndexTable>
-            <div className="space-4"></div>
-            <div className="offer-table-footer">
-              <Pagination
-                label="1 of 10"
-                hasPrevious
-                onPrevious={() => {
-                  console.log('Previous');
-                }}
-                hasNext
-                onNext={() => {
-                  console.log('Next');
-                }}
-              />
-            </div>
-          </LegacyCard>
-          <div className="space-10"></div>
+          
+          <OffersList></OffersList>
+          
           <Grid>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
               <TotalSalesData/>
