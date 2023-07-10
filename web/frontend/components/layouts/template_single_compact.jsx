@@ -22,7 +22,7 @@ export default function Compact(props) {
 
 	          	<div style="display: flex; justify-content:center"> 
 	          		{{#show_product_image}}           
-                <img src="//{{ medium_image_url }}" class="product-image {{ product_image_size }}">
+                <img src="//{{ medium_image_url }}" class="product-image medium">
                 {{/show_product_image}}
 	            </div>
 	            {{#link_to_product }}

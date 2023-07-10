@@ -33,6 +33,8 @@ export default function Carousel(props) {
 		setIsLoading(false);
 	}, [props.checkKeysValidity])
 
+	
+	// Called everytime frequently to update the JS.
 	function reinitCarousel() {
 		if (document.querySelector(".offer-collection") && document.querySelector('.js-prev')) {
 		  if (mySiema) {
@@ -60,7 +62,7 @@ export default function Carousel(props) {
     <div class="product-wrapper">
       {{#show_product_image}}
       <div class="product-image-wrapper">
-          <img src="//{{ medium_image_url }}" class="product-image {{ product_image_size }}">
+          <img src="//{{ medium_image_url }}" class="product-image medium">
       </div>
       {{/show_product_image}}
       <div class="details">

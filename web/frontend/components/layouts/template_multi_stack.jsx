@@ -19,7 +19,7 @@ export default function Stack(props) {
     <div class="product-wrapper">
       {{#show_product_image}}
         <div class="product-image-wrapper">
-        	<img src="//{{ medium_image_url }}" class="product-image {{ product_image_size }}">
+        	<img src="//{{ medium_image_url }}" class="product-image medium">
         </div>
       {{/show_product_image}}
       <div class="details">

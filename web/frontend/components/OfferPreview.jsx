@@ -15,12 +15,11 @@ import Siema from 'siema'
 
 export function OfferPreview(props) {
 
-	// runs on first render and when shop attribute changes to apply checks on the attribute for the layout
-
 	useEffect(() => {
 		combinedCss();
 	},[props.shop]);
 
+	// Called everytime when any attribute in shop changes.
 	function combinedCss () {
 		if(props.shop.css_options.main.marginTop && parseInt(props.shop.css_options.main.marginTop) > 0) {
 			props.updateCheckKeysValidity("mainMarginTop", true );
