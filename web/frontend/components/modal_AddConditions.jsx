@@ -1,72 +1,160 @@
-import {Select,TextField,Stack} from '@shopify/polaris';
-import {useState, useCallback} from 'react';
+import { Select, TextField, LegacyStack, ResourceList, ResourceItem, OptionList } from '@shopify/polaris';
+import { useState, useCallback, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { SearchProductsList } from './SearchProductsList';
+import { countriesList } from "../components/countries.js";
+import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 
-export function ModalAddConditions() {
-  const [selected, setSelected] = useState('today');
-  const handleSelectChange = useCallback((value) => setSelected(value), []);
+export function ModalAddConditions(props) {
+  const fetch = useAuthenticatedFetch();
+  const shopAndHost = useSelector(state => state.shopAndHost);
 
-  const options = [
-    {label: 'Cart contain at least', value: 'cart_at_least'},
-    {label: 'Cart contain at most', value: 'cart_at_most'},
-    {label: 'Cart contains exactly', value: 'cart_exactly'},
-    {label: 'Cart does not contain any', value: 'cart_does_not_contain'},
-    {label: 'Cart contains variant', value: 'cart_contains_variant'},
-    {label: 'Cart does not contain variant', value: 'Cart does not contain variant'},
-    {label: 'Cart contains a product from vendor', value: 'cart_contains_item_from_vendor'},
-    {label: 'Cart does not contain any product from vendor', value: 'cart_does_not_contain_item_from_vendor'},
-    {label: 'Order Total Is At Least', value: 'total_at_least'},
-    {label: 'Order Total Is At Most', value: 'total_at_most'},
-    {label: 'Cookie is set', value: 'cookie_is_set'},
-    {label: 'Cookie is not set', value: 'cookie_is_not_set'},
-    {label: 'Customer is tagged', value: 'customer_is_tagged'},
-    {label: 'Customer is not tagged', value: 'customer_is_not_tagged'},
-    {label: 'Product/Cart URL contains', value: 'url_contains'},
-    {label: 'Product/Cart URL does not contain', value: 'url_does_not_contain'},
-    {label: 'Customer is located in', value: 'in_location'},
-    {label: 'Customer is not located in', value: 'not_in_location'},
-    {label: 'Customer is viewing this product/collection', value: 'on_product_this_product_or_in_collection'},
-    {label: 'Customer is not viewing this product/collection', value: 'on_product_not_this_product_or_not_in_collection'},
-  ];
+  const [queryValue, setQueryValue] = useState(null);
+  const [productData, setProductData] = useState("");
+  const [resourceListLoading, setResourceListLoading] = useState(false);
+  const [errorText, setErrorText] = useState(null);
 
-  //Quantity controllers
-  const [qtySelector, setQtySelector] = useState('1');
-  const handleQtySelectorChange = useCallback((newValue) => setQtySelector(newValue), []);
-  
-  //Select Product
-  const [value, setValue] = useState('');
-  const handleChange = useCallback((newValue) => setValue(newValue), []);
+  function findProduct() {
+    return (props.rule.rule_selector === 'cart_at_least' || props.rule.rule_selector === 'cart_at_most' || props.rule.rule_selector === 'cart_exactly' || props.rule.rule_selector === 'cart_does_not_contain' || props.rule.rule_selector === 'cart_contains_variant' || props.rule.rule_selector === 'cart_does_not_contain_variant' || props.rule.rule_selector === 'cart_contains_item_from_vendor' || props.rule.rule_selector === 'on_product_this_product_or_in_collection' || props.rule.rule_selector === 'on_product_not_this_product_or_not_in_collection')
+  }
+
+  function inputAmount() {
+    return props.rule.rule_selector === 'total_at_least' || props.rule.rule_selector === 'total_at_most'
+  }
+
+  function inputCountry() {
+    return props.rule.rule_selector === 'in_location' || props.rule.rule_selector === 'not_in_location'
+  }
+
+  const handleChange = (value, id) => { 
+    props.setRule(prev => ({ ...prev, [id]: value })) 
+  }
+
+  function updateQuery(childData) {
+    setResourceListLoading(true);
+    fetch('/api/merchant/element_search', {
+      method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify( {shopify_domain: shopAndHost.shop, product: { query: childData, type: 'product' }, json: true }),
+     })
+     .then( (response) => { return response.json(); })
+     .then( (data) => {
+        setResourceListLoading(false);
+        setProductData(data);
+     })
+     .catch((error) => {
+     })
+  }
+
+  const handleQueryValueChange = useCallback((value) => {
+    setQueryValue(value);
+    updateQuery(value);
+  }, [],
+  );
+
+  function updateSelectedProduct(title, id, selectedVariants) {
+    if (Array.isArray(id)) {
+      props.setRule(prev => ({ ...prev, item_shopify_id: id[0], item_name: title}))
+    }
+  }
+
+  function countryNames(){
+    var names = ['Select a country']
+    countriesList.map(([code, name]) => {
+      names.push(name)
+    })
+    return names;
+  }
 
   return (
     <>
-      <Stack distribution='fillEvenly'>
-        <Stack.Item>
+      <LegacyStack distribution='fillEvenly'>
+        <LegacyStack.Item>
           <Select
             label="Condition"
-            options={options}
-            onChange={handleSelectChange}
-            value={selected}
-          />
-        </Stack.Item>
-        <Stack.Item distribution='fillEvenly'>
-          <TextField
-            label="Quantity"
-            type="number"
-            value={qtySelector}
-            onChange={handleQtySelectorChange}
-            autoComplete="off"
-            className={"qtyCon"}
-          />
-        </Stack.Item>
-        <Stack.Item distribution='fillEvenly'>
-          <TextField
-            label="Select product or collection"
-            value={value}
+            options={props.condition_options}
+            id='rule_selector'
             onChange={handleChange}
-            autoComplete="off"
-            placeholder='Search product or collection'
+            value={props.rule.rule_selector}
           />
-        </Stack.Item>
-      </Stack>
+        </LegacyStack.Item>
+        {props.rule.rule_selector === 'cart_at_least' || props.rule.rule_selector === 'cart_at_most' || props.rule.rule_selector === 'cart_exactly' ? (
+          <LegacyStack.Item distribution='fillEvenly'>
+            <TextField
+              label="Quantity"
+              type="number"
+              id="quantity"
+              value={props.rule.quantity}
+              onChange={handleChange}
+              autoComplete="off"
+              className={"qtyCon"}
+              min={0}
+              error={props.quantityErrorText}
+            />
+          </LegacyStack.Item>
+        ) : null}
+        {findProduct() ? (
+          <>
+            <LegacyStack.Item distribution='fillEvenly'>
+              <TextField
+                label="Select product or collection"
+                value={queryValue}
+                onChange={handleQueryValueChange}
+                autoComplete="off"
+                placeholder='Search product or collection'
+                error={props.itemErrorText}
+              />
+            </LegacyStack.Item>
+            {productData ? (
+              <LegacyStack.Item>
+                <SearchProductsList shop={shopAndHost.shop} updateQuery={updateQuery} productData={productData} resourceListLoading={resourceListLoading} setResourceListLoading={setResourceListLoading} updateSelectedProduct={updateSelectedProduct} />
+              </LegacyStack.Item>
+            ) : null
+            }
+          </>
+        ) : null}
+        {inputAmount() ? (
+          <LegacyStack.Item distribution='fillEvenly'>
+            <TextField
+              label="Enter the amount in cents (or your local equivalent)"
+              type="number"
+              id= "item_name"
+              value={props.rule.item_name}
+              onChange={handleChange}
+              autoComplete="off"
+              className={"qtyCon"}
+              error={props.itemErrorText}
+            />
+          </LegacyStack.Item>
+        ) : null}
+        {inputCountry() ? (
+          <LegacyStack.Item>
+          <Select
+            label="Select a country"
+            options={countryNames()}
+            id='item_name'
+            onChange={handleChange}
+            value={props.rule.item_name}
+            error={props.itemErrorText}
+          />
+        </LegacyStack.Item>
+        ) : null}
+        {(!findProduct() && !inputAmount()) && !inputCountry()? (
+          <LegacyStack.Item distribution='fillEvenly'>
+            <TextField
+              label="Value"
+              type="text"
+              id="item_name"
+              value={props.rule.item_name}
+              onChange={handleChange}
+              autoComplete="off"
+              error={props.itemErrorText}
+            />
+          </LegacyStack.Item>
+        ) : null}
+      </LegacyStack>
     </>
   );
 }

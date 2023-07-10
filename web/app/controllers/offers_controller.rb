@@ -3,8 +3,8 @@
 
 class OffersController < AuthenticatedController
 
-  before_action :offer_params, only: [:update_from_builder]
-  before_action :set_shop, only: [:update_from_builder, :create_from_builder]
+  before_action :offer_params, only: [:update_from_builder, :create_from_builder]
+  before_action :set_shop, only: [:update_from_builder, :create_from_builder, :duplicate, :destroy]
 
 
   # POST   /offers/:shop_id/builder(.:format)
@@ -66,11 +66,31 @@ class OffersController < AuthenticatedController
     end
   end
 
+  def duplicate
+    offer = @icushop.offers.find(params[:id])
+    if offer.duplicate
+      render json: {offers: @icushop.offer_data_with_stats}
+    else
+      render json: {message: "Could not duplicate #{offer.id}"}, status: 400
+    end
+  end
+
+  def destroy
+    offer = @icushop.offers.find(params[:id])
+    offer.destroy
+    old_offer_ids = @icushop.old_offers || []
+    old_offer_ids << params[:id]
+    @icushop.update_attribute(:old_offers, old_offer_ids.uniq)
+    @icushop.publish_async
+    render json: { message: "Offer Deleted", offers: @icushop.offer_data_with_stats}
+  end
+
   
   private
 
   def set_shop
-    @icushop = Shop.find(params[:shop_id])
+    @icushop = Shop.find(params[:shop_id]) if params[:shop_id]
+    @icushop = Shop.find_by(shopify_domain: params[:shopify_domain]) if params[:shopify_domain]
   end
 
   def offer_params

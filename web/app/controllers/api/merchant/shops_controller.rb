@@ -3,6 +3,7 @@ module Api
   module Merchant
     class ShopsController < ApiMerchantBaseController
       before_action :find_shop
+      before_action :set_admin, only: [:shop_settings, :update_shop_settings]
       before_action :ensure_plan
 
       # Get /api/merchant/current_shop
@@ -13,7 +14,8 @@ module Api
 
       #POST /api/merchant/shop_settings
       def shop_settings
-        render json: @icushop.shop_settings(@admin)
+        @shop_settings = @icushop.shop_settings(@admin)
+        render "shops/shop_settings"
       end
 
       #PATCH /api/merchant/update_shop_settings
@@ -29,17 +31,17 @@ module Api
         @icushop.custom_product_page_dom_selector = opts['custom_product_page_dom_selector']
         @icushop.custom_product_page_dom_action = opts['custom_product_page_dom_action']
         @icushop.css_options = opts['css_options']
-        @icushop.custom_bg_color = opts['css_options']['main']['backgroundColor']
-        @icushop.custom_button_bg_color = opts['css_options']['button']['backgroundColor']
-        @icushop.custom_button_text_color = opts['css_options']['button']['color']
-        @icushop.custom_text_color = opts['css_options']['main']['color']
+        @icushop.custom_bg_color = opts['css_options']['main']['backgroundColor'] || opts['custom_bg_color']
+        @icushop.custom_button_bg_color = opts['css_options']['button']['backgroundColor'] || opts['custom_button_bg_color']
+        @icushop.custom_button_text_color = opts['css_options']['button']['color'] || opts['custom_button_text_color']
+        @icushop.custom_text_color = opts['css_options']['main']['color'] || opts['custom_text_color']
         @icushop.custom_theme_template = opts['custom_theme_template']
         @icushop.offer_css = opts['offer_css']
         @icushop.tax_percentage = opts['tax_percentage']
         @icushop.money_format = opts['money_format']
         @icushop.show_spinner = opts['show_spinner']
         @icushop.stats_from = opts['stats_from'].present? ? Time.parse(opts['stats_from']) : nil
-
+  
         # ADMIN OPTS
         if @admin
           @icushop.review = opts['review']
@@ -63,16 +65,18 @@ module Api
         if @icushop.save
           @icushop.publish_async  # trigger update
 
-          render json: { shop: @icushop.shop_settings(@admin) }
+          @message = "Shop settings saved!"
         else
-          render json: { error: @icushop.errors.full_messages.first }, status: :bad_request
+          @message = @icushop.errors.full_messages.first
         end
+        render "shops/update_shop_settings"
       end
 
       #GET /api/merchant/toggle_activation
       def toggle_activation
         @icushop.update_attribute(:activated, !@icushop.activated)
         @icushop.force_purge_cache
+        render "shops/toggle_activation"
       end
 
       private
@@ -85,7 +89,20 @@ module Api
       end
 
       def set_admin
-        @admin = shop_params['admin'] || params['admin']
+        if params['shop']
+          @admin = shop_params['admin'] 
+        else
+          @admin = params['admin']
+        end
+      end
+
+      def css_options
+        opts = %w[backgroundColor color marginTop marginBottom marginLeft marginRight borderColor
+                  borderStyle width paddingLeft borderRadius paddingTop paddingRight
+                  paddingBottom paddingLeft fontSize fontFamily fontWeight
+                  borderWidth justifyContent letterSpacing textTransform fontWeightInPixel]
+        { 'css_options' => { 'main' => opts, 'button' => opts, 'text' => opts,
+                             'image' => opts, 'custom' => opts } }
       end
 
       def css_options

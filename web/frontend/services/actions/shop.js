@@ -11,7 +11,7 @@ export function getShop(shopify_domain) {
 
 export function setShopSettings(shop_params, shop_id) {
   return api.patch(UPDATE_SHOP_SETTINGS, {
-    shopify_domain: shop_params,
+    shop: shop_params,
     shop_id: shop_id
   });
 }
