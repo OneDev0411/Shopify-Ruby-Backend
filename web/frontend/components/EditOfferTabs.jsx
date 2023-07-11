@@ -36,9 +36,15 @@ export function EditOfferTabs(props) {
     const [altOfferText, setAltOfferText] = useState("");
     const [altBtnTitle, setAltBtnTitle] = useState("");
     const handleTitleChange = useCallback((newValue) => props.updateOffer("title", newValue), []);
-    const handleTextChange = useCallback((newValue) => props.updateOffer("text_a", newValue), []);
+    const handleTextChange = useCallback((newValue) => {
+        props.updateOffer("text_a", newValue);
+        props.updateOffer("text", newValue.replace("{{ product_title }}", props.offer.offerable_product_details[0].title));
+    }, []);
     const handleAltTextChange = useCallback((newValue) => props.updateOffer("text_b", newValue), []);
-    const handleBtnChange = useCallback((newValue) => props.updateOffer("cta_a", newValue), []);
+    const handleBtnChange = useCallback((newValue) => {
+        props.updateOffer("cta_a", newValue);
+        props.updateOffer('cta', newValue);
+    }, []);
     const handleAltBtnChange = useCallback((newValue) => props.updateOffer("cta_b", newValue), []);
     //checkbox controls
     const [abTestCheck, setAbTestCheck] = useState(false);
@@ -134,8 +140,11 @@ export function EditOfferTabs(props) {
 
     //Called when the save button of popup modal is clicked
     function updateProducts() {
-        props.updateOffer("offerable_product_details", []);
-        props.updateOffer("offerable_product_shopify_ids", []);
+        if(selectedProducts.length > 0) {
+            props.updateOffer("offerable_product_details", []);
+            props.updateOffer("offerable_product_shopify_ids", []);
+        }
+        var responseCount = 0;
         for(var i=0; i<selectedProducts.length; i++) {
             fetch(`/api/merchant/products/multi/${selectedProducts[i]}?shop_id=${props.shop.shop_id}`, {
                 method: 'GET',
@@ -147,6 +156,11 @@ export function EditOfferTabs(props) {
             .then( (data) => {
                 props.updateProductsOfOffer(data);
                 setProductData("");
+                if(responseCount == 0) {
+                    props.updateOffer("text", props.offer.text_a.replace("{{ product_title }}", data.title));
+                    props.updateOffer('cta', props.offer.cta_a);
+                }
+                responseCount++;
             })
             .catch((error) => {
                 console.log("# Error updateProducts > ", JSON.stringify(error));
