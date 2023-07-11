@@ -317,7 +317,14 @@ export function SecondTab(props){
     const [quantityErrorText, setQuantityErrorText] = useState(null);
     const [itemErrorText, setItemErrorText] = useState(null);
     const quantityArray = ['cart_at_least', 'cart_at_most', 'cart_exactly'];
-    const orderArray = ['total_at_least', 'total_at_most']
+    const orderArray = ['total_at_least', 'total_at_most'];
+    const [cartPage, setCartPage] = useState(false);
+    const [productPage, setProductPage] = useState(false);
+    const [productAndCartPage, setProductAndCartPage] = useState(false);
+    const [ajax, setAjax] = useState(false);
+    const [ajaxAndCartPage, setAjaxAndCartPage] = useState(false);
+    const [defaultSetting, setDefaultSetting] = useState(false);
+    const [useTemplate, setUseTemplate] = useState(false);
 
     function upadteCondition () {
         if(quantityArray.includes(rule.rule_selector)){
@@ -376,6 +383,60 @@ export function SecondTab(props){
         }
       setSelected(value);
     }, []);
+
+    const handleCartPageChange = useCallback((value) => {
+        if(value) {
+            setCartPage(true);
+        }
+        else {
+            setCartPage(false);
+        }
+    })
+
+    const handleProductPageChange = useCallback((value) => {
+        if(value) {
+            setPartPage(true);
+        }
+        else {
+            setPartPage(false);
+        }
+    })
+
+    const handleProductAndCartPageChange = useCallback((value) => {
+        if(value) {
+            setProductAndCartPage(true);
+        }
+        else {
+            setProductAndCartPage(false);
+        }
+    })
+
+    const handleAjaxChange = useCallback((value) => {
+        if(value) {
+            setAjax(true);
+        }
+        else {
+            setAjax(false);
+        }
+    })
+
+    const handleDefaultSettingChange = useCallback((value) => {
+        if(value) {
+            setDefaultSetting(true);
+        }
+        else {
+            setDefaultSetting(false);
+        }
+    })
+
+    const handleUseTemplateChange = useCallback((value) => {
+        if(value) {
+            setUseTemplate(true);
+        }
+        else {
+            setUseTemplate(false);
+        }
+    })
 
   const options = [
       {label: 'Cart page', value: 'cartpage'},
@@ -467,6 +528,71 @@ export function SecondTab(props){
                             options={options}
                             onChange={handleSelectChange}
                             value={selected}
+                        />
+                    </Grid.Cell>
+                </Grid>
+                </LegacyCard.Section>
+            </LegacyCard>
+            <LegacyCard title="Choose placement" sectioned>
+                <LegacyCard.Section title="Where would you like your offer to appear?">
+                <Grid>
+                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Checkbox
+                            label="Cart Page"
+                            value={cartPage}
+                            onChange={handleCartPageChange}
+                        />
+                    </Grid.Cell>
+                </Grid>
+                <Grid>
+                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Checkbox
+                            label="Product Page"
+                            onChange={handleSelectChange}
+                        />
+                    </Grid.Cell>
+                </Grid>
+                <Grid>
+                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Checkbox
+                            label="Product and Cart Page"
+                            onChange={handleSelectChange}
+                        />
+                    </Grid.Cell>
+                </Grid>
+                <Grid>
+                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Checkbox
+                            label="Ajax Cart"
+                            onChange={handleSelectChange}
+                        />
+                    </Grid.Cell>
+                </Grid>
+                <Grid>
+                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Checkbox
+                            label="Ajax and Cart Page"
+                            onChange={handleSelectChange}
+                        />
+                    </Grid.Cell>
+                </Grid>
+                </LegacyCard.Section>
+                <LegacyCard.Section title="Where on this page would you like for this offer to appear?">
+                <Grid>
+                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Checkbox
+                            label="Use default settings"
+                            checked={defaultSetting}
+                            onChange={handleDefaultSettingChange}
+                        />
+                    </Grid.Cell>
+                </Grid>
+                <Grid>
+                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Checkbox
+                            label="Use Template"
+                            checked={useTemplate}
+                            onChange={handleUseTemplateChange}
                         />
                     </Grid.Cell>
                 </Grid>
