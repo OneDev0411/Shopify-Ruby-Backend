@@ -336,7 +336,7 @@ export default function EditPage() {
           ots.interval_unit = offer.interval_unit;
           ots.interval_frequency = offer.interval_frequency;
         }
-        if(location.state != null && location.state?.offerId == null) {
+        if(location.state != null && location.state?.offerID == null) {
             fetch(`/api/offers/create/${shop.shop_id}`, {
                 method: 'POST',
                 headers: {
