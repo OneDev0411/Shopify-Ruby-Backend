@@ -7,8 +7,10 @@ import { useSelector } from 'react-redux';
 import React, { useState, useEffect, useCallback } from "react";
 import { Redirect, Toast } from '@shopify/app-bridge/actions';
 import { Partners, SettingTabs, GenericTitleBar } from "../components";
+import { useAuthenticatedFetch } from "../hooks";
 
 export default function Settings() {
+    const fetch = useAuthenticatedFetch();
     const shop = useSelector(state => state.shopAndHost.shop);
     const [currentShop, setCurrentShop] = useState(null);
     const [formData, setFormData] = useState({});
