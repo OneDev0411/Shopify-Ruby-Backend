@@ -79,6 +79,39 @@ module Api
         render "shops/toggle_activation"
       end
 
+       # Gets shop sale stats. POST  /api/merchant/shops_sale_stats
+      def shop_sale_stats
+        begin
+          @sales_stats = @icushop.sales_stats(params[:period])
+          render "shops/shop_sale_stats"
+        rescue StandardError => e
+          Rails.logger.debug "Error Message: #{e.message}"
+          Rollbar.error("Error", e)
+        end
+      end
+
+      # Gets shop orders stats. POST  /api/merchant/shops_orders_stats
+      def shop_orders_stats
+      begin
+        @orders_stats = @icushop.orders_stats(params[:period])
+        render "shops/shop_orders_stats"
+      rescue StandardError => e
+        Rails.logger.debug "Error Message: #{e.message}"
+        Rollbar.error("Error", e)
+      end
+    end
+
+    # Gets all Shops. POST  /api/merchant/shops_last_stats
+    def shop_offers_stats
+      begin
+        @offers_stats = @icushop.recent_stats
+        render "shops/shop_offers_stats"
+      rescue StandardError => e
+        Rails.logger.debug "Error Message: #{e.message}"
+        Rollbar.error("Error", e)
+      end
+    end
+
       private
 
       def shop_params

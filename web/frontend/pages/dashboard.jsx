@@ -11,7 +11,7 @@ import {
     Pagination,
     Grid, TextField
   } from '@shopify/polaris';
-  import { TotalSalesData, ConversionRate,OrderOverTimeData} from "../components";
+  import { TotalSalesData, ConversionRate, OrderOverTimeData} from "../components";
   import { TitleBar } from '@shopify/app-bridge-react';
   import { useState, useEffect, useCallback } from 'react';
   import { OffersList } from "../components";
@@ -32,8 +32,8 @@ import {
 
 
       const resourceName = {
-        singular: 'customer',
-        plural: 'customers',
+        singular: 'offer',
+        plural: 'offers',
       };
 
       const {selectedResources, allResourcesSelected, handleSelectionChange} =
@@ -120,31 +120,13 @@ import {
           
           <Grid>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <LegacyCard title="Total sales" sectioned>
-                <h3 className="report-money"><strong>$100.00</strong></h3>
-                <div className="space-4"></div>
-                <p>SALES OVER TIME</p>
-                <br/>
-                <c/>
-              </LegacyCard>
+              <TotalSalesData/>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <LegacyCard title="Conversion rate" sectioned>
-                <h3 className="report-money"><strong>12%</strong></h3>
-                <div className="space-4"></div>
-                <p>CONVERSION FUNNEL</p>
-                <br/>
-                <ConversionRate/>
-              </LegacyCard>
+              <ConversionRate/>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <LegacyCard title="Total order" sectioned>
-                <h3 className="report-money"><strong>40</strong></h3>
-                <div className="space-4"></div>
-                <p>ORDERS OVER TIME</p>
-                <br/>
-                <OrderOverTimeData/>
-              </LegacyCard>
+              <OrderOverTimeData/>
             </Grid.Cell>
           </Grid>
           <div className='space-10'></div>
