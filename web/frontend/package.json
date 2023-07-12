@@ -22,12 +22,15 @@
     "react": "^18.2",
     "react-color": "^2.19.3",
     "react-dom": "^18.2",
+    "react-mustache-template-component": "^2.0.3",
     "react-query": "^3.36",
     "react-redux": "^8.1.0",
     "react-router-dom": "^6.4",
     "react-slick": "^0.29.0",
     "slick-carousel": "^1.8.1",
     "tinycolor2": "^1.6.0",
+    "react-siema": "^1.0.1",
+    "siema": "^1.5.1",
     "vite": "^4.3"
   },
   "devDependencies": {
