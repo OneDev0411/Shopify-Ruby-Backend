@@ -17,6 +17,7 @@ import {
   import {useState, useCallback, useEffect} from 'react';
   import React from 'react';
   import { useNavigate } from 'react-router-dom';
+  import { GenericFooter } from '../components';
   import { useAppQuery, useAuthenticatedFetch } from "../hooks";
   import { useSelector } from "react-redux";
   import { OffersList } from '../components';
@@ -39,6 +40,8 @@ import {
     return (
       <Page> 
         <OffersList></OffersList>
+        <div className="space-10"></div>
+        <GenericFooter text='Learn more about ' linkUrl='#' linkText='offers'></GenericFooter>
       </Page>
     );
   }
