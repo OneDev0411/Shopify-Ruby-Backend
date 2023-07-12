@@ -2,7 +2,7 @@
 module Api
   module Merchant
     class OffersController < ApiMerchantBaseController
-      before_action :find_shop, only: [:offer_settings, :update_from_builder]
+      before_action :find_shop, only: [:offer_settings, :update_from_builder, :offers_list, :activate, :deactivate, :duplicate, :destroy]
       before_action :set_offer, only: [:load_offer_details]
 
       # GET /api/merchant/shop_offers
@@ -14,7 +14,7 @@ module Api
 
       # POST /api/merchant/offers_list
       def offers_list
-        render json: { shopify_domain: @icushop.shopify_domain, offers: @icushop.offers }
+        render json: { shopify_domain: @icushop.shopify_domain, offers: @icushop.offer_data_with_stats }
       end
 
       # POST /api/merchant/load_offer_details
@@ -126,6 +126,25 @@ module Api
         end
       end
 
+      def duplicate
+        offer = @icushop.offers.find(params[:id])
+        if offer.duplicate
+          render json: {offers: @icushop.offer_data_with_stats}
+        else
+          render json: {message: "Could not duplicate #{offer.id}"}, status: 400
+        end
+      end
+
+      def destroy
+        offer = @icushop.offers.find(params[:id])
+        offer.destroy
+        old_offer_ids = @icushop.old_offers || []
+        old_offer_ids << params[:id]
+        @icushop.update_attribute(:old_offers, old_offer_ids.uniq)
+        @icushop.publish_async
+        render json: { message: "Offer Deleted", offers: @icushop.offer_data_with_stats}
+      end
+
 
       private
 
@@ -135,15 +154,6 @@ module Api
 
       def set_offer
         @offer = Offer.find(offer_params[:offer_id])
-      end
-
-      def set_shop
-        puts "###{__LINE__} VVVV #{File.basename(__FILE__)} : request.headers['jwt.shopify_domain']  ##>>  #{request.headers['jwt.shopify_domain'].inspect}"
-        begin
-          @icushop = Shop.find_by shopify_domain: request.headers['action_dispatch.request.parameters']['shop']
-        rescue ActiveRecord::RecordNotFound
-          raise ApiException::NotFound
-        end
       end
     end
   end

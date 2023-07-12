@@ -1,10 +1,11 @@
-import {Card,Page,FooterHelp,Link,Grid,Popover, ActionList, Button,Stack,Image} from '@shopify/polaris';
+import {LegacyCard,Page,FooterHelp,Link,Grid,Popover, ActionList, Button,LegacyStack,Image} from '@shopify/polaris';
 import { TitleBar } from "@shopify/app-bridge-react";
 import {CalendarMinor} from '@shopify/polaris-icons';
 import "../components/stylesheets/mainstyle.css";
 import {useState, useCallback} from 'react';
 import React from 'react';
 import { GenericFooter } from '../components/GenericFooter';
+import { TotalSalesData, ConversionRate, OrderOverTimeData} from "../components";
   
 export default function AnalyticsOffers() { 
     const [active, setActive] = useState(false);
@@ -45,83 +46,62 @@ export default function AnalyticsOffers() {
         <div className="space-10"></div>
         <div id={"graphs"}>
         <Grid>
-          {/* Total sales */}
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <Card title="Total sales" sectioned>
-              <h3 className="report-money"><strong>$10,00.00</strong></h3>
-              <div className="space-4"></div>
-              <p>SALES OVER TIME</p>
-              <br/>
-              <p>placeholder for TotalSalesData component</p>
-            </Card>
+            <TotalSalesData/>
           </Grid.Cell>
-          {/* Conversion rate */}
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <Card title="Conversion rate" sectioned>
-              <h3 className="report-money"><strong>12%</strong></h3>
-              <div className="space-4"></div>
-              <p>CONVERSION FUNNEL</p>
-             
-              <p>placeholder for ConversionRate component</p>
-            </Card>
+            <ConversionRate/>
           </Grid.Cell>
-          {/* Total order */}
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <Card title="Total order" sectioned>
-              <h3 className="report-money"><strong>40</strong></h3>
-              <div className="space-4"></div>
-              <p>ORDERS OVER TIME</p>
-              <br/>
-              <p>placeholder for OrderOverTimeData component</p>
-            </Card>
+            <OrderOverTimeData/>
           </Grid.Cell>
           {/* A/B testing report */}
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <Card title="A/B testing" sectioned>
+            <LegacyCard title="A/B testing" sectioned>
               <h3 className="report-money"><strong>$0.00</strong></h3>
               <div className="space-4"></div>
               <p>SALES OVER TIME</p>
               <br/>
               <p>placeholder for AbTestingData component</p>
-            </Card>
+            </LegacyCard>
             <div className={'space-4'}></div>
-            <Stack distribution="center">
+            <LegacyStack distribution="center">
               <Button>Select offer to compare</Button>
-          </Stack>
+          </LegacyStack>
           </Grid.Cell>
           {/*Click through rate*/}
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <Card title="Click through rate" sectioned>
+            <LegacyCard title="Click through rate" sectioned>
               <h3 className="report-money"><strong>0</strong></h3>
               <div className="space-4"></div>
               <p>CLICK THROUGH RATE</p>
               <br/>
               <p>placeholder for ClickThroughtRateData component</p>
-            </Card>
+            </LegacyCard>
           </Grid.Cell>
           {/* top performing offers */}
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <Card title="Top performing offers" sectioned>
+            <LegacyCard title="Top performing offers" sectioned>
               <h3 className="report-money"><strong>0</strong></h3>
               <div className="space-4"></div>
-              <Stack distribution='equalSpacing'>
-                <Stack.Item>
+              <LegacyStack distribution='equalSpacing'>
+                <LegacyStack.Item>
                   <p><strong>Offer name</strong></p>
                   <p><strong>Offer name</strong></p>
                   <p><strong>Offer name</strong></p>
                   <p><strong>Offer name</strong></p>
                   <p><strong>Offer name</strong></p>
                   <p><strong>Offer name</strong></p>
-                </Stack.Item>
-                <Stack.Item>
+                </LegacyStack.Item>
+                <LegacyStack.Item>
                   <Image 
                     source={"./assets/Analytics.png"}
                     width={"150px"}
                     max-Width={"150px"}
                   />
-                </Stack.Item>
-              </Stack>
-            </Card>
+                </LegacyStack.Item>
+              </LegacyStack>
+            </LegacyCard>
           </Grid.Cell>
         </Grid>
         </div>

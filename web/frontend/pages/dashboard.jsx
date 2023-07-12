@@ -11,116 +11,34 @@ import {
     Pagination,
     Grid, TextField
   } from '@shopify/polaris';
-  import { TotalSalesData, ConversionRate,OrderOverTimeData} from "../components";
+  import { TotalSalesData, ConversionRate, OrderOverTimeData} from "../components";
   import { TitleBar } from '@shopify/app-bridge-react';
   import { useState, useEffect, useCallback } from 'react';
-
   import { OffersList } from "../components";
+  import { useAppQuery, useAuthenticatedFetch } from "../hooks";
+  import { useAppBridge } from "@shopify/app-bridge-react";
+  import { useSelector } from "react-redux";
 
   export default function IndexTableWithAllElementsExample() {
-
-    const info = {offer: { shop_domain: window.location.host }};
+    
+    const [queryValue, setQueryValue] = useState(null);
     const [offersData, setOffersData] = useState([]);
     const [isLoading, setIsLoading]   = useState(true);
+    const [filteredData, setFilteredData] = useState([]);
+    const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch();
+    const app = useAppBridge();
 
-  useEffect(()=>{
-    setIsLoading(true);
-    fetch('/api/v1/offers_list', {
-      method: 'POST',
-      mode: 'cors',
-      cache: 'no-cache',
-      credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      redirect: 'follow',
-      referrerPolicy: 'no-referrer',
-      body: JSON.stringify(info),
-    })
-      .then((response) => response.json())
-	    .then((data) => {
-        console.log('API Data >>> ', data);
-        localStorage.setItem('icushopify_domain', data.shopify_domain);
-        setOffersData(data.offers);
-        setIsLoading(false);
-      }).catch((error) => {
-        console.log('Fetch error >> ', error);
-      });
-  },[]);
 
-       //Dummy data fo IndexTable
-      const customers = [
-        {
-          id: '341',
-          url: 'http://offer-example.com',
-          offer_name: 'Easter Upsell',
-           //The badge should change based on status
-          status:<Badge status="success">Published</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue: '$2019.10'
-        },
-        {
-          id: '348',
-          url: 'http://offer-example.com',
-          offer_name: 'Valentine Upsell',
-          // The badge should change based on status
-          status:<Badge>Unpublished</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue:'$1,123.23'
-        },
-        {
-          id: '349',
-          url: 'http: offer-example.com',
-          offer_name: 'Valentine Upsell',
-          //The badge should change based on status
-          status:<Badge>Unpublished</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue:'$1,123.23'
-        },
-        {
-          id: '3417',
-          url: 'http: offer-example.com',
-          offer_name: 'Easter Upsell',
-          //The badge should change based on status
-          status:<Badge status="success">Published</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue: '$2019.10'
-        },
-        {
-          id: '3418',
-          url: 'http: offer-example.com',
-          offer_name: 'Valentine Upsell',
-          //The badge should change based on status
-          status:<Badge>Unpublished</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue:'$1,123.23'
-        },
-        {
-          id: '3419',
-          url: 'http: offer-example.com',
-          offer_name: 'Valentine Upsell',
-          //The badge should change based on status
-          status:<Badge>Unpublished</Badge>,
-          clicks: 20,
-          views: 30,
-          revenue:'$1,123.23'
-        },
-      ];
 
       const resourceName = {
-        singular: 'customer',
-        plural: 'customers',
+        singular: 'offer',
+        plural: 'offers',
       };
 
       const {selectedResources, allResourcesSelected, handleSelectionChange} =
-        useIndexResourceState(customers);
+        useIndexResourceState(filteredData);
       const [taggedWith, setTaggedWith] = useState('');
-      const [queryValue, setQueryValue] = useState('');
       const [sortValue, setSortValue] = useState('today');
 
       const handleTaggedWithChange = useCallback(
@@ -134,27 +52,9 @@ import {
         handleQueryValueRemove();
       }, [handleQueryValueRemove, handleTaggedWithRemove]);
       const handleSortChange = useCallback((value) => setSortValue(value), []);
-
-      const promotedBulkActions = [
-        {
-          content: 'Duplicate Offer',
-          onAction: () => console.log('Todo: implement bulk edit'),
-        },
-      ];
-      const bulkActions = [
-        {
-          content: 'Publish',
-          onAction: () => console.log('Todo: implement bulk add tags'),
-        },
-        {
-          content: 'Draft',
-          onAction: () => console.log('Todo: implement bulk remove tags'),
-        },
-        {
-          content: 'Delete',
-          onAction: () => console.log('Todo: implement bulk delete'),
-        },
-      ];
+      const handleQueryValueChange = useCallback((value) => {
+        setFilteredData(offersData.filter((o) => o.title.includes(value)));
+      });
 
       const filters = [
         {
@@ -190,118 +90,43 @@ import {
         {label: 'Revenue', value: 'revenue'},
       ];
 
-      const rowMarkup = customers.map(
-        ({id, offer_name, status, clicks, views,revenue}, index) => (
+      const rowMarkup = filteredData.map(
+        ({id, title, status, clicks, views,revenue}, index) => (
           <IndexTable.Row
             id={id}
             key={id}
             selected={selectedResources.includes(id)}
             position={index}
           >
-            <IndexTable.Cell>{offer_name}</IndexTable.Cell>
-            <IndexTable.Cell>{status}</IndexTable.Cell>
+            <IndexTable.Cell>{title}</IndexTable.Cell>
+            <IndexTable.Cell>{status ? (<Badge status="success">Published</Badge>) : (<Badge>Unpublished</Badge>)}</IndexTable.Cell>
             <IndexTable.Cell>{clicks}</IndexTable.Cell>
             <IndexTable.Cell>{views}</IndexTable.Cell>
-            <IndexTable.Cell>{revenue}</IndexTable.Cell>
+            <IndexTable.Cell>{`$${revenue}`}</IndexTable.Cell>
           </IndexTable.Row>
         ),
       );
-
       return (
         <Page>
           <TitleBar
-              title="Your Offers"
+              title="Dashboard"
               primaryAction={{
               content: "Create Offer",
               onAction: () => console.log("create offer btn clicked"),
               }}
           />
-          <LegacyCard sectioned>
-            <div style={{display: 'flex'}}>
-              <div style={{flex: 1}}>
-                <Filters
-                  queryValue={queryValue}
-                  filters={filters}
-                  appliedFilters={appliedFilters}
-                  onQueryChange={setQueryValue}
-                  onQueryClear={handleQueryValueRemove}
-                  onClearAll={handleClearAll}
-                />
-              </div>
-              <div style={{paddingLeft: '0.25rem'}}>
-                <Select
-                  labelInline
-                  label="Sort"
-                  options={sortOptions}
-                  value={sortValue}
-                  onChange={handleSortChange}
-                />
-              </div>
-            </div>
-            <IndexTable
-              resourceName={resourceName}
-              itemCount={customers.length}
-              selectedItemsCount={
-                allResourcesSelected ? 'All' : selectedResources.length
-              }
-              onSelectionChange={handleSelectionChange}
-              hasMoreItems
-              bulkActions={bulkActions}
-              promotedBulkActions={promotedBulkActions}
-              lastColumnSticky
-              headings={[
-                {title: 'Offer'},
-                {title: 'Status'},
-                {title: 'Clicks'},
-                {title: 'Views'},
-                {title: 'Revenue', hidden: false},
-              ]}
-            >
-              {rowMarkup}
-            </IndexTable>
-            <div className="space-4"></div>
-            <div className="offer-table-footer">
-              <Pagination
-                label="1 of 10"
-                hasPrevious
-                onPrevious={() => {
-                  console.log('Previous');
-                }}
-                hasNext
-                onNext={() => {
-                  console.log('Next');
-                }}
-              />
-            </div>
-          </LegacyCard>
-          <div className="space-10"></div>
+          
+          <OffersList></OffersList>
+          
           <Grid>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <LegacyCard title="Total sales" sectioned>
-                <h3 className="report-money"><strong>$100.00</strong></h3>
-                <div className="space-4"></div>
-                <p>SALES OVER TIME</p>
-                <br/>
-                <TotalSalesData/>
-              </LegacyCard>
+              <TotalSalesData/>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <LegacyCard title="Conversion rate" sectioned>
-                <h3 className="report-money"><strong>12%</strong></h3>
-                <div className="space-4"></div>
-                <p>CONVERSION FUNNEL</p>
-                <br/>
-                <ConversionRate/>
-              </LegacyCard>
+              <ConversionRate/>
             </Grid.Cell>
             <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-              <LegacyCard title="Total order" sectioned>
-                <h3 className="report-money"><strong>40</strong></h3>
-                <div className="space-4"></div>
-                <p>ORDERS OVER TIME</p>
-                <br/>
-                <OrderOverTimeData/>
-              </LegacyCard>
+              <OrderOverTimeData/>
             </Grid.Cell>
           </Grid>
           <div className='space-10'></div>

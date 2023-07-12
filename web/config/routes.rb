@@ -14,11 +14,6 @@ Rails.application.routes.draw do
   get '/confirm_from_outside', to: 'js#confirm_from_outside'
     # API V1
   namespace :api do
-    namespace :v1, defaults: { format: 'json' } do
-      post 'offer_activate', to: 'offers#activate'
-      post 'offers_list', to: 'offers#offers_list'
-    end
-
     namespace :merchant, defaults: { format: 'json' } do
       post 'element_search', to: 'products#element_search'
       post 'load_offer_details', to: 'offers#load_offer_details'
@@ -34,11 +29,20 @@ Rails.application.routes.draw do
       get 'current_subscription', to: 'subscriptions#current_subscription'
       get 'subscription/confirm_charge', to: 'subscriptions#confirm_charge'
       get 'partners', to: 'partners#index'
+      
+      post 'offers_list', to: 'offers#offers_list'
+      post 'offer_activate', to: 'offers#activate'
+      post 'offer_deactivate', to: 'offers#deactivate'
+      post 'shop_sale_stats', to: 'shops#shop_sale_stats'
+      post 'shop_orders_stats', to: 'shops#shop_orders_stats'
+      post 'shop_offers_stats', to: 'shops#shop_offers_stats'
+      post '/offers/:id/duplicate', to: 'offers#duplicate'
+      delete '/offers/:id', to: 'offers#destroy'
     end
+    post '/offers/create/:shop_id', to: 'offers#create_from_builder'
+    post '/offers/:id/update/:shop_id', to: 'offers#update_from_builder'
   end
 
-  post '/api/offers/create/:shop_id', to: 'offers#create_from_builder'
-  post '/api/offers/:id/update/:shop_id', to: 'offers#update_from_builder'
 
 
   # Any other routes will just render the react app

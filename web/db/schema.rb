@@ -10,9 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_04_135454) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "intarray"
   enable_extension "plpgsql"
 
   create_table "admins", force: :cascade do |t|
@@ -36,8 +35,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["unlock_token"], name: "index_admins_on_unlock_token", unique: true
   end
 
-  create_table "cases", id: :serial, force: :cascade do |t|
-    t.integer "shop_id"
+  create_table "cases", force: :cascade do |t|
+    t.bigint "shop_id"
     t.string "status"
     t.text "subject"
     t.string "category"
@@ -47,8 +46,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["shop_id"], name: "index_cases_on_shop_id"
   end
 
-  create_table "collections", id: :serial, force: :cascade do |t|
-    t.integer "shop_id"
+  create_table "collections", force: :cascade do |t|
+    t.bigint "shop_id"
     t.string "title"
     t.bigint "shopify_id"
     t.datetime "created_at", precision: nil, null: false
@@ -72,22 +71,25 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.string "handle"
     t.index ["shop_id"], name: "index_collections_on_shop_id"
     t.index ["shopify_id"], name: "index_collections_on_shopify_id"
+    t.index ["title"], name: "index_collections_on_title"
   end
 
-  create_table "collects", id: :serial, force: :cascade do |t|
-    t.integer "collection_id"
-    t.integer "product_id"
+  create_table "collects", force: :cascade do |t|
+    t.bigint "collection_id"
+    t.bigint "product_id"
     t.bigint "shopify_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.bigint "collection_shopify_id"
     t.bigint "product_shopify_id"
     t.index ["collection_id"], name: "index_collects_on_collection_id"
+    t.index ["product_id"], name: "index_collects_on_product_id"
+    t.index ["shopify_id"], name: "index_collects_on_shopify_id"
   end
 
-  create_table "customers", id: :serial, force: :cascade do |t|
+  create_table "customers", force: :cascade do |t|
     t.bigint "shopify_id"
-    t.integer "shop_id"
+    t.bigint "shop_id"
     t.string "email"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
@@ -99,8 +101,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["shopify_domain"], name: "index_customers_on_shopify_domain"
   end
 
-  create_table "daily_stats", id: :serial, force: :cascade do |t|
-    t.integer "offer_id"
+  create_table "daily_stats", force: :cascade do |t|
+    t.bigint "offer_id"
     t.integer "times_loaded", default: 0, null: false
     t.integer "times_clicked", default: 0, null: false
     t.decimal "click_revenue", default: "0.0"
@@ -119,13 +121,13 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.integer "times_clicked_product", default: 0, null: false
     t.integer "times_clicked_cart", default: 0, null: false
     t.integer "times_clicked_popup", default: 0, null: false
-    t.index ["for_date", "shop_id", "offer_id"], name: "date_offer_shop_unique", unique: true
+    t.integer "times_checkedout", default: 0, null: false
     t.index ["for_date"], name: "index_daily_stats_on_for_date"
     t.index ["offer_id"], name: "index_daily_stats_on_offer_id"
     t.index ["shop_id"], name: "index_daily_stats_on_shop_id"
   end
 
-  create_table "delayed_jobs", id: :serial, force: :cascade do |t|
+  create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
     t.text "handler", null: false
@@ -137,6 +139,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.string "queue"
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
+    t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
   create_table "discount_shops", force: :cascade do |t|
@@ -149,7 +152,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["shop_id"], name: "index_discount_shops_on_shop_id"
   end
 
-  create_table "feature_requests", id: :serial, force: :cascade do |t|
+  create_table "feature_requests", force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.integer "shop_id"
@@ -186,9 +189,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["discount_type"], name: "index_marketings_on_discount_type"
   end
 
-  create_table "messages", id: :serial, force: :cascade do |t|
-    t.integer "case_id"
-    t.integer "shop_id"
+  create_table "messages", force: :cascade do |t|
+    t.bigint "case_id"
+    t.bigint "shop_id"
     t.text "body"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
@@ -208,8 +211,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["offer_id"], name: "index_offer_events_on_offer_id"
   end
 
-  create_table "offer_stats", id: :serial, force: :cascade do |t|
-    t.integer "offer_id"
+  create_table "offer_stats", force: :cascade do |t|
+    t.bigint "offer_id"
     t.integer "place"
     t.bigint "variant_id"
     t.string "test_ab"
@@ -221,10 +224,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["offer_id"], name: "index_offer_stats_on_offer_id"
   end
 
-  create_table "offers", id: :serial, force: :cascade do |t|
+  create_table "offers", force: :cascade do |t|
     t.string "title"
-    t.integer "shop_id"
-    t.integer "product_id"
+    t.bigint "shop_id"
+    t.bigint "product_id"
     t.boolean "active", default: false
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
@@ -255,8 +258,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.string "variants_filter"
     t.string "interval_unit"
     t.integer "interval_frequency"
-    t.bigint "recharge_subscription_id"
-    t.bigint "recharge_discount_product_id"
+    t.integer "recharge_subscription_id"
+    t.integer "recharge_discount_product_id"
     t.string "screen_position"
     t.boolean "remove_if_no_longer_valid", default: false, null: false
     t.boolean "use_bigger_image", default: false, null: false
@@ -321,18 +324,19 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.boolean "in_ajax_cart", default: false
     t.boolean "in_product_page", default: false
     t.integer "position_order", default: 1
+    t.index ["product_id"], name: "index_offers_on_product_id"
     t.index ["shop_id"], name: "index_offers_on_shop_id"
   end
 
-  create_table "order_products", id: :serial, force: :cascade do |t|
-    t.integer "order_id"
+  create_table "order_products", force: :cascade do |t|
+    t.bigint "order_id"
     t.bigint "shopify_product_id"
     t.index ["order_id"], name: "index_order_products_on_order_id"
     t.index ["shopify_product_id"], name: "index_order_products_on_shopify_product_id"
   end
 
-  create_table "orders", id: :serial, force: :cascade do |t|
-    t.integer "shop_id"
+  create_table "orders", force: :cascade do |t|
+    t.bigint "shop_id"
     t.bigint "shopify_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
@@ -345,14 +349,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.jsonb "unique_product_ids"
     t.text "referring_site"
     t.integer "orders_count"
-    t.index "jsonb_array_length(unique_product_ids)", name: "index_orders_on_number_of_unique_product_ids"
     t.index ["cart_token"], name: "index_orders_on_cart_token"
-    t.index ["created_at"], name: "index_orders_on_created_at"
     t.index ["shop_id"], name: "index_orders_on_shop_id"
-    t.index ["unique_product_ids"], name: "gin_unique_product_ids", using: :gin
   end
 
-  create_table "partners", id: :serial, force: :cascade do |t|
+  create_table "partners", force: :cascade do |t|
     t.string "image", null: false
     t.text "description", null: false
     t.string "name", null: false
@@ -364,8 +365,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["name"], name: "index_partners_on_name", unique: true
   end
 
-  create_table "pending_jobs", id: :serial, force: :cascade do |t|
-    t.integer "shop_id"
+  create_table "pending_jobs", force: :cascade do |t|
+    t.bigint "shop_id"
     t.bigint "job_id"
     t.text "description"
     t.datetime "created_at", precision: nil, null: false
@@ -374,7 +375,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["shop_id"], name: "index_pending_jobs_on_shop_id"
   end
 
-  create_table "plans", id: :serial, force: :cascade do |t|
+  create_table "plans", force: :cascade do |t|
     t.string "name"
     t.integer "price_in_cents", default: 0
     t.integer "offers_limit", default: 0
@@ -395,7 +396,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.string "internal_name"
   end
 
-  create_table "product_companions", id: :serial, force: :cascade do |t|
+  create_table "product_companions", force: :cascade do |t|
     t.bigint "product_shopify_id"
     t.bigint "companion_product_shopify_id"
     t.bigint "orders", array: true
@@ -404,8 +405,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["product_shopify_id"], name: "index_product_companions_on_product_shopify_id"
   end
 
-  create_table "products", id: :serial, force: :cascade do |t|
-    t.integer "shop_id"
+  create_table "products", force: :cascade do |t|
+    t.bigint "shop_id"
     t.string "title"
     t.bigint "shopify_id"
     t.string "product_type"
@@ -433,25 +434,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.datetime "most_popular_companions_updated_at", precision: nil
     t.integer "orders_count"
     t.integer "status", default: 1
-    t.index ["orders_count"], name: "index_products_on_orders_count"
     t.index ["shop_id"], name: "index_products_on_shop_id"
-    t.index ["shopify_id"], name: "index_products_on_shopify_id", unique: true
+    t.index ["shopify_id"], name: "index_products_on_shopify_id"
+    t.index ["title"], name: "index_products_on_title"
   end
 
-  create_table "refersions", id: :serial, force: :cascade do |t|
-    t.string "affilitate"
-    t.datetime "visited", precision: nil
-    t.datetime "converted", precision: nil
-    t.integer "shop_id"
-    t.integer "coupon"
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-  end
-
-  create_table "revenue_events", id: :serial, force: :cascade do |t|
+  create_table "revenue_events", force: :cascade do |t|
     t.text "description"
     t.decimal "mrr"
-    t.integer "shop_id"
+    t.bigint "shop_id"
     t.decimal "amount"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
@@ -459,7 +450,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["shop_id"], name: "index_revenue_events_on_shop_id"
   end
 
-  create_table "revenue_snapshots", id: :serial, force: :cascade do |t|
+  create_table "revenue_snapshots", force: :cascade do |t|
     t.integer "trial_amount_in_cents"
     t.integer "trial_count"
     t.integer "subscription_amount_in_cents"
@@ -471,8 +462,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.jsonb "bucket_data"
   end
 
-  create_table "rules", id: :serial, force: :cascade do |t|
-    t.integer "offer_id"
+  create_table "rules", force: :cascade do |t|
+    t.bigint "offer_id"
     t.integer "item_id"
     t.string "item_type"
     t.boolean "presence"
@@ -491,20 +482,19 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.datetime "item_stock_status_updated_at", precision: nil
     t.bigint "item_shopify_id"
     t.text "item_shopify_title"
-    t.index ["backup_id"], name: "unique_backup_id", unique: true
     t.index ["offer_id"], name: "index_rules_on_offer_id"
   end
 
-  create_table "setups", id: :serial, force: :cascade do |t|
-    t.integer "shop_id"
+  create_table "setups", force: :cascade do |t|
+    t.bigint "shop_id"
     t.jsonb "details"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["shop_id"], name: "index_setups_on_shop_id"
   end
 
-  create_table "shop_events", id: :serial, force: :cascade do |t|
-    t.integer "shop_id"
+  create_table "shop_events", force: :cascade do |t|
+    t.bigint "shop_id"
     t.string "title"
     t.text "body"
     t.decimal "revenue_impact"
@@ -513,7 +503,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["shop_id"], name: "index_shop_events_on_shop_id"
   end
 
-  create_table "shops", id: :serial, force: :cascade do |t|
+  create_table "shops", force: :cascade do |t|
     t.string "name"
     t.string "myshopify_domain"
     t.bigint "shopify_id"
@@ -575,7 +565,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.string "currency_thousands_separator"
     t.integer "currency_decimal_places"
     t.string "currency_symbol_location"
-    t.string "cdn", default: "stackpath"
+    t.string "cdn"
     t.boolean "has_remove_offer"
     t.string "republish_status"
     t.boolean "has_geo_offers"
@@ -606,7 +596,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.jsonb "feature_flags"
     t.string "stat_provider"
     t.boolean "has_multi"
-    t.integer "shopify_id_bak"
     t.string "companions_status"
     t.datetime "companions_status_updated_at", precision: nil
     t.string "app", default: "incartupsell", null: false
@@ -642,16 +631,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.datetime "stats_from", precision: nil
     t.string "shop_domain"
     t.string "phone_number"
+    t.integer "unpublished_offer_ids", array: true
+    t.boolean "activated", default: true
+    t.integer "orders_through_offers", default: 0, null: false
     t.index ["created_at"], name: "index_shops_on_created_at"
-    t.index ["finder_token"], name: "index_shops_on_finder_token"
-    t.index ["installed_at"], name: "index_shops_on_installed_at"
-    t.index ["myshopify_domain"], name: "index_shops_on_myshopify_domain", unique: true
     t.index ["uninstalled_at"], name: "index_shops_on_uninstalled_at"
   end
 
-  create_table "subscriptions", id: :serial, force: :cascade do |t|
-    t.integer "plan_id"
-    t.integer "shop_id"
+  create_table "subscriptions", force: :cascade do |t|
+    t.bigint "plan_id"
+    t.bigint "shop_id"
     t.integer "price_in_cents"
     t.integer "offers_limit"
     t.integer "views_limit"
@@ -673,14 +662,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.string "platform"
     t.string "stripe_token"
     t.integer "discount_percent"
-    t.bigint "shopify_charge_id_bak"
     t.date "bill_on"
+    t.boolean "free_plan_after_trial"
     t.index ["plan_id"], name: "index_subscriptions_on_plan_id"
     t.index ["shop_id"], name: "index_subscriptions_on_shop_id"
   end
 
-  create_table "sync_results", id: :serial, force: :cascade do |t|
-    t.integer "shop_id"
+  create_table "sync_results", force: :cascade do |t|
+    t.bigint "shop_id"
     t.integer "active_offers_count"
     t.jsonb "active_offer_ids"
     t.jsonb "offerable_products"
@@ -702,17 +691,18 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.index ["shop_id"], name: "index_sync_results_on_shop_id"
   end
 
-  create_table "tags", id: :serial, force: :cascade do |t|
+  create_table "tags", force: :cascade do |t|
     t.string "body"
-    t.integer "customer_id"
+    t.bigint "customer_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.integer "shop_id"
+    t.index ["body"], name: "index_tags_on_body"
     t.index ["customer_id"], name: "index_tags_on_customer_id"
     t.index ["shop_id"], name: "index_tags_on_shop_id"
   end
 
-  create_table "themes", id: :serial, force: :cascade do |t|
+  create_table "themes", force: :cascade do |t|
     t.string "name"
     t.string "settings_asset_file"
     t.datetime "created_at", precision: nil, null: false
@@ -723,7 +713,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.text "css"
   end
 
-  create_table "usage_charges", id: :serial, force: :cascade do |t|
+  create_table "usage_charges", force: :cascade do |t|
     t.integer "subscription_id"
     t.integer "amount_cents"
     t.string "result"
@@ -732,12 +722,19 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_03_100856) do
     t.bigint "shopify_id"
   end
 
+  create_table "webhooks_passed_and_rejected_count", primary_key: "shopify_domain", id: :string, force: :cascade do |t|
+    t.bigint "passed_webhooks_count", default: 0, null: false
+    t.bigint "rejected_webhooks_count", default: 0, null: false
+  end
+
   add_foreign_key "collections", "shops"
   add_foreign_key "customers", "shops"
+  add_foreign_key "daily_stats", "offers"
   add_foreign_key "offer_events", "offers"
   add_foreign_key "offer_stats", "offers"
   add_foreign_key "offers", "products"
   add_foreign_key "offers", "shops"
+  add_foreign_key "orders", "shops"
   add_foreign_key "pending_jobs", "shops"
   add_foreign_key "products", "shops"
   add_foreign_key "rules", "offers"
