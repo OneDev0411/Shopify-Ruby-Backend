@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from '@shopify/app-bridge-react';
 import { confirmCharge } from "../services/actions/subscription";
-
+import { useSelector } from "react-redux";
+import { useAuthenticatedFetch } from "../hooks";
 
 const ConfirmFromOutside = () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -10,10 +11,12 @@ const ConfirmFromOutside = () => {
   const charge_id = urlParams.get('charge_id');
   const app = useAppBridge();
   const redirect = Redirect.create(app);
+  const shopAndHost = useSelector(state => state.shopAndHost);
+  const fetch = useAuthenticatedFetch();
 
   async function renderConfirmCharge(){
 
-    fetch(`/api/merchant/subscription/confirm_charge?shopify_domain=${shopify_domain}&charge_id=${charge_id}`, {
+    fetch(`/api/merchant/subscription/confirm_charge?shop=${shopify_domain}&host=${shopAndHost.host}&charge_id=${charge_id}`, {
       method: 'GET',
          headers: {
            'Content-Type': 'application/json',
