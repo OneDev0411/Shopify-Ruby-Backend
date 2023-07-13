@@ -37,7 +37,7 @@ export function ModalAddConditions(props) {
          headers: {
            'Content-Type': 'application/json',
          },
-         body: JSON.stringify( {shopify_domain: shopAndHost.shop, product: { query: childData, type: 'product' }, json: true }),
+         body: JSON.stringify( {shop: shopAndHost.shop, host: shopAndHost.host, product: { query: childData, type: 'product' }, json: true }),
      })
      .then( (response) => { return response.json(); })
      .then( (data) => {

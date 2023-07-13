@@ -123,7 +123,7 @@ export default function EditPage() {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ offer: {include_sample_products: 0}, shopify_domain: shopAndHost.shop }),
+                body: JSON.stringify({ offer: {include_sample_products: 0}, shop: shopAndHost.shop, host: shopAndHost.host }),
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
@@ -139,7 +139,7 @@ export default function EditPage() {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ shop: { admin: null }, shopify_domain: shopAndHost.shop}),
+                body: JSON.stringify({ shop_attr: { admin: null }, shop: shopAndHost.shop, host: shopAndHost.host}),
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
@@ -156,7 +156,7 @@ export default function EditPage() {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ offer: { offer_id: offerID } , shopify_domain: shopAndHost.shop}),
+                body: JSON.stringify({ offer: { offer_id: offerID } , shop: shopAndHost.shop, host: shopAndHost.host}),
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
@@ -177,7 +177,7 @@ export default function EditPage() {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ offer: {include_sample_products: 0}, shopify_domain: shopAndHost.shop }),
+                body: JSON.stringify({ offer: {include_sample_products: 0}, shop: shopAndHost.shop, host: shopAndHost.host }),
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
@@ -192,7 +192,7 @@ export default function EditPage() {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ shop: { admin: null }, shopify_domain: shopAndHost.shop }),
+                body: JSON.stringify({ shop_attr: { admin: null }, shop: shopAndHost.shop, host: shopAndHost.host }),
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
@@ -342,7 +342,7 @@ export default function EditPage() {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({offer: ots}),
+                body: JSON.stringify({offer: ots, shop: shopAndHost.shop, host: shopAndHost.host}),
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
@@ -359,7 +359,7 @@ export default function EditPage() {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({offer: ots}),
+                body: JSON.stringify({offer: ots, shop: shopAndHost.shop, host: shopAndHost.host}),
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
@@ -381,7 +381,7 @@ export default function EditPage() {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify( {shop: shop, shopify_domain: shopAndHost.shop, admin: shop.admin, json: true }),
+                body: JSON.stringify( {shop_attr: shop, shop: shopAndHost.shop, host: shopAndHost.host, admin: shop.admin, json: true }),
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
@@ -460,7 +460,7 @@ export default function EditPage() {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({offer: {offer_id: offer.id}, shopify_domain: shopAndHost.shop})
+          body: JSON.stringify({offer: {offer_id: offer.id}, shop: shopAndHost.shop, host: shopAndHost.host})
         })
           .then((response) => response.json())
           .then( (data) => {

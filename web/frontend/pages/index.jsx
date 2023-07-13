@@ -10,14 +10,14 @@ import { useAuthenticatedFetch } from "../hooks";
 
 export default function HomePage() {
   const fetch = useAuthenticatedFetch();
-  const shop = useSelector(state => state.shopAndHost.shop);
+  const shopAndHost = useSelector(state => state.shopAndHost);
   const [currentShop, setCurrentShop] = useState(null);
   const [planName, setPlanName] = useState();
   const [trialDays, setTrialDays] = useState();
 
   const fetchCurrentShop = useCallback(async () => {
 
-    fetch(`/api/merchant/current_shop?shopify_domain=${shop}`, {
+    fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}&host=${shopAndHost.host}`, {
       method: 'GET',
          headers: {
            'Content-Type': 'application/json',
@@ -25,7 +25,6 @@ export default function HomePage() {
      })
      .then( (response) => { return response.json(); })
      .then( (data) => {
-        console.log("dataaaaaaaaa", data);
         setCurrentShop(data.shop);
         setPlanName(data.plan);
         setTrialDays(data.days_remaining_in_trial);

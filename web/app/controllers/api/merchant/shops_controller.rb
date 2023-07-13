@@ -8,7 +8,7 @@ module Api
 
       # Get /api/merchant/current_shop
       def current_shop
-        @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shopify_domain]) if @icushop.present?
+        @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shop]) if @icushop.present?
         render "shops/current_shop"
       end
 
@@ -118,11 +118,11 @@ module Api
         all_names = Shop.column_names + ['date_min', 'date_max', 'canonical_domain',
                                          'path_to_cart', 'has_branding', 'custom_theme_css',
                                          'image', 'stats_from', css_options]
-        params.require('shop').permit(all_names)
+        params.require('shop_attr').permit(all_names)
       end
 
       def set_admin
-        if params['shop']
+        if params['shop_attr']
           @admin = shop_params['admin'] 
         else
           @admin = params['admin']
