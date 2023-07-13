@@ -3,10 +3,14 @@ import {useState, useCallback, useEffect} from 'react';
 import {stars} from "../assets";
 import Slider from "react-slick";
 import React from "react";
+import { useSelector } from 'react-redux';
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
+import { useAuthenticatedFetch } from "../hooks";
 
 export function Partners(){
+    const fetch = useAuthenticatedFetch();
+    const shopAndHost = useSelector(state => state.shopAndHost);
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [partners, setPartners] = useState(null);
     const previousVal = null;
@@ -59,8 +63,7 @@ export function Partners(){
     }
 
     const getAllPartners = useCallback(async ()=>{
-      partners
-      fetch("/api/merchant/partners", {
+      fetch(`/api/merchant/partners?shop=${shopAndHost.shop}&host=${shopAndHost.host}`, {
         method: 'GET',
            headers: {
              'Content-Type': 'application/json',
