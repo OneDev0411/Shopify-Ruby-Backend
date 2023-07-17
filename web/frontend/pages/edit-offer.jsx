@@ -111,12 +111,12 @@ export default function EditPage() {
 
     const [isLoading, setIsLoading] = useState(false);
                                       
-    const offerID = location.state.offerID;
+    const offerID = location?.state?.offerID;
     const fetch = useAuthenticatedFetch();
 
     //Call on initial render
     useEffect(() => {
-        if(location.state != null && location.state?.offerID == null) {
+        if(location.state != null && location?.state?.offerID == null) {
             setIsLoading(true);
             fetch(`/api/merchant/offer_settings`, {
                 method: 'POST',

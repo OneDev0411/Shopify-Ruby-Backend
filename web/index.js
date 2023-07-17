@@ -17,6 +17,14 @@ const STATIC_PATH =
 
 const app = express();
 
+const addSessionShopToReqParams = (req, res, next) => {
+  const shop = res.locals?.shopify?.session?.shop;
+  if (shop && !req.query.shop) {
+    req.query.shop = shop;
+  }
+  return next();
+}
+
 // Set up Shopify authentication and webhook handling
 app.get(shopify.config.auth.path, shopify.auth.begin());
 app.get(
@@ -29,8 +37,13 @@ app.post(
   shopify.processWebhooks({ webhookHandlers: GDPRWebhookHandlers })
 );
 
+
+
 // All endpoints after this point will require an active session
 app.use("/api/*", shopify.validateAuthenticatedSession());
+
+// we have to add our new middleware *after* the shopify.validateAuthenticatedSession middleware
+app.use("/*", addSessionShopToReqParams)
 
 app.use(express.json());
 
