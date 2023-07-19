@@ -9,9 +9,11 @@ import {
     OptionList
   } from '@shopify/polaris';
   import {useState, useCallback, useEffect, useRef} from 'react';
+  import { useSelector } from 'react-redux';
 
   
  export function ModalAddProduct(props) {
+    const shopAndHost = useSelector(state => state.shopAndHost);
     const [resourceListLoading, setResourceListLoading] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectedVariants, setSelectedVariants] = useState({})
