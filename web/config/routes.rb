@@ -35,6 +35,7 @@ Rails.application.routes.draw do
       post 'offer_deactivate', to: 'offers#deactivate'
       post '/offers/:id/duplicate', to: 'offers#duplicate'
       delete '/offers/:id', to: 'offers#destroy'
+      get 'active_theme_for_dafault_template', to: 'shops#active_theme_for_dafault_template'
     end
     post '/offers/create/:shop_id', to: 'offers#create_from_builder'
     post '/offers/:id/update/:shop_id', to: 'offers#update_from_builder'
