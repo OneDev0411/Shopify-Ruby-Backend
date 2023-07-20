@@ -1088,7 +1088,7 @@ export function SecondTab(props){
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                                     <Checkbox
                                         label="Use default settings for Product Page"
-                                        checked={props.shop.default_template_settings.defaultSettingsForProductPage}
+                                        checked={props.shop.default_template_settings?.defaultSettingsForProductPage}
                                         onChange={(event) => handleDefaultSettingChange(event, 'product')}
                                     />
                                 </Grid.Cell>
@@ -1097,12 +1097,12 @@ export function SecondTab(props){
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                                     <Checkbox
                                         label="Use Template for Product Page"
-                                        checked={props.shop.default_template_settings.templateForProductPage}
+                                        checked={props.shop.default_template_settings?.templateForProductPage}
                                         onChange={(event) => handleUseTemplateChange(event, 'product')}
                                     />
                                 </Grid.Cell>
                             </Grid>
-                            {props.shop.default_template_settings.templateForProductPage && (
+                            {props.shop.default_template_settings?.templateForProductPage && (
                                 <>
                                     <Image
                                         source={product_page_image_1}
@@ -1130,7 +1130,7 @@ export function SecondTab(props){
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                                     <Checkbox
                                         label="Use default settings for Cart Page"
-                                        checked={props.shop.default_template_settings.defaultSettingsForCartPage}
+                                        checked={props.shop.default_template_settings?.defaultSettingsForCartPage}
                                         onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
                                     />
                                 </Grid.Cell>
@@ -1139,12 +1139,12 @@ export function SecondTab(props){
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                                     <Checkbox
                                         label="Use Template for Cart Page"
-                                        checked={props.shop.default_template_settings.templateForCartPage}
+                                        checked={props.shop.default_template_settings?.templateForCartPage}
                                         onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
                                     />
                                 </Grid.Cell>
                             </Grid>
-                            {props.shop.default_template_settings.templateForCartPage && (
+                            {props.shop.default_template_settings?.templateForCartPage && (
                                 <>
                                     <Image
                                         source={cart_page_image_1}
@@ -1175,7 +1175,7 @@ export function SecondTab(props){
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                                     <Checkbox
                                         label="Use default settings for Ajax Cart"
-                                        checked={props.shop.default_template_settings.defaultSettingsForAjaxCart}
+                                        checked={props.shop.default_template_settings?.defaultSettingsForAjaxCart}
                                         onChange={(event) => handleDefaultSettingChange(event, 'ajax')}
                                     />
                                 </Grid.Cell>
@@ -1184,12 +1184,12 @@ export function SecondTab(props){
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                                     <Checkbox
                                         label="Use Template for Ajax Cart"
-                                        checked={props.shop.default_template_settings.templateForAjaxCart}
+                                        checked={props.shop.default_template_settings?.templateForAjaxCart}
                                         onChange={(event) => handleUseTemplateChange(event, 'ajax')}
                                     />
                                 </Grid.Cell>
                             </Grid>
-                            {props.shop.default_template_settings.templateForAjaxCart && (
+                            {props.shop.default_template_settings?.templateForAjaxCart && (
                                 <>
                                     <Image
                                         source={ajax_cart_image_1}
@@ -1217,7 +1217,7 @@ export function SecondTab(props){
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                                     <Checkbox
                                         label="Use default settings for Cart Page"
-                                        checked={props.shop.default_template_settings.defaultSettingsForCartPage}
+                                        checked={props.shop.default_template_settings?.defaultSettingsForCartPage}
                                         onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
                                     />
                                 </Grid.Cell>
@@ -1226,12 +1226,12 @@ export function SecondTab(props){
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                                     <Checkbox
                                         label="Use Template for Cart Page"
-                                        checked={props.shop.default_template_settings.templateForCartPage}
+                                        checked={props.shop.default_template_settings?.templateForCartPage}
                                         onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
                                     />
                                 </Grid.Cell>
                             </Grid>
-                            {props.shop.default_template_settings.templateForCartPage && (
+                            {props.shop.default_template_settings?.templateForCartPage && (
                                 <>
                                     <Image
                                         source={cart_page_image_1}
