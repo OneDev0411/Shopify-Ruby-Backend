@@ -17,7 +17,7 @@ export default function HomePage() {
 
   const fetchCurrentShop = useCallback(async () => {
 
-    fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}&host=${shopAndHost.host}`, {
+    fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
       method: 'GET',
          headers: {
            'Content-Type': 'application/json',

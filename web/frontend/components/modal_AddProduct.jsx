@@ -193,7 +193,7 @@ import {
         setResourceListLoading(true);
         let shopifyId = id[id.length-1]
 
-        fetch(`/api/merchant/products/shopify/${shopifyId}?shop_id=${props.shop_id}&shop=${shopAndHost.shop}&host=${shopAndHost.host}`, {
+        fetch(`/api/merchant/products/shopify/${shopifyId}?shop_id=${props.shop_id}&shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

@@ -53,7 +53,7 @@ export function OffersList() {
       },
       redirect: 'follow',
       referrerPolicy: 'no-referrer',
-      body: JSON.stringify({ shop: shopAndHost.shop, host: shopAndHost.host }),
+      body: JSON.stringify({ shop: shopAndHost.shop }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -202,7 +202,7 @@ export function OffersList() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ offer_id: resource, shop: shopAndHost.shop, host: shopAndHost.host })
+        body: JSON.stringify({ offer_id: resource, shop: shopAndHost.shop })
       })
         .then((response) => response.json())
         .then((data) => {
@@ -223,7 +223,7 @@ export function OffersList() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ offer_id: resource, shop: shopAndHost.shop, host: shopAndHost.host })
+        body: JSON.stringify({ offer_id: resource, shop: shopAndHost.shop })
       })
         .then((response) => response.json())
         .then((data) => {
@@ -244,7 +244,7 @@ export function OffersList() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ offer: { offer_id: resource }, shop: shopAndHost.shop, host: shopAndHost.host })
+        body: JSON.stringify({ offer: { offer_id: resource }, shop: shopAndHost.shop })
       })
         .then((response) => response.json())
         .then((data) => {
@@ -267,7 +267,7 @@ export function OffersList() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ offer: { offer_id: resource }, shop: shopAndHost.shop, host: shopAndHost.host })
+        body: JSON.stringify({ offer: { offer_id: resource }, shop: shopAndHost.shop })
       })
         .then((response) => response.json())
         .then((data) => {

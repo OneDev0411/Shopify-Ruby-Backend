@@ -30,7 +30,7 @@ export function TotalSalesData() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify( {shop: shopAndHost.shop, host: shopAndHost.host, period: period }),
+            body: JSON.stringify( {shop: shopAndHost.shop, period: period }),
         })
         .then( (response) => { return response.json(); })
         .then( (data) => {
@@ -109,7 +109,7 @@ export function TotalSalesData() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify( {shop: shopAndHost.shop, host: shopAndHost.host }),
+            body: JSON.stringify( {shop: shopAndHost.shop }),
         })
         .then( (response) => { return response.json(); })
         .then( (data) => {
@@ -164,7 +164,7 @@ export function TotalSalesData() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify( {shop: shopAndHost.shop, host: shopAndHost.host, period: period }),
+            body: JSON.stringify( {shop: shopAndHost.shop, period: period }),
         })
         .then( (response) => { return response.json(); })
         .then( (data) => {
