@@ -6,8 +6,8 @@ import { countriesList } from "../components/countries.js";
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 
 export function ModalAddConditions(props) {
-  const fetch = useAuthenticatedFetch();
   const shopAndHost = useSelector(state => state.shopAndHost);
+  const fetch = useAuthenticatedFetch(shopAndHost.host);
 
   const [queryValue, setQueryValue] = useState(null);
   const [productData, setProductData] = useState("");
