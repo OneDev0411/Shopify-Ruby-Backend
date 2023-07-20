@@ -88,7 +88,7 @@ export function EditOfferTabs(props) {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ product: { query: childData, type: 'product' }, shop: shopAndHost.shop, host: shopAndHost.host}),
+            body: JSON.stringify({ product: { query: childData, type: 'product' }, shop: shopAndHost.shop}),
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
@@ -120,7 +120,7 @@ export function EditOfferTabs(props) {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ product: { query: query, type: 'product' }, shop: shopAndHost.shop, host: shopAndHost.host}),
+            body: JSON.stringify({ product: { query: query, type: 'product' }, shop: shopAndHost.shop}),
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
@@ -137,7 +137,7 @@ export function EditOfferTabs(props) {
         props.updateOffer("offerable_product_details", []);
         props.updateOffer("offerable_product_shopify_ids", []);
         for(var i=0; i<selectedProducts.length; i++) {
-            fetch(`/api/merchant/products/multi/${selectedProducts[i]}?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}&host=${shopAndHost.host}`, {
+            fetch(`/api/merchant/products/multi/${selectedProducts[i]}?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',

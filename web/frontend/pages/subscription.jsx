@@ -31,7 +31,7 @@ export default function Subscription() {
                headers: {
                  'Content-Type': 'application/json',
                },
-               body: JSON.stringify( {subscription: { plan_internal_name: internal_name }, shop: shopAndHost.shop, host: shopAndHost.host }),
+               body: JSON.stringify( {subscription: { plan_internal_name: internal_name }, shop: shopAndHost.shop }),
            })
            .then( (response) => { return response.json(); })
            .then( (data) => {
@@ -54,7 +54,7 @@ export default function Subscription() {
     }
 
     const fetchSubscription = useCallback(() => {
-        fetch(`/api/merchant/current_subscription?shop=${shopAndHost.shop}&host=${shopAndHost.host}`, {
+        fetch(`/api/merchant/current_subscription?shop=${shopAndHost.shop}`, {
             method: 'GET',
                headers: {
                  'Content-Type': 'application/json',

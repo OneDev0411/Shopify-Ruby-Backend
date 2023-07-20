@@ -63,7 +63,7 @@ export function Partners(){
     }
 
     const getAllPartners = useCallback(async ()=>{
-      fetch(`/api/merchant/partners?shop=${shopAndHost.shop}&host=${shopAndHost.host}`, {
+      fetch(`/api/merchant/partners?shop=${shopAndHost.shop}`, {
         method: 'GET',
            headers: {
              'Content-Type': 'application/json',
