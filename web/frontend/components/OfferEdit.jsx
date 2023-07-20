@@ -6,7 +6,8 @@ import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 
 export function OfferEdit() {
 
-  const fetch = useAuthenticatedFetch();
+  const shopAndHost = useSelector(state => state.shopAndHost);
+  const fetch = useAuthenticatedFetch(shopAndHost.host);
   const [isLoading, setIsLoading]   = useState(true);
   const [selected, setSelected] = useState(0);
 

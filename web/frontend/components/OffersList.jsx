@@ -38,7 +38,7 @@ export function OffersList() {
   const [sortValue, setSortValue] = useState('today');
   const [filteredData, setFilteredData] = useState([]);
   const shopAndHost = useSelector(state => state.shopAndHost);
-  const fetch = useAuthenticatedFetch();
+  const fetch = useAuthenticatedFetch(shopAndHost.host);
 
   const [currentPage, setCurrentPage] = useState(1);
 

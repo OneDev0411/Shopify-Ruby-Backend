@@ -18,8 +18,8 @@ function setKeys(period){
 }
 
 export function TotalSalesData() { 
-    const fetch = useAuthenticatedFetch();
     const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [period, setPeriod] = useState('daily');
     const [salesTotal, setSalesTotal] = useState(0);
     const [salesData, setSalesData] = useState(0);
@@ -96,8 +96,8 @@ export function TotalSalesData() {
 
 
   export function ConversionRate(){
-    const fetch = useAuthenticatedFetch();
     const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [addedToCart, setAddedToCart] = useState(0);
     const [reachedCheckout, setReachedCheckout] = useState(0);
     const [converted, setConverted] = useState(0);
@@ -151,8 +151,8 @@ export function TotalSalesData() {
 
 
   export function OrderOverTimeData(){
-    const fetch = useAuthenticatedFetch();
     const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [period, setPeriod] = useState('daily');
     const [ordersTotal, setOrdersTotal] = useState(0);
     const [ordersData, setOrdersData] = useState(null);
