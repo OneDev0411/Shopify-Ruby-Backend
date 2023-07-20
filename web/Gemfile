@@ -6,7 +6,7 @@ ruby '3.1.4'
 
 gem 'aws-sdk'
 gem 'bootsnap', require: false
-gem 'customerio'
+gem 'customerio'  # A ruby client for the Customer.io event API
 gem 'importmap-rails' # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem 'jbuilder' # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem 'pg'
@@ -15,6 +15,7 @@ gem 'rails', '~> 7.0.4'
 gem 'redis', '~> 5.0'
 gem 'rollbar'
 gem 'liquid'
+gem 'rack-cors'
 gem 'sass-rails', '>= 6'
 gem 'shopify_app', '~> 21.4'
 gem 'sidekiq', '~> 6.1'
@@ -23,9 +24,7 @@ gem 'sprockets-rails'
 gem 'stimulus-rails' # Hotwire's modest JavaScript framework
 gem 'turbo-rails' # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem 'tzinfo-data'
-gem 'liquid'
 gem 'httparty'
-gem 'customerio'           # A ruby client for the Customer.io event API
 
 group :development, :test do
   gem 'byebug'
