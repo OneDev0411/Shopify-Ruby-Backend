@@ -32,6 +32,10 @@ class Plan < ApplicationRecord
     internal_name == "free_plan"
   end
 
+  def trial_plan?
+    internal_name == "trial_plan"
+  end
+
   # Public Class Method.
   # TODO: in the future, only 'plan_based_billing' aka (FLEX plan)
   def self.paid_plan_ids

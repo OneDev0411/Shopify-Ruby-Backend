@@ -16,6 +16,7 @@ import {
   import {useState, useCallback, useEffect} from 'react';
   import React from 'react';
   import { useNavigate } from 'react-router-dom';
+  import { GenericFooter } from '../components';
   import { useAppQuery, useAuthenticatedFetch } from "../hooks";
   import { useSelector } from "react-redux";
   import { OffersList } from '../components';
@@ -33,11 +34,13 @@ import {
     const [sortValue, setSortValue] = useState('today');
     const [filteredData, setFilteredData] = useState([]);
     const shopAndHost = useSelector(state => state.shopAndHost);
-    const fetch = useAuthenticatedFetch();
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
 
     return (
       <Page> 
         <OffersList></OffersList>
+        <div className="space-10"></div>
+        <GenericFooter text='Learn more about ' linkUrl='#' linkText='offers'></GenericFooter>
       </Page>
     );
   

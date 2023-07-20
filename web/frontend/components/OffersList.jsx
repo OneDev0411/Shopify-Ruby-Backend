@@ -9,6 +9,7 @@ import {
   Link,
   FooterHelp,
   Pagination,
+  Select,
   LegacyCard
 } from '@shopify/polaris';
 
@@ -37,7 +38,9 @@ export function OffersList() {
   const [sortValue, setSortValue] = useState('today');
   const [filteredData, setFilteredData] = useState([]);
   const shopAndHost = useSelector(state => state.shopAndHost);
-  const fetch = useAuthenticatedFetch();
+  const fetch = useAuthenticatedFetch(shopAndHost.host);
+
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetch('/api/merchant/offers_list', {
@@ -50,7 +53,7 @@ export function OffersList() {
       },
       redirect: 'follow',
       referrerPolicy: 'no-referrer',
-      body: JSON.stringify({ shopify_domain: shopAndHost.shop }),
+      body: JSON.stringify({ shop: shopAndHost.shop }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -63,8 +66,20 @@ export function OffersList() {
       });
   }, []);
 
+  // Pagination configuration
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, endIndex);
+
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(filteredData);
+    useIndexResourceState(paginatedData);
+
+  // Handle pagination page change
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
   const handleTaggedWithChange = useCallback(
     (value) => setTaggedWith(value),
@@ -82,7 +97,25 @@ export function OffersList() {
     handleTaggedWithRemove();
     handleQueryValueRemove();
   }, [handleQueryValueRemove, handleTaggedWithRemove]);
-  const handleSortChange = useCallback((value) => setSortValue(value), []);
+  const handleSortChange = useCallback((value) => {
+    if(value == "date_asc") {
+      filteredData.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    }
+    else if(value == "date_des") {
+      filteredData.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      filteredData.reverse();
+    }
+    else if (value == "clicks") {
+      filteredData.sort(function(a, b) {
+        return b.clicks - a.clicks;
+      });
+    }
+    else if (value == "revenue") {
+      filteredData.sort(function(a, b) {
+        return b.revenue - a.revenue;
+      });
+    }
+    setSortValue(value), []});
 
   const promotedBulkActions = [
     {
@@ -133,15 +166,13 @@ export function OffersList() {
     : [];
 
   const sortOptions = [
-    { label: 'Date Asc', value: 'date_asc' },
-    { label: 'Date Desc', value: 'date_des' },
-    { label: 'Clicks Asc', value: 'clicks_asc' },
-    { label: 'Clicks Desc', value: 'clicks_desc' },
-    { label: 'Revenue Asc', value: 'revenue_asc' },
-    { label: 'Revenue Desc', value: 'revenue_desc' },
+    {label: 'Date Desc', value: 'date_des'},
+    {label: 'Date Asc', value: 'date_asc'},
+    {label: 'Clicks', value: 'clicks'},
+    {label: 'Revenue', value: 'revenue'},
   ];
 
-  const rowMarkup = filteredData.map(
+  const rowMarkup = paginatedData.map(
     ({ id, title, status, clicks, views, revenue }, index) => (
       <IndexTable.Row
         id={id}
@@ -171,7 +202,7 @@ export function OffersList() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ offer_id: resource, shopify_domain: shopAndHost.shop })
+        body: JSON.stringify({ offer_id: resource, shop: shopAndHost.shop })
       })
         .then((response) => response.json())
         .then((data) => {
@@ -192,7 +223,7 @@ export function OffersList() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ offer_id: resource, shopify_domain: shopAndHost.shop })
+        body: JSON.stringify({ offer_id: resource, shop: shopAndHost.shop })
       })
         .then((response) => response.json())
         .then((data) => {
@@ -213,7 +244,7 @@ export function OffersList() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ offer: { offer_id: resource }, shopify_domain: shopAndHost.shop })
+        body: JSON.stringify({ offer: { offer_id: resource }, shop: shopAndHost.shop })
       })
         .then((response) => response.json())
         .then((data) => {
@@ -236,7 +267,7 @@ export function OffersList() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ offer: { offer_id: resource }, shopify_domain: shopAndHost.shop })
+        body: JSON.stringify({ offer: { offer_id: resource }, shop: shopAndHost.shop })
       })
         .then((response) => response.json())
         .then((data) => {
@@ -283,16 +314,23 @@ export function OffersList() {
             />
           </div>
           <div style={{ paddingLeft: '0.25rem' }}>
+            <Select
+              labelInline
+              label="Sort"
+              options={sortOptions}
+              value={sortValue}
+              onChange={handleSortChange}
+            />
           </div>
         </div>
         <IndexTable
-          // sortOptions={sortOptions}
+          sortOptions={sortOptions}
           sortable={[false, false, true, true, true]}
           sortDirection={'descending'}
           sortColumnIndex={4}
           sort={{ handleSorting }}
           resourceName={resourceName}
-          itemCount={filteredData.length}
+          itemCount={paginatedData.length}
           selectedItemsCount={
             allResourcesSelected ? 'All' : selectedResources.length
           }
@@ -312,6 +350,13 @@ export function OffersList() {
         </IndexTable>
         <div className="space-4"></div>
         <div className="offer-table-footer">
+          <Pagination
+            label={`${currentPage} of ${totalPages}`}
+            hasPrevious={currentPage > 1}
+            hasNext={currentPage < totalPages}
+            onPrevious={() => handlePageChange(currentPage - 1)}
+            onNext={() => handlePageChange(currentPage + 1)}
+          />
         </div>
       </LegacyCard>
       <div className="space-10"></div>

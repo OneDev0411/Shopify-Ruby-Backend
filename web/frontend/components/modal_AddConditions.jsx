@@ -6,8 +6,8 @@ import { countriesList } from "../components/countries.js";
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 
 export function ModalAddConditions(props) {
-  const fetch = useAuthenticatedFetch();
   const shopAndHost = useSelector(state => state.shopAndHost);
+  const fetch = useAuthenticatedFetch(shopAndHost.host);
 
   const [queryValue, setQueryValue] = useState(null);
   const [productData, setProductData] = useState("");
@@ -37,7 +37,7 @@ export function ModalAddConditions(props) {
          headers: {
            'Content-Type': 'application/json',
          },
-         body: JSON.stringify( {shopify_domain: shopAndHost.shop, product: { query: childData, type: 'product' }, json: true }),
+         body: JSON.stringify( {shop: shopAndHost.shop, product: { query: childData, type: 'product' }, json: true }),
      })
      .then( (response) => { return response.json(); })
      .then( (data) => {

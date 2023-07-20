@@ -8,7 +8,7 @@ module Api
 
       # Get /api/merchant/current_shop
       def current_shop
-        @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shopify_domain]) if @icushop.present?
+        @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shop]) if @icushop.present?
         render "shops/current_shop"
       end
 
@@ -79,7 +79,6 @@ module Api
         render "shops/toggle_activation"
       end
 
-
       #GET /api/merchant/active_theme_for_dafault_template
       def active_theme_for_dafault_template
         begin
@@ -103,17 +102,50 @@ module Api
         end
       end
 
+       # Gets shop sale stats. POST  /api/merchant/shops_sale_stats
+      def shop_sale_stats
+        begin
+          @sales_stats = @icushop.sales_stats(params[:period])
+          render "shops/shop_sale_stats"
+        rescue StandardError => e
+          Rails.logger.debug "Error Message: #{e.message}"
+          Rollbar.error("Error", e)
+        end
+      end
+
+      # Gets shop orders stats. POST  /api/merchant/shops_orders_stats
+      def shop_orders_stats
+      begin
+        @orders_stats = @icushop.orders_stats(params[:period])
+        render "shops/shop_orders_stats"
+      rescue StandardError => e
+        Rails.logger.debug "Error Message: #{e.message}"
+        Rollbar.error("Error", e)
+      end
+    end
+
+    # Gets all Shops. POST  /api/merchant/shops_last_stats
+    def shop_offers_stats
+      begin
+        @offers_stats = @icushop.recent_stats
+        render "shops/shop_offers_stats"
+      rescue StandardError => e
+        Rails.logger.debug "Error Message: #{e.message}"
+        Rollbar.error("Error", e)
+      end
+    end
+
       private
 
       def shop_params
         all_names = Shop.column_names + ['date_min', 'date_max', 'canonical_domain',
                                          'path_to_cart', 'has_branding', 'custom_theme_css',
                                          'image', 'stats_from', css_options]
-        params.require('shop').permit(all_names)
+        params.require('shop_attr').permit(all_names)
       end
 
       def set_admin
-        if params['shop']
+        if params['shop_attr']
           @admin = shop_params['admin'] 
         else
           @admin = params['admin']

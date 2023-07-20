@@ -6,19 +6,32 @@ import { isSubscriptionActive } from "../services/actions/subscription";
 import { getShop } from "../services/actions/shop";
 import { useEffect, useState, useCallback } from "react";
 import { useSelector } from 'react-redux';
+import { useAuthenticatedFetch } from "../hooks";
 
 export default function HomePage() {
-  const shop = useSelector(state => state.shopAndHost.shop);
+  const shopAndHost = useSelector(state => state.shopAndHost);
+  const fetch = useAuthenticatedFetch(shopAndHost.host);
   const [currentShop, setCurrentShop] = useState(null);
   const [planName, setPlanName] = useState();
   const [trialDays, setTrialDays] = useState();
 
   const fetchCurrentShop = useCallback(async () => {
-    const response = await getShop(shop);
 
-    setCurrentShop(response.shop);
-    setPlanName(response.plan);
-    setTrialDays(response.days_remaining_in_trial);
+    fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
+      method: 'GET',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+     })
+     .then( (response) => { return response.json(); })
+     .then( (data) => {
+        setCurrentShop(data.shop);
+        setPlanName(data.plan);
+        setTrialDays(data.days_remaining_in_trial);
+     })
+     .catch((error) => {
+      console.log("error", error);
+     })    
   }, [setCurrentShop, setPlanName, setTrialDays]);
 
   useEffect(async()=>{

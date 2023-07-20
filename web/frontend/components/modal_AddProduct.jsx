@@ -9,9 +9,11 @@ import {
     OptionList
   } from '@shopify/polaris';
   import {useState, useCallback, useEffect, useRef} from 'react';
+  import { useSelector } from 'react-redux';
 
   
  export function ModalAddProduct(props) {
+    const shopAndHost = useSelector(state => state.shopAndHost);
     const [resourceListLoading, setResourceListLoading] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectedVariants, setSelectedVariants] = useState({})
@@ -191,7 +193,7 @@ import {
         setResourceListLoading(true);
         let shopifyId = id[id.length-1]
 
-        fetch(`/api/merchant/products/shopify/${shopifyId}?shop_id=${props.shop_id}`, {
+        fetch(`/api/merchant/products/shopify/${shopifyId}?shop_id=${props.shop_id}&shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

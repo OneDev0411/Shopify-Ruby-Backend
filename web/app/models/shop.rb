@@ -1088,7 +1088,8 @@ class Shop < ApplicationRecord
         status: offer.active,
         clicks: offer.daily_stats.map(&:times_clicked).sum,
         views: offer.daily_stats.map(&:times_loaded).sum,
-        revenue: offer.offer_events&.where(action: 'sale')&.pluck(:amount).sum
+        revenue: offer.offer_events&.where(action: 'sale')&.pluck(:amount).sum,
+        created_at: offer.created_at.to_datetime,
       }
     end
     return data

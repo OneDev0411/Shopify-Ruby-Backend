@@ -7,9 +7,11 @@ import { useSelector } from 'react-redux';
 import React, { useState, useEffect, useCallback } from "react";
 import { Redirect, Toast } from '@shopify/app-bridge/actions';
 import { Partners, SettingTabs, GenericTitleBar } from "../components";
+import { useAuthenticatedFetch } from "../hooks";
 
 export default function Settings() {
-    const shop = useSelector(state => state.shopAndHost.shop);
+    const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [currentShop, setCurrentShop] = useState(null);
     const [formData, setFormData] = useState({});
     const app = useAppBridge();
@@ -22,7 +24,7 @@ export default function Settings() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ shopify_domain: shop, admin: null }),
+            body: JSON.stringify({ shop: shopAndHost.shop, admin: null }),
         })
             .then((response) => { return response.json() })
             .then((data) => {
@@ -56,7 +58,7 @@ export default function Settings() {
     };
 
     const toggleActivation = async () => {
-        fetch(`/api/merchant/toggle_activation?shopify_domain=${shop}`, {
+        fetch(`/api/merchant/toggle_activation?shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -90,7 +92,7 @@ export default function Settings() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ shop: data, shopify_domain: shop, admin: data.admin, json: true }),
+                body: JSON.stringify({ shop_attr: data, shop: shopAndHost.shop, admin: data.admin, json: true }),
             })
                 .then((response) => { return response.json(); })
                 .then((data) => {
