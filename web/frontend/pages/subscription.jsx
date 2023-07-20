@@ -14,8 +14,8 @@ import { useAuthenticatedFetch } from "../hooks";
 import { isSubscriptionActive } from "../services/actions/subscription";
 
 export default function Subscription() {
-    const fetch = useAuthenticatedFetch();
     const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [currentSubscription, setCurrentSubscription] = useState(null);
     const [planName, setPlanName] = useState();
     const [trialDays, setTrialDays] = useState();

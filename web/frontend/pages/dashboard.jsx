@@ -26,7 +26,7 @@ import {
     const [isLoading, setIsLoading]   = useState(true);
     const [filteredData, setFilteredData] = useState([]);
     const shopAndHost = useSelector(state => state.shopAndHost);
-    const fetch = useAuthenticatedFetch();
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
     const app = useAppBridge();
 
 

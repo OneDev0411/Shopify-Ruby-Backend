@@ -112,7 +112,7 @@ export default function EditPage() {
     const [isLoading, setIsLoading] = useState(false);
                                       
     const offerID = location.state.offerID;
-    const fetch = useAuthenticatedFetch();
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
 
     //Call on initial render
     useEffect(() => {

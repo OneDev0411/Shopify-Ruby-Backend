@@ -9,8 +9,8 @@ import { useSelector } from 'react-redux';
 import { useAuthenticatedFetch } from "../hooks";
 
 export default function HomePage() {
-  const fetch = useAuthenticatedFetch();
   const shopAndHost = useSelector(state => state.shopAndHost);
+  const fetch = useAuthenticatedFetch(shopAndHost.host);
   const [currentShop, setCurrentShop] = useState(null);
   const [planName, setPlanName] = useState();
   const [trialDays, setTrialDays] = useState();

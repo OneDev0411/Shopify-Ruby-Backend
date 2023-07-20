@@ -10,8 +10,8 @@ import { Partners, SettingTabs, GenericTitleBar } from "../components";
 import { useAuthenticatedFetch } from "../hooks";
 
 export default function Settings() {
-    const fetch = useAuthenticatedFetch();
     const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [currentShop, setCurrentShop] = useState(null);
     const [formData, setFormData] = useState({});
     const app = useAppBridge();

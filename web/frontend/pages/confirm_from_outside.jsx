@@ -12,7 +12,7 @@ const ConfirmFromOutside = () => {
   const app = useAppBridge();
   const redirect = Redirect.create(app);
   const shopAndHost = useSelector(state => state.shopAndHost);
-  const fetch = useAuthenticatedFetch();
+  const fetch = useAuthenticatedFetch(shopAndHost.host);
 
   async function renderConfirmCharge(){
 
