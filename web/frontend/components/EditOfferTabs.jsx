@@ -32,14 +32,15 @@ import tinycolor from "tinycolor2";
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { elementSearch, productsMulti } from "../services/products/actions/product";
-import product_page_image_1 from "../assets/images/product_page_image_1.png"
-import product_page_image_2 from "../assets/images/product_page_image_2.png"
-import product_page_image_3 from "../assets/images/product_page_image_3.png"
-import cart_page_image_1 from "../assets/images/cart_page_image_1.png"
-import cart_page_image_2 from "../assets/images/cart_page_image_2.png"
-import cart_page_image_3 from "../assets/images/cart_page_image_3.png"
-import ajax_cart_image_1 from "../assets/images/ajax_cart_image_1.png"
-import ajax_cart_image_2 from "../assets/images/ajax_cart_image_2.png"
+import "../assets/theme.css";
+import product_page_image_1 from "../assets/images/product_page_image_1.png";
+import product_page_image_2 from "../assets/images/product_page_image_2.png";
+import product_page_image_3 from "../assets/images/product_page_image_3.png";
+import cart_page_image_1 from "../assets/images/cart_page_image_1.png";
+import cart_page_image_2 from "../assets/images/cart_page_image_2.png";
+import cart_page_image_3 from "../assets/images/cart_page_image_3.png";
+import ajax_cart_image_1 from "../assets/images/ajax_cart_image_1.png";
+import ajax_cart_image_2 from "../assets/images/ajax_cart_image_2.png";
 
 export function EditOfferTabs(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -462,109 +463,101 @@ export function SecondTab(props){
         }
     };
     const useTemplatesToDisplayOffer = {
-        Dawn: {
-            cart_page_selector: ['cart1', 'cart2', 'cart3'],
-            cart_page_action: ['before', 'after', 'prepend'],
-            product_page_selector: ['product1', 'product2', 'product3'],
-            product_page_action: ['before', 'after', 'prepend'],
-            ajax_cart_selector: ['ajax1', 'ajax2', 'ajax3'],
-            ajax_cart_action: ['before', 'after', 'prepend']
-        },
         Refresh: {
-            cart_page_selector: ['cart1', 'cart2', 'cart3'],
-            cart_page_action: ['before', 'after', 'prepend'],
-            product_page_selector: ['product1', 'product2', 'product3'],
-            product_page_action: ['before', 'after', 'prepend'],
-            ajax_cart_selector: ['ajax1', 'ajax2', 'ajax3'],
-            ajax_cart_action: ['before', 'after', 'prepend']
+            cart_page_selector: ['.cart-items', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ["[class*='product__description']", '.product-form__quantity', '.product-form__quantity'],
+            product_page_action: ['before', 'before', 'after'],
+            ajax_cart_selector: ['#CartDrawer-Form', '#cart-notification-button', '#cart-notification-button'],
+            ajax_cart_action: ['prepend', 'before', 'before']
         },
         Craft: {
-            cart_page_selector: ['cart1', 'cart2', 'cart3'],
-            cart_page_action: ['before', 'after', 'prepend'],
-            product_page_selector: ['product1', 'product2', 'product3'],
-            product_page_action: ['before', 'after', 'prepend'],
-            ajax_cart_selector: ['ajax1', 'ajax2', 'ajax3'],
-            ajax_cart_action: ['before', 'after', 'prepend']
+            cart_page_selector: ['.cart-items', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ["[class*='product__description']", '.product-form__quantity', '.product-form__quantity'],
+            product_page_action: ['before', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '#cart-notification-button', '#cart-notification-button'],
+            ajax_cart_action: ['before', 'before', 'before']
         },
         Sense: {
-            cart_page_selector: ['cart1', 'cart2', 'cart3'],
-            cart_page_action: ['before', 'after', 'prepend'],
-            product_page_selector: ['product1', 'product2', 'product3'],
-            product_page_action: ['before', 'after', 'prepend'],
-            ajax_cart_selector: ['ajax1', 'ajax2', 'ajax3'],
-            ajax_cart_action: ['before', 'after', 'prepend']
+            cart_page_selector: ['.cart-items', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ["[class*='product__description']", '.product-form__quantity', '.product-form__quantity'],
+            product_page_action: ['before', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '#cart-notification-button', '#cart-notification-button'],
+            ajax_cart_action: ['before', 'before', 'before']
         },
         Origin: {
-            cart_page_selector: ['cart1', 'cart2', 'cart3'],
-            cart_page_action: ['before', 'after', 'prepend'],
-            product_page_selector: ['product1', 'product2', 'product3'],
-            product_page_action: ['before', 'after', 'prepend'],
-            ajax_cart_selector: ['ajax1', 'ajax2', 'ajax3'],
-            ajax_cart_action: ['before', 'after', 'prepend']
+            cart_page_selector: ['#cart', '#cart__ctas', '#cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__quantity', '.product-form__quantity'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['.cart-item:first', '.drawer__footer', '.drawer__footer'],
+            ajax_cart_action: ['before', 'prepend', 'prepend']
         },
         Ride: {
-            cart_page_selector: ['cart1', 'cart2', 'cart3'],
-            cart_page_action: ['before', 'after', 'prepend'],
-            product_page_selector: ['product1', 'product2', 'product3'],
-            product_page_action: ['before', 'after', 'prepend'],
-            ajax_cart_selector: ['ajax1', 'ajax2', 'ajax3'],
-            ajax_cart_action: ['before', 'after', 'prepend']
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
         },
         Spotlight: {
-            cart_page_selector: ['cart1', 'cart2', 'cart3'],
-            cart_page_action: ['before', 'after', 'prepend'],
-            product_page_selector: ['product1', 'product2', 'product3'],
-            product_page_action: ['before', 'after', 'prepend'],
-            ajax_cart_selector: ['ajax1', 'ajax2', 'ajax3'],
-            ajax_cart_action: ['before', 'after', 'prepend']
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
         },
         Taste: {
-            cart_page_selector: ['cart1', 'cart2', 'cart3'],
-            cart_page_action: ['before', 'after', 'prepend'],
-            product_page_selector: ['product1', 'product2', 'product3'],
-            product_page_action: ['before', 'after', 'prepend'],
-            ajax_cart_selector: ['ajax1', 'ajax2', 'ajax3'],
-            ajax_cart_action: ['before', 'after', 'prepend']
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
         },
         Studio: {
-            cart_page_selector: ['cart1', 'cart2', 'cart3'],
-            cart_page_action: ['before', 'after', 'prepend'],
-            product_page_selector: ['product1', 'product2', 'product3'],
-            product_page_action: ['before', 'after', 'prepend'],
-            ajax_cart_selector: ['ajax1', 'ajax2', 'ajax3'],
-            ajax_cart_action: ['before', 'after', 'prepend']
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
         },
         Crave: {
-            cart_page_selector: ['cart1', 'cart2', 'cart3'],
-            cart_page_action: ['before', 'after', 'prepend'],
-            product_page_selector: ['product1', 'product2', 'product3'],
-            product_page_action: ['before', 'after', 'prepend'],
-            ajax_cart_selector: ['ajax1', 'ajax2', 'ajax3'],
-            ajax_cart_action: ['before', 'after', 'prepend']
-        },
-        Refresh: {
-            cart_page_selector: ['cart1', 'cart2', 'cart3'],
-            cart_page_action: ['before', 'after', 'prepend'],
-            product_page_selector: ['product1', 'product2', 'product3'],
-            product_page_action: ['before', 'after', 'prepend'],
-            ajax_cart_selector: ['ajax1', 'ajax2', 'ajax3'],
-            ajax_cart_action: ['before', 'after', 'prepend']
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
         },
         Publisher: {
-            cart_page_selector: ['cart1', 'cart2', 'cart3'],
-            cart_page_action: ['before', 'after', 'prepend'],
-            product_page_selector: ['product1', 'product2', 'product3'],
-            product_page_action: ['before', 'after', 'prepend'],
-            ajax_cart_selector: ['ajax1', 'ajax2', 'ajax3'],
-            ajax_cart_action: ['before', 'after', 'prepend']
+            cart_page_selector: ['#cart', '#cart__ctas', '#cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__quantity', '.product-form__quantity'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['.cart-item:first', '.drawer__footer', '.drawer__footer'],
+            ajax_cart_action: ['before', 'prepend', 'prepend']
         },
         Colorblock: {
-            cart_page_selector: ['cart1', 'cart2', 'cart3'],
-            cart_page_action: ['before', 'after', 'prepend'],
-            product_page_selector: ['product1', 'product2', 'product3'],
-            product_page_action: ['before', 'after', 'prepend'],
-            ajax_cart_selector: ['ajax1', 'ajax2', 'ajax3'],
-            ajax_cart_action: ['before', 'after', 'prepend']
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['before', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
+        },
+        Dawn: {
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
         }
     }
 
@@ -1007,7 +1000,7 @@ export function SecondTab(props){
         }
     })
 
-  const options = [
+    const options = [
       {label: 'Cart page', value: 'cartpage'},
       {label: 'Product page', value: 'productpage'},
       {label: 'Product and cart page', value: 'cartpageproductpage'},
@@ -1108,6 +1101,7 @@ export function SecondTab(props){
                                         source={product_page_image_1}
                                         alt="Sample Image 1"
                                         style={{marginRight : '10px',marginTop: '10px', height: '150px', width: '165px'}}
+                                        className={"hover-effect"}
                                         onClick={() => handleImageClick('product_page', 1)}
                                     />
                                     <Image
@@ -1282,18 +1276,21 @@ export function SecondTab(props){
                                 source={insertedImage1}
                                 alt="Sample Image 1"
                                 style={{marginRight : '10px', marginTop: '10px', height: '150px', width: '165px'}}
+                                className="editOfferTabs_image_tag"
                                 onClick={() => handleImageClick(null, 1)}
                             />
                             <Image
                                 source={insertedImage2}
                                 alt="Sample Image 2"
                                 style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
+                                className="editOfferTabs_image_tag"
                                 onClick={() => handleImageClick(null, 1)}
                             />
                             <Image
                                 source={insertedImage3}
                                 alt="Sample Image 3"
                                 style={{marginLeft : '10px', height: '150px', width: '165px'}}
+                                className="editOfferTabs_image_tag"
                                 onClick={() => handleImageClick(null, 1)}
                             />
                         </>
