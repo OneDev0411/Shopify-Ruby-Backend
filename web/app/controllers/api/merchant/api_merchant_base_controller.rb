@@ -3,11 +3,11 @@
 module Api
   module Merchant
     class ApiMerchantBaseController < ActionController::API
-      before_action :allow_cors
+      # before_action :allow_cors
   
       protected
       def allow_cors
-        response.headers['Access-Control-Allow-Origin'] = ENV['FRONTEND_URL']
+        response.headers['Access-Control-Allow-Origin'] = '*'
         response.headers['Access-Control-Allow-Credentials'] = 'true'
         response.headers['Access-Control-Allow-Headers'] = 'accept, content-type'
         response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,PATCH'
