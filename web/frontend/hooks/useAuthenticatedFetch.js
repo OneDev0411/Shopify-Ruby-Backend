@@ -14,12 +14,16 @@ import { Redirect } from "@shopify/app-bridge/actions";
  *
  * @returns {Function} fetch function
  */
-export function useAuthenticatedFetch() {
+export function useAuthenticatedFetch(host) {
   const app = useAppBridge();
   const fetchFunction = authenticatedFetch(app);
 
   return async (uri, options) => {
-    const response = await fetchFunction(uri, options);
+    const hasQueryParams = uri.includes("?");
+    const uriWithHost = hasQueryParams
+      ? `${uri}&host=${host}`
+      : `${uri}?host=${host}`;
+    const response = await fetchFunction(uriWithHost, options);
     checkHeadersForReauthorization(response.headers, app);
     return response;
   };

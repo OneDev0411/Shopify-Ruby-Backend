@@ -10,8 +10,8 @@ import { Partners, SettingTabs, GenericTitleBar } from "../components";
 import { useAuthenticatedFetch } from "../hooks";
 
 export default function Settings() {
-    const fetch = useAuthenticatedFetch();
     const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [currentShop, setCurrentShop] = useState(null);
     const [formData, setFormData] = useState({});
     const app = useAppBridge();
@@ -24,7 +24,7 @@ export default function Settings() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ shop: shopAndHost.shop, host: shopAndHost.host, admin: null }),
+            body: JSON.stringify({ shop: shopAndHost.shop, admin: null }),
         })
             .then((response) => { return response.json() })
             .then((data) => {
@@ -58,7 +58,7 @@ export default function Settings() {
     };
 
     const toggleActivation = async () => {
-        fetch(`/api/merchant/toggle_activation?shop=${shopAndHost.shop}&host=${shopAndHost.host}`, {
+        fetch(`/api/merchant/toggle_activation?shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ export default function Settings() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ shop_attr: data, shop: shopAndHost.shop, host: shopAndHost.host, admin: data.admin, json: true }),
+                body: JSON.stringify({ shop_attr: data, shop: shopAndHost.shop, admin: data.admin, json: true }),
             })
                 .then((response) => { return response.json(); })
                 .then((data) => {

@@ -1,4 +1,4 @@
-import {ButtonGroup, Button, MediaCard, VideoThumbnail, LegacyCard, Page, Layout, Text, Image, LegacyStack, Heading, Subheading, Banner, VerticalStack} from "@shopify/polaris";
+import {ButtonGroup, Button, Link, MediaCard, VideoThumbnail, LegacyCard, Page, Layout, Text, Image, LegacyStack, Heading, Subheading, Banner, VerticalStack} from "@shopify/polaris";
 import {homeImage, iculogo} from "../assets";
 import "../components/stylesheets/mainstyle.css";
 import { GenericTitleBar } from "../components";
@@ -7,17 +7,18 @@ import { getShop } from "../services/actions/shop";
 import { useEffect, useState, useCallback } from "react";
 import { useSelector } from 'react-redux';
 import { useAuthenticatedFetch } from "../hooks";
+import { useNavigate } from 'react-router-dom';
 
 export default function HomePage() {
-  const fetch = useAuthenticatedFetch();
   const shopAndHost = useSelector(state => state.shopAndHost);
+  const fetch = useAuthenticatedFetch(shopAndHost.host);
   const [currentShop, setCurrentShop] = useState(null);
   const [planName, setPlanName] = useState();
   const [trialDays, setTrialDays] = useState();
 
   const fetchCurrentShop = useCallback(async () => {
 
-    fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}&host=${shopAndHost.host}`, {
+    fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
       method: 'GET',
          headers: {
            'Content-Type': 'application/json',
@@ -37,6 +38,11 @@ export default function HomePage() {
   useEffect(async()=>{
     fetchCurrentShop();
   }, [fetchCurrentShop])
+
+  const navigateTo = useNavigate();
+  const handleCreateOffer = () => {
+    navigateTo('/edit-offer', { state: { offerID: null } });
+  }
   return (
     <Page
       title={<GenericTitleBar image={iculogo} title={'In Cart Upsell & Cross Sell'} /> }
@@ -68,8 +74,8 @@ export default function HomePage() {
                   <div className="space-10"></div>
                   <div className="center-btn">
                     <ButtonGroup>
-                      <Button primary>Create offer</Button>
-                      <Button>View help docs</Button>
+                      <Button primary onClick={() => handleCreateOffer()}>Create offer</Button>
+                      <Button><Link url="https://help.incartupsell.com/en/collections/3263755-all" external>View Help Docs</Link></Button>
                     </ButtonGroup>
                   </div>
                 </div>

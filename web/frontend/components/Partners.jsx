@@ -9,8 +9,8 @@ import "slick-carousel/slick/slick-theme.css";
 import { useAuthenticatedFetch } from "../hooks";
 
 export function Partners(){
-    const fetch = useAuthenticatedFetch();
     const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [partners, setPartners] = useState(null);
     const previousVal = null;
@@ -63,7 +63,7 @@ export function Partners(){
     }
 
     const getAllPartners = useCallback(async ()=>{
-      fetch(`/api/merchant/partners?shop=${shopAndHost.shop}&host=${shopAndHost.host}`, {
+      fetch(`/api/merchant/partners?shop=${shopAndHost.shop}`, {
         method: 'GET',
            headers: {
              'Content-Type': 'application/json',

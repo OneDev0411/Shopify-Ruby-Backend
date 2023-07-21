@@ -71,7 +71,6 @@ app.get("/api/products/create", async (_req, res) => {
 app.use(serveStatic(STATIC_PATH, { index: false }));
 
 app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
-  console.log("requset", _req);
   return res
     .status(200)
     .set("Content-Type", "text/html")

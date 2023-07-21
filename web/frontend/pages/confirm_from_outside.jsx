@@ -12,11 +12,11 @@ const ConfirmFromOutside = () => {
   const app = useAppBridge();
   const redirect = Redirect.create(app);
   const shopAndHost = useSelector(state => state.shopAndHost);
-  const fetch = useAuthenticatedFetch();
+  const fetch = useAuthenticatedFetch(shopAndHost.host);
 
   async function renderConfirmCharge(){
 
-    fetch(`/api/merchant/subscription/confirm_charge?shop=${shopify_domain}&host=${shopAndHost.host}&charge_id=${charge_id}`, {
+    fetch(`/api/merchant/subscription/confirm_charge?shop=${shopify_domain}&charge_id=${charge_id}`, {
       method: 'GET',
          headers: {
            'Content-Type': 'application/json',
