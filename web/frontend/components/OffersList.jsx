@@ -43,7 +43,7 @@ export function OffersList() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetch('/api/merchant/offers_list', {
+    fetch('/api/offers_list', {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
@@ -58,7 +58,7 @@ export function OffersList() {
       .then((response) => response.json())
       .then((data) => {
         console.log('API Data >>> ', data);
-        localStorage.setItem('icushopify_domain', data.shopify_domain);
+        // localStorage.setItem('icushopify_domain', data.shopify_domain);
         setOffersData(data.offers);
         setFilteredData(data.offers);
       }).catch((error) => {

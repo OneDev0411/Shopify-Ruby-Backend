@@ -39,5 +39,14 @@ module ShopifyAppTemplateRuby
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+    if ShopifyAPI::Context.embedded?
+      config.action_dispatch.default_headers = config.action_dispatch.default_headers.merge({
+        "Access-Control-Allow-Origin" => "*",
+        "Access-Control-Allow-Headers" => "Authorization",
+        "Access-Control-Expose-Headers" => "X-Shopify-API-Request-Failure-Reauthorize-Url",
+      })
+    end
+
+    config.hosts.clear
   end
 end

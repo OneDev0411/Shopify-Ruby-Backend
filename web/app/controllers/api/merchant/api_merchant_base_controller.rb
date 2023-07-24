@@ -3,7 +3,8 @@
 module Api
   module Merchant
     class ApiMerchantBaseController < ActionController::API
-      # before_action :allow_cors
+      before_action :allow_cors
+
   
       protected
       def allow_cors

@@ -4,29 +4,33 @@
 class OffersController < AuthenticatedController
 
   before_action :offer_params, only: [:update_from_builder, :create_from_builder]
-  before_action :set_shop, only: [:update_from_builder, :create_from_builder, :duplicate, :destroy]
+  before_action :set_shop, only: [:update_from_builder, :create_from_builder, :duplicate, :destroy, :offers_list]
 
 
   # POST   /offers/:shop_id/builder(.:format)
-      # The current offer create  method
-      def create_from_builder
-        offer = Offer.new(offer_params.except('publish_status'))
-        offer.shop_id = @icushop.id
-        offer.offerable_type = 'multi'
-        offer.rules_json = offer_params['rules_json']
-        if offer_params['publish_status'] == 'published'
-          offer.published_at = Time.now.utc
-          offer.active = true
-        end
+  # The current offer create  method
+  def create_from_builder
+    offer = Offer.new(offer_params.except('publish_status'))
+    offer.shop_id = @icushop.id
+    offer.offerable_type = 'multi'
+    offer.rules_json = offer_params['rules_json']
+    if offer_params['publish_status'] == 'published'
+      offer.published_at = Time.now.utc
+      offer.active = true
+    end
 
-        if offer.save
-          $customerio.track(@icushop.id, 'offer created')
-          @icushop.publish_async
-          render json: { message: 'success', offer_id: offer.id, offer: offer.library_json }
-        else
-          render json: { message: 'could not save', errors: offer.errors }
-        end
-      end
+    if offer.save
+      $customerio.track(@icushop.id, 'offer created')
+      @icushop.publish_async
+      render json: { message: 'success', offer_id: offer.id, offer: offer.library_json }
+    else
+      render json: { message: 'could not save', errors: offer.errors }
+    end
+  end
+
+  def offers_list
+    render json: { shopify_domain: @icushop.shopify_domain, offers: @icushop.offer_data_with_stats }
+  end
 
   # POST  api/offers/:id/update/:shop_id(.:format)
   # The CURRENT offer update method
@@ -90,7 +94,7 @@ class OffersController < AuthenticatedController
 
   def set_shop
     @icushop = Shop.find(params[:shop_id]) if params[:shop_id]
-    @icushop = Shop.find_by(shopify_domain: params[:shopify_domain]) if params[:shopify_domain]
+    @icushop = Shop.find_by(shopify_domain: params['shop']) if params['shop']
   end
 
   def offer_params
