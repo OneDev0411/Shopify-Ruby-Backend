@@ -15,6 +15,7 @@
     "@shopify/app": "^3.46",
     "@shopify/cli": "^3.46",
     "@shopify/polaris": "^10.49",
+    "@shopify/shopify-app-express": "^2.1",
     "@shopify/shopify-app-session-storage-postgresql": "^1.1.7",
     "axios": "^1.4.0",
     "@reduxjs/toolkit": "^1.9.5",
