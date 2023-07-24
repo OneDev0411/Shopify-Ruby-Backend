@@ -32,11 +32,8 @@ const shopify = shopifyApp({
     path: "/api/webhooks",
   },
   // This should be replaced with your preferred storage strategy
-  sessionStorage: new Shopify.Session.PostgreSQLSessionStorage.withCredentials(
-    process.env.POSTGRES_HOST,
-    process.env.POSTGRES_DB,
-    process.env.POSTGRES_USER,
-    process.env.POSTGRES_PASSWORD
+  sessionStorage: new Shopify.session.PostgreSQLSessionStorage(
+    process.env.DATABASE_URL
   ),
 });
 
