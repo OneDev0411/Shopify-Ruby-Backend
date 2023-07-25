@@ -14,10 +14,10 @@ ENV RAILS_MASTER_KEY=$RAILS_MASTER_KEY
 WORKDIR /app
 COPY web .
 
-RUN npm install
-RUN cd frontend && npm install && npm run build
-
+RUN cd frontend && npm install
 RUN bundle install
+
+RUN cd frontend && npm run build
 RUN rake build:all
 
 COPY entrypoint.sh /usr/bin/
