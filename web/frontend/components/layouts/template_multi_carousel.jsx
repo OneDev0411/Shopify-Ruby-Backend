@@ -2,54 +2,13 @@ import { forwardRef, useState, useEffect, useRef } from "react";
 import TemplateComponent from 'react-mustache-template-component';
 import themeCss from '../../assets/theme.css';
 import Siema from 'siema';
-import { Spinner } from '@shopify/polaris';
 
 export default function Carousel(props) {
 
-	const [isLoading, setIsLoading] = useState(false)
-
 	let mySiema, prev, next;
 
-	useEffect(() => {
-		reinitCarousel();
-	}, []);
 
-
-	useEffect(() => {
-		setIsLoading(true);
-		if (document.querySelector(".offer-collection") && document.querySelector('.js-prev')) {
-		  if (mySiema) {
-		    mySiema.destroy(true);
-		  }
-		  mySiema = new Siema({
-		    selector: '.offer-collection',
-		    loop: true
-		  })
-		  prev = document.querySelector('.js-prev');
-		  prev.addEventListener('click', function () { mySiema.prev() });
-		  next = document.querySelector('.js-next');
-		  next.addEventListener('click', function () { mySiema.next() });
-		}
-		setIsLoading(false);
-	}, [props.checkKeysValidity])
-
-	
-	// Called everytime frequently to update the JS.
-	function reinitCarousel() {
-		if (document.querySelector(".offer-collection") && document.querySelector('.js-prev')) {
-		  if (mySiema) {
-		    mySiema.destroy(true);
-		  }
-		  mySiema = new Siema({
-		    selector: '.offer-collection',
-		    loop: true
-		  })
-		  props.updateCheckKeysValidity("carouselWidth", mySiema.selectorWidth);
-		  props.updateCheckKeysValidity("selectedCarouselWidth", true);
-		}
-	}
-
-	const template = `<div id="nudge-offer-{{ id }}" style="background-color: {{ css_options.main.backgroundColor }}; color: {{ css_options.main.color}}; {{#mainMarginTop }} margin-top: {{css_options.main.marginTop}}; {{/mainMarginTop}} {{#mainMarginBottom }} margin-bottom: {{css_options.main.marginBottom}}; {{/mainMarginBottom}} {{#mainBorderWidth}} border: {{css_options.main.borderWidth}}px {{css_options.main.borderStyle}}; {{/mainBorderWidth}} {{#mainBorderRadius}} border-radius: {{css_options.main.borderRadius}}px; {{/mainBorderRadius}} {{ #mobileViewWidth }} width: 320px {{/ mobileViewWidth}}" class="nudge-offer {{ theme }} {{#show_product_image}} with-image {{/show_product_image}} multi {{ multi_layout }} {{shop.extra_css_classes}}"
+	const template = useRef(`<div id="nudge-offer-{{ id }}" style="background-color: {{ css_options.main.backgroundColor }}; color: {{ css_options.main.color}}; {{#mainMarginTop }} margin-top: {{css_options.main.marginTop}}; {{/mainMarginTop}} {{#mainMarginBottom }} margin-bottom: {{css_options.main.marginBottom}}; {{/mainMarginBottom}} {{#mainBorderWidth}} border: {{css_options.main.borderWidth}}px {{css_options.main.borderStyle}}; {{/mainBorderWidth}} {{#mainBorderRadius}} border-radius: {{css_options.main.borderRadius}}px; {{/mainBorderRadius}} {{ #mobileViewWidth }} width: 320px {{/ mobileViewWidth}}" class="nudge-offer {{ theme }} {{#show_product_image}} with-image {{/show_product_image}} multi {{ multi_layout }} {{shop.extra_css_classes}}"
      data-offerid="{{ id }}">
   {{#show_nothanks}}
   <a class="dismiss-button" onclick="InCartUpsell.dismissOffer({{ id }}); return false;">
@@ -173,16 +132,33 @@ export default function Carousel(props) {
     <a style="color: {{ powered_by_link_color }}; display: inline !important;" href="http://apps.shopify.com/in-cart-upsell?ref=app">In Cart Upsell</a>
   </div>
   {{/show_powered_by}}
-</div>`;
+</div>`);
+
+
+	useEffect(() => {
+		if (document.querySelector(".offer-collection") && document.querySelector('.product-wrapper')) {
+		  if (mySiema) {
+		    mySiema.destroy(true);
+		  }
+		  mySiema = new Siema({
+		    selector: '.offer-collection',
+		    loop: true
+		  })
+		  if(!props.checkKeysValidity.selectedCarouselWidth) {
+		  	props.updateCheckKeysValidity("carouselWidth", mySiema.selectorWidth);
+	  		props.updateCheckKeysValidity("selectedCarouselWidth", true);
+		  }
+		  prev = document.querySelector('.js-prev');
+		  prev.addEventListener('click', function () { mySiema.prev() });
+		  next = document.querySelector('.js-next');
+		  next.addEventListener('click', function () { mySiema.next() });
+		}
+	}, [props.checkKeysValidity.selectedCarouselWidth])
 	
 
 	return( 
 		<>
-		{isLoading ? (
-				<Spinner/>
-			) : (
-				<TemplateComponent template={template} data={({...props.offer, ...props.shop, ...props.checkKeysValidity})}/>
-			)}
+				<TemplateComponent template={template.current} data={({...props.offer, ...props.shop, ...props.checkKeysValidity})}/>
 		</>
 	);
 }
