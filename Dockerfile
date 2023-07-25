@@ -16,7 +16,6 @@ COPY web .
 
 RUN npm install
 RUN cd frontend && npm install && npm run build
-RUN cd web && npm install && npm run build
 
 RUN bundle install
 RUN rake build:all
