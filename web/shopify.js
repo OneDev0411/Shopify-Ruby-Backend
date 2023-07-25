@@ -1,4 +1,4 @@
-import { BillingInterval, LATEST_API_VERSION } from "@shopify/shopify-api";
+import { Shopify, BillingInterval, LATEST_API_VERSION } from "@shopify/shopify-api";
 import { shopifyApp } from "@shopify/shopify-app-express";
 import {PostgreSQLSessionStorage} from '@shopify/shopify-app-session-storage-postgresql';
 let { restResources } = await import(
@@ -32,8 +32,11 @@ const shopify = shopifyApp({
     path: "/api/webhooks",
   },
   // This should be replaced with your preferred storage strategy
-  sessionStorage: new PostgreSQLSessionStorage(
-    new URL('postgres://ua0qbodo646ito:p9eab0c730a447e57589ff972885869252567053971e5dc7f26397ac9fec49b1c@ec2-35-169-23-28.compute-1.amazonaws.com:5432/d52ei2g7is3nbs'),
+  sessionStorage: new PostgreSQLSessionStorage.withCredentials(
+    process.env.POSTGRES_HOST,
+    process.env.POSTGRES_DB,
+    process.env.POSTGRES_USER,
+    process.env.POSTGRES_PASSWORD
   ),
 });
 

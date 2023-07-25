@@ -28,7 +28,8 @@ class Shop < ApplicationRecord
   def shop_setup
     async_setup
     signup_for_referral_program
-    select_plan('trial_plan')
+    # todo: uncomment select_plan('trial_plan')
+    # select_plan('trial_plan')
     track_installation
   end
 
