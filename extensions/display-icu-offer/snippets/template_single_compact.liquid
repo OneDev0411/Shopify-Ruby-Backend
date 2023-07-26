@@ -1,0 +1,62 @@
+<div id="nudge-offer-compact" class="nudge-offer">
+  <a id="dismiss-button-compact" class="dismiss-button" onclick="dismissOfferCompact()">&times;</a>
+  <!-- <div id="offerable-product-details-compact-{{id}}"> -->
+  	<div id="product-image-wrapper-compact-{{id}}" class="product-image-wrapper">
+  		<a id="link-to-product-image-compact-{{id}}" href="">
+  			<img id="product-image-compact-{{id}}" src="" class="product-image" loading="lazy" width="" height="auto">
+  		</a>
+  	</div>
+    <div id="nudge-wrapper-compact-{{id}}" class="nudge-wrapper">
+      <div id="offer-text-compact-{{id}}" class="offer-text">
+      </div>
+    	<div class="product-title-wrapper">
+    		<a id="link-to-product-title-compact-{{id}}" href="">
+					<span id="product-title-compact-{{id}}" class="product-title"></span>
+					<span id="comparable-price-compact-{{id}}" class="product-price-wrapper compare-at-price money"></span>
+					<span id="product-price-compact-{{id}}" class="product-price-wrapper money"></span>
+				</a>
+    	</div>
+
+
+
+
+
+
+
+    	<form id="product-actions-compact-{{id}}" class="variants" action="/cart/add" method="post">
+    		<input id="custom-field-compact-first-{{id}}" type="text" name="" class="custom-field">
+    		<input id="custom-field-compact-second-{{id}}" type="text" name="" class="custom-field">
+    		<input id="custom-field-compact-third-{{id}}" type="text" name="" class="custom-field">
+    		<span id="variants-wrapper-compact-{{id}}" class="variants-wrapper">
+			    <select id="product-select-compact-{{id}}" name="" onchange="changeJsonVariant(this)">
+			    </select>
+			  </span>
+			  <span id="single-variant-price-compact-{{id}}" class="single-variant-price money">
+			  	<span id="single-variant-price-compact-text-{{id}}"></span>
+			  	<select id="product-select-compact-single-{{id}}"></select>
+			  </span>
+			  <span id="quantity-wrapper-compact-{{id}}" class="quantity-wrapper">
+			    <select id="quantity-select-compact-{{id}}" name="quantity">
+			      <option value="1">1</option>
+			      <option value="2">2</option>
+			      <option value="3">3</option>
+			      <option value="4">4</option>
+			      <option value="5">5</option>
+			      <option value="6">6</option>
+			      <option value="7">7</option>
+			      <option value="8">8</option>
+			      <option value="9">9</option>
+			      <option value="10">10</option>
+			    </select>
+		  	</span>
+		  	<input id="single-quantity-select-compact-{{id}}" name="quantity" type="hidden" value="1"></input>
+		  	<input id="interval-unit-input-compact-{{id}}" name="" type="hidden" value=""></input>
+				<input id="interval-frequency-input-compact-{{id}}" name="" type="hidden" value=""></input>
+				<input id="recharge-subscription-id-input-compact-{{id}}" name="" type="hidden" value=""></input>
+		  	<button id="submit-button-compact-{{id}}" type="submit" name="add" class="bttn product-price" onclick="acceptShopifyOffer(this.form)">
+		  	</button>
+			  <input id="submit-input-compact-{{id}}" type="submit" name="add" class="bttn product-price" value="" onClick="acceptShopifyOffer(this.form)"></input>
+    	</form>
+    </div>            
+	<!-- </div> -->
+</div>

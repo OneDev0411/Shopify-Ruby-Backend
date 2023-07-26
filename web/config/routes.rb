@@ -35,6 +35,7 @@ Rails.application.routes.draw do
       get 'current_subscription', to: 'subscriptions#current_subscription'
       get 'subscription/confirm_charge', to: 'subscriptions#confirm_charge', as: :confirm_charge
       get 'partners', to: 'partners#index'
+      get 'shop_info' => 'shops#shop_info'
       get 'autopilot_details', to: 'shops#autopilot_details'
       post 'enable_autopilot', to: 'shops#enable_autopilot'
       get 'enable_autopilot_status', to: 'shops#enable_autopilot_status'

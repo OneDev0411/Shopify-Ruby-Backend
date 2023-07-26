@@ -1,0 +1,175 @@
+<div id="nudge-offer" class="nudge-offer custom with-image multi flex " data-offerid="">
+  {% if block.settings.show_nothanks %}
+    <a class="dismiss-button">&times;</a>
+  {% endif %}
+  <div id="domain" class="offer-text">{{ shop.id }}</div>
+  {% for product in block.settings.product_list %}
+    <div class="offer-collection">
+      <div class="product-wrapper">
+          <div class="product-image-wrapper">
+            {% if block.settings.show_image %}
+            <a href={{ product.url }}>
+            <img src= "{{ product | image_url: 'medium' }}" loading="lazy" class="product-image medium" width=50, height=50></img></a>
+            {% endif %}
+          </div>
+          {% render "partial_price_block", product: product, link_image_and_title: block.settings.link_image_and_title, show_title: block.settings.show_title, price_next_to_title: block.settings.price_next_to_title, product_compare_at_price: block.settings.product_compare_at_price %}      
+
+          {% render "partial_product_form", product: product, has_variant: block.settings.has_variant, product_price: block.settings.product_price, show_quantity_selector: block.settings.show_quantity_selector, recharge_subscription: block.settings.recharge_subscription, interval_unit: block.settings.interval_unit, interval_frequency: block.settings.interval_frequency, button_text: block.settings.button_text %}          
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+
+{% schema %}
+  {
+    "name": "Multi Flex",
+    "target": "section",
+    "stylesheet": "index.css",
+    "javascript": "index.js",
+    "settings": [
+      { 
+          "id": "offer_text",
+          "type": "text",
+          "label": "Offer Text",
+          "default": "Would you like to add this product??"
+      },
+      {
+        "type": "product_list",
+        "id": "product_list",
+        "label": "Products",
+        "limit": 12
+      },
+      { 
+          "id": "button_text",
+          "type": "text",
+          "label": "Button Text",
+          "default": "Add To Cart"
+      },
+      {
+        "type": "select",
+        "id": "color_scheme",
+        "label": "Color Scheme",
+        "options": [
+          {
+            "value": "custom",
+            "label": "Custom"
+          },
+          {
+            "value": "default",
+            "label": "Default"
+          },
+          {
+            "value": "inverse",
+            "label": "Inverse"
+          },
+          {
+            "value": "original",
+            "label": "Original"
+          },
+          {
+            "value": "desert",
+            "label": "Desert"
+          },
+          {
+            "value": "cobalt",
+            "label": "Cobalt"
+          },
+          {
+            "value": "haloween",
+            "label": "Haloween"
+          },
+          {
+            "value": "turqo",
+            "label": "Cobalt"
+          },
+          {
+            "value": "blank",
+            "label": "Blank"
+          }
+        ],
+        "default": "custom"
+      },
+      {
+        "type": "select",
+        "id": "offer_layout",
+        "label": "Layout",
+        "options": [
+          {
+            "value": "compact",
+            "label": "Compact"
+          },
+          {
+            "value": "stack",
+            "label": "Stack"
+          },
+          {
+            "value": "carousel",
+            "label": "Carousel"
+          },
+          {
+            "value": "flex",
+            "label": "Flex"
+          }
+        ],
+        "default": "stack"
+      },
+      {
+        "id": "has_variant",
+        "type": "checkbox",
+        "label": "Product has variant",
+        "default": false
+      },
+      {
+        "id": "show_image",
+        "type": "checkbox",
+        "label": "Show Image",
+        "default": true
+      },
+      {
+        "id": "show_title",
+        "type": "checkbox",
+        "label": "Title",
+        "default": false
+      },
+      {
+        "id": "price_next_to_title",
+        "type": "checkbox",
+        "label": "Price (next to title)",
+        "default": false
+      },
+      {
+        "id": "product_compare_at_price",
+        "type": "checkbox",
+        "label": "Compare At Price (next to title)",
+        "default": false
+      },
+      {
+        "id": "product_price",
+        "type": "checkbox",
+        "label": "Price (in variant dropdown)",
+        "default": false
+      },
+      {
+        "id": "link_image_and_title",
+        "type": "checkbox",
+        "label": "Link image and title to offered product(s) (not recommended)",
+        "default": false
+      },
+      {
+        "id": "show_nothanks",
+        "type": "checkbox",
+        "label": "Show an x in the corner so shoppers can dismiss it (not recommended)",
+        "default": false
+      },
+      {
+        "id": "show_quantity_selector",
+        "type": "checkbox",
+        "label": "Quantity chooser (otherwise the quantity will automatically be 1)",
+        "default": false
+      }
+    ]
+  }
+
+{% endschema %}

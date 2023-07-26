@@ -4,12 +4,21 @@ module Api
     class ShopsController < ApiMerchantBaseController
       before_action :find_shop
       before_action :set_admin, only: [:shop_settings, :update_shop_settings]
-      before_action :ensure_plan
+      before_action :ensure_plan, except: [:shop_info]
 
       # Get /api/merchant/current_shop
       def current_shop
         @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shop]) if @icushop.present?
         render "shops/current_shop"
+      end
+
+
+      def shop_info
+        if @icushop.present?
+          render json: {shop: @icushop, path_to_cart: @icushop.path_to_cart, canonical_domain: @icushop.canonical_domain, can_run_on_checkout_page: @icushop.can_run_on_checkout_page}
+        else
+          render json: {message: "no shop found"}
+        end
       end
 
       #POST /api/merchant/shop_settings

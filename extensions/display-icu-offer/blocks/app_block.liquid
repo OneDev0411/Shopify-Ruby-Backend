@@ -1,0 +1,24 @@
+<head>
+  {% # theme-check-disable AssetSizeJavaScript, ParserBlockingJavaScript, RemoteAsset %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" defer></script>
+    <script type="module">
+      import { Helpers } from './helpers.js';
+    </script>
+  {% # theme-check-enable AssetSizeJavaScript, ParserBlockingJavaScript, RemoteAsset %}
+</head>
+<div id="template-multi-flex">
+  {% render "template_multi_flex" %}
+</div>
+
+<div id="template-single-compact">
+  {% render "template_single_compact" %}
+</div>
+
+{% schema %}
+  {
+    "name": "Theme App Block",
+    "target": "section",
+    "stylesheet": "index.css",
+    "javascript": "index.js"
+  }
+{% endschema %}
