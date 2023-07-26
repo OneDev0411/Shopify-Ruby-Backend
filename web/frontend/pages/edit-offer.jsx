@@ -10,10 +10,13 @@ import { offerActivate, loadOfferDetails, getOfferSettings } from "../services/o
 import { useLocation } from 'react-router-dom';
 import { useSelector } from "react-redux";
 import { OfferPreview } from "../components/OfferPreview";
+import { useAppBridge } from '@shopify/app-bridge-react'
+import { Redirect } from '@shopify/app-bridge/actions';
 
 export default function EditPage() {
 
     const shopAndHost = useSelector(state => state.shopAndHost);
+    const app = useAppBridge();
 
     // Content section tab data
     const location = useLocation();
@@ -116,6 +119,7 @@ export default function EditPage() {
 
     //Call on initial render
     useEffect(() => {
+        let redirect = Redirect.create(app);
         if(location.state != null && location.state?.offerID == null) {
             setIsLoading(true);
             fetch(`/api/merchant/offer_settings`, {
@@ -143,6 +147,9 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                }
                 setShop(data.shop_settings);
             })
             .catch((error) => {   
@@ -196,6 +203,9 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                }
                 setShop(data.shop_settings);
             })
             .catch((error) => {
@@ -337,7 +347,7 @@ export default function EditPage() {
           ots.interval_frequency = offer.interval_frequency;
         }
         if(location.state != null && location.state?.offerID == null) {
-            fetch(`/api/offers/create/${shop.shop_id}`, {
+            fetch(`/api/offers/create/${shop?.shop_id}`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -354,7 +364,7 @@ export default function EditPage() {
             // offerUpdate(fetch, offer.id, shopId, ots);
         }
         else {
-            fetch(`/api/offers/${offer.id}/update/${shop.shop_id}`, {
+            fetch(`/api/offers/${offer.id}/update/${shop?.shop_id}`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',

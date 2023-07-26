@@ -304,7 +304,7 @@ export function EditOfferTabs(props) {
         }}
       >
         <Modal.Section>
-            <ModalAddProduct updateQuery={updateQuery} shop_id={props.shop.shop_id} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct}/>
+            <ModalAddProduct updateQuery={updateQuery} shop_id={props.shop?.shop_id} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct}/>
         </Modal.Section>
       </Modal>
     </div>
