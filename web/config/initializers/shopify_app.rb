@@ -18,9 +18,9 @@ ShopifyApp.configure do |config|
   config.reauth_on_access_scope_changes = true
 
   DOMAIN_URL = ENV.fetch('JUST_DOMAIN_URL', '').presence
-  config.root_url = "#{DOMAIN_URL}/api"
-  config.login_url = "#{DOMAIN_URL}/api/auth"
-  config.login_callback_url = "#{DOMAIN_URL}/api/auth/callback"
+  config.root_url = "/api"
+  config.login_url = "/api/auth"
+  config.login_callback_url = "/api/auth/callback"
   config.embedded_redirect_url = '/ExitIframe'
 
   # You may want to charge merchants for using your app. Setting the billing configuration will cause the Authenticated
