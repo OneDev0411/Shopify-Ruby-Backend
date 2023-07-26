@@ -33,7 +33,7 @@ const shopify = shopifyApp({
   },
   // This should be replaced with your preferred storage strategy
   sessionStorage: new PostgreSQLSessionStorage(
-    new URL('postgres://ua0qbodo646ito:p9eab0c730a447e57589ff972885869252567053971e5dc7f26397ac9fec49b1c@ec2-35-169-23-28.compute-1.amazonaws.com:5432/d52ei2g7is3nbs')
+    new URL(process.env.DATABASE_URL),
   ),
 });
 
