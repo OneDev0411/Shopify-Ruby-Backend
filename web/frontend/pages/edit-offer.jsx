@@ -124,7 +124,6 @@ export default function EditPage() {
             setIsLoading(true);
             fetch(`/api/merchant/offer_settings`, {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: {
                   'Content-Type': 'application/json',
                 },
@@ -141,7 +140,6 @@ export default function EditPage() {
             setIsLoading(true);
             fetch(`/api/merchant/shop_settings`, {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: {
                   'Content-Type': 'application/json',
                 },
@@ -162,7 +160,6 @@ export default function EditPage() {
             setIsLoading(true);
             fetch(`/api/merchant/load_offer_details`, {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: {
                   'Content-Type': 'application/json',
                 },
@@ -184,7 +181,6 @@ export default function EditPage() {
             setIsLoading(true);
             fetch(`/api/merchant/offer_settings`, {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: {
                   'Content-Type': 'application/json',
                 },
@@ -200,7 +196,6 @@ export default function EditPage() {
             setIsLoading(true);
             fetch(`/api/merchant/shop_settings`, {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: {
                   'Content-Type': 'application/json',
                 },
