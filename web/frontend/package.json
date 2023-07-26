@@ -17,6 +17,7 @@
     "@shopify/app-bridge-react": "^3.7",
     "@shopify/app-bridge-utils": "^3.5.1",
     "@shopify/polaris": "^10.49",
+    "@shopify/polaris-viz": "^8.1.1",
     "@vitejs/plugin-react": "4.0",
     "axios": "^1.4.0",
     "react": "^18.2",

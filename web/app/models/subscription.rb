@@ -336,8 +336,8 @@ class Subscription < ApplicationRecord
   end
 
   def track_customerio_event
-    $customerio.track(shop.id, 'installed')
-    $customerio.identify(id: shop.id, email: shop.email, active: shop.active?, shopify_plan: shop.shopify_plan_name, app_plan_name: shop.plan&.name, created_at: shop.created_at.to_i, updated_at: shop.updated_at.to_i, status: "installed")
+    # $customerio.track(shop.id, 'installed')
+    # $customerio.identify(id: shop.id, email: shop.email, active: shop.active?, shopify_plan: shop.shopify_plan_name, app_plan_name: shop.plan&.name, created_at: shop.created_at.to_i, updated_at: shop.updated_at.to_i, status: "installed")
   end
 
   def track_plan_change

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'boot'
+require "action_cable/engine"
 
 # OUT active_storage/engine
 # OUT action_cable/engine
