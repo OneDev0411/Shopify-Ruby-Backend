@@ -12,6 +12,9 @@ Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   get '/confirm_from_outside', to: 'js#confirm_from_outside'
+  post 'api/offers/create/:shop_id', to: 'offers#create_from_builder'
+  patch 'api/offers/:id/update/:shop_id', to: 'offers#update_from_builder'
+
     # API V1
   namespace :api do
     namespace :merchant, defaults: { format: 'json' } do
@@ -39,8 +42,6 @@ Rails.application.routes.draw do
       post '/offers/:id/duplicate', to: 'offers#duplicate'
       delete '/offers/:id', to: 'offers#destroy'
     end
-    post '/offers/create/:shop_id', to: 'offers#create_from_builder'
-    post '/offers/:id/update/:shop_id', to: 'offers#update_from_builder'
   end
 
 
