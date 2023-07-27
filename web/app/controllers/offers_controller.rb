@@ -3,9 +3,7 @@
 
 class OffersController < AuthenticatedController
 
-  before_action :offer_params, only: [:update_from_builder, :create_from_builder]
-  before_action :set_shop, only: [:update_from_builder, :create_from_builder, :duplicate, :destroy, :offers_list]
-
+  before_action :set_shop, only: [:update_from_builder, :create_from_builder, :duplicate, :destroy]
 
   # POST   /offers/:shop_id/builder(.:format)
   # The current offer create  method
@@ -26,10 +24,6 @@ class OffersController < AuthenticatedController
     else
       render json: { message: 'could not save', errors: offer.errors }
     end
-  end
-
-  def offers_list
-    render json: { shopify_domain: @icushop.shopify_domain, offers: @icushop.offer_data_with_stats }
   end
 
   # POST  api/offers/:id/update/:shop_id(.:format)

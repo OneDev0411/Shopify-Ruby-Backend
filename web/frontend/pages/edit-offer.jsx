@@ -155,6 +155,8 @@ export default function EditPage() {
             .catch((error) => {   
                 console.log("Error > ", error);
             })
+            updateCheckKeysValidity('text', offer.text_a);
+            updateCheckKeysValidity('cta', offer.cta_a);
         }
         else {
             setIsLoading(true);
@@ -167,8 +169,8 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
-                data.text = data.text_a.replace("{{ product_title }}", data.offerable_product_details[0].title)
-                data.cta = data.cta_a;
+                updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0].title));
+                updateCheckKeysValidity('cta', data.cta_a);
                 for(var i=0; i<data.offerable_product_details.length; i++) {
                     data.offerable_product_details[i].preview_mode = true;
                 }
@@ -352,20 +354,20 @@ export default function EditPage() {
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({offer: ots, shop: shopAndHost.shop, host: shopAndHost.host}),
+                body: JSON.stringify({offer: ots})
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
                 setOffer(data.offer);
-                location.state = null;
+                location.state.offerID = data.offer.id;
             })
             .catch((error) => {
             })
             // offerUpdate(fetch, offer.id, shopId, ots);
         }
         else {
-            fetch(`/api/offers/${offer.id}/update/${shop?.shop_id}`, {
-                method: 'POST',
+            fetch(`/api/offers/${offer.id}/update/${shop.shop_id}`, {
+                method: 'PATCH',
                 headers: {
                   'Content-Type': 'application/json',
                 },
@@ -373,13 +375,12 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json(); })
             .then( (data) => {
-                location.state = null;
                 data.text = data.text_a.replace("{{ product_title }}", data.offerable_product_details[0].title)
                 data.cta = data.cta_a;
-                for(var i=0; i<data.offerable_product_details.length; i++) {
-                    data.offerable_product_details[i].preview_mode = true;
+                for(var i=0; i<data.offer.offerable_product_details.length; i++) {
+                    data.offer.offerable_product_details[i].preview_mode = true;
                 }
-                 setOffer(data.offer);
+                setOffer(data.offer);
             })
             .catch((error) => {
             })

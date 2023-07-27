@@ -43,7 +43,7 @@ export function OffersList() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetch('/api/offers_list', {
+    fetch('/api/merchant/offers_list', {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
