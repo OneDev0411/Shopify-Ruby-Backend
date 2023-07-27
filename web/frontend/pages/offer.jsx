@@ -37,8 +37,19 @@ import {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
 
+    const handleOpenOfferPage = () => {
+      navigateTo('/edit-offer', { state: { offerID: null } });
+    }
+
     return (
-      <Page> 
+      <Page>
+        <TitleBar
+          title="Offers"
+          primaryAction={{
+            content: "Create Offer",
+            onAction: handleOpenOfferPage,
+          }}
+        />
         <OffersList></OffersList>
         <div className="space-10"></div>
         <GenericFooter text='Learn more about ' linkUrl='#' linkText='offers'></GenericFooter>

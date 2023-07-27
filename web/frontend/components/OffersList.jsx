@@ -284,23 +284,12 @@ export function OffersList() {
 
   const navigateTo = useNavigate();
 
-  const handleOpenOfferPage = () => {
-    navigateTo('/edit-offer', { state: { offerID: null } });
-  }
-
   const handleEditOffer = (offer_id) => {
     navigateTo('/edit-offer', { state: { offerID: offer_id } });
   }
 
   return (
     <Page>
-      <TitleBar
-        title="Offers"
-        primaryAction={{
-          content: "Create Offer",
-          onAction: handleOpenOfferPage,
-        }}
-      />
       <LegacyCard sectioned>
         <div style={{ display: 'flex' }}>
           <div style={{ flex: 1 }}>

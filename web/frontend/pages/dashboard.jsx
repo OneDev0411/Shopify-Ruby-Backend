@@ -111,8 +111,8 @@ import {
           <TitleBar
               title="Dashboard"
               primaryAction={{
-              content: "Create Offer",
-              onAction: () => console.log("create offer btn clicked"),
+                  content: "Create Offer",
+                  onAction: () => console.log("create offer btn clicked"),
               }}
           />
           
