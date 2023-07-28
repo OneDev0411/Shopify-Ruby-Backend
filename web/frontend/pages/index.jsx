@@ -43,6 +43,7 @@ export default function HomePage() {
   const handleCreateOffer = () => {
     navigateTo('/edit-offer', { state: { offerID: null } });
   }
+
   return (
     <Page
       title={<GenericTitleBar image={iculogo} title={'In Cart Upsell & Cross Sell'} /> }
