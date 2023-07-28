@@ -311,7 +311,7 @@ export function OffersList() {
                   <div className="center-btn">
                     <ButtonGroup>
                       <Button primary onClick={() => handleCreateOffer()}>Create offer</Button>
-                      <Button><Link url="https://help.incartupsell.com/en/collections/3263755-all" external>View Help Docs</Link></Button>
+                      <Button><Link url="https://help.incartupsell.com/en/collections/3263755-icu-help-center" external>View Help Docs</Link></Button>
                     </ButtonGroup>
                   </div>
                 </div>
