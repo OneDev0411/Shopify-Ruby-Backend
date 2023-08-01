@@ -38,12 +38,14 @@ export function EditOfferTabs(props) {
     const handleTitleChange = useCallback((newValue) => props.updateOffer("title", newValue), []);
     const handleTextChange = useCallback((newValue) => {
         props.updateOffer("text_a", newValue);
-        props.updateOffer("text", newValue.replace("{{ product_title }}", props.offer.offerable_product_details[0].title));
-    }, []);
+        if(props.offer.offerable_product_details.length > 0) {
+            props.updateCheckKeysValidity("text", newValue.replace("{{ product_title }}", props.offer.offerable_product_details[0].title));
+        }
+    }, [props.offer.offerable_product_details]);
     const handleAltTextChange = useCallback((newValue) => props.updateOffer("text_b", newValue), []);
     const handleBtnChange = useCallback((newValue) => {
         props.updateOffer("cta_a", newValue);
-        props.updateOffer('cta', newValue);
+        props.updateCheckKeysValidity('cta', newValue);
     }, []);
     const handleAltBtnChange = useCallback((newValue) => props.updateOffer("cta_b", newValue), []);
     //checkbox controls
@@ -85,7 +87,6 @@ export function EditOfferTabs(props) {
     const [resourceListLoading, setResourceListLoading] = useState(false);
     const [selectedProducts, setSelectedProducts] = useState([]);
 
-
     //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
     function updateQuery (childData) {
         setResourceListLoading(true);
@@ -98,8 +99,8 @@ export function EditOfferTabs(props) {
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
-            setResourceListLoading(false);
             setProductData(data);
+            setResourceListLoading(false);
         })
         .catch((error) => {
             console.log("Error > ", error);
@@ -130,8 +131,8 @@ export function EditOfferTabs(props) {
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
-            setResourceListLoading(false);
             setProductData(data);
+            setResourceListLoading(false);
         })
         .catch((error) => {
             console.log("# Error getProducts > ", JSON.stringify(error));
@@ -157,8 +158,8 @@ export function EditOfferTabs(props) {
                 props.updateProductsOfOffer(data);
                 setProductData("");
                 if(responseCount == 0) {
-                    props.updateOffer("text", props.offer.text_a.replace("{{ product_title }}", data.title));
-                    props.updateOffer('cta', props.offer.cta_a);
+                    props.updateCheckKeysValidity("text", props.offer.text_a.replace("{{ product_title }}", data.title));
+                    props.updateCheckKeysValidity('cta', props.offer.cta_a);
                 }
                 responseCount++;
             })
