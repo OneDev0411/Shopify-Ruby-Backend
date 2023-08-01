@@ -1,0 +1,91 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://dev-store-manuel.myshopify.com/admin/api/2023-07/shop.json
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - ShopifyApp/21.6.0 | Shopify API Library v13.1.0 | Ruby 3.1.4
+      Accept:
+      - application/json
+      X-Shopify-Access-Token:
+      - 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
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 401
+      message: Unauthorized
+    headers:
+      Date:
+      - Mon, 31 Jul 2023 18:01:59 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      X-Sorting-Hat-Podid:
+      - '154'
+      X-Sorting-Hat-Shopid:
+      - '43462361243'
+      Referrer-Policy:
+      - origin-when-cross-origin
+      X-Frame-Options:
+      - DENY
+      X-Shopid:
+      - '43462361243'
+      X-Shardid:
+      - '154'
+      Www-Authenticate:
+      - Basic Realm="Shopify API Authentication"
+      Strict-Transport-Security:
+      - max-age=7889238
+      Server-Timing:
+      - cfRequestDuration;dur=135.999918
+      - processing;dur=73
+      X-Shopify-Stage:
+      - production
+      Content-Security-Policy:
+      - 'default-src ''self'' data: blob: ''unsafe-inline'' ''unsafe-eval'' https://*
+        shopify-pos://*; block-all-mixed-content; child-src ''self'' https://* shopify-pos://*;
+        connect-src ''self'' wss://* https://*; frame-ancestors ''none''; img-src
+        ''self'' data: blob: https:; script-src https://cdn.shopify.com https://cdn.shopifycdn.net
+        https://checkout.shopifycs.com https://api.stripe.com https://mpsnare.iesnare.com
+        https://appcenter.intuit.com https://www.paypal.com https://js.braintreegateway.com
+        https://c.paypal.com https://maps.googleapis.com https://www.google-analytics.com
+        https://v.shopify.com ''self'' ''unsafe-inline'' ''unsafe-eval''; upgrade-insecure-requests;
+        report-uri /csp-report?source%5Baction%5D=show&source%5Bapp%5D=Shopify&source%5Bcontroller%5D=admin%2Fshops&source%5Bsection%5D=admin_api&source%5Buuid%5D=003ffd30-7477-40f6-91f3-6eee0061a068'
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block; report=/xss-report?source%5Baction%5D=show&source%5Bapp%5D=Shopify&source%5Bcontroller%5D=admin%2Fshops&source%5Bsection%5D=admin_api&source%5Buuid%5D=003ffd30-7477-40f6-91f3-6eee0061a068
+      X-Dc:
+      - gcp-us-south1,gcp-us-central1,gcp-us-central1
+      X-Request-Id:
+      - 003ffd30-7477-40f6-91f3-6eee0061a068
+      Cf-Cache-Status:
+      - DYNAMIC
+      Report-To:
+      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v3?s=%2Fk9vjFF2PygRw3iX5f7C1WOA6H7vxmSESPRhKXDKYz%2B1BQT47JcFRsPXcFQr8DziMzoQ8dG%2BRs%2FjVc0cmunjeztcnYqhTEgZhSgcw%2FvTL3a1w9t%2FRjAoVEd6WK1d47y7Hn4miQ6W%2FQA0ZJXhxxr1Sw%3D%3D"}],"group":"cf-nel","max_age":604800}'
+      Nel:
+      - '{"success_fraction":0.01,"report_to":"cf-nel","max_age":604800}'
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 7ef7bff2d92d3ad0-DFW
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: UTF-8
+      string: '{"errors":"[API] Invalid API key or access token (unrecognized login
+        or wrong password)"}'
+  recorded_at: Mon, 31 Jul 2023 18:01:59 GMT
+recorded_with: VCR 6.2.0

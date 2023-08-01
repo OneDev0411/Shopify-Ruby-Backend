@@ -1,0 +1,317 @@
+require:
+  - rubocop-rails
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 3.0
+  TargetRailsVersion: 6.1
+  Exclude:
+    - 'vendor/**/*'
+    - 'bin/**/*'
+    - 'db/**/*'
+    - 'tmp/**/*'
+    - 'node_modules/**/*'
+    - 'lib/tasks/auto_annotate_models.rake'
+    - 'db/schema.rb'
+
+Lint/MixedRegexpCaptureTypes:
+  Description: 'Do not mix named captures and numbered captures in a Regexp literal'
+  Enabled: true
+
+Style/RedundantFetchBlock:
+  Description: 'This cop identifies places where fetch(key) { value } can be replaced by fetch(key, value)'
+  Enabled: true
+
+Style/RedundantRegexpCharacterClass:
+  Description: 'This cop checks for unnecessary single-element Regexp character classes.'
+  Enabled: true
+
+Style/RedundantBegin:
+  Description: 'This cop checks for redundant begin blocks.'
+  Enabled: false
+
+Style/RedundantRegexpEscape:
+  Description: 'This cop checks for redundant escapes inside Regexp literals.'
+  Enabled: true
+
+Layout/AccessModifierIndentation:
+  Description: 'Check indentation of private/protected visibility modifiers.'
+  StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#indent-public-private-protected'
+  Enabled: true
+
+Layout/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Layout/SpaceAroundOperators:
+  Enabled: false
+
+Layout/IndentationWidth:
+  Description: 'Use 2 spaces for indentation.'
+  StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#spaces-indentation'
+  Enabled: true
+
+Layout/EmptyLinesAroundModuleBody:
+  Enabled: false
+
+Style/Documentation:
+  Description: 'Missing top-level class documentation comment'
+  Enabled: false
+
+Style/AndOr:
+  Description: 'Use &&/|| instead of and/or.'
+  StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#no-and-or-or'
+  Enabled: true
+
+Style/BeginBlock:
+  Description: 'Avoid the use of BEGIN blocks.'
+  StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#no-BEGIN-blocks'
+  Enabled: true
+
+Naming/ClassAndModuleCamelCase:
+  Description: 'Use CamelCase for classes and modules.'
+  StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#camelcase-classes'
+  Enabled: true
+
+Naming/AsciiIdentifiers:
+  Description: 'Use only ascii symbols in identifiers.'
+  StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#english-identifiers'
+  Enabled: true
+
+Layout/LineLength:
+  Max: 120
+
+Rails:
+  Enabled: true
+
+Rails/ReadWriteAttribute:
+  Enabled: false
+
+Rails/FilePath:
+  Exclude:
+    - 'lib/tasks/dev.rake'
+    - 'spec/rails_helper.rb'
+
+Style/AsciiComments:
+  Enabled: false
+
+# Method definitions after `private` or `protected` isolated calls need one
+# extra level of indentation.
+Layout/IndentationConsistency:
+  Enabled: false
+  EnforcedStyle: normal
+
+Layout/CommentIndentation:
+  Enabled: false
+
+# https://rubocop.readthedocs.io/en/stable/cops_layout/#layoutemptylinesaroundattributeaccessor
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: true
+
+# https://rubocop.readthedocs.io/en/stable/cops_layout/#layoutspacearoundmethodcalloperator
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
+
+# https://docs.rubocop.org/rubocop/cops_lint.html#lintdeprecatedopensslconstant
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: true
+
+# https://rubocop.readthedocs.io/en/stable/cops_lint/#lintraiseexception
+Lint/RaiseException:
+  Enabled: true
+
+# https://rubocop.readthedocs.io/en/stable/cops_lint/#lintstructnewoverride
+Lint/StructNewOverride:
+  Enabled: true
+
+Metrics/AbcSize:
+  Exclude:
+    - 'lib/tasks/dev.rake'
+
+Metrics/BlockLength:
+  CountComments: false
+  Exclude:
+    - 'Guardfile'
+    - 'config/routes.rb'
+    - 'spec/**/*'
+    - 'app/views/**/*.jbuilder'
+    - 'lib/tasks/dev.rake'
+
+Metrics/ClassLength:
+  CountComments: false
+
+Metrics/MethodLength:
+  CountComments: false
+  Max: 15
+  Exclude:
+    - 'lib/tasks/dev.rake'
+
+Metrics/ModuleLength:
+  CountComments: false
+
+Naming/FileName:
+  Exclude:
+    - 'Gemfile'
+    - 'Guardfile'
+
+Naming/MethodParameterName:
+  AllowedNames: [e]
+
+RSpec/ContextWording:
+  Enabled: false
+
+RSpec/DescribedClass:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/ExpectInHook:
+  Enabled: false
+
+# An instance variable can be used when needed, but use let when possible.
+RSpec/InstanceVariable:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Max: 5
+
+Style/BlockComments:
+  Exclude:
+    - 'spec/spec_helper.rb'
+
+# https://rubocop.readthedocs.io/en/stable/cops_style/#styleblockdelimiters
+Style/BlockDelimiters:
+  EnforcedStyle: braces_for_chaining
+  Exclude:
+    - 'spec/**/*'
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+# https://rubocop.readthedocs.io/en/stable/cops_style/#styleexponentialnotation
+Style/ExponentialNotation:
+  Enabled: true
+
+# https://rubocop.readthedocs.io/en/stable/cops_style/#stylehasheachmethods
+Style/HashEachMethods:
+  Enabled: true
+
+# https://rubocop.readthedocs.io/en/stable/cops_style/#stylehashtransformkeys
+Style/HashTransformKeys:
+  Enabled: true
+
+# https://rubocop.readthedocs.io/en/stable/cops_style/#stylehashtransformvalues
+Style/HashTransformValues:
+  Enabled: true
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/Lambda:
+  EnforcedStyle: literal
+
+Style/RegexpLiteral:
+  Enabled: false
+
+# https://rubocop.readthedocs.io/en/stable/cops_style/#styleslicingwithrange
+Style/SlicingWithRange:
+  Enabled: true
+
+Lint/TrailingCommaInAttributeDeclaration:
+  Enabled: true
+Lint/UnreachableLoop:
+  Enabled: true
+Lint/UselessMethodDefinition:
+  Enabled: true
+Style/AccessorGrouping:
+  Enabled: true
+Style/ArrayCoercion: # (new in 0.88)
+  Enabled: true
+Style/BisectedAttrAccessor:
+  Enabled: true
+Style/CaseLikeIf:
+  Enabled: true
+Style/CombinableLoops: # (new in 0.90)
+  Enabled: true
+Style/ExplicitBlockArgument:
+  Enabled: true
+Style/GlobalStdStream: # (new in 0.89)
+  Enabled: true
+Style/HashAsLastArrayItem: # (new in 0.88)
+  Enabled: true
+Style/HashLikeCase:
+  Enabled: true
+Style/KeywordParametersOrder:
+  Enabled: true
+Style/OptionalBooleanParameter: # (new in 0.89)
+  Enabled: true
+Style/RedundantAssignment: # (new in 0.87)
+  Enabled: true
+Style/RedundantFileExtensionInRequire: # (new in 0.88)
+  Enabled: true
+Lint/BinaryOperatorWithIdenticalOperands:
+  Enabled: true
+Lint/DuplicateElsifCondition:
+  Enabled: true
+Lint/DuplicateRequire:
+  Enabled: true
+Lint/DuplicateRescueException:
+  Enabled: true
+Lint/EmptyConditionalBody:
+  Enabled: true
+Lint/EmptyFile:
+  Enabled: true
+Lint/FloatComparison:
+  Enabled: true
+Lint/MissingSuper:
+  Enabled: true
+Lint/OutOfRangeRegexpRef:
+  Enabled: true
+Lint/SelfAssignment:
+  Enabled: true
+Lint/TopLevelReturnWithArgument:
+  Enabled: true
+Rails/PluckInWhere: # (new in 2.7)
+  Enabled: true
+Rails/RenderInline: # (new in 2.7)
+  Enabled: true
+Rails/RenderPlainText: # (new in 2.7)
+  Enabled: true
+Rails/ShortI18n: # (new in 2.7)
+  Enabled: true
+Rails/SquishedSQLHeredocs: # (new in 2.8)
+  Enabled: true
+Rails/WhereExists: # (new in 2.7)
+  Enabled: true
+Rails/WhereNot: # (new in 2.8)
+  Enabled: true
+Style/RedundantSelfAssignment: # (new in 0.90)
+  Enabled: true
+Style/SingleArgumentDig: # (new in 0.89)
+  Enabled: true
+Style/SoleNestedConditional: # (new in 0.89)
+  Enabled: true
+Style/StringConcatenation: # (new in 0.89)
+  Enabled: true
+Rails/ActiveRecordCallbacksOrder: # (new in 2.7)
+  Enabled: true
+Rails/AfterCommitOverride: # (new in 2.8)
+  Enabled: true
+Rails/FindById: # (new in 2.7)
+  Enabled: true
+Rails/Inquiry: # (new in 2.7)
+  Enabled: true
+Rails/MailerName: # (new in 2.7)
+  Enabled: true
+Rails/MatchRoute: # (new in 2.7)
+  Enabled: true
+Rails/NegateInclude: # (new in 2.7)
+  Enabled: true
+Rails/Pluck: # (new in 2.7)
+  Enabled: true
