@@ -18,6 +18,7 @@ import {
   import { useAppBridge } from "@shopify/app-bridge-react";
   import { useSelector } from "react-redux";
   import { TotalSalesData, ConversionRate, OrderOverTimeData } from "../components"
+import {useNavigate} from "react-router-dom";
 
   export default function IndexTableWithAllElementsExample() {
     
@@ -106,13 +107,20 @@ import {
           </IndexTable.Row>
         ),
       );
+
+    const navigateTo = useNavigate();
+
+    const handleOpenOfferPage = () => {
+      navigateTo('/edit-offer', { state: { offerID: null } });
+    }
+
       return (
         <Page>
           <TitleBar
               title="Dashboard"
               primaryAction={{
-              content: "Create Offer",
-              onAction: () => console.log("create offer btn clicked"),
+                content: "Create Offer",
+                onAction: handleOpenOfferPage,
               }}
           />
           
