@@ -525,6 +525,10 @@ export default function EditPage() {
         save(true);
     };
 
+    const changeTab = () => {
+        handleTabChange(selected + 1)
+    }
+
     return (
         <div style={{ overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', }}>
             {isLoading ? (
@@ -551,11 +555,11 @@ export default function EditPage() {
 
                                 {selected == 0 ?
                                     // page was imported from components folder
-                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity} initialVariants={initialVariants} updateInitialVariants={updateInitialVariants} autopilotCheck={autopilotCheck} openAutopilotSection={openAutopilotSection} updateOpenAutopilotSection={updateOpenAutopilotSection}/>
+                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity} handleTabChange={changeTab} initialVariants={initialVariants} updateInitialVariants={updateInitialVariants} autopilotCheck={autopilotCheck} openAutopilotSection={openAutopilotSection} updateOpenAutopilotSection={updateOpenAutopilotSection}/>
                                 : "" }
                                 {selected == 1 ?
                                     // page was imported from components folder
-                                    <SecondTab offer={offer} shop={shop} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateShop={updateShop} shopifyThemeName={shopifyThemeName} autopilotCheck={autopilotCheck}/>
+                                    <SecondTab offer={offer} shop={shop} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateShop={updateShop} shopifyThemeName={shopifyThemeName} autopilotCheck={autopilotCheck} handleTabChange={changeTab}/>
                                 : "" }
                                 {selected == 2 ?
                                     // page was imported from components folder

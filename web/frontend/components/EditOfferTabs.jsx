@@ -580,7 +580,7 @@ export function EditOfferTabs(props) {
                 </LegacyCard>
                 <div className="space-4"></div>
                 <LegacyStack distribution="center">
-                    <Button id={"btnAddProduct"} onClick={handleModal} ref={modalRef}>Add product</Button>
+                    <Button onClick={props.handleTabChange}>Continue To Placement</Button>
                 </LegacyStack>
 
                 <div className="space-10"></div>
@@ -604,7 +604,6 @@ export function EditOfferTabs(props) {
         </div>
     );
 }
-
 export function SecondTab(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
@@ -1851,9 +1850,9 @@ export function SecondTab(props) {
                 </>
                 )}
             <div className="space-4"></div>
-            <LegacyStack distribution="center">
-                <Button disabled="true">Continue to Appearance</Button>
-            </LegacyStack>
+                <LegacyStack distribution="center">
+                    <Button onClick={props.handleTabChange}>Continue to Appearance</Button>
+                </LegacyStack>
             <div className="space-10"></div>
             <Modal
                 activator={activatorCon}
