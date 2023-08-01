@@ -46,8 +46,8 @@ export default function Settings() {
             })
     }, [])
 
-    useEffect(async () => {
-        await fetchCurrentShop()
+    useEffect(() => {
+        fetchCurrentShop()
     }, [fetchCurrentShop]);
 
     const handleFormChange = (value, id) => {

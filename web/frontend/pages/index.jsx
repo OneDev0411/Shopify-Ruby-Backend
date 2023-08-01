@@ -34,13 +34,13 @@ export default function HomePage() {
         setTrialDays(data.days_remaining_in_trial);
      })
      .catch((error) => {
-      console.log("error", error);
+        console.log("error", error);
      })    
   }, [setCurrentShop, setPlanName, setTrialDays]);
-
-  useEffect(async()=>{
+  
+  useEffect(()=>{
     fetchCurrentShop();
-  }, [fetchCurrentShop])
+  }, [fetchCurrentShop]) 
 
   return (
     <Page

@@ -48,10 +48,6 @@ export default function App() {
                   label: "Help",
                   destination: "/help-page",
                 },
-                {
-                  label: "No Offer",
-                  destination: "/no-offer-found",
-                },
               ]}
             />
             <Routes pages={pages} />
