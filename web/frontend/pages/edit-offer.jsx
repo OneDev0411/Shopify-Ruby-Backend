@@ -120,7 +120,7 @@ export default function EditPage() {
     //Call on initial render
     useEffect(() => {
         let redirect = Redirect.create(app);
-        if(location.state != null && location.state?.offerID == null) {
+        if(location?.state?.offerID == null) {
             setIsLoading(true);
             fetch(`/api/merchant/offer_settings`, {
                 method: 'POST',
