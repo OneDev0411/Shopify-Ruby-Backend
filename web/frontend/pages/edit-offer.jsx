@@ -41,7 +41,7 @@ export default function EditPage() {
     discount_target_type: 'none',
     hide_variants_wrapper: '',
     id: null,
-    link_to_product: false,
+    link_to_product: true,
     multi_layout: 'compact',
     must_accept: false,
     offerable: {},
@@ -62,13 +62,13 @@ export default function EditPage() {
     shop: {},
     show_product_image: true,
     show_variant_price: false,
-    show_product_price: false,
+    show_product_price: true,
     show_product_title: false,
     show_spinner: null,
     show_nothanks: false,
-    show_quantity_selector: false,
+    show_quantity_selector: true,
     show_custom_field: false,
-    show_compare_at_price: null,
+    show_compare_at_price: true,
     uses_ab_test: null,
     stop_showing_after_accepted: false,
     recharge_subscription_id: null,
@@ -148,8 +148,6 @@ export default function EditPage() {
             .catch((error) => {   
                 console.log("Error > ", error);
             })
-            updateCheckKeysValidity('text', offer.text_a);
-            updateCheckKeysValidity('cta', offer.cta_a);
         }
         else {
             setIsLoading(true);
@@ -497,7 +495,7 @@ export default function EditPage() {
 
                                 {selected == 0 ?
                                     // page was imported from components folder
-                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer}/>
+                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity}/>
                                 : "" }
                                 {selected == 1 ?
                                     // page was imported from components folder
