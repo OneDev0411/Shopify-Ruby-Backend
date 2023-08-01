@@ -10,7 +10,7 @@ import {
   FooterHelp,
   Pagination,
   Select,
-  LegacyCard
+  LegacyCard, LegacyStack, Image, VerticalStack, Text, ButtonGroup, MediaCard, VideoThumbnail
 } from '@shopify/polaris';
 
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -19,6 +19,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 import { useSelector } from "react-redux";
+import {homeImage} from "../assets/index.js";
+import {CreateOfferCard} from "./CreateOfferCard.jsx";
 
 export function OffersList() {
 
@@ -290,64 +292,70 @@ export function OffersList() {
 
   return (
     <Page>
-      <LegacyCard sectioned>
-        <div style={{ display: 'flex' }}>
-          <div style={{ flex: 1 }}>
-            <Filters
-              queryValue={queryValue}
-              filters={filters}
-              appliedFilters={appliedFilters}
-              onQueryChange={handleQueryValueChange}
-              onQueryClear={handleQueryValueRemove}
-              onClearAll={handleClearAll}
-            />
-          </div>
-          <div style={{ paddingLeft: '0.25rem' }}>
-            <Select
-              labelInline
-              label="Sort"
-              options={sortOptions}
-              value={sortValue}
-              onChange={handleSortChange}
-            />
-          </div>
-        </div>
-        <IndexTable
-          sortOptions={sortOptions}
-          sortable={[false, false, true, true, true]}
-          sortDirection={'descending'}
-          sortColumnIndex={4}
-          sort={{ handleSorting }}
-          resourceName={resourceName}
-          itemCount={paginatedData.length}
-          selectedItemsCount={
-            allResourcesSelected ? 'All' : selectedResources.length
-          }
-          onSelectionChange={handleSelectionChange}
-          hasZebraStriping
-          bulkActions={bulkActions}
-          promotedBulkActions={promotedBulkActions}
-          headings={[
-            { title: 'Offer' },
-            { title: 'Status' },
-            { title: 'Clicks' },
-            { title: 'Views' },
-            { title: 'Revenue', hidden: false },
-          ]}
-        >
-          {rowMarkup}
-        </IndexTable>
-        <div className="space-4"></div>
-        <div className="offer-table-footer">
-          <Pagination
-            label={`${currentPage} of ${totalPages}`}
-            hasPrevious={currentPage > 1}
-            hasNext={currentPage < totalPages}
-            onPrevious={() => handlePageChange(currentPage - 1)}
-            onNext={() => handlePageChange(currentPage + 1)}
-          />
-        </div>
-      </LegacyCard>
+      { offersData.length === 0 ?
+          <CreateOfferCard />
+        :
+        <>
+          <LegacyCard sectioned>
+            <div style={{ display: 'flex' }}>
+              <div style={{ flex: 1 }}>
+                <Filters
+                  queryValue={queryValue}
+                  filters={filters}
+                  appliedFilters={appliedFilters}
+                  onQueryChange={handleQueryValueChange}
+                  onQueryClear={handleQueryValueRemove}
+                  onClearAll={handleClearAll}
+                />
+              </div>
+              <div style={{ paddingLeft: '0.25rem' }}>
+                <Select
+                  labelInline
+                  label="Sort"
+                  options={sortOptions}
+                  value={sortValue}
+                  onChange={handleSortChange}
+                />
+              </div>
+            </div>
+            <IndexTable
+              sortOptions={sortOptions}
+              sortable={[false, false, true, true, true]}
+              sortDirection={'descending'}
+              sortColumnIndex={4}
+              sort={{ handleSorting }}
+              resourceName={resourceName}
+              itemCount={paginatedData.length}
+              selectedItemsCount={
+                allResourcesSelected ? 'All' : selectedResources.length
+              }
+              onSelectionChange={handleSelectionChange}
+              hasZebraStriping
+              bulkActions={bulkActions}
+              promotedBulkActions={promotedBulkActions}
+              headings={[
+                { title: 'Offer' },
+                { title: 'Status' },
+                { title: 'Clicks' },
+                { title: 'Views' },
+                { title: 'Revenue', hidden: false },
+              ]}
+            >
+              {rowMarkup}
+            </IndexTable>
+            <div className="space-4"></div>
+            <div className="offer-table-footer">
+              <Pagination
+                label={`${currentPage} of ${totalPages}`}
+                hasPrevious={currentPage > 1}
+                hasNext={currentPage < totalPages}
+                onPrevious={() => handlePageChange(currentPage - 1)}
+                onNext={() => handlePageChange(currentPage + 1)}
+              />
+            </div>
+          </LegacyCard>
+        </>
+      }
       <div className="space-10"></div>
       <FooterHelp>
         Learn more about{' '}
