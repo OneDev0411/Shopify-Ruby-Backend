@@ -44,7 +44,7 @@ export function CreateOfferCard() {
               <div className="center-btn">
                 <ButtonGroup>
                   <Button primary onClick={() => handleCreateOffer()}>Create offer</Button>
-                  <Button><Link url="https://help.incartupsell.com/en/collections/3263755-all" external>View Help Docs</Link></Button>
+                  <Button url="https://help.incartupsell.com/en/collections/3263755-all" external target="_blank">View Help Docs</Button>
                 </ButtonGroup>
               </div>
             </div>
