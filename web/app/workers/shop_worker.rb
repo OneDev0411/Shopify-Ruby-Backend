@@ -2,15 +2,6 @@
 
 module ShopWorker
 
-  class ForcePurgeCacheJob
-    include Sidekiq::Worker
-    include Sidekiq::Status::Worker
-    def perform(shop_id)
-      icushop = Shop.find(shop_id)
-      icushop.force_purge_cache
-    end
-  end
-
   class SaveOfferStatJob
     include Sidekiq::Worker
     sidekiq_options queue: 'stats'
