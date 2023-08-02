@@ -553,7 +553,7 @@ class Shop < ApplicationRecord
   #
   # Return boolean.
   def publish_async
-    j = ShopWorker::ForcePurgeCacheJob.perform_async(id)
+    j = Sidekiq::Client.push('class' => 'ShopWorker::ForcePurgeCacheJob', 'args' => [id], 'queue' => 'shop', 'at' => Time.now.to_i)
     update_column(:publish_job, j)
   end
 
