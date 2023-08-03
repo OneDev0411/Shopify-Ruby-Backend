@@ -344,11 +344,7 @@ export function EditOfferTabs(props) {
         }}
       >
         <Modal.Section>
-<<<<<<< Updated upstream
-            <ModalAddProduct updateQuery={updateQuery} shop_id={props.shop?.shop_id} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct}/>
-=======
             <ModalAddProduct offer={props.offer} updateQuery={updateQuery} shop_id={props.shop.shop_id} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct}/>
->>>>>>> Stashed changes
         </Modal.Section>
       </Modal>
     </div>
