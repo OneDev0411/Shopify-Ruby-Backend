@@ -8,7 +8,7 @@ module Api
         products_details = []
         result = product_params['type'] == 'product' ? product_search : collection_search
         result.map do |hashedValue|
-          hashedValue[:variants] = Product.find_by(shopify_id: hashedValue[:id].to_s).available_variants_for_handlebars
+          hashedValue[:variants] = @icushop.products.find_by(shopify_id: hashedValue[:id])&.available_variants_for_handlebars
           products_details.push(hashedValue)
         end
         render json: products_details
