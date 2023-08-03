@@ -26,6 +26,7 @@ export default function EditPage() {
         [],
     );
     const [checkKeysValidity, setCheckKeysValidity] = useState({});
+    const [initialVariants, setInitialVariants] = useState({});
 
     const [offer, setOffer] = useState({
     offerId: undefined,
@@ -167,12 +168,13 @@ export default function EditPage() {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
+                setInitialVariants({...data.included_variants});
                 updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0].title));
                 updateCheckKeysValidity('cta', data.cta_a);
                 for(var i=0; i<data.offerable_product_details.length; i++) {
                     data.offerable_product_details[i].preview_mode = true;
                 }
-                setOffer(data);
+                setOffer({...data});
                 setIsLoading(false);
             })
             .catch((error) => {
@@ -227,7 +229,7 @@ export default function EditPage() {
     //Called whenever the offer changes in any child component
     function updateOffer(updatedKey, updatedValue) {
         setOffer(previousState => {
-          return { ...previousState, [updatedKey]: updatedValue };
+            return { ...previousState, [updatedKey]: updatedValue };
         });
     }
 
@@ -238,16 +240,16 @@ export default function EditPage() {
 
     // Called to update the included variants in offer
     function updateIncludedVariants(selectedItem, selectedVariants) {
+        const updatedOffer = {...offer};
         if(Array.isArray(selectedItem)) {
-            const updatedOffer = {...offer};
             for(var key in selectedVariants) {
                 updatedOffer.included_variants[key] = selectedVariants[key];
             }
         }
         else {
-            const updatedOffer = {...offer};
             updatedOffer.included_variants[selectedItem] = selectedVariants;
         }
+        setOffer({...updatedOffer});
     }
 
     // Called to update offerable_product_details and offerable_product_shopify_ids of offer
@@ -288,6 +290,11 @@ export default function EditPage() {
                 }
             }));
         }
+    }
+
+    //Called to update the initial variants of the offer
+    function updateInitialVariants(value) {
+        setInitialVariants({...value});
     }
 
 
@@ -471,12 +478,12 @@ export default function EditPage() {
           },
           body: JSON.stringify({offer: {offer_id: offer.id}, shop: shopAndHost.shop})
         })
-          .then((response) => response.json())
-          .then( (data) => {
-           offer.active = true;
-          })
-            .catch((error) => {
-          })
+        .then((response) => response.json())
+        .then( (data) => {
+            offer.active = true;
+        })
+        .catch((error) => {
+        })
     };
 
     return (
@@ -505,7 +512,7 @@ export default function EditPage() {
 
                                 {selected == 0 ?
                                     // page was imported from components folder
-                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity}/>
+                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity} initialVariants={initialVariants} updateInitialVariants={updateInitialVariants} />
                                 : "" }
                                 {selected == 1 ?
                                     // page was imported from components folder

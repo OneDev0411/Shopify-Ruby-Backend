@@ -29,6 +29,7 @@ import tinycolor from "tinycolor2";
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { elementSearch, productsMulti } from "../services/products/actions/product";
+import { useLocation } from 'react-router-dom';
 
 export function EditOfferTabs(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -75,17 +76,27 @@ export function EditOfferTabs(props) {
     const handleCustomTextChange = useCallback((newChecked) => props.updateOffer("show_custom_field", newChecked), []);
     //modal controls
     const [productModal, setProductModal] = useState(false);
+    const [productData, setProductData] = useState("");
     const handleModal = useCallback(() => {
         setProductModal(!productModal);
     }, [productModal]);
+    const handleModalCloseEvent = useCallback(() => {
+        props.updateOffer("included_variants", {...props.initialVariants});
+        for(var i=0; i<productData.length; i++) {
+            if(!Object.keys(props.initialVariants).includes(productData[i].id.toString()))
+            {
+                productData[i].variants = [];
+            }
+        }
+        setProductModal(false);
+    },[props.initialVariants,productData]);
     const modalRef = useRef(null);
     const activator = modalRef;
 
     //Available Products
     const [query, setQuery] = useState("");
-    const [productData, setProductData] = useState("");
     const [resourceListLoading, setResourceListLoading] = useState(false);
-    const [selectedProducts, setSelectedProducts] = useState([]);
+    const [selectedProducts, setSelectedProducts] = useState(props.offer.offerable_product_shopify_ids);
 
     //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
     function updateQuery (childData) {
@@ -99,6 +110,12 @@ export function EditOfferTabs(props) {
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
+            for(var i=0; i<data.length; i++) {
+                if(!Object.keys(props.offer.included_variants).includes(data[i].id.toString()))
+                {
+                    data[i].variants = [];
+                }
+            }
             setProductData(data);
             setResourceListLoading(false);
         })
@@ -119,8 +136,6 @@ export function EditOfferTabs(props) {
 
     //Called when "select product manually button clicked"
     function getProducts() {
-        props.updateOffer("included_variants", {});
-
         setResourceListLoading(true);
         fetch(`/api/merchant/element_search`, {
             method: 'POST',
@@ -131,6 +146,12 @@ export function EditOfferTabs(props) {
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
+            for(var i=0; i<data.length; i++) {
+                if(!Object.keys(props.offer.included_variants).includes(data[i].id.toString()))
+                {
+                    data[i].variants = [];
+                }
+            }
             setProductData(data);
             setResourceListLoading(false);
         })
@@ -141,10 +162,13 @@ export function EditOfferTabs(props) {
 
     //Called when the save button of popup modal is clicked
     function updateProducts() {
-        if(selectedProducts.length > 0) {
-            props.updateOffer("offerable_product_details", []);
-            props.updateOffer("offerable_product_shopify_ids", []);
+        if(selectedProducts.length == 0) {
+            props.updateOffer("included_variants", {});
+            setProductData("");
         }
+        props.updateOffer("offerable_product_details", []);
+        props.updateOffer("offerable_product_shopify_ids", []);
+        props.updateInitialVariants(props.offer.included_variants);
         var responseCount = 0;
         for(var i=0; i<selectedProducts.length; i++) {
             fetch(`/api/merchant/products/multi/${selectedProducts[i]}?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
@@ -155,8 +179,8 @@ export function EditOfferTabs(props) {
             })
             .then( (response) => { return response.json() })
             .then( (data) => {
+                data.available_json_variants = data.available_json_variants.filter((o) => props.offer.included_variants[data.id].includes(o.id))
                 props.updateProductsOfOffer(data);
-                setProductData("");
                 if(responseCount == 0) {
                     props.updateCheckKeysValidity("text", props.offer.text_a.replace("{{ product_title }}", data.title));
                     props.updateCheckKeysValidity('cta', props.offer.cta_a);
@@ -311,7 +335,7 @@ export function EditOfferTabs(props) {
         <Modal
         activator={activator}
         open={productModal}
-        onClose={handleModal}
+        onClose={handleModalCloseEvent}
         title="Select products from your store"
         primaryAction={{
           content: 'Save',
@@ -319,7 +343,7 @@ export function EditOfferTabs(props) {
         }}
       >
         <Modal.Section>
-            <ModalAddProduct updateQuery={updateQuery} shop_id={props.shop?.shop_id} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct}/>
+            <ModalAddProduct offer={props.offer} updateQuery={updateQuery} shop_id={props.shop.shop_id} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct}/>
         </Modal.Section>
       </Modal>
     </div>
@@ -543,6 +567,7 @@ export function SecondTab(props){
 }
 
 export function ThirdTab(props){
+
     const [selected, setSelected] = useState(props.shop.css_options.main.borderStyle);
     const options = [
         {label: 'Compact', value: 'compact'},
@@ -862,7 +887,7 @@ export function ThirdTab(props){
 // Advanced Tab
 export function FourthTab(props){
 
-     const [checked, setChecked] = useState(false);
+    const [checked, setChecked] = useState(false);
     const handleChange = useCallback((newChecked) => setChecked(newChecked), []);
     const handleProductDomSelector = useCallback((newValue) => props.updateShop(newValue,"custom_product_page_dom_selector"), []);
     const handleProductDomAction = useCallback((newValue) => props.updateShop(newValue, "custom_product_page_dom_action"), []);
