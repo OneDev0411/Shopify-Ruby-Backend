@@ -136,7 +136,6 @@ export function EditOfferTabs(props) {
 
     //Called when "select product manually button clicked"
     function getProducts() {
-       console.log(productData);
         setResourceListLoading(true);
         fetch(`/api/merchant/element_search`, {
             method: 'POST',

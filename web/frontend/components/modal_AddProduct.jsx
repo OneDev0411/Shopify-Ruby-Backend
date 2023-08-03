@@ -38,7 +38,6 @@ import {
 
 
     useEffect(() => {
-      console.log(selectedVariants);
       setResourceListLoading(props.resourceListLoading);
     }, [props.resourceListLoading]);
   
