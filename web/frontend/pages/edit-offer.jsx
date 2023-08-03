@@ -297,12 +297,11 @@ export default function EditPage() {
         setInitialVariants({...value});
     }
 
-
-    // Called when save button is clicked
-    function save() {
+    function save(status) {
         console.log("Shop >>",shop);
         console.log("Offer >>", offer)
         var ots = {
+            active: status,
             checkout_after_accepted: offer.checkout_after_accepted,
             custom_field_name: offer.custom_field_name,
             custom_field_placeholder: offer.custom_field_placeholder,
@@ -328,7 +327,7 @@ export default function EditPage() {
             offer_text_alt: offer.text_b,
             product_image_size: offer.product_image_size,
             products_to_remove: offer.products_to_remove,
-            publish_status: offer.publish_status,
+            publish_status: status ? "published" : "draft",
             remove_if_no_longer_valid: offer.remove_if_no_longer_valid,
             redirect_to_product: offer.redirect_to_product,
             rules_json: offer.rules_json,
@@ -407,6 +406,10 @@ export default function EditPage() {
             })
     }
 
+    function saveDraft(){
+        save(false);
+    }
+
     const tabs = [
         {
             id: 'content',
@@ -470,20 +473,7 @@ export default function EditPage() {
     ];
 
     async function publishOffer() {
-        let url = '/api/merchant/offer_activate';
-        fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({offer: {offer_id: offer.id}, shop: shopAndHost.shop})
-        })
-        .then((response) => response.json())
-        .then( (data) => {
-            offer.active = true;
-        })
-        .catch((error) => {
-        })
+        save(true);
     };
 
     return (
@@ -495,7 +485,7 @@ export default function EditPage() {
                     breadcrumbs={[{content: 'Products', url: '/'}]}
                     title="Create new offer"
                     primaryAction={{content: 'Publish', disabled: false, onClick: publishOffer}}
-                    secondaryActions={[{content: 'Save Draft', disabled: false, onAction: () => save()}]}
+                    secondaryActions={[{content: 'Save Draft', disabled: false, onAction: () => saveDraft()}]}
                     style={{ overflow: 'hidden' }}
                 >
                     <TitleBar/>
@@ -520,7 +510,7 @@ export default function EditPage() {
                                 : "" }
                                 {selected == 2 ?
                                     // page was imported from components folder
-                                    <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop}/>
+                                    <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} saveDraft={saveDraft} publishOffer={publishOffer}/>
                                 : "" }
                                 {selected == 3 ?
                                     // page was imported from components folder

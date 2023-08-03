@@ -763,7 +763,7 @@ export function ThirdTab(props){
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                             <RangeSlider
-                                label="Border Radius"
+                                label="Corner Radius"
                                 value={parseInt(props.shop.css_options.main.borderRadius)}
                                 onChange={handlesetBorderRange}
                                 output
@@ -863,7 +863,7 @@ export function ThirdTab(props){
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                             <RangeSlider
-                                label="Button Radius"
+                                label="Border Radius"
                                 value={props.shop.css_options.button.borderRadius}
                                 onChange={handleRangeSliderChange}
                                 output
@@ -875,8 +875,8 @@ export function ThirdTab(props){
             <div className="space-4"></div>
             <LegacyStack distribution="center">
                 <ButtonGroup>
-                    <Button>Save Draft</Button>
-                    <Button primary>Publish</Button>
+                    <Button onClick={() => props.saveDraft()}>Save Draft</Button>
+                    <Button primary onClick={() => props.publishOffer()}>Publish</Button>
                 </ButtonGroup>
             </LegacyStack>
             <div className="space-10"></div>
