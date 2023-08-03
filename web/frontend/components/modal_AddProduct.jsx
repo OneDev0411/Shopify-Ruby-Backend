@@ -15,8 +15,8 @@ import {
  export function ModalAddProduct(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const [resourceListLoading, setResourceListLoading] = useState(false);
-    const [selectedItems, setSelectedItems] = useState([]);
-    const [selectedVariants, setSelectedVariants] = useState({})
+    const [selectedItems, setSelectedItems] = useState(props.offer.offerable_product_shopify_ids);
+    const [selectedVariants, setSelectedVariants] = useState(props.offer.included_variants);
     const [taggedWith, setTaggedWith] = useState(null);
     const [queryValue, setQueryValue] = useState(null);
   
@@ -38,9 +38,9 @@ import {
 
 
     useEffect(() => {
+      console.log(selectedVariants);
       setResourceListLoading(props.resourceListLoading);
-    }, [props.resourceListLoading])
-
+    }, [props.resourceListLoading]);
   
     const resourceName = {
       singular: 'product',
@@ -102,6 +102,7 @@ import {
     );
 
     function renderItem(item) {
+      
       const {id, title, image, variants} = item;
       const media = <Avatar customer size="medium" name={title} />;
       if(variants.length <= 1)
@@ -146,7 +147,7 @@ import {
               <OptionList
               options={option}
               selected={selectedVariants[id]}
-              onChange={(selectedOptions) =>  (selectedOptions, id)}
+              onChange={(selectedOptions) => handleSelectedVariant(selectedOptions, id)}
               allowMultiple
               >
               </OptionList>
