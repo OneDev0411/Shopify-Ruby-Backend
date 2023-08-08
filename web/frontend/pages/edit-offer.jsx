@@ -205,7 +205,7 @@ export default function EditPage() {
         }
 
 
-        fetch(`/api/merchant/active_theme_for_dafault_template?shopify_domain=${shopAndHost.shop}`, {
+        fetch(`/api/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',

@@ -94,7 +94,9 @@ module Api
               shopify_theme_name: res[:message]
             }
           end
-        rescue Exception => e
+        rescue StandardError => e
+          Rails.logger.debug "Error Message: #{e.message}"
+          Rollbar.error("Error", e)
           render json: {
             message: "Error: #{e.message}",
             shopify_theme_name: @icushop.shopify_theme_name || ''
