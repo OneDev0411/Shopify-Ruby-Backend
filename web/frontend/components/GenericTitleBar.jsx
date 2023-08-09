@@ -7,10 +7,7 @@ export function GenericTitleBar(props) {
 			<Grid>
 				<Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 10, xl: 4}}>
 					<div style={{display: 'flex', float:'left', gap: '10px'}}>
-						<Icon
-							source={props.image}
-							color="base"
-						/>
+						<img src={props.image}></img>
 						<DisplayText size="small">
 							{props.title}
 						</DisplayText>
