@@ -4,7 +4,7 @@ import {stars} from "../assets";
 import Slider from "react-slick";
 import React from "react";
 import { useSelector } from 'react-redux';
-import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useAuthenticatedFetch } from "../hooks";
 
@@ -112,14 +112,20 @@ export function Partners(){
                               />
                             </div>
                             <br/>
-                            <h1 className="Polaris-Heading"><strong>{partner.name}</strong></h1>
+                            <h1 className='settings-card-heading'>
+                              <strong style={{
+                                fontSize: `${partner.name.length > 20 ? 14 : 28}px`,
+                                lineHeight: "0.8"
+                              }}>{partner.name}
+                              </strong>
+                            </h1>
                             <br/>
                             <p style={index === expandedIndex ? {} : { display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }} onClick={() => handleToggleDescription(index)} key={index}>
                               {partner.description}
                             </p>
                             <br/>
                             <VerticalStack distribution="start">
-                            <Image 
+                            <Image
                               style={{
                               width:'60%',
                               marginBottom:'15px',
@@ -127,7 +133,7 @@ export function Partners(){
                               source={stars}
                             />
                             <Button url={partner.app_url} target="blank">View on Shopify App Store</Button>
-                            </VerticalStack>  
+                            </VerticalStack>
                           </LegacyCard>
                         </div>
                       </Grid.Cell>

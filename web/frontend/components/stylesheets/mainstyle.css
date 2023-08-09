@@ -67,3 +67,7 @@ h1{
 .offer-header-title {
     font-family: Helvetica Neue;
 }
+
+.settings-card-heading {
+    height: 33px;
+}
