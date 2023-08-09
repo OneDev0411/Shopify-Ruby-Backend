@@ -34,7 +34,23 @@ export function SearchProductsList(props) {
   );
 
   function renderItem(item) {
-    const {id, title, image, variants} = item;
+    const {id, title, image, variants} = item
+    if(!variants){
+      return (
+        <ResourceItem
+          id={id}
+          title={title}
+          accessibilityLabel={`View details for ${title}`}
+          persistActions
+          onClick={() => selectedProduct(item)}
+        >
+          <p variant="bodyMd" fontWeight="bold" as="h3">
+            <strong>{title}</strong>
+          </p>
+
+        </ResourceItem>
+      );
+    }
     if(variants.length <= 1)
     {
       return (
@@ -44,7 +60,7 @@ export function SearchProductsList(props) {
           image={image}
           accessibilityLabel={`View details for ${title}`}
           persistActions
-          onClick={() => selectedProduct(id)}
+          onClick={() => selectedProduct(item)}
         >
           <p variant="bodyMd" fontWeight="bold" as="h3">
             <strong>{title}</strong>
@@ -67,7 +83,7 @@ export function SearchProductsList(props) {
           image={image}
           accessibilityLabel={`View details for ${title}`}
           persistActions
-          onClick={() => selectedProduct(id)}
+          onClick={() => selectedProduct(currentValue)}
         >
           <p variant="bodyMd" fontWeight="bold" as="h3">
             <strong>{title}</strong>
@@ -78,7 +94,6 @@ export function SearchProductsList(props) {
             options={option}
             selected={selectedVariants[id]}
             onChange={(selectedOptions) => handleSelectedVariant(selectedOptions, id)}
-            allowMultiple
             >
             </OptionList>
         </div>
@@ -87,9 +102,15 @@ export function SearchProductsList(props) {
     }
   }
 
-  function selectedProduct(id) {
-    let idToArray = [id];
-    selectionChange(idToArray);
+  function selectedProduct(item) {
+    if(props.item_type!=="product"){
+      props.updateSelectedProduct(item.title, item.id);
+      props.setResourceListLoading(false);
+      setSelectedItems(item.id);
+    }
+    else{
+      selectionChange([item.id]);
+    }
   }
 
   function selectionChange (id) {

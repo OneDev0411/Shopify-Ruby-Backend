@@ -3,7 +3,7 @@ module Api
   module Merchant
     class OffersController < ApiMerchantBaseController
       before_action :find_shop, only: [:offer_settings, :update_from_builder, :offers_list, :activate, :deactivate, :duplicate, :destroy]
-      before_action :set_offer, only: [:load_offer_details]
+      before_action :set_offer, only: [:load_offer_details, :shopify_ids_from_rule]
 
       # GET /api/merchant/shop_offers
       def shop_offers
@@ -145,6 +145,11 @@ module Api
         render json: { message: "Offer Deleted", offers: @icushop.offer_data_with_stats}
       end
 
+      def shopify_ids_from_rule   
+        filtered_items = @offer.rules_json.select { |item| item["rule_selector"] == params[:rule_selector] && item["item_type"] == params[:item_type] }
+        item_shopify_ids = filtered_items.map { |item| item["item_shopify_id"] }
+        render json: {item_shopify_ids: item_shopify_ids}
+      end
 
       private
 

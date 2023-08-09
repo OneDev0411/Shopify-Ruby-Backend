@@ -17,11 +17,11 @@ import {
 } from "@shopify/polaris";
 import {
     CancelMajor
-  } from '@shopify/polaris-icons';
-import {ModalAddProduct} from "./modal_AddProduct";
-import {ModalAddConditions} from "./modal_AddConditions";
+} from '@shopify/polaris-icons';
+import { ModalAddProduct } from "./modal_AddProduct";
+import { ModalAddConditions } from "./modal_AddConditions";
 import HomePage from "../pages/subscription";
-import {useState,useCallback,useRef,useEffect} from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { SketchPicker } from 'react-color';
 import React from "react";
 import Subscription from "../pages/subscription";
@@ -30,16 +30,21 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { elementSearch, productsMulti } from "../services/products/actions/product";
 import { useLocation } from 'react-router-dom';
+import SelectProductsModal from "../components/SelectProductsModal";
+import { SelectCollectionsModal } from "../components/SelectCollectionsModal";
+import { useAuthenticatedFetch } from "../hooks";
 
 export function EditOfferTabs(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
 
     const [altOfferText, setAltOfferText] = useState("");
     const [altBtnTitle, setAltBtnTitle] = useState("");
+    const [selectedItems, setSelectedItems] = useState(props.offer.offerable_product_shopify_ids);
     const handleTitleChange = useCallback((newValue) => props.updateOffer("title", newValue), []);
     const handleTextChange = useCallback((newValue) => {
         props.updateOffer("text_a", newValue);
-        if(props.offer.offerable_product_details.length > 0) {
+        if (props.offer.offerable_product_details.length > 0) {
             props.updateCheckKeysValidity("text", newValue.replace("{{ product_title }}", props.offer.offerable_product_details[0].title));
         }
     }, [props.offer.offerable_product_details]);
@@ -72,7 +77,7 @@ export function EditOfferTabs(props) {
         else {
             props.updateOffer("discount_target_type", "none");
         }
-    },[]);
+    }, []);
     const handleCustomTextChange = useCallback((newChecked) => props.updateOffer("show_custom_field", newChecked), []);
     //modal controls
     const [productModal, setProductModal] = useState(false);
@@ -81,15 +86,14 @@ export function EditOfferTabs(props) {
         setProductModal(!productModal);
     }, [productModal]);
     const handleModalCloseEvent = useCallback(() => {
-        props.updateOffer("included_variants", {...props.initialVariants});
-        for(var i=0; i<productData.length; i++) {
-            if(!Object.keys(props.initialVariants).includes(productData[i].id.toString()))
-            {
+        props.updateOffer("included_variants", { ...props.initialVariants });
+        for (var i = 0; i < productData.length; i++) {
+            if (!Object.keys(props.initialVariants).includes(productData[i].id.toString())) {
                 productData[i].variants = [];
             }
         }
         setProductModal(false);
-    },[props.initialVariants,productData]);
+    }, [props.initialVariants, productData]);
     const modalRef = useRef(null);
     const activator = modalRef;
 
@@ -99,31 +103,30 @@ export function EditOfferTabs(props) {
     const [selectedProducts, setSelectedProducts] = useState(props.offer.offerable_product_shopify_ids);
 
     //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
-    function updateQuery (childData) {
+    function updateQuery(childData) {
         setResourceListLoading(true);
         fetch(`/api/merchant/element_search`, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ product: { query: childData, type: 'product' }, shop: shopAndHost.shop}),
+            body: JSON.stringify({ product: { query: childData, type: 'product' }, shop: shopAndHost.shop }),
         })
-        .then( (response) => { return response.json() })
-        .then( (data) => {
-            for(var i=0; i<data.length; i++) {
-                if(!Object.keys(props.offer.included_variants).includes(data[i].id.toString()))
-                {
-                    data[i].variants = [];
+            .then((response) => { return response.json() })
+            .then((data) => {
+                for (var i = 0; i < data.length; i++) {
+                    if (!Object.keys(props.offer.included_variants).includes(data[i].id.toString())) {
+                        data[i].variants = [];
+                    }
                 }
-            }
-            setProductData(data);
-            setResourceListLoading(false);
-        })
-        .catch((error) => {
-            console.log("Error > ", error);
-        })
+                setProductData(data);
+                setResourceListLoading(false);
+            })
+            .catch((error) => {
+                console.log("Error > ", error);
+            })
 
-      setQuery(childData);
+        setQuery(childData);
     }
 
     //Called when the selected product or variants of selected product changes in popup modal
@@ -140,29 +143,28 @@ export function EditOfferTabs(props) {
         fetch(`/api/merchant/element_search`, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ product: { query: query, type: 'product' }, shop: shopAndHost.shop}),
+            body: JSON.stringify({ product: { query: query, type: 'product' }, shop: shopAndHost.shop }),
         })
-        .then( (response) => { return response.json() })
-        .then( (data) => {
-            for(var i=0; i<data.length; i++) {
-                if(!Object.keys(props.offer.included_variants).includes(data[i].id.toString()))
-                {
-                    data[i].variants = [];
+            .then((response) => { return response.json() })
+            .then((data) => {
+                for (var i = 0; i < data.length; i++) {
+                    if (!Object.keys(props.offer.included_variants).includes(data[i].id.toString())) {
+                        data[i].variants = [];
+                    }
                 }
-            }
-            setProductData(data);
-            setResourceListLoading(false);
-        })
-        .catch((error) => {
-            console.log("# Error getProducts > ", JSON.stringify(error));
-        })
+                setProductData(data);
+                setResourceListLoading(false);
+            })
+            .catch((error) => {
+                console.log("# Error getProducts > ", JSON.stringify(error));
+            })
     }
 
     //Called when the save button of popup modal is clicked
     function updateProducts() {
-        if(selectedProducts.length == 0) {
+        if (selectedProducts.length == 0) {
             props.updateOffer("included_variants", {});
             setProductData("");
         }
@@ -170,26 +172,26 @@ export function EditOfferTabs(props) {
         props.updateOffer("offerable_product_shopify_ids", []);
         props.updateInitialVariants(props.offer.included_variants);
         var responseCount = 0;
-        for(var i=0; i<selectedProducts.length; i++) {
+        for (var i = 0; i < selectedProducts.length; i++) {
             fetch(`/api/merchant/products/multi/${selectedProducts[i]}?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
                 method: 'GET',
                 headers: {
-                  'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
             })
-            .then( (response) => { return response.json() })
-            .then( (data) => {
-                data.available_json_variants = data.available_json_variants.filter((o) => props.offer.included_variants[data.id].includes(o.id))
-                props.updateProductsOfOffer(data);
-                if(responseCount == 0) {
-                    props.updateCheckKeysValidity("text", props.offer.text_a.replace("{{ product_title }}", data.title));
-                    props.updateCheckKeysValidity('cta', props.offer.cta_a);
-                }
-                responseCount++;
-            })
-            .catch((error) => {
-                console.log("# Error updateProducts > ", JSON.stringify(error));
-            })
+                .then((response) => { return response.json() })
+                .then((data) => {
+                    data.available_json_variants = data.available_json_variants.filter((o) => props.offer.included_variants[data.id].includes(o.id))
+                    props.updateProductsOfOffer(data);
+                    if (responseCount == 0) {
+                        props.updateCheckKeysValidity("text", props.offer.text_a.replace("{{ product_title }}", data.title));
+                        props.updateCheckKeysValidity('cta', props.offer.cta_a);
+                    }
+                    responseCount++;
+                })
+                .catch((error) => {
+                    console.log("# Error updateProducts > ", JSON.stringify(error));
+                })
         }
         handleModal();
     }
@@ -201,239 +203,272 @@ export function EditOfferTabs(props) {
 
     return (
         <div>
-        <LegacyCard title="Offer Product" actions={[{content: 'Learn about Autopilot'}]} sectioned >
-            <LegacyCard.Section>
-                <LegacyStack spacing="loose" vertical>
-                    <p>What product would you like to have in the offer?</p>
-                    <ButtonGroup>
-                        <Button id={"btnSelectProduct"} onClick={ () => { handleModal(); getProducts(); } } ref={modalRef}>Select product manually</Button>
-                        <Button id={"btnLaunchAI"} primary>Launch Autopilot</Button>
-                    </ButtonGroup>
-                </LegacyStack>
-            </LegacyCard.Section>
-        </LegacyCard>
-        <LegacyCard title="Text" sectioned >
-            <LegacyCard.Section>
-                <LegacyStack spacing="loose" vertical>
-                    <TextField
-                        label="Offer title"
-                        placeholder='Offer #1'
-                        value={props.offer.title}
-                        onChange={handleTitleChange}
-                        autoComplete="off"
-                        helpText="This title will only be visible to you so you can reference it internally"
-                    />
-                    <TextField
-                        label="Offer text"
-                        placeholder='Take advantage of this limited offer'
-                        autoComplete="off"
-                        value={props.offer.text_a}
-                        onChange={handleTextChange}
-                    />
-                    <TextField
-                        label="Button text"
-                        placeholder='Add to cart'
-                        value={props.offer.cta_a}
-                        onChange={handleBtnChange}
-                        autoComplete="off"
-                    />
-                    <Checkbox id={"abTesting"}
-                        label="Enable A/B testing"
-                        checked={abTestCheck}
-                        onChange={handleAbChange}
-                    />
-                    <Collapsible
-                        open={abTestCheck}
-                        id="basic-collapsible"
-                        transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
-                        // expandOnPrint
-                    >
-                    <Collapsible
-                      open={!props.offerSettings.has_ab_testing}
-                      id="ab-testing-not-present-collapsible"
-                      transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
-                      expandOnPrint
-                    >
-                      <VerticalStack>
-                        <p>
-                            A/B testing is available on our Professional plan. Please <Link to="/subscription">upgrade your subscription</Link> to enable it.
-                        </p>
-                      </VerticalStack>
-                    </Collapsible>
-                        <Collapsible
-                            open={props.offerSettings.has_ab_testing}
-                            id="ab-testing-present-collapsible"
-                            transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
-                            expandOnPrint
-                        >
+            <LegacyCard title="Offer Product" actions={[{ content: 'Learn about Autopilot' }]} sectioned >
+                <LegacyCard.Section>
+                    <LegacyStack spacing="loose" vertical>
+                        <p>What product would you like to have in the offer?</p>
+                        <ButtonGroup>
+                            <Button id={"btnSelectProduct"} onClick={() => { handleModal(); getProducts(); }} ref={modalRef}>Select product manually</Button>
+                            <Button id={"btnLaunchAI"} primary>Launch Autopilot</Button>
+                        </ButtonGroup>
+                    </LegacyStack>
+                </LegacyCard.Section>
+            </LegacyCard>
+            <LegacyCard title="Text" sectioned >
+                <LegacyCard.Section>
+                    <LegacyStack spacing="loose" vertical>
                         <TextField
-                          label="Alternative offer text"
-                          placeholder='Take advantage of this limited offer'
-                          autoComplete="off"
-                          value={props.offer.text_b}
-                          onChange={handleAltTextChange}
+                            label="Offer title"
+                            placeholder='Offer #1'
+                            value={props.offer.title}
+                            onChange={handleTitleChange}
+                            autoComplete="off"
+                            helpText="This title will only be visible to you so you can reference it internally"
                         />
-                            <TextField
-                                label="Alternative button text"
-                                placeholder='Add to cart'
-                                autoComplete="off"
-                                value={props.offer.cta_b}
-                                onChange={handleAltBtnChange}
-                            />
+                        <TextField
+                            label="Offer text"
+                            placeholder='Take advantage of this limited offer'
+                            autoComplete="off"
+                            value={props.offer.text_a}
+                            onChange={handleTextChange}
+                        />
+                        <TextField
+                            label="Button text"
+                            placeholder='Add to cart'
+                            value={props.offer.cta_a}
+                            onChange={handleBtnChange}
+                            autoComplete="off"
+                        />
+                        <Checkbox id={"abTesting"}
+                            label="Enable A/B testing"
+                            checked={abTestCheck}
+                            onChange={handleAbChange}
+                        />
+                        <Collapsible
+                            open={abTestCheck}
+                            id="basic-collapsible"
+                            transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
+                        // expandOnPrint
+                        >
+                            <Collapsible
+                                open={!props.offerSettings.has_ab_testing}
+                                id="ab-testing-not-present-collapsible"
+                                transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
+                                expandOnPrint
+                            >
+                                <VerticalStack>
+                                    <p>
+                                        A/B testing is available on our Professional plan. Please <Link to="/subscription">upgrade your subscription</Link> to enable it.
+                                    </p>
+                                </VerticalStack>
+                            </Collapsible>
+                            <Collapsible
+                                open={props.offerSettings.has_ab_testing}
+                                id="ab-testing-present-collapsible"
+                                transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
+                                expandOnPrint
+                            >
+                                <TextField
+                                    label="Alternative offer text"
+                                    placeholder='Take advantage of this limited offer'
+                                    autoComplete="off"
+                                    value={props.offer.text_b}
+                                    onChange={handleAltTextChange}
+                                />
+                                <TextField
+                                    label="Alternative button text"
+                                    placeholder='Add to cart'
+                                    autoComplete="off"
+                                    value={props.offer.cta_b}
+                                    onChange={handleAltBtnChange}
+                                />
+                            </Collapsible>
                         </Collapsible>
-                    </Collapsible>
-                </LegacyStack>
-            </LegacyCard.Section>
-        </LegacyCard>
-        <LegacyCard title="Display options" sectioned>
-            <LegacyCard.Section>
-            <LegacyStack vertical>
-                <Checkbox id={"removeImg"}
-                    checked={!props.offer.show_product_image}
-                    onChange={handleImageChange}
-                    label="Remove product image"
-                />
-                <Checkbox id={"removePrice"}
-                    checked={!props.offer.show_product_price}
-                    onChange={handlePriceChange}
-                    label="Remove price"
-                />
-                <Checkbox id={"removeComparePrice"}
-                    checked={!props.offer.show_compare_at_price}
-                    onChange={handleCompareChange}
-                    label="Remove compare at price"
-                />
-                <Checkbox id={"removeProductPage"}
-                    checked={!props.offer.link_to_product}
-                    onChange={handleProductPageChange}
-                    label="Remove link to product page"
-                />
-                <Checkbox id={"autoDiscount"}
-                    label="Automatically apply discount code"
-                    checked={props.offer.discount_target_type == "code"}
-                    onChange={handleDiscountChange}
-                />
-                <Checkbox id={"removeQtySelector"}
-                    checked={!props.offer.show_quantity_selector}
-                    onChange={handleQtySelectorChange}
-                    label="Remove quantity selector"
-                />
-                <Checkbox id={"addCustomtext"}
-                    checked={props.offer.show_custom_field}
-                    onChange={handleCustomTextChange}
-                    label="Add custom textbox"
-                />
+                    </LegacyStack>
+                </LegacyCard.Section>
+            </LegacyCard>
+            <LegacyCard title="Display options" sectioned>
+                <LegacyCard.Section>
+                    <LegacyStack vertical>
+                        <Checkbox id={"removeImg"}
+                            checked={!props.offer.show_product_image}
+                            onChange={handleImageChange}
+                            label="Remove product image"
+                        />
+                        <Checkbox id={"removePrice"}
+                            checked={!props.offer.show_product_price}
+                            onChange={handlePriceChange}
+                            label="Remove price"
+                        />
+                        <Checkbox id={"removeComparePrice"}
+                            checked={!props.offer.show_compare_at_price}
+                            onChange={handleCompareChange}
+                            label="Remove compare at price"
+                        />
+                        <Checkbox id={"removeProductPage"}
+                            checked={!props.offer.link_to_product}
+                            onChange={handleProductPageChange}
+                            label="Remove link to product page"
+                        />
+                        <Checkbox id={"autoDiscount"}
+                            label="Automatically apply discount code"
+                            checked={props.offer.discount_target_type == "code"}
+                            onChange={handleDiscountChange}
+                        />
+                        <Checkbox id={"removeQtySelector"}
+                            checked={!props.offer.show_quantity_selector}
+                            onChange={handleQtySelectorChange}
+                            label="Remove quantity selector"
+                        />
+                        <Checkbox id={"addCustomtext"}
+                            checked={props.offer.show_custom_field}
+                            onChange={handleCustomTextChange}
+                            label="Add custom textbox"
+                        />
+                    </LegacyStack>
+                </LegacyCard.Section>
+            </LegacyCard>
+            <div className="space-4"></div>
+            <LegacyStack distribution="center">
+                <Button id={"btnAddProduct"} onClick={handleModal} ref={modalRef}>Add product</Button>
             </LegacyStack>
-            </LegacyCard.Section>
-        </LegacyCard>
-        <div className="space-4"></div>
-        <LegacyStack distribution="center">
-            <Button id={"btnAddProduct"} onClick={handleModal} ref={modalRef}>Add product</Button>
-        </LegacyStack>
-        <div className="space-10"></div>
-        {/* Modal */}
-        <Modal
-        activator={activator}
-        open={productModal}
-        onClose={handleModalCloseEvent}
-        title="Select products from your store"
-        primaryAction={{
-          content: 'Save',
-          onAction: updateProducts,
-        }}
-      >
-        <Modal.Section>
-            <ModalAddProduct offer={props.offer} updateQuery={updateQuery} shop_id={props.shop.shop_id} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct}/>
-        </Modal.Section>
-      </Modal>
-    </div>
-  );
+            <div className="space-10"></div>
+            {/* Modal */}
+            <Modal
+                activator={activator}
+                open={productModal}
+                onClose={handleModalCloseEvent}
+                title="Select products from your store"
+                primaryAction={{
+                    content: 'Save',
+                    onAction: updateProducts,
+                }}
+            >
+                <Modal.Section>
+                    <ModalAddProduct selectedItems={selectedItems} setSelectedItems={setSelectedItems} offer={props.offer} updateQuery={updateQuery} shop_id={props.shop.shop_id} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct} />
+                </Modal.Section>
+            </Modal>
+        </div>
+    );
 }
 
-export function SecondTab(props){
+export function SecondTab(props) {
+    const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
+
     const [selected, setSelected] = useState('cartpage');
-    const [rule, setRule] = useState({quantity: null, rule_selector: 'cart_at_least', item_type: 'product', item_shopify_id: null, item_name: null});
+    const [rule, setRule] = useState({ quantity: null, rule_selector: 'cart_at_least', item_type: 'product', item_shopify_id: null, item_name: null });
     const [quantityErrorText, setQuantityErrorText] = useState(null);
     const [itemErrorText, setItemErrorText] = useState(null);
     const quantityArray = ['cart_at_least', 'cart_at_most', 'cart_exactly'];
-    const orderArray = ['total_at_least', 'total_at_most']
+    const orderArray = ['total_at_least', 'total_at_most'];
+    const [selectedItems, setSelectedItems] = useState([]);
 
-    function upadteCondition () {
-        if(quantityArray.includes(rule.rule_selector)){
-            if(!rule.quantity){
+    function upadteCondition() {
+        if (quantityArray.includes(rule.rule_selector)) {
+            if (!rule.quantity) {
                 setQuantityErrorText("Required filed");
                 return;
             }
-            else if(rule.quantity<1){
+            else if (rule.quantity < 1) {
                 setQuantityErrorText("Quantity can't be less than 1");
                 return;
             }
         }
-        if(orderArray.includes(rule.rule_selector)){
-            if(!rule.item_name){
+        if (orderArray.includes(rule.rule_selector)) {
+            if (!rule.item_name) {
                 setItemErrorText("Required filed");
                 return;
             }
-            else if(rule.item_name<1){
+            else if (rule.item_name < 1) {
                 setItemErrorText("Amount can't be less than 1");
                 return;
             }
         }
-        else if(!rule.item_name){
+        else if (!rule.item_name) {
             setItemErrorText("Required field");
             return;
         }
         props.setOffer(prev => ({ ...prev, rules_json: [...prev.rules_json, rule] }));
-        handleModal();
+        handleConditionModal();
     }
 
     const handleSelectChange = useCallback((value) => {
-        if(value === "cartpage") {
+        if (value === "cartpage") {
             props.updateOffer("in_cart_page", true);
             props.updateOffer("in_product_page", false);
             props.updateOffer("in_ajax_cart", false);
         }
-        else if(value === "productpage") {
+        else if (value === "productpage") {
             props.updateOffer("in_cart_page", false);
             props.updateOffer("in_product_page", true);
             props.updateOffer("in_ajax_cart", false);
         }
-        else if(value === "cartpageproductpage") {
+        else if (value === "cartpageproductpage") {
             props.updateOffer("in_cart_page", true);
             props.updateOffer("in_product_page", true);
             props.updateOffer("in_ajax_cart", false);
         }
-        else if(value === "ajax") {
+        else if (value === "ajax") {
             props.updateOffer("in_cart_page", false);
             props.updateOffer("in_product_page", false);
             props.updateOffer("in_ajax_cart", true);
         }
-        else if(value === "ajaxcartpage") {
+        else if (value === "ajaxcartpage") {
             props.updateOffer("in_cart_page", true);
             props.updateOffer("in_product_page", false);
             props.updateOffer("in_ajax_cart", true);
         }
-      setSelected(value);
+        setSelected(value);
     }, []);
 
-  const options = [
-      {label: 'Cart page', value: 'cartpage'},
-      {label: 'Product page', value: 'productpage'},
-      {label: 'Product and cart page', value: 'cartpageproductpage'},
-      {label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax'},
-      {label: 'AJAX and cart page', value: 'ajaxcartpage'}
+    const options = [
+        { label: 'Cart page', value: 'cartpage' },
+        { label: 'Product page', value: 'productpage' },
+        { label: 'Product and cart page', value: 'cartpageproductpage' },
+        { label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax' },
+        { label: 'AJAX and cart page', value: 'ajaxcartpage' }
     ];
 
     const handleDisableCheckoutBtn = useCallback((newChecked) => props.updateOffer("must_accept", newChecked), []);
     const handleRemoveItiem = useCallback((newChecked) => props.updateOffer("remove_if_no_longer_valid", newChecked), []);
     //Modal controllers
     const [conditionModal, setConditionModal] = useState(false);
-    const handleModal = useCallback(() => {
+    const handleConditionModal = useCallback(() => {
         setConditionModal(!conditionModal), [conditionModal]
         setDefaultRule();
     });
     const modalCon = useRef(null);
     const activatorCon = modalCon;
+
+    const [productModal, setProductModal] = useState(false);
+    const [productData, setProductData] = useState("");
+    const [selectedProducts, setSelectedProducts] = useState([]);
+
+    const handleProductsModal = () => {
+        setProductModal(prev => !prev);
+    };
+
+    async function handleSelectProductsModal() {
+        await getSelectedItems('product');
+        handleProductsModal();
+    }
+    const modalProd = useRef(null);
+
+    const [collectionModal, setCollectionModal] = useState(false);
+    const [collectionData, setCollectionData] = useState("");
+    const [selectedCollections, setSelectedCollections] = useState([]);
+
+    const handleCollectionsModal = useCallback(() => {
+        setCollectionModal(!collectionModal);
+    }, [collectionModal]);
+
+    async function handleSelectCollectionsModal() {
+        await getSelectedItems('collection');
+        handleCollectionsModal();
+    }
+    const modalColl = useRef(null);
+    const activatorColl = modalColl;
 
     useEffect(() => {
         if (props.offer.in_product_page && props.offer.in_cart_page) {
@@ -456,8 +491,54 @@ export function SecondTab(props){
         }
     }, []);
 
-    const setDefaultRule = ()=>{
-        setRule({quantity: null, rule_selector: 'cart_at_least', item_type: 'product', item_shopify_id: null, item_name: null});
+    function getSelectedItems(item_type) {
+        return fetch(`/api/merchant/offer/shopify_ids_from_rule`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ offer: { offer_id: props.offer.id }, shop: shopAndHost.shop, rule_selector: 'on_product_this_product_or_in_collection', item_type: item_type }),
+        })
+            .then((response) => { return response.json() })
+            .then(data => {
+                setSelectedItems(data.item_shopify_ids);
+                return data
+            })
+    }
+
+    function addProductsRule() {
+        if (Array.isArray(selectedProducts)) {
+            const offerRules = [...props.offer.rules_json];
+            for (var i = 0; i < selectedProducts.length; i++) {
+                console.log("Selected Prod", selectedProducts[i]);
+                if(selectedProducts[i].id){
+                    const offer_rule = { quantity: null, rule_selector: "on_product_this_product_or_in_collection", item_type: "product", item_shopify_id: selectedProducts[i].id, item_name: selectedProducts[i].title }
+                    offerRules.push(offer_rule);
+                }
+            }
+            props.updateOffer('rules_json', offerRules);
+            props.updateOffer('ruleset_type', "or");
+        }
+        setSelectedProducts([]);
+        handleProductsModal();
+    }
+
+    function addCollectionsRule() {
+        const offerRules = [...props.offer.rules_json];
+        if (Array.isArray(selectedCollections)) {
+            for (var i = 0; i < selectedCollections.length; i++) {
+                const offer_rule = { quantity: null, rule_selector: "on_product_this_product_or_in_collection", item_type: "collection", item_shopify_id: selectedCollections[i].id, item_name: selectedCollections[i].title }
+                offerRules.push(offer_rule);
+            }
+            props.updateOffer('rules_json', offerRules);
+            props.updateOffer('ruleset_type', "or");
+        }
+        setSelectedCollections([]);
+        handleCollectionsModal();
+    }
+
+    const setDefaultRule = () => {
+        setRule({ quantity: null, rule_selector: 'cart_at_least', item_type: 'product', item_shopify_id: null, item_name: null });
         setQuantityErrorText(null);
         setItemErrorText(null);
     }
@@ -490,42 +571,70 @@ export function SecondTab(props){
         return condition ? condition.label : null;
     }
 
-    function deleteRule(index){
+    function deleteRule(index) {
         const updatedRules = [...props.offer.rules_json];
         updatedRules.splice(index, 1);
         props.updateOffer('rules_json', updatedRules);
     }
 
-    return(
+    return (
         <div>
             <LegacyCard title="Choose placement" sectioned>
                 <LegacyCard.Section>
-                <Grid>
-                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                        <Select
-                            options={options}
-                            onChange={handleSelectChange}
-                            value={selected}
-                        />
-                    </Grid.Cell>
-                </Grid>
+                    <Grid>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                            <Select
+                                options={options}
+                                onChange={handleSelectChange}
+                                value={selected}
+                            />
+                        </Grid.Cell>
+                    </Grid>
+                    <div className="space-4"></div>
+                    <Button onClick={handleSelectProductsModal} ref={modalProd} >Select Product</Button>
+                    <Modal 
+                        open={productModal}
+                        onClose={handleProductsModal}
+                        title="Select products from your store"
+                        primaryAction={{
+                            content: 'Save',
+                            onAction: () => { addProductsRule(); },
+                        }}>
+                        <Modal.Section>
+                            <SelectProductsModal selectedItems={selectedItems} setSelectedItems={setSelectedItems} offer={props.offer} shop={props.shop} handleProductsModal={handleProductsModal} selectedProducts={selectedProducts} setSelectedProducts={setSelectedProducts} />
+                        </Modal.Section>
+                    </Modal>
+                    <div className="space-4"></div>
+                    <Button onClick={handleSelectCollectionsModal} ref={modalColl}>Select Collection</Button>
+                    <Modal
+                        open={collectionModal}
+                        onClose={handleCollectionsModal}
+                        title="Select collections from your store"
+                        primaryAction={{
+                            content: 'Save',
+                            onAction: () => { addCollectionsRule(); },
+                        }}>
+                        <Modal.Section>
+                            <SelectCollectionsModal selectedItems={selectedItems} setSelectedItems={setSelectedItems} offer={props.offer} shop={props.shop} handleCollectionsModal={handleCollectionsModal} selectedCollections={selectedCollections} setSelectedCollections={setSelectedCollections}/>
+                        </Modal.Section>
+                    </Modal>
                 </LegacyCard.Section>
             </LegacyCard>
             <LegacyCard title="Display Conditions" sectioned>
                 <LegacyCard.Section>
-                    {props.offer.rules_json.length===0 ? (
+                    {props.offer.rules_json.length === 0 ? (
                         <p>None selected (show offer to all customer)</p>
-                    ): (
+                    ) : (
                         <>{Array.isArray(props.offer.rules_json) && props.offer.rules_json.map((rule, index) => (
-                        <li key={index} style={{ display: 'flex', alignItems: 'center'}}>{getLabelFromValue(rule.rule_selector)} {rule.quantity} {rule.item_name}
-                            <p onClick={()=> deleteRule(index) }>
-                                <Icon source={CancelMajor} color="critical"/>
-                            </p>
-                        </li>
+                            <li key={index} style={{ display: 'flex', alignItems: 'center' }}>{getLabelFromValue(rule.rule_selector)} {rule.quantity} <b>{rule.item_name}</b>
+                                <p onClick={() => deleteRule(index)}>
+                                    <Icon source={CancelMajor} color="critical" />
+                                </p>
+                            </li>
                         ))}</>
                     )}
-                    <br/>
-                    <Button onClick={handleModal} ref={modalCon}>Add condition</Button>
+                    <br />
+                    <Button onClick={handleConditionModal} ref={modalCon}>Add condition</Button>
                 </LegacyCard.Section>
                 <LegacyCard.Section title="Condition options">
                     <LegacyStack vertical>
@@ -544,40 +653,40 @@ export function SecondTab(props){
                 </LegacyCard.Section>
             </LegacyCard>
             <div className="space-4"></div>
-                <LegacyStack distribution="center">
-                    <Button disabled="true">Continue to Appearance</Button>
-                </LegacyStack>
+            <LegacyStack distribution="center">
+                <Button disabled="true">Continue to Appearance</Button>
+            </LegacyStack>
             <div className="space-10"></div>
             <Modal
                 activator={activatorCon}
                 open={conditionModal}
-                onClose={handleModal}
+                onClose={handleConditionModal}
                 title="Select products from your store"
                 primaryAction={{
-                content: 'Save',
-                onAction: upadteCondition,
+                    content: 'Save',
+                    onAction: upadteCondition,
                 }}
             >
                 <Modal.Section>
-                   <ModalAddConditions quantityErrorText={quantityErrorText} itemErrorText={itemErrorText} condition_options={condition_options} updateOffer={props.updateOffer} rule={rule} setRule={setRule} />
+                    <ModalAddConditions quantityErrorText={quantityErrorText} itemErrorText={itemErrorText} condition_options={condition_options} updateOffer={props.updateOffer} rule={rule} setRule={setRule} />
                 </Modal.Section>
             </Modal>
         </div>
     );
 }
 
-export function ThirdTab(props){
+export function ThirdTab(props) {
 
     const [selected, setSelected] = useState(props.shop.css_options.main.borderStyle);
     const options = [
-        {label: 'Compact', value: 'compact'},
-        {label: 'Stack', value: 'stack'},
-        {label: 'Carousel', value: 'carousel'},
-        {label: 'Flex', value: 'flex'},
+        { label: 'Compact', value: 'compact' },
+        { label: 'Stack', value: 'stack' },
+        { label: 'Carousel', value: 'carousel' },
+        { label: 'Flex', value: 'flex' },
     ];
 
     const handleLayout = useCallback((value) => {
-         props.updateOffer("multi_layout", value);
+        props.updateOffer("multi_layout", value);
     }, []);
     const handleSelectChange = useCallback((value) => setSelected(value), []);
 
@@ -586,21 +695,21 @@ export function ThirdTab(props){
     // Space below the offer
     const handleBelowSpace = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "main", "marginBottom"), []);
     //Border style drop-down menu
-    const handleBorderStyle = useCallback((newValue) => { 
+    const handleBorderStyle = useCallback((newValue) => {
         props.updateShop(newValue, "css_options", "main", "borderStyle");
         setSelected(newValue);
     }, []);
     const BorderOptions = [
-        {label: 'No border', value: 'none'},
-        {label: 'Dotted lines', value: 'dotted'},
-        {label: 'Dashed line', value: 'dashed'},
-        {label: 'Solid line', value: 'solid'},
-        {label: 'Double line', value: 'double'},
-        {label: 'Groove line', value: 'groove'},
-        {label: 'Ridge line', value: 'ridge'},
-        {label: 'Inset line', value: 'inset'},
-        {label: 'Outset line', value: 'outset'},
-        {label: 'Hidden line', value: 'hidden'},
+        { label: 'No border', value: 'none' },
+        { label: 'Dotted lines', value: 'dotted' },
+        { label: 'Dashed line', value: 'dashed' },
+        { label: 'Solid line', value: 'solid' },
+        { label: 'Double line', value: 'double' },
+        { label: 'Groove line', value: 'groove' },
+        { label: 'Ridge line', value: 'ridge' },
+        { label: 'Inset line', value: 'inset' },
+        { label: 'Outset line', value: 'outset' },
+        { label: 'Hidden line', value: 'hidden' },
     ];
 
     //Border width
@@ -616,40 +725,40 @@ export function ThirdTab(props){
 
     //Font options
     // const [fontSelect, setFontSelect] = useState("Dummy font 1");
-    const handleFontSelect = useCallback((value)=> props.updateShop(value, "css_options", "text", "fontFamily"),[]);
+    const handleFontSelect = useCallback((value) => props.updateShop(value, "css_options", "text", "fontFamily"), []);
     const fontOptions = [
-        {label: 'None', value: 'None'},
-        {label: 'Arial', value: 'Arial'},
-        {label: 'Caveat', value: 'Caveat'},
-        {label: 'Confortaa', value: 'Confortaa'},
-        {label: 'Comic Sans MS', value: 'Comic Sans MS'},
-        {label: 'Courier New', value: 'Courier New'},
-        {label: 'EB Garamond', value: 'EB Garamond'},
-        {label: 'Georgia', value: 'Georgia'},
-        {label: 'Impact', value: 'Impact'},
-        {label: 'Lexend', value: 'Lexend'},
-        {label: 'Lobster', value: 'Lobster'},
-        {label: 'Lora', value: 'Lora'},
-        {label: 'Merriweather', value: 'Merriweather'},
-        {label: 'Montserrat', value: 'Montserrat'},
-        {label: 'Oswald', value: 'Oswald'},
-        {label: 'Pacifico', value: 'Pacifico'},
-        {label: 'Playfair Display', value: 'Playfair Display'},
-        {label: 'Roboto', value: 'Roboto'},
-        {label: 'Spectral', value: 'Spectral'},
-        {label: 'Trebuchet MS', value: 'Trebuchet MS'},
-        {label: 'Verdana', value: 'Verdana'},
-      ];
+        { label: 'None', value: 'None' },
+        { label: 'Arial', value: 'Arial' },
+        { label: 'Caveat', value: 'Caveat' },
+        { label: 'Confortaa', value: 'Confortaa' },
+        { label: 'Comic Sans MS', value: 'Comic Sans MS' },
+        { label: 'Courier New', value: 'Courier New' },
+        { label: 'EB Garamond', value: 'EB Garamond' },
+        { label: 'Georgia', value: 'Georgia' },
+        { label: 'Impact', value: 'Impact' },
+        { label: 'Lexend', value: 'Lexend' },
+        { label: 'Lobster', value: 'Lobster' },
+        { label: 'Lora', value: 'Lora' },
+        { label: 'Merriweather', value: 'Merriweather' },
+        { label: 'Montserrat', value: 'Montserrat' },
+        { label: 'Oswald', value: 'Oswald' },
+        { label: 'Pacifico', value: 'Pacifico' },
+        { label: 'Playfair Display', value: 'Playfair Display' },
+        { label: 'Roboto', value: 'Roboto' },
+        { label: 'Spectral', value: 'Spectral' },
+        { label: 'Trebuchet MS', value: 'Trebuchet MS' },
+        { label: 'Verdana', value: 'Verdana' },
+    ];
 
     //Font weight
     const handleFontWeight = useCallback((newValue) => {
         props.updateShop(`${newValue}px`, "css_options", "text", "fontWeightInPixel");
-            if(parseInt(newValue) > 400 && props.shop.css_options.text.fontWeight != "bold") {
-                props.updateShop("bold", "css_options", "text", "fontWeight");
-            }
-            else if(parseInt(newValue) <= 400 && props.shop.css_options.text.fontWeight != "Normal" && props.shop.css_options.text.fontWeight != "inherit") {
-                props.updateShop("Normal", "css_options", "text", "fontWeight");
-            }
+        if (parseInt(newValue) > 400 && props.shop.css_options.text.fontWeight != "bold") {
+            props.updateShop("bold", "css_options", "text", "fontWeight");
+        }
+        else if (parseInt(newValue) <= 400 && props.shop.css_options.text.fontWeight != "Normal" && props.shop.css_options.text.fontWeight != "inherit") {
+            props.updateShop("Normal", "css_options", "text", "fontWeight");
+        }
     }, []);
 
     //Font sizes
@@ -657,40 +766,40 @@ export function ThirdTab(props){
 
 
     //Button options
-    const handleBtnSelect = useCallback((value)=> props.updateShop(value, "css_options", "button", "fontFamily"),[]);
+    const handleBtnSelect = useCallback((value) => props.updateShop(value, "css_options", "button", "fontFamily"), []);
     const btnOptions = [
-        {label: 'None', value: 'None'},
-        {label: 'Arial', value: 'Arial'},
-        {label: 'Caveat', value: 'Caveat'},
-        {label: 'Confortaa', value: 'Confortaa'},
-        {label: 'Comic Sans MS', value: 'Comic Sans MS'},
-        {label: 'Courier New', value: 'Courier New'},
-        {label: 'EB Garamond', value: 'EB Garamond'},
-        {label: 'Georgia', value: 'Georgia'},
-        {label: 'Impact', value: 'Impact'},
-        {label: 'Lexend', value: 'Lexend'},
-        {label: 'Lobster', value: 'Lobster'},
-        {label: 'Lora', value: 'Lora'},
-        {label: 'Merriweather', value: 'Merriweather'},
-        {label: 'Montserrat', value: 'Montserrat'},
-        {label: 'Oswald', value: 'Oswald'},
-        {label: 'Pacifico', value: 'Pacifico'},
-        {label: 'Playfair Display', value: 'Playfair Display'},
-        {label: 'Roboto', value: 'Roboto'},
-        {label: 'Spectral', value: 'Spectral'},
-        {label: 'Trebuchet MS', value: 'Trebuchet MS'},
-        {label: 'Verdana', value: 'Verdana'},
-      ];
+        { label: 'None', value: 'None' },
+        { label: 'Arial', value: 'Arial' },
+        { label: 'Caveat', value: 'Caveat' },
+        { label: 'Confortaa', value: 'Confortaa' },
+        { label: 'Comic Sans MS', value: 'Comic Sans MS' },
+        { label: 'Courier New', value: 'Courier New' },
+        { label: 'EB Garamond', value: 'EB Garamond' },
+        { label: 'Georgia', value: 'Georgia' },
+        { label: 'Impact', value: 'Impact' },
+        { label: 'Lexend', value: 'Lexend' },
+        { label: 'Lobster', value: 'Lobster' },
+        { label: 'Lora', value: 'Lora' },
+        { label: 'Merriweather', value: 'Merriweather' },
+        { label: 'Montserrat', value: 'Montserrat' },
+        { label: 'Oswald', value: 'Oswald' },
+        { label: 'Pacifico', value: 'Pacifico' },
+        { label: 'Playfair Display', value: 'Playfair Display' },
+        { label: 'Roboto', value: 'Roboto' },
+        { label: 'Spectral', value: 'Spectral' },
+        { label: 'Trebuchet MS', value: 'Trebuchet MS' },
+        { label: 'Verdana', value: 'Verdana' },
+    ];
 
     //Button weight
     const handleBtnWeight = useCallback((newValue) => {
         props.updateShop(`${newValue}px`, "css_options", "button", "fontWeightInPixel");
-            if(parseInt(newValue) > 400 && props.shop.css_options.button.fontWeight != "bold") {
-                props.updateShop("bold", "css_options", "button", "fontWeight");
-            }
-            else if(parseInt(newValue) <= 400 && props.shop.css_options.button.fontWeight != "Normal" && props.shop.css_options.button.fontWeight != "inherit") {
-                props.updateShop("Normal", "css_options", "button", "fontWeight");
-            }
+        if (parseInt(newValue) > 400 && props.shop.css_options.button.fontWeight != "bold") {
+            props.updateShop("bold", "css_options", "button", "fontWeight");
+        }
+        else if (parseInt(newValue) <= 400 && props.shop.css_options.button.fontWeight != "Normal" && props.shop.css_options.button.fontWeight != "inherit") {
+            props.updateShop("Normal", "css_options", "button", "fontWeight");
+        }
     }, []);
 
     //Button size
@@ -705,12 +814,12 @@ export function ThirdTab(props){
         props.updateShop(newValue.hex, "css_options", "main", "backgroundColor");
     }, []);
 
-    return(
+    return (
         <div>
             <LegacyCard title="Offer box" sectioned>
                 <LegacyCard.Section>
                     <Grid>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <Select
                                 label="Layout"
                                 options={options}
@@ -719,9 +828,9 @@ export function ThirdTab(props){
                             />
                         </Grid.Cell>
                     </Grid>
-                    <br/>
+                    <br />
                     <Grid>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Space above offer"
                                 type="number"
@@ -730,7 +839,7 @@ export function ThirdTab(props){
                                 suffix="px"
                             />
                         </Grid.Cell>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Space below offer"
                                 type="number"
@@ -740,16 +849,16 @@ export function ThirdTab(props){
                             />
                         </Grid.Cell>
                     </Grid>
-                    <br/>
+                    <br />
                     <Grid>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <Select label="Border style"
                                 options={BorderOptions}
                                 onChange={handleBorderStyle}
                                 value={selected}
                             />
                         </Grid.Cell>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Border width"
                                 type="number"
@@ -759,9 +868,9 @@ export function ThirdTab(props){
                             />
                         </Grid.Cell>
                     </Grid>
-                    <br/>
+                    <br />
                     <Grid>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <RangeSlider
                                 label="Corner Radius"
                                 value={parseInt(props.shop.css_options.main.borderRadius)}
@@ -786,19 +895,19 @@ export function ThirdTab(props){
                         <Collapsible
                             open={open}
                             id="basic-collapsible"
-                            transition={{duration: '500ms', timingFunction: 'ease-in-out'}}
+                            transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                             expandOnPrint
                         >
-                        <br/><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main.backgroundColor} />
-                        {/*<br/><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main.backgroundColor} />*/}
+                            <br /><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main.backgroundColor} />
+                            {/*<br/><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main.backgroundColor} />*/}
                         </Collapsible>
                     </Stack>
                 </LegacyCard.Section>
             </LegacyCard>
-            <LegacyCard  title="Offer text" className="input-box" sectioned>
+            <LegacyCard title="Offer text" className="input-box" sectioned>
                 <LegacyCard.Section>
                     <Grid>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <Select
                                 label="Font"
                                 options={fontOptions}
@@ -806,7 +915,7 @@ export function ThirdTab(props){
                                 value={props.shop.css_options.text.fontFamily}
                             />
                         </Grid.Cell>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Weight"
                                 type="number"
@@ -816,7 +925,7 @@ export function ThirdTab(props){
                                 value={parseInt(props.shop.css_options.text.fontWeightInPixel)}
                             />
                         </Grid.Cell>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Size"
                                 type="number"
@@ -830,7 +939,7 @@ export function ThirdTab(props){
                 </LegacyCard.Section>
                 <LegacyCard.Section title="Button text">
                     <Grid>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <Select
                                 label="Font"
                                 options={btnOptions}
@@ -838,7 +947,7 @@ export function ThirdTab(props){
                                 value={props.shop.css_options.button.fontFamily}
                             />
                         </Grid.Cell>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Weight"
                                 type="number"
@@ -848,7 +957,7 @@ export function ThirdTab(props){
                                 value={parseInt(props.shop.css_options.button.fontWeightInPixel)}
                             />
                         </Grid.Cell>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Size"
                                 type="number"
@@ -859,9 +968,9 @@ export function ThirdTab(props){
                             />
                         </Grid.Cell>
                     </Grid>
-                    <br/>
+                    <br />
                     <Grid>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <RangeSlider
                                 label="Border Radius"
                                 value={props.shop.css_options.button.borderRadius}
@@ -885,22 +994,22 @@ export function ThirdTab(props){
 }
 
 // Advanced Tab
-export function FourthTab(props){
+export function FourthTab(props) {
 
     const [checked, setChecked] = useState(false);
     const handleChange = useCallback((newChecked) => setChecked(newChecked), []);
-    const handleProductDomSelector = useCallback((newValue) => props.updateShop(newValue,"custom_product_page_dom_selector"), []);
+    const handleProductDomSelector = useCallback((newValue) => props.updateShop(newValue, "custom_product_page_dom_selector"), []);
     const handleProductDomAction = useCallback((newValue) => props.updateShop(newValue, "custom_product_page_dom_action"), []);
-    const handleCartDomSelector = useCallback((newValue) => props.updateShop(newValue,"custom_cart_page_dom_selector"), []);
-    const handleCartDomAction = useCallback((newValue) => props.updateShop(newValue,"custom_cart_page_dom_action"), []);
-    const handleAjaxDomSelector = useCallback((newValue) => props.updateShop(newValue,"custom_ajax_dom_selector"), []);
+    const handleCartDomSelector = useCallback((newValue) => props.updateShop(newValue, "custom_cart_page_dom_selector"), []);
+    const handleCartDomAction = useCallback((newValue) => props.updateShop(newValue, "custom_cart_page_dom_action"), []);
+    const handleAjaxDomSelector = useCallback((newValue) => props.updateShop(newValue, "custom_ajax_dom_selector"), []);
     const handleAjaxDomAction = useCallback((newValue) => props.updateShop(newValue, "custom_ajax_dom_action"), []);
     const handleAjaxRefreshCode = useCallback((newValue) => props.updateShop(newValue, "ajax_refresh_code"), []);
     const handleOfferCss = useCallback((newValue) => props.updateShop(newValue, "offer_css"), []);
 
-    return(
+    return (
         <>
-            <LegacyCard sectioned title="Offer placement - advanced settings" actions={[{content: 'View help doc'}]}>
+            <LegacyCard sectioned title="Offer placement - advanced settings" actions={[{ content: 'View help doc' }]}>
                 <LegacyCard.Section title="Product page">
                     <TextField label="DOM Selector" value={props.shop.custom_product_page_dom_selector} onChange={handleProductDomSelector} type="text"></TextField>
                     <TextField label="DOM Action" value={props.shop.custom_product_page_dom_action} onChange={handleProductDomAction}></TextField>
@@ -916,7 +1025,7 @@ export function FourthTab(props){
                 </LegacyCard.Section>
                 <LegacyCard.Section title="Custom CSS">
                     <TextField value={props.shop.offer_css} onChange={handleOfferCss} multiline={6}></TextField>
-                    <br/>
+                    <br />
                     <Checkbox
                         label="Save as default settings"
                         helpText="This placement will apply to all offers created in the future.

@@ -506,7 +506,7 @@ export default function EditPage() {
                                 : "" }
                                 {selected == 1 ?
                                     // page was imported from components folder
-                                    <SecondTab offer={offer} offerSettings={offerSettings} updateOffer={updateOffer}/>
+                                    <SecondTab offer={offer} setOffer={setOffer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer}/>
                                 : "" }
                                 {selected == 2 ?
                                     // page was imported from components folder
