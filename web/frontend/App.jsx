@@ -29,10 +29,6 @@ export default function App() {
                   destination: "/offer",
                 },
                 {
-                  label: "Edit Offer",
-                  destination: "/edit-offer",
-                },
-                {
                   label: "Analytics",
                   destination: "/analytics",
                 },
