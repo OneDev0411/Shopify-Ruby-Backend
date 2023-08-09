@@ -131,7 +131,7 @@ export function OffersList() {
       onAction: () => activateSelectedOffer(),
     },
     {
-      content: 'Draft',
+      content: 'Unpublish',
       onAction: () => deactivateSelectedOffer(),
     },
     {
