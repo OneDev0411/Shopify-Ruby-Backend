@@ -272,7 +272,7 @@ module Shopifable
     res.parsed_response['data']['collections']['edges'].map do |coll|
       {
         id: coll['node']['id'].delete_prefix('gid://shopify/Collection/').to_i,
-        title: coll.get('node.title')
+        title: coll['node']['title']
       }
     end
   end
