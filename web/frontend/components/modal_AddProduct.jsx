@@ -106,22 +106,20 @@ export function ModalAddProduct(props) {
     if (variants.length <= 1) {
 
       return (
-        <div style={props.selectedItems.includes(id) ? {pointerEvents: 'none'}: {}}>
-          <ResourceItem
-            id={id}
-            title={title}
-            image={image}
-            accessibilityLabel={`View details for ${title}`}
-            persistActions
-            disabled={true}
-            onClick={() => selectedProduct(id)}
-          >
-            <p variant="bodyMd" fontWeight="bold" as="h3">
-              <strong>{title}</strong>
-            </p>
+        <ResourceItem
+          id={id}
+          title={title}
+          image={image}
+          accessibilityLabel={`View details for ${title}`}
+          persistActions
+          disabled={true}
+          onClick={() => selectedProduct(id)}
+        >
+          <p variant="bodyMd" fontWeight="bold" as="h3">
+            <strong>{title}</strong>
+          </p>
 
-          </ResourceItem>
-        </div>
+        </ResourceItem>
 
       );
     }
