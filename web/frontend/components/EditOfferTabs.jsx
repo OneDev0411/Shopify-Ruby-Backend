@@ -13,7 +13,10 @@ import {
     Grid,
     ColorPicker,
     Stack,
-    Icon
+    Icon,
+    Text,
+    Badge,
+    Image
 } from "@shopify/polaris";
 import {
     CancelMajor
@@ -33,6 +36,15 @@ import { useLocation } from 'react-router-dom';
 import SelectProductsModal from "../components/SelectProductsModal";
 import { SelectCollectionsModal } from "../components/SelectCollectionsModal";
 import { useAuthenticatedFetch } from "../hooks";
+import "../assets/theme.css";
+import product_page_image_1 from "../assets/images/product_page_image_1.png";
+import product_page_image_2 from "../assets/images/product_page_image_2.png";
+import product_page_image_3 from "../assets/images/product_page_image_3.png";
+import cart_page_image_1 from "../assets/images/cart_page_image_1.png";
+import cart_page_image_2 from "../assets/images/cart_page_image_2.png";
+import cart_page_image_3 from "../assets/images/cart_page_image_3.png";
+import ajax_cart_image_1 from "../assets/images/ajax_cart_image_1.png";
+import ajax_cart_image_2 from "../assets/images/ajax_cart_image_2.png";
 
 export function EditOfferTabs(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -203,20 +215,39 @@ export function EditOfferTabs(props) {
 
     return (
         <div>
-            <LegacyCard title="Offer Product" actions={[{ content: 'Learn about Autopilot' }]} sectioned >
-                <LegacyCard.Section>
-                    <LegacyStack spacing="loose" vertical>
-                        <p>What product would you like to have in the offer?</p>
-                        <ButtonGroup>
-                            <Button id={"btnSelectProduct"} onClick={() => { handleModal(); getProducts(); }} ref={modalRef}>Select product manually</Button>
-                            <Button id={"btnLaunchAI"} primary>Launch Autopilot</Button>
-                        </ButtonGroup>
-                    </LegacyStack>
-                </LegacyCard.Section>
-            </LegacyCard>
-            <LegacyCard title="Text" sectioned >
-                <LegacyCard.Section>
-                    <LegacyStack spacing="loose" vertical>
+        <LegacyCard title="Offer Product" actions={[{content: 'Learn about Autopilot'}]} sectioned >
+            <p>What product would you like to have in the offer?</p>
+            <LegacyCard.Section>
+                <LegacyStack spacing="loose" vertical>
+                    <b>Selected Products:
+                    {props.offer.offerable_product_details.length > 0 ? (
+                        <>
+                            {props.offer.offerable_product_details.map((value, index) => (
+                                <>  
+                                    <Badge><p style={{color: 'blue'}}>{props.offer.offerable_product_details[index].title}</p></Badge>
+                                </>
+                            ))}
+                        </>
+                        ) : (
+                            <></>
+                        )}
+                    </b>
+                    <ButtonGroup>
+                        <Button id={"btnSelectProduct"} onClick={ () => { handleModal(); getProducts(); } } ref={modalRef}>
+                        {props.offer.offerable_product_details.length > 0 ? (
+                            <span>Change product</span>
+                        ) : (
+                            <span>Select product manually</span>
+                        )}
+                        </Button>
+                        <Button id={"btnLaunchAI"} primary>Launch Autopilot</Button>
+                    </ButtonGroup>
+                </LegacyStack>
+            </LegacyCard.Section>
+        </LegacyCard>
+        <LegacyCard title="Text" sectioned >
+            <LegacyCard.Section>
+                <LegacyStack spacing="loose" vertical>
                         <TextField
                             label="Offer title"
                             placeholder='Offer #1'
@@ -363,6 +394,287 @@ export function SecondTab(props) {
     const quantityArray = ['cart_at_least', 'cart_at_most', 'cart_exactly'];
     const orderArray = ['total_at_least', 'total_at_most'];
     const [selectedItems, setSelectedItems] = useState([]);
+    const [defaultSetting, setDefaultSetting] = useState(false);
+    const [useTemplate, setUseTemplate] = useState(false);
+    const [defaultSettingSecond, setDefaultSettingSecond] = useState(false);
+    const [useTemplateSecond, setUseTemplateSecond] = useState(false);
+    const [multipleDefaultSettings, setMultipleDefaultSettings] = useState(false);
+    const [defaultTemplateSettings, setDefaultTemplateSettings] = useState({
+        defaultSettingsForProductPage: false,
+        defaultSettingsForAjaxCart: false,
+        defaultSettingsForCartPage: false,
+        templateForProductPage: false,
+        templateForAjaxCart: false,
+        templateForCartPage: false,
+    });
+    const [insertedImage1, setInsertedImage1] = useState(null);
+    const [insertedImage2, setInsertedImage2] = useState(null);
+    const [insertedImage3, setInsertedImage3] = useState(null);
+    const defaultSettingsToDisplayOffer = {
+        Dawn: {
+            cart_page_selector: '#cart',
+            cart_page_action: 'before',
+            product_page_selector: '.product-form',
+            product_page_action: 'after',
+            ajax_cart_selector: '.cart-notification-product',
+            ajax_cart_action: 'before'
+        },
+        Colorblock: {
+            cart_page_selector: '#cart',
+            cart_page_action: 'before',
+            product_page_selector: '.product-form',
+            product_page_action: 'before',
+            ajax_cart_selector: '.cart-notification-product',
+            ajax_cart_action: 'before'
+        },
+        Publisher: {
+            cart_page_selector: '#cart',
+            cart_page_action: 'before',
+            product_page_selector: '.product-form',
+            product_page_action: 'after',
+            ajax_cart_selector: '.cart-item:first',
+            ajax_cart_action: 'before'
+        },
+        Crave: {
+            cart_page_selector: '#cart',
+            cart_page_action: 'before',
+            product_page_selector: '.product-form',
+            product_page_action: 'after',
+            ajax_cart_selector: '.cart-notification-product',
+            ajax_cart_action: 'before'
+        },
+        Studio: {
+            cart_page_selector: '#cart',
+            cart_page_action: 'before',
+            product_page_selector: '.product-form',
+            product_page_action: 'after',
+            ajax_cart_selector: '.cart-notification-product',
+            ajax_cart_action: 'before'
+        },
+        Taste: {
+            cart_page_selector: '#cart',
+            cart_page_action: 'before',
+            product_page_selector: '.product-form',
+            product_page_action: 'after',
+            ajax_cart_selector: '.cart-notification-product ',
+            ajax_cart_action: 'before'
+        },
+        Spotlight: {
+            cart_page_selector: '#cart',
+            cart_page_action: 'before',
+            product_page_selector: '.product-form',
+            product_page_action: 'after',
+            ajax_cart_selector: '.cart-notification-product',
+            ajax_cart_action: 'before'
+        },
+        Ride: {
+            cart_page_selector: '#cart',
+            cart_page_action: 'before',
+            product_page_selector: '.product-form',
+            product_page_action: 'after',
+            ajax_cart_selector: '.cart-notification-product',
+            ajax_cart_action: 'before'
+        },
+        Origin: {
+            cart_page_selector: '#cart',
+            cart_page_action: 'before',
+            product_page_selector: '.product-form',
+            product_page_action: 'after',
+            ajax_cart_selector: '.cart-item:first',
+            ajax_cart_action: 'before'
+        },
+        Sense: {
+            cart_page_selector: '.cart-items',
+            cart_page_action: 'before',
+            product_page_selector: "[class*='product__description']",
+            product_page_action: 'before',
+            ajax_cart_selector: '#cart-notification-product',
+            ajax_cart_action: 'before'
+        },
+        Craft: {
+            cart_page_selector: '.cart-items',
+            cart_page_action: 'before',
+            product_page_selector: "[class*='product__description']",
+            product_page_action: 'before',
+            ajax_cart_selector: '#cart-notification-product',
+            ajax_cart_action: 'before'
+        },
+        Refresh: {
+            cart_page_selector: '#cart',
+            cart_page_action: 'before',
+            product_page_selector: '.product-form',
+            product_page_action: 'before',
+            ajax_cart_selector: '#CartDrawer-Form',
+            ajax_cart_action: 'prepend'
+        }
+    };
+    const useTemplatesToDisplayOffer = {
+        Refresh: {
+            cart_page_selector: ['.cart-items', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ["[class*='product__description']", '.product-form__quantity', '.product-form__quantity'],
+            product_page_action: ['before', 'before', 'after'],
+            ajax_cart_selector: ['#CartDrawer-Form', '#cart-notification-button', '#cart-notification-button'],
+            ajax_cart_action: ['prepend', 'before', 'before']
+        },
+        Craft: {
+            cart_page_selector: ['.cart-items', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ["[class*='product__description']", '.product-form__quantity', '.product-form__quantity'],
+            product_page_action: ['before', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '#cart-notification-button', '#cart-notification-button'],
+            ajax_cart_action: ['before', 'before', 'before']
+        },
+        Sense: {
+            cart_page_selector: ['.cart-items', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ["[class*='product__description']", '.product-form__quantity', '.product-form__quantity'],
+            product_page_action: ['before', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '#cart-notification-button', '#cart-notification-button'],
+            ajax_cart_action: ['before', 'before', 'before']
+        },
+        Origin: {
+            cart_page_selector: ['#cart', '#cart__ctas', '#cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__quantity', '.product-form__quantity'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['.cart-item:first', '.drawer__footer', '.drawer__footer'],
+            ajax_cart_action: ['before', 'prepend', 'prepend']
+        },
+        Ride: {
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
+        },
+        Spotlight: {
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
+        },
+        Taste: {
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
+        },
+        Studio: {
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
+        },
+        Crave: {
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
+        },
+        Publisher: {
+            cart_page_selector: ['#cart', '#cart__ctas', '#cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__quantity', '.product-form__quantity'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['.cart-item:first', '.drawer__footer', '.drawer__footer'],
+            ajax_cart_action: ['before', 'prepend', 'prepend']
+        },
+        Colorblock: {
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['before', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
+        },
+        Dawn: {
+            cart_page_selector: ['#cart', '.cart__ctas', '.cart__ctas'],
+            cart_page_action: ['before', 'before', 'after'],
+            product_page_selector: ['.product-form', '.product-form__buttons', '.product-form__buttons'],
+            product_page_action: ['after', 'before', 'after'],
+            ajax_cart_selector: ['#cart-notification-product', '.cart-notification-product', '.cart-notification-product'],
+            ajax_cart_action: ['before', 'after', 'after']
+        }
+    }
+
+    useEffect(() => {
+        if(props.offer.in_product_page && props.offer.in_cart_page) {
+            setSelected("cartpageproductpage");
+        }
+        else if (props.offer.in_ajax_cart && props.offer.in_cart_page) {
+            setSelected("ajaxcartpage");
+        }
+        else if (props.offer.in_cart_page) {
+            setSelected("cartpage");
+        }
+        else if (props.offer.in_product_page) {
+            setSelected("productpage");
+        }
+        else if (props.offer.in_ajax_cart) {
+            setSelected("ajax");
+        }
+        else {
+            setSelected("cartpage");
+        }
+    }, []);
+
+
+    //Checked to see if offer is displayed in multiple pages of the app.
+    useEffect(() => {
+        setDefaultSetting(false);
+        setUseTemplate(false);
+        if(props.offer.in_product_page && props.offer.in_cart_page) {
+            setMultipleDefaultSettings(true);
+        }
+        else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
+            setMultipleDefaultSettings(true);
+        }
+        else if (props.offer.in_cart_page) {
+            setMultipleDefaultSettings(false);
+            if(props.shop.default_template_settings && props.shop.default_template_settings.defaultSettingsForCartPage) {
+                setDefaultSetting(true);   
+            }
+            else if(props.shop.default_template_settings && props.shop.default_template_settings.templateForCartPage) {
+                setUseTemplate(true);
+                setInsertedImage1(cart_page_image_1);
+                setInsertedImage2(cart_page_image_2);
+                setInsertedImage3(cart_page_image_3);
+            }
+        }
+        else if (props.offer.in_product_page) {
+            setMultipleDefaultSettings(false);
+            if(props.shop.default_template_settings && props.shop.default_template_settings.defaultSettingsForProductPage) {
+                setDefaultSetting(true);   
+            }
+            else if(props.shop.default_template_settings && props.shop.default_template_settings.templateForProductPage) {
+                setUseTemplate(true);
+                setInsertedImage1(product_page_image_1);
+                setInsertedImage2(product_page_image_2);
+                setInsertedImage3(product_page_image_3);
+            }
+        }
+        else if (props.offer.in_ajax_cart) {
+            setMultipleDefaultSettings(false);
+            if(props.shop.default_template_settings && props.shop.default_template_settings.defaultSettingsForAjaxCart) {
+                setDefaultSetting(true);
+            }
+            else if(props.shop.default_template_settings && props.shop.default_template_settings.templateForAjaxCart) {
+                setUseTemplate(true);
+                setInsertedImage1(ajax_cart_image_1);
+                setInsertedImage2(ajax_cart_image_2);
+            }
+        }
+    }, [props.offer.in_cart_page, props.offer.in_ajax_cart, props.offer.in_product_page]);
 
     function upadteCondition() {
         if (quantityArray.includes(rule.rule_selector)) {
@@ -422,13 +734,318 @@ export function SecondTab(props) {
         setSelected(value);
     }, []);
 
+
     const options = [
         { label: 'Cart page', value: 'cartpage' },
         { label: 'Product page', value: 'productpage' },
         { label: 'Product and cart page', value: 'cartpageproductpage' },
         { label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax' },
         { label: 'AJAX and cart page', value: 'ajaxcartpage' }
-    ];
+    ]
+
+    const handleDefaultSettingChange = useCallback((value, selectedPage) => {
+         if(value) {
+            if(props.offer.in_product_page && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_action, "custom_cart_page_dom_action");
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_selector, "custom_cart_page_dom_selector");
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
+                    props.updateShop(!value, "default_template_settings", "templateForCartPage");
+                }
+                else if(selectedPage == "product") {
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_action, "custom_product_page_dom_action");
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_selector, "custom_product_page_dom_selector");
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForProductPage");
+                    props.updateShop(!value, "default_template_settings", "templateForProductPage");
+                }
+            }
+            else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_action, "custom_cart_page_dom_action");
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_selector, "custom_cart_page_dom_selector");
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
+                    props.updateShop(!value, "default_template_settings", "templateForCartPage");
+                }
+                else if(selectedPage == "ajax") {
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_action, "custom_ajax_dom_action");
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_selector, "custom_ajax_dom_selector");
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForAjaxCart");
+                    props.updateShop(!value, "default_template_settings", "templateForAjaxCart");
+                }
+            }
+            else if(props.offer.in_cart_page) {
+                props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_action, "custom_cart_page_dom_action");
+                props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_selector, "custom_cart_page_dom_selector");
+                props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
+                props.updateShop(!value, "default_template_settings", "templateForCartPage");
+                setDefaultSetting(value);
+                setUseTemplate(!value);
+            }
+            else if(props.offer.in_product_page) {
+                props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_action, "custom_product_page_dom_action");
+                props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_selector, "custom_product_page_dom_selector");
+                props.updateShop(value, "default_template_settings", "defaultSettingsForProductPage");
+                props.updateShop(!value, "default_template_settings", "templateForProductPage");
+                setDefaultSetting(value);
+                setUseTemplate(!value);
+            }
+            else if(props.offer.in_ajax_cart) {
+                props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_action, "custom_ajax_dom_action");
+                props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_selector, "custom_ajax_dom_selector");
+                props.updateShop(value, "default_template_settings", "defaultSettingsForAjaxCart");
+                props.updateShop(!value, "default_template_settings", "templateForAjaxCart");
+                setDefaultSetting(value);
+                setUseTemplate(!value);
+            }
+        }
+        else {
+            if(props.offer.in_product_page && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
+                }
+                else if(selectedPage == "product") {
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForProductPage");
+                }
+            }
+            else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
+                }
+                else if(selectedPage == "ajax") {
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForAjaxCart");
+                }
+            }
+            else if(props.offer.in_cart_page) {
+                props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
+                setDefaultSetting(value);
+            }
+            else if(props.offer.in_product_page) {
+                props.updateShop(value, "default_template_settings", "defaultSettingsForProductPage");
+                setDefaultSetting(value);
+            }
+            else if(props.offer.in_ajax_cart) {
+                props.updateShop(value, "default_template_settings", "defaultSettingsForAjaxCart");
+                setDefaultSetting(value);
+            }
+        }
+    });
+    
+
+    const handleUseTemplateChange = useCallback((value, selectedPage) => {
+        if(value) {
+            if(props.offer.in_product_page && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(!value, "default_template_settings", "defaultSettingsForCartPage");
+                    props.updateShop(value, "default_template_settings", "templateForCartPage");
+                }
+                else if(selectedPage == "product") {
+                    props.updateShop(!value, "default_template_settings", "defaultSettingsForProductPage");
+                    props.updateShop(value, "default_template_settings", "templateForProductPage");
+                }
+            }
+            else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(!value, "default_template_settings", "defaultSettingsForCartPage");
+                    props.updateShop(value, "default_template_settings", "templateForCartPage");
+                }
+                else if(selectedPage == "ajax") {
+                    props.updateShop(!value, "default_template_settings", "defaultSettingsForAjaxCart");
+                    props.updateShop(value, "default_template_settings", "templateForAjaxCart");
+                }
+            }
+            else if(props.offer.in_cart_page) {
+                props.updateShop(!value, "default_template_settings", "defaultSettingsForCartPage");
+                props.updateShop(value, "default_template_settings", "templateForCartPage");
+                setDefaultSetting(!value);
+                setUseTemplate(value);
+                setInsertedImage1(cart_page_image_1);
+                setInsertedImage2(cart_page_image_2);
+                setInsertedImage3(cart_page_image_3);
+            }
+            else if(props.offer.in_product_page) {
+                props.updateShop(!value, "default_template_settings", "defaultSettingsForProductPage");
+                props.updateShop(value, "default_template_settings", "templateForProductPage");
+                setDefaultSetting(!value);
+                setUseTemplate(value);
+                setInsertedImage1(product_page_image_1);
+                setInsertedImage2(product_page_image_2);
+                setInsertedImage3(product_page_image_3);
+            }
+            else if(props.offer.in_ajax_cart) {
+                props.updateShop(!value, "default_template_settings", "defaultSettingsForAjaxCart");
+                props.updateShop(value, "default_template_settings", "templateForAjaxCart");
+                setDefaultSetting(!value);
+                setUseTemplate(value);
+                setInsertedImage1(ajax_cart_image_1);
+                setInsertedImage2(ajax_cart_image_2);
+                
+            }
+        }
+        else {
+            if(props.offer.in_product_page && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(value, "default_template_settings", "templateForCartPage");
+                }
+                else if(selectedPage == "product") {
+                    props.updateShop(value, "default_template_settings", "templateForProductPage");
+                }
+            }
+            else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(value, "default_template_settings", "templateForCartPage");
+                }
+                else if(selectedPage == "ajax") {
+                    props.updateShop(value, "default_template_settings", "templateForAjaxCart");
+                }
+            }
+            else if(props.offer.in_cart_page) {
+                props.updateShop(value, "default_template_settings", "templateForCartPage");
+                setUseTemplate(value);
+            }
+            else if(props.offer.in_product_page) {
+                props.updateShop(value, "default_template_settings", "templateForProductPage");
+                setUseTemplate(value);
+            }
+            else if(props.offer.in_ajax_cart) {
+                props.updateShop(value, "default_template_settings", "templateForAjaxCart");
+                setUseTemplate(value);
+            }
+        }
+    });
+
+    const handleDefaultSettingSecondChange = useCallback((value, selectedPage) => {
+        if(value) {
+            if(props.offer.in_product_page && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_action, "custom_cart_page_dom_action");
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_selector, "custom_cart_page_dom_selector");
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
+                    props.updateShop(!value, "default_template_settings", "templateForCartPage");
+                }
+                else if(selectedPage == "product") {
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_action, "custom_product_page_dom_action");
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_selector, "custom_product_page_dom_selector");
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForProductPage");
+                    props.updateShop(!value, "default_template_settings", "templateForProductPage");
+                }
+            }
+            else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_action, "custom_cart_page_dom_action");
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_selector, "custom_cart_page_dom_selector");
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
+                    props.updateShop(!value, "default_template_settings", "templateForCartPage");
+                }
+                else if(selectedPage == "ajax") {
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_action, "custom_ajax_dom_action");
+                    props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_selector, "custom_ajax_dom_selector");
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForAjaxCart");
+                    props.updateShop(!value, "default_template_settings", "templateForAjaxCart");
+                }
+            }
+            else if(props.offer.in_cart_page) {
+                props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_action, "custom_cart_page_dom_action");
+                props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_selector, "custom_cart_page_dom_selector");
+                props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
+                props.updateShop(!value, "default_template_settings", "templateForCartPage");
+            }
+            else if(props.offer.in_product_page) {
+                props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_action, "custom_product_page_dom_action");
+                props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_selector, "custom_product_page_dom_selector");
+                props.updateShop(value, "default_template_settings", "defaultSettingsForProductPage");
+                props.updateShop(!value, "default_template_settings", "templateForProductPage");
+            }
+            else if(props.offer.in_ajax_cart) {
+                props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_action, "custom_ajax_dom_action");
+                props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_selector, "custom_ajax_dom_selector");
+                props.updateShop(value, "default_template_settings", "defaultSettingsForAjaxCart");
+                props.updateShop(!value, "default_template_settings", "templateForAjaxCart");
+            }
+        }
+        else {
+            if(props.offer.in_product_page && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
+                }
+                else if(selectedPage == "product") {
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForProductPage");
+                }
+            }
+            else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
+                }
+                else if(selectedPage == "ajax") {
+                    props.updateShop(value, "default_template_settings", "defaultSettingsForAjaxCart");
+                }
+            }
+            else if(props.offer.in_cart_page) {
+                props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
+            }
+            else if(props.offer.in_product_page) {
+                props.updateShop(value, "default_template_settings", "defaultSettingsForProductPage");
+            }
+            else if(props.offer.in_ajax_cart) {
+                props.updateShop(value, "default_template_settings", "defaultSettingsForAjaxCart");
+            }
+        }
+    });
+
+    const handleUseTemplateSecondChange = useCallback((value, selectedPage) => {
+        if(value) {
+            if(props.offer.in_product_page && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(!value, "default_template_settings", "defaultSettingsForCartPage");
+                    props.updateShop(value, "default_template_settings", "templateForCartPage");
+                }
+            }
+            else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(!value, "default_template_settings", "defaultSettingsForCartPage");
+                    props.updateShop(value, "default_template_settings", "templateForCartPage");
+                }
+            }
+        }
+        else {
+            if(props.offer.in_product_page && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(value, "default_template_settings", "templateForCartPage");
+                }
+            }
+            else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
+                if(selectedPage == "cart") {
+                    props.updateShop(value, "default_template_settings", "templateForCartPage");
+                }
+            }
+        }
+    });
+
+    const handleImageClick = useCallback((pageName, clickedImageNum) => {
+        if(pageName === 'product_page') {
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].product_page_selector[clickedImageNum-1], "custom_product_page_dom_selector");
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].product_page_action[clickedImageNum-1], "custom_product_page_dom_action");
+        }
+        else if(pageName === 'cart_page') {
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_selector[clickedImageNum-1], "custom_cart_page_dom_selector");
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_action[clickedImageNum-1], "custom_product_page_dom_action");
+        }
+        else if(pageName === 'ajax_cart') {
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].ajax_cart_selector[clickedImageNum-1], "custom_ajax_dom_selector");
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].ajax_cart_action[clickedImageNum-1], "custom_ajax_dom_action");
+        }
+        else if(props.offer.in_product_page) {
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].product_page_selector[clickedImageNum-1], "custom_product_page_dom_selector");
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].product_page_action[clickedImageNum-1], "custom_product_page_dom_action");
+        }
+        else if(props.offer.in_cart_page) {
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_selector[clickedImageNum-1], "custom_cart_page_dom_selector");
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_action[clickedImageNum-1], "custom_product_page_dom_action");
+        }
+        else if(props.offer.in_ajax_cart) {
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].ajax_cart_selector[clickedImageNum-1], "custom_ajax_dom_selector");
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].ajax_cart_action[clickedImageNum-1], "custom_ajax_dom_action");
+        }
+    });
 
     const handleDisableCheckoutBtn = useCallback((newChecked) => props.updateOffer("must_accept", newChecked), []);
     const handleRemoveItiem = useCallback((newChecked) => props.updateOffer("remove_if_no_longer_valid", newChecked), []);
@@ -619,6 +1236,230 @@ export function SecondTab(props) {
                         </Modal.Section>
                     </Modal>
                 </LegacyCard.Section>
+                {multipleDefaultSettings ? (
+                    (props.offer.in_product_page && props.offer.in_cart_page) ? (
+                        <>
+                            <LegacyCard.Section title="Where on this page would you like for this offer to appear?">
+                            <Grid>
+                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                                    <Checkbox
+                                        label="Use default settings for Product Page"
+                                        checked={props.shop.default_template_settings?.defaultSettingsForProductPage}
+                                        onChange={(event) => handleDefaultSettingChange(event, 'product')}
+                                    />
+                                </Grid.Cell>
+                            </Grid>
+                            <Grid>
+                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                                    <Checkbox
+                                        label="Use Template for Product Page"
+                                        checked={props.shop.default_template_settings?.templateForProductPage}
+                                        onChange={(event) => handleUseTemplateChange(event, 'product')}
+                                    />
+                                </Grid.Cell>
+                            </Grid>
+                            {props.shop.default_template_settings?.templateForProductPage && (
+                                <>
+                                    <Image
+                                        source={product_page_image_1}
+                                        alt="Sample Image 1"
+                                        style={{marginRight : '10px',marginTop: '10px', height: '150px', width: '165px'}}
+                                        className={"hover-effect"}
+                                        onClick={() => handleImageClick('product_page', 1)}
+                                    />
+                                    <Image
+                                        source={product_page_image_2}
+                                        alt="Sample Image 2"
+                                        style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
+                                        onClick={() => handleImageClick('product_page', 2)}
+                                    />
+                                    <Image
+                                        source={product_page_image_3}
+                                        alt="Sample Image 3"
+                                        style={{marginLeft : '10px', height: '150px', width: '165px'}}
+                                        onClick={() => handleImageClick('product_page', 3)}
+                                    />
+                                </>
+                            )}
+                            </LegacyCard.Section>
+                            <LegacyCard.Section title="Where on this page would you like for this offer to appear?">
+                            <Grid>
+                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                                    <Checkbox
+                                        label="Use default settings for Cart Page"
+                                        checked={props.shop.default_template_settings?.defaultSettingsForCartPage}
+                                        onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
+                                    />
+                                </Grid.Cell>
+                            </Grid>
+                            <Grid>
+                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                                    <Checkbox
+                                        label="Use Template for Cart Page"
+                                        checked={props.shop.default_template_settings?.templateForCartPage}
+                                        onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
+                                    />
+                                </Grid.Cell>
+                            </Grid>
+                            {props.shop.default_template_settings?.templateForCartPage && (
+                                <>
+                                    <Image
+                                        source={cart_page_image_1}
+                                        alt="Sample Image 1"
+                                        style={{marginRight : '10px',marginTop: '10px', height: '150px', width: '165px'}}
+                                        onClick={() => handleImageClick('cart_page', 1)}
+                                    />
+                                    <Image
+                                        source={cart_page_image_2}
+                                        alt="Sample Image 2"
+                                        style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
+                                        onClick={() => handleImageClick('cart_page', 2)}
+                                    />
+                                    <Image
+                                        source={cart_page_image_3}
+                                        alt="Sample Image 3"
+                                        style={{marginLeft : '10px', height: '150px', width: '165px'}}
+                                        onClick={() => handleImageClick('cart_page', 3)}
+                                    />
+                                </>
+                            )}
+                            </LegacyCard.Section>
+                        </>
+                        ) : (
+                        <>
+                            <LegacyCard.Section title="Where on this page would you like for this offer to appear?">
+                            <Grid>
+                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                                    <Checkbox
+                                        label="Use default settings for Ajax Cart"
+                                        checked={props.shop.default_template_settings?.defaultSettingsForAjaxCart}
+                                        onChange={(event) => handleDefaultSettingChange(event, 'ajax')}
+                                    />
+                                </Grid.Cell>
+                            </Grid>
+                            <Grid>
+                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                                    <Checkbox
+                                        label="Use Template for Ajax Cart"
+                                        checked={props.shop.default_template_settings?.templateForAjaxCart}
+                                        onChange={(event) => handleUseTemplateChange(event, 'ajax')}
+                                    />
+                                </Grid.Cell>
+                            </Grid>
+                            {props.shop.default_template_settings?.templateForAjaxCart && (
+                                <>
+                                    <Image
+                                        source={ajax_cart_image_1}
+                                        alt="Sample Image 1"
+                                        style={{marginRight : '10px', marginTop: '10px', height: '150px', width: '165px'}}
+                                        onClick={() => handleImageClick('ajax_cart', 1)}
+                                    />
+                                    <Image
+                                        source={ajax_cart_image_2}
+                                        alt="Sample Image 2"
+                                        style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
+                                        onClick={() => handleImageClick('ajax_cart', 2)}
+                                    />
+                                    <Image
+                                        source="https://picsum.photos/id/12/150"
+                                        alt="Sample Image 3"
+                                        style={{marginLeft : '10px', height: '150px', width: '165px'}}
+                                        onClick={() => handleImageClick('ajax_cart', 3)}
+                                    />
+                                </>
+                            )}
+                            </LegacyCard.Section>
+                            <LegacyCard.Section title="Where on this page would you like for this offer to appear?">
+                            <Grid>
+                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                                    <Checkbox
+                                        label="Use default settings for Cart Page"
+                                        checked={props.shop.default_template_settings?.defaultSettingsForCartPage}
+                                        onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
+                                    />
+                                </Grid.Cell>
+                            </Grid>
+                            <Grid>
+                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                                    <Checkbox
+                                        label="Use Template for Cart Page"
+                                        checked={props.shop.default_template_settings?.templateForCartPage}
+                                        onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
+                                    />
+                                </Grid.Cell>
+                            </Grid>
+                            {props.shop.default_template_settings?.templateForCartPage && (
+                                <>
+                                    <Image
+                                        source={cart_page_image_1}
+                                        alt="Sample Image 1"
+                                        style={{marginRight : '10px', marginTop: '10px', height: '150px', width: '165px'}}
+                                        onClick={() => handleImageClick('cart_page', 1)}
+                                    />
+                                    <Image
+                                        source={cart_page_image_2}
+                                        alt="Sample Image 2"
+                                        style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
+                                        onClick={() => handleImageClick('cart_page', 2)}
+                                    />
+                                    <Image
+                                        source={cart_page_image_3}
+                                        alt="Sample Image 3"
+                                        style={{marginLeft : '10px', height: '150px', width: '165px'}}
+                                        onClick={() => handleImageClick('cart_page', 3)}
+                                    />
+                                </>
+                            )}
+                            </LegacyCard.Section>
+                        </>
+                    )
+                    ) : (
+                    <LegacyCard.Section title="Where on this page would you like for this offer to appear?">
+                    <Grid>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <Checkbox
+                                label="Use default settings"
+                                checked={defaultSetting}
+                                onChange={(event) => handleDefaultSettingChange(event, null)}
+                            />
+                        </Grid.Cell>
+                    </Grid>
+                    <Grid>
+                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                            <Checkbox
+                                label="Use Template"
+                                checked={useTemplate}
+                                onChange={(event) => handleUseTemplateChange(event, null)}
+                            />
+                        </Grid.Cell>
+                    </Grid>
+                    {useTemplate && (
+                        <>
+                            <Image
+                                source={insertedImage1}
+                                alt="Sample Image 1"
+                                style={{marginRight : '10px', marginTop: '10px', height: '150px', width: '165px'}}
+                                className="editOfferTabs_image_tag"
+                                onClick={() => handleImageClick(null, 1)}
+                            />
+                            <Image
+                                source={insertedImage2}
+                                alt="Sample Image 2"
+                                style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
+                                className="editOfferTabs_image_tag"
+                                onClick={() => handleImageClick(null, 1)}
+                            />
+                            <Image
+                                source={insertedImage3}
+                                alt="Sample Image 3"
+                                style={{marginLeft : '10px', height: '150px', width: '165px'}}
+                                className="editOfferTabs_image_tag"
+                                onClick={() => handleImageClick(null, 1)}
+                            />
+                        </>
+                    )}
+                    </LegacyCard.Section>
+                )}
             </LegacyCard>
             <LegacyCard title="Display Conditions" sectioned>
                 <LegacyCard.Section>
