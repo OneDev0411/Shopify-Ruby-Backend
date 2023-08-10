@@ -8,3 +8,4 @@ export { default as helpImage } from "./help.svg";
 export { default as woohoo } from "./woohoo.png";
 export {default as iculogo } from "./ICU-Logo-Small.png";
 export { default as themeCss } from "./theme.css";
+export { default as customCss } from "./custom.css";
