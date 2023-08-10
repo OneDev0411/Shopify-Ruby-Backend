@@ -1239,7 +1239,7 @@ export function SecondTab(props) {
                 {multipleDefaultSettings ? (
                     (props.offer.in_product_page && props.offer.in_cart_page) ? (
                         <>
-                            <LegacyCard.Section title="Where on this page would you like for this offer to appear?">
+                            <LegacyCard.Section title="Where on this page would you like the offer to appear?">
                             <Grid>
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                                     <Checkbox
@@ -1282,7 +1282,7 @@ export function SecondTab(props) {
                                 </>
                             )}
                             </LegacyCard.Section>
-                            <LegacyCard.Section title="Where on this page would you like for this offer to appear?">
+                            <LegacyCard.Section title="Where on this page would you like the offer to appear?">
                             <Grid>
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                                     <Checkbox
@@ -1327,7 +1327,7 @@ export function SecondTab(props) {
                         </>
                         ) : (
                         <>
-                            <LegacyCard.Section title="Where on this page would you like for this offer to appear?">
+                            <LegacyCard.Section title="Where on this page would you like the offer to appear?">
                             <Grid>
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                                     <Checkbox
@@ -1369,7 +1369,7 @@ export function SecondTab(props) {
                                 </>
                             )}
                             </LegacyCard.Section>
-                            <LegacyCard.Section title="Where on this page would you like for this offer to appear?">
+                            <LegacyCard.Section title="Where on this page would you like the offer to appear?">
                             <Grid>
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                                     <Checkbox
@@ -1414,7 +1414,7 @@ export function SecondTab(props) {
                         </>
                     )
                     ) : (
-                    <LegacyCard.Section title="Where on this page would you like for this offer to appear?">
+                    <LegacyCard.Section title="Where on this page would you like the offer to appear?">
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                             <Checkbox
