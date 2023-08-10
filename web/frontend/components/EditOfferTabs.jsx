@@ -36,7 +36,7 @@ import { useLocation } from 'react-router-dom';
 import SelectProductsModal from "../components/SelectProductsModal";
 import { SelectCollectionsModal } from "../components/SelectCollectionsModal";
 import { useAuthenticatedFetch } from "../hooks";
-import "../assets/theme.css";
+import customCss from '../assets/custom.css';
 import product_page_image_1 from "../assets/images/product_page_image_1.png";
 import product_page_image_2 from "../assets/images/product_page_image_2.png";
 import product_page_image_3 from "../assets/images/product_page_image_3.png";
