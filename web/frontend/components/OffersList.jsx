@@ -22,8 +22,7 @@ import { useSelector } from "react-redux";
 import {homeImage} from "../assets/index.js";
 import {CreateOfferCard} from "./CreateOfferCard.jsx";
 
-export function OffersList() {
-
+export function OffersList(props) {
   const resourceName = {
     singular: 'offer',
     plural: 'offers',
@@ -44,6 +43,10 @@ export function OffersList() {
 
   const [currentPage, setCurrentPage] = useState(1);
 
+  const sendOfferList =
+    props.getOfferListData &&
+    useCallback((newValue) => props.getOfferListData(newValue), []);
+
   useEffect(() => {
     fetch('/api/merchant/offers_list', {
       method: 'POST',
@@ -63,6 +66,9 @@ export function OffersList() {
         // localStorage.setItem('icushopify_domain', data.shopify_domain);
         setOffersData(data.offers);
         setFilteredData(data.offers);
+        if(sendOfferList){
+          data.offers.length > 0 ? sendOfferList(true) : sendOfferList(false);
+        }
       }).catch((error) => {
         console.log('Fetch error >> ', error);
       });
@@ -159,12 +165,12 @@ export function OffersList() {
 
   const appliedFilters = !isEmpty(taggedWith)
     ? [
-      {
+        {
         key: 'filteredby',
         label: disambiguateLabel('taggedWith', taggedWith),
-        onRemove: handleTaggedWithRemove,
-      },
-    ]
+          onRemove: handleTaggedWithRemove,
+        },
+      ]
     : [];
 
   const sortOptions = [
@@ -293,7 +299,7 @@ export function OffersList() {
   return (
     <Page>
       { offersData.length === 0 ?
-          <CreateOfferCard />
+        <CreateOfferCard />
         :
         <>
           <LegacyCard sectioned>
