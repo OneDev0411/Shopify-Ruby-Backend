@@ -17,6 +17,8 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { fetchShopData } from "../services/shopService"; // Example path
 
+const ShopContext = createContext(null);
+
 export function CreateOfferCard() {
   const navigateTo = useNavigate();
   const shopAndHost = useSelector((state) => state.shopAndHost);
@@ -46,12 +48,13 @@ export function CreateOfferCard() {
     fetchCurrentShop();
   }, [fetchCurrentShop]);
 
+  // Though not necessary, this should serve as an example of how to use the Context API
   return (
-    <div>
-      <OfferCard handleCreateOffer={handleCreateOffer} />
+    <ShopContext.Provider value={{ shopData, setShopData }}>
+      <OfferCard  handleCreateOffer={handleCreateOffer} />
       <HelpSection />
-      <VideoModal active={active} handleClose={handleClose} />
-    </div>
+      <VideoModal active={active} handleClose={handleClose} handleOpen={handleOpen} />
+    </ShopContext.Provider>
   );
 }
 
@@ -97,9 +100,12 @@ function OfferCard({ handleCreateOffer }) {
   );
 }
 
-function HelpSection({ currentShop }) {
+function HelpSection({ handleOpen }) {
+  const { shopData } = useContext(ShopContext);
+
   const showIntercomWidget = useCallback(() => {
     // Intercom needs to be initialized/booted before it can be used.
+    const { currentShop } = shopData;
     window.Intercom('boot', {
       app_id: window.CHAT_APP_ID,
       id: currentShop.id,
@@ -111,8 +117,8 @@ function HelpSection({ currentShop }) {
       trailing_30_day_roi: currentShop.trailing_30_day_roi,
       shop_url: `https://${currentShop.shopify_domain}`
       // No context as to why the attributes below are here
-      // plan: '#{@icushop.try(:plan).try(:name)}',
-      // dashboard: "https://incartupsell.herokuapp.com/?shop_id=#{@icushop.id}"
+      // plan: '#{@currentShop.try(:plan).try(:name)}',
+      // dashboard: "https://incartupsell.herokuapp.com/?shop_id=#{@currentShop.id}"
     });
     window.Intercom('show');
   }, []);
@@ -132,7 +138,7 @@ function HelpSection({ currentShop }) {
       popoverActions={[{ content: "Dismiss", onAction: () => {} }]}
     >
       <VideoThumbnail
-        onClick={showIntercomWidget}
+        onClick={handleOpen}
         videoLength={80}
         thumbnailUrl="./../assets/business-woman-smiling-in-office.jpeg"
       />
@@ -160,17 +166,26 @@ function VideoModal({ active, handleClose }) {
 
 // This service function should be placed in a separate file
 async function fetchShopData(shop) {
-  const response = await fetch(`/api/merchant/current_shop?shop=${shop}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  try {
+    const response = await fetch(`/api/merchant/current_shop?shop=${shop}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-  const data = await response.json();
-  return {
-    currentShop: data.shop,
-    planName: data.plan,
-    trialDays: data.days_remaining_in_trial,
-  };
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    return {
+      currentShop: data.shop,
+      planName: data.plan,
+      trialDays: data.days_remaining_in_trial,
+    };
+  } catch (error) {
+    console.error("Failed to fetch shop data:", error);
+    throw error;
+  }
 }
