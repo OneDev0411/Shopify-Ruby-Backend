@@ -5,12 +5,11 @@ import {
 } from "@shopify/polaris";
 import {iculogo} from "../assets";
 import "../components/stylesheets/mainstyle.css";
-import { GenericTitleBar } from "../components";
+import { GenericTitleBar, OffersList } from "../components";
 import { isSubscriptionActive } from "../services/actions/subscription";
 import {useEffect, useState, useCallback, useRef} from "react";
 import { useSelector } from 'react-redux';
 import { useAuthenticatedFetch } from "../hooks";
-import {CreateOfferCard} from "../components/CreateOfferCard.jsx";
 
 export default function HomePage() {
   const shopAndHost = useSelector(state => state.shopAndHost);
@@ -56,7 +55,7 @@ export default function HomePage() {
           }
         </Layout.Section>
         <Layout.Section>
-          <CreateOfferCard />
+          <OffersList />
         </Layout.Section>
       </Layout>
     </Page>

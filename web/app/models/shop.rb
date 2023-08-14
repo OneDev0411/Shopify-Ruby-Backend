@@ -214,32 +214,32 @@ class Shop < ApplicationRecord
 
   # Public. DOM element to anchor the offer on the popup drawer
   def ajax_dom_selector
-    custom_ajax_dom_selector.present? ? custom_ajax_dom_selector : ".ajaxcart__row:first"
+    custom_ajax_dom_selector.present? ? custom_ajax_dom_selector : nil
   end
 
   # Public. Where to put offer relative to the ajax_dom_selector: 'prepend', 'append', 'after' or 'before'
   def ajax_dom_action
-    custom_ajax_dom_action.present? ? custom_ajax_dom_action : 'prepend'
+    custom_ajax_dom_action.present? ? custom_ajax_dom_action : nil
   end
 
   # Public. DOM element to anchor the offer on the cart page
   def cart_page_dom_selector
-    custom_cart_page_dom_selector.present? ? custom_cart_page_dom_selector : "form[action^='/cart']"
+    custom_cart_page_dom_selector.present? ? custom_cart_page_dom_selector : nil
   end
 
   # Public. Where to put offer relative to the cart_page_dom_selector: 'prepend', 'append', 'after' or 'before'
   def cart_page_dom_action
-    custom_cart_page_dom_action.present? ? custom_cart_page_dom_action : 'prepend'
+    custom_cart_page_dom_action.present? ? custom_cart_page_dom_action : nil
   end
 
   # Public. DOM element to anchor the offer on the product page
   def product_page_dom_selector
-    custom_product_page_dom_selector.present? ? custom_product_page_dom_selector : "[class*='description']"
+    custom_product_page_dom_selector.present? ? custom_product_page_dom_selector : nil
   end
 
   # Public. Where to put offer relative to the product_page_dom_selector: 'prepend', 'append', 'after' or 'before'
   def product_page_dom_action
-    custom_product_page_dom_action.present? ? custom_product_page_dom_action : 'after'
+    custom_product_page_dom_action.present? ? custom_product_page_dom_action : nil
   end
 
   # Checkout page is for now deprecated
@@ -778,7 +778,8 @@ class Shop < ApplicationRecord
       tax_percentage: tax_percentage,
       money_format: money_format,
       stats_from: stats_date_for_UI,
-      shop_id: id
+      shop_id: id,
+      default_template_settings: default_template_settings
     }
     admin ? std_settings.merge(admin_settings) : std_settings
   end

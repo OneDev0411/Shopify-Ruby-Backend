@@ -79,6 +79,31 @@ module Api
         render "shops/toggle_activation"
       end
 
+      #GET /api/merchant/active_theme_for_dafault_template
+      def active_theme_for_dafault_template
+        begin
+          res = @icushop.active_theme_for_dafault_template
+          if res[:result] == true
+            render json: {
+              themeExist: res[:result],
+              shopify_theme_name: res[:message]
+            }
+          else
+            render json: {
+              themeExist: res[:result],
+              shopify_theme_name: res[:message]
+            }
+          end
+        rescue StandardError => e
+          Rails.logger.debug "Error Message: #{e.message}"
+          Rollbar.error("Error", e)
+          render json: {
+            message: "Error: #{e.message}",
+            shopify_theme_name: @icushop.shopify_theme_name || ''
+          }
+        end
+      end
+
        # Gets shop sale stats. POST  /api/merchant/shops_sale_stats
       def shop_sale_stats
         begin

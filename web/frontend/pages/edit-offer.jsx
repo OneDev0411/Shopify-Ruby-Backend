@@ -118,6 +118,7 @@ export default function EditPage() {
     });
 
     const [isLoading, setIsLoading] = useState(false);
+    const [shopifyThemeName, setShopifyThemeName] = useState(null);
                                       
     const offerID = location?.state?.offerID;
     const fetch = useAuthenticatedFetch(shopAndHost.host);
@@ -234,7 +235,27 @@ export default function EditPage() {
             console.log("# Error AutopilotDetails > ", JSON.stringify(error));
         })
 
+        fetch(`/api/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+        })
+        .then( (response) => { return response.json() })
+        .then( (data) => {
+            if(data.themeExist) {
+                setShopifyThemeName(data.shopify_theme_name)
+            }
+            else {
+                setShopifyThemeName(null);
+            }
+        })
+        .catch((error) => {
+            console.log("# Error updateProducts > ", JSON.stringify(error));
+        })
+
     },[openAutopilotSection]);
+
 
     //Called whenever the checkKeysValidity changes in any child component
     function updateCheckKeysValidity(updatedKey, updatedValue) {
@@ -530,7 +551,7 @@ export default function EditPage() {
                                 : "" }
                                 {selected == 1 ?
                                     // page was imported from components folder
-                                    <SecondTab offer={offer} offerSettings={offerSettings} updateOffer={updateOffer}/>
+                                    <SecondTab offer={offer} shop={shop} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateShop={updateShop} shopifyThemeName={shopifyThemeName}/>
                                 : "" }
                                 {selected == 2 ?
                                     // page was imported from components folder

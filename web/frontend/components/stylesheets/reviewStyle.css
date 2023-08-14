@@ -1,0 +1,16 @@
+.review-section .Polaris-Card {
+    margin-top: 0 !important;
+    display: flex;
+    flex-direction: column;
+}
+  
+.review-section .Polaris-Card .Polaris-Card__Section {
+    height: 100%;
+}
+  
+.card-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}

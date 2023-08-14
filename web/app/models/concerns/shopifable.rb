@@ -272,7 +272,7 @@ module Shopifable
     res.parsed_response['data']['collections']['edges'].map do |coll|
       {
         id: coll['node']['id'].delete_prefix('gid://shopify/Collection/').to_i,
-        title: coll.get('node.title')
+        title: coll['node']['title']
       }
     end
   end
@@ -684,6 +684,21 @@ module Shopifable
       self.installed_at = Time.now.utc
     end
     self.uninstalled_at = nil
+  end
+
+  #Called to get name of the theme for the current shop
+  def active_theme_for_dafault_template
+    activate_session
+    shopify_theme = ShopifyAPI::Theme.all.map{|t| t if t.role == 'main'}.compact.first
+    if shopify_theme.nil?
+      return {result: false, message: 'Could not find active Shopify Theme via API' }
+    else
+      if shopify_theme.name != shopify_theme_name
+        self.shopify_theme_name = shopify_theme.name
+        save
+      end
+    end
+    return {result: true, message: shopify_theme_name }
   end
 
   private

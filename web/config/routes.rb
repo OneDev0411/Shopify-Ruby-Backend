@@ -44,6 +44,8 @@ Rails.application.routes.draw do
       post 'shop_offers_stats', to: 'shops#shop_offers_stats'
       post '/offers/:id/duplicate', to: 'offers#duplicate'
       delete '/offers/:id', to: 'offers#destroy'
+      post 'offer/shopify_ids_from_rule', to: 'offers#shopify_ids_from_rule'
+      get 'active_theme_for_dafault_template', to: 'shops#active_theme_for_dafault_template'
     end
   end
 
