@@ -45,6 +45,7 @@ import cart_page_image_2 from "../assets/images/cart_page_image_2.png";
 import cart_page_image_3 from "../assets/images/cart_page_image_3.png";
 import ajax_cart_image_1 from "../assets/images/ajax_cart_image_1.png";
 import ajax_cart_image_2 from "../assets/images/ajax_cart_image_2.png";
+import ajax_cart_image_3 from "../assets/images/ajax_cart_image_3.png";
 
 export function EditOfferTabs(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -410,6 +411,11 @@ export function SecondTab(props) {
     const [insertedImage1, setInsertedImage1] = useState(null);
     const [insertedImage2, setInsertedImage2] = useState(null);
     const [insertedImage3, setInsertedImage3] = useState(null);
+
+    const [productIsClicked, setProductIsClicked] = useState([false, false, false]);
+    const [cartIsClicked, setCartIsClicked] = useState([false, false, false]);
+    const [ajaxIsClicked, setAjaxIsClicked] = useState([false, false, false]);
+
     const defaultSettingsToDisplayOffer = {
         Dawn: {
             cart_page_selector: '#cart',
@@ -672,6 +678,7 @@ export function SecondTab(props) {
                 setUseTemplate(true);
                 setInsertedImage1(ajax_cart_image_1);
                 setInsertedImage2(ajax_cart_image_2);
+                setInsertedImage2(ajax_cart_image_3);
             }
         }
     }, [props.offer.in_cart_page, props.offer.in_ajax_cart, props.offer.in_product_page]);
@@ -747,12 +754,22 @@ export function SecondTab(props) {
          if(value) {
             if(props.offer.in_product_page && props.offer.in_cart_page) {
                 if(selectedPage == "cart") {
+                    const newArray = [...cartIsClicked];
+                    newArray[0] = false;
+                    newArray[1] = false;
+                    newArray[2] = false;
+                    setCartIsClicked(newArray);
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_action, "custom_cart_page_dom_action");
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_selector, "custom_cart_page_dom_selector");
                     props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
                     props.updateShop(!value, "default_template_settings", "templateForCartPage");
                 }
                 else if(selectedPage == "product") {
+                    const newArray = [...productIsClicked];
+                    newArray[0] = false;
+                    newArray[1] = false;
+                    newArray[2] = false;
+                    setProductIsClicked(newArray);
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_action, "custom_product_page_dom_action");
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_selector, "custom_product_page_dom_selector");
                     props.updateShop(value, "default_template_settings", "defaultSettingsForProductPage");
@@ -761,12 +778,22 @@ export function SecondTab(props) {
             }
             else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
                 if(selectedPage == "cart") {
+                    const newArray = [...cartIsClicked];
+                    newArray[0] = false;
+                    newArray[1] = false;
+                    newArray[2] = false;
+                    setCartIsClicked(newArray);
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_action, "custom_cart_page_dom_action");
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_selector, "custom_cart_page_dom_selector");
                     props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
                     props.updateShop(!value, "default_template_settings", "templateForCartPage");
                 }
                 else if(selectedPage == "ajax") {
+                    const newArray = [...ajaxIsClicked];
+                    newArray[0] = false;
+                    newArray[1] = false;
+                    newArray[2] = false;
+                    setAjaxIsClicked(newArray);
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_action, "custom_ajax_dom_action");
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_selector, "custom_ajax_dom_selector");
                     props.updateShop(value, "default_template_settings", "defaultSettingsForAjaxCart");
@@ -774,6 +801,11 @@ export function SecondTab(props) {
                 }
             }
             else if(props.offer.in_cart_page) {
+                const newArray = [...cartIsClicked];
+                newArray[0] = false;
+                newArray[1] = false;
+                newArray[2] = false;
+                setCartIsClicked(newArray);
                 props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_action, "custom_cart_page_dom_action");
                 props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_selector, "custom_cart_page_dom_selector");
                 props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
@@ -782,6 +814,11 @@ export function SecondTab(props) {
                 setUseTemplate(!value);
             }
             else if(props.offer.in_product_page) {
+                const newArray = [...productIsClicked];
+                newArray[0] = false;
+                newArray[1] = false;
+                newArray[2] = false;
+                setProductIsClicked(newArray);
                 props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_action, "custom_product_page_dom_action");
                 props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_selector, "custom_product_page_dom_selector");
                 props.updateShop(value, "default_template_settings", "defaultSettingsForProductPage");
@@ -790,6 +827,11 @@ export function SecondTab(props) {
                 setUseTemplate(!value);
             }
             else if(props.offer.in_ajax_cart) {
+                const newArray = [...ajaxIsClicked];
+                newArray[0] = false;
+                newArray[1] = false;
+                newArray[2] = false;
+                setAjaxIsClicked(newArray);
                 props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_action, "custom_ajax_dom_action");
                 props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_selector, "custom_ajax_dom_selector");
                 props.updateShop(value, "default_template_settings", "defaultSettingsForAjaxCart");
@@ -878,6 +920,7 @@ export function SecondTab(props) {
                 setUseTemplate(value);
                 setInsertedImage1(ajax_cart_image_1);
                 setInsertedImage2(ajax_cart_image_2);
+                setInsertedImage2(ajax_cart_image_3);
                 
             }
         }
@@ -917,12 +960,22 @@ export function SecondTab(props) {
         if(value) {
             if(props.offer.in_product_page && props.offer.in_cart_page) {
                 if(selectedPage == "cart") {
+                    const newArray = [...cartIsClicked];
+                    newArray[0] = false;
+                    newArray[1] = false;
+                    newArray[2] = false;
+                    setCartIsClicked(newArray);
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_action, "custom_cart_page_dom_action");
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_selector, "custom_cart_page_dom_selector");
                     props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
                     props.updateShop(!value, "default_template_settings", "templateForCartPage");
                 }
                 else if(selectedPage == "product") {
+                    const newArray = [...productIsClicked];
+                    newArray[0] = false;
+                    newArray[1] = false;
+                    newArray[2] = false;
+                    setProductIsClicked(newArray);
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_action, "custom_product_page_dom_action");
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_selector, "custom_product_page_dom_selector");
                     props.updateShop(value, "default_template_settings", "defaultSettingsForProductPage");
@@ -931,12 +984,22 @@ export function SecondTab(props) {
             }
             else if(props.offer.in_ajax_cart && props.offer.in_cart_page) {
                 if(selectedPage == "cart") {
+                    const newArray = [...cartIsClicked];
+                    newArray[0] = false;
+                    newArray[1] = false;
+                    newArray[2] = false;
+                    setCartIsClicked(newArray);
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_action, "custom_cart_page_dom_action");
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_selector, "custom_cart_page_dom_selector");
                     props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
                     props.updateShop(!value, "default_template_settings", "templateForCartPage");
                 }
                 else if(selectedPage == "ajax") {
+                    const newArray = [...ajaxIsClicked];
+                    newArray[0] = false;
+                    newArray[1] = false;
+                    newArray[2] = false;
+                    setAjaxIsClicked(newArray);
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_action, "custom_ajax_dom_action");
                     props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_selector, "custom_ajax_dom_selector");
                     props.updateShop(value, "default_template_settings", "defaultSettingsForAjaxCart");
@@ -944,18 +1007,33 @@ export function SecondTab(props) {
                 }
             }
             else if(props.offer.in_cart_page) {
+                const newArray = [...cartIsClicked];
+                    newArray[0] = false;
+                    newArray[1] = false;
+                    newArray[2] = false;
+                    setCartIsClicked(newArray);
                 props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_action, "custom_cart_page_dom_action");
                 props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].cart_page_selector, "custom_cart_page_dom_selector");
                 props.updateShop(value, "default_template_settings", "defaultSettingsForCartPage");
                 props.updateShop(!value, "default_template_settings", "templateForCartPage");
             }
             else if(props.offer.in_product_page) {
+                const newArray = [...cartIsClicked];
+                newArray[0] = false;
+                newArray[1] = false;
+                newArray[2] = false;
+                setCartIsClicked(newArray);
                 props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_action, "custom_product_page_dom_action");
                 props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].product_page_selector, "custom_product_page_dom_selector");
                 props.updateShop(value, "default_template_settings", "defaultSettingsForProductPage");
                 props.updateShop(!value, "default_template_settings", "templateForProductPage");
             }
             else if(props.offer.in_ajax_cart) {
+                const newArray = [...cartIsClicked];
+                newArray[0] = false;
+                newArray[1] = false;
+                newArray[2] = false;
+                setCartIsClicked(newArray);
                 props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_action, "custom_ajax_dom_action");
                 props.updateShop(defaultSettingsToDisplayOffer[props.shopifyThemeName].ajax_cart_selector, "custom_ajax_dom_selector");
                 props.updateShop(value, "default_template_settings", "defaultSettingsForAjaxCart");
@@ -1021,27 +1099,64 @@ export function SecondTab(props) {
     });
 
     const handleImageClick = useCallback((pageName, clickedImageNum) => {
+        debugger;
         if(pageName === 'product_page') {
+            const newArray = [...productIsClicked];
+            newArray[0] = false;
+            newArray[1] = false;
+            newArray[2] = false;
+            newArray[clickedImageNum-1] = true;
+            setProductIsClicked(newArray);
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].product_page_selector[clickedImageNum-1], "custom_product_page_dom_selector");
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].product_page_action[clickedImageNum-1], "custom_product_page_dom_action");
         }
         else if(pageName === 'cart_page') {
+            const newArray = [...cartIsClicked];
+            newArray[0] = false;
+            newArray[1] = false;
+            newArray[2] = false;
+            newArray[clickedImageNum-1] = true;
+            setCartIsClicked(newArray);
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_selector[clickedImageNum-1], "custom_cart_page_dom_selector");
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_action[clickedImageNum-1], "custom_product_page_dom_action");
         }
         else if(pageName === 'ajax_cart') {
+            const newArray = [...ajaxIsClicked];
+            newArray[0] = false;
+            newArray[1] = false;
+            newArray[2] = false;
+            newArray[clickedImageNum-1] = true;
+            setAjaxIsClicked(newArray);
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].ajax_cart_selector[clickedImageNum-1], "custom_ajax_dom_selector");
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].ajax_cart_action[clickedImageNum-1], "custom_ajax_dom_action");
         }
         else if(props.offer.in_product_page) {
+            const newArray = [...productIsClicked];
+            newArray[0] = false;
+            newArray[1] = false;
+            newArray[2] = false;
+            newArray[clickedImageNum-1] = true;
+            setProductIsClicked(newArray);
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].product_page_selector[clickedImageNum-1], "custom_product_page_dom_selector");
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].product_page_action[clickedImageNum-1], "custom_product_page_dom_action");
         }
         else if(props.offer.in_cart_page) {
+            const newArray = [...cartIsClicked];
+            newArray[0] = false;
+            newArray[1] = false;
+            newArray[2] = false;
+            newArray[clickedImageNum-1] = true;
+            setCartIsClicked(newArray);
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_selector[clickedImageNum-1], "custom_cart_page_dom_selector");
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_action[clickedImageNum-1], "custom_product_page_dom_action");
         }
         else if(props.offer.in_ajax_cart) {
+            const newArray = [...ajaxIsClicked];
+            newArray[0] = false;
+            newArray[1] = false;
+            newArray[2] = false;
+            newArray[clickedImageNum-1] = true;
+            setAjaxIsClicked(newArray);
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].ajax_cart_selector[clickedImageNum-1], "custom_ajax_dom_selector");
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].ajax_cart_action[clickedImageNum-1], "custom_ajax_dom_action");
         }
@@ -1264,19 +1379,21 @@ export function SecondTab(props) {
                                         source={product_page_image_1}
                                         alt="Sample Image 1"
                                         style={{marginRight : '10px',marginTop: '10px', height: '150px', width: '165px'}}
-                                        className={"hover-effect"}
+                                        className={ productIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                         onClick={() => handleImageClick('product_page', 1)}
                                     />
                                     <Image
                                         source={product_page_image_2}
                                         alt="Sample Image 2"
                                         style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
+                                        className={ productIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                         onClick={() => handleImageClick('product_page', 2)}
                                     />
                                     <Image
                                         source={product_page_image_3}
                                         alt="Sample Image 3"
                                         style={{marginLeft : '10px', height: '150px', width: '165px'}}
+                                        className={ productIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                         onClick={() => handleImageClick('product_page', 3)}
                                     />
                                 </>
@@ -1307,18 +1424,21 @@ export function SecondTab(props) {
                                         source={cart_page_image_1}
                                         alt="Sample Image 1"
                                         style={{marginRight : '10px',marginTop: '10px', height: '150px', width: '165px'}}
+                                        className={ cartIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                         onClick={() => handleImageClick('cart_page', 1)}
                                     />
                                     <Image
                                         source={cart_page_image_2}
                                         alt="Sample Image 2"
                                         style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
+                                        className={ cartIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                         onClick={() => handleImageClick('cart_page', 2)}
                                     />
                                     <Image
                                         source={cart_page_image_3}
                                         alt="Sample Image 3"
                                         style={{marginLeft : '10px', height: '150px', width: '165px'}}
+                                        className={ cartIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                         onClick={() => handleImageClick('cart_page', 3)}
                                     />
                                 </>
@@ -1352,18 +1472,21 @@ export function SecondTab(props) {
                                         source={ajax_cart_image_1}
                                         alt="Sample Image 1"
                                         style={{marginRight : '10px', marginTop: '10px', height: '150px', width: '165px'}}
+                                        className={ ajaxIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                         onClick={() => handleImageClick('ajax_cart', 1)}
                                     />
                                     <Image
                                         source={ajax_cart_image_2}
                                         alt="Sample Image 2"
                                         style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
+                                        className={ ajaxIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                         onClick={() => handleImageClick('ajax_cart', 2)}
                                     />
                                     <Image
-                                        source="https://picsum.photos/id/12/150"
+                                        source={ajax_cart_image_3}
                                         alt="Sample Image 3"
                                         style={{marginLeft : '10px', height: '150px', width: '165px'}}
+                                        className={ ajaxIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                         onClick={() => handleImageClick('ajax_cart', 3)}
                                     />
                                 </>
@@ -1394,18 +1517,21 @@ export function SecondTab(props) {
                                         source={cart_page_image_1}
                                         alt="Sample Image 1"
                                         style={{marginRight : '10px', marginTop: '10px', height: '150px', width: '165px'}}
+                                        className={ cartIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                         onClick={() => handleImageClick('cart_page', 1)}
                                     />
                                     <Image
                                         source={cart_page_image_2}
                                         alt="Sample Image 2"
                                         style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
+                                        className={ cartIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                         onClick={() => handleImageClick('cart_page', 2)}
                                     />
                                     <Image
                                         source={cart_page_image_3}
                                         alt="Sample Image 3"
                                         style={{marginLeft : '10px', height: '150px', width: '165px'}}
+                                        className={ cartIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                         onClick={() => handleImageClick('cart_page', 3)}
                                     />
                                 </>
@@ -1439,22 +1565,22 @@ export function SecondTab(props) {
                                 source={insertedImage1}
                                 alt="Sample Image 1"
                                 style={{marginRight : '10px', marginTop: '10px', height: '150px', width: '165px'}}
-                                className="editOfferTabs_image_tag"
+                                className={ props.offer.in_cart_page ? (cartIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_product_page ? (productIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_ajax_cart ? (ajaxIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : 'editOfferTabs_image_tag')) }
                                 onClick={() => handleImageClick(null, 1)}
                             />
                             <Image
                                 source={insertedImage2}
                                 alt="Sample Image 2"
                                 style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
-                                className="editOfferTabs_image_tag"
-                                onClick={() => handleImageClick(null, 1)}
+                                className={ props.offer.in_cart_page ? (cartIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_product_page ? (productIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_ajax_cart ? (ajaxIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : 'editOfferTabs_image_tag')) }
+                                onClick={() => handleImageClick(null, 2)}
                             />
                             <Image
                                 source={insertedImage3}
                                 alt="Sample Image 3"
                                 style={{marginLeft : '10px', height: '150px', width: '165px'}}
-                                className="editOfferTabs_image_tag"
-                                onClick={() => handleImageClick(null, 1)}
+                                className={ props.offer.in_cart_page ? (cartIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_product_page ? (productIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_ajax_cart ? (ajaxIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : 'editOfferTabs_image_tag')) }
+                                onClick={() => handleImageClick(null, 3)}
                             />
                         </>
                     )}
