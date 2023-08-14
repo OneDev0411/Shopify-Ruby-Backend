@@ -637,7 +637,6 @@ export function SecondTab(props) {
 
     //Checked to see if offer is displayed in multiple pages of the app.
     useEffect(() => {
-        debugger;
         setDefaultSetting(false);
         setUseTemplate(false);
         if(props.offer.in_product_page && props.offer.in_cart_page) {
@@ -752,7 +751,6 @@ export function SecondTab(props) {
     ]
 
     const handleDefaultSettingChange = useCallback((value, selectedPage) => {
-        debugger;
          if(value) {
             if(props.offer.in_product_page && props.offer.in_cart_page) {
                 if(selectedPage == "cart") {
