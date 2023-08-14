@@ -90,6 +90,7 @@ export function EditOfferTabs(props) {
             props.updateOffer("discount_target_type", "none");
         }
     }, []);
+    const handleDiscountCodeChange = useCallback((value)=> props.updateOffer("discount_code", value), []);
     const handleCustomTextChange = useCallback((newChecked) => props.updateOffer("show_custom_field", newChecked), []);
     //modal controls
     const [productModal, setProductModal] = useState(false);
@@ -346,6 +347,19 @@ export function EditOfferTabs(props) {
                             checked={props.offer.discount_target_type == "code"}
                             onChange={handleDiscountChange}
                         />
+                        {props.offer.discount_target_type == "code" ? ( 
+                            <>
+                                <TextField
+                                    label="Discount Code"
+                                    value={props.offer.discount_code}
+                                    onChange={handleDiscountCodeChange}
+                                    autoComplete="off"
+                                />
+                                <p>Make sure you have already set up this <Link to={`https://admin.shopify.com/store/${shopAndHost.shop.replace(/\.myshopify\.com$/, '')}/discounts`} target="blank">discount code</Link> in your discount code section.
+                                    The discount will apply automatically at checkout
+                                </p>
+                            </>
+                            ) : null}
                         <Checkbox id={"removeQtySelector"}
                             checked={!props.offer.show_quantity_selector}
                             onChange={handleQtySelectorChange}
