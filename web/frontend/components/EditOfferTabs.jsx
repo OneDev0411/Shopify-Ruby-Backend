@@ -97,6 +97,7 @@ export function EditOfferTabs(props) {
             props.updateOffer("discount_target_type", "none");
         }
     }, []);
+    const handleDiscountCodeChange = useCallback((value)=> props.updateOffer("discount_code", value), []);
     const handleCustomTextChange = useCallback((newChecked) => props.updateOffer("show_custom_field", newChecked), []);
     const handleShowNoThanksChange = useCallback((newChecked) => props.updateOffer("show_nothanks", !newChecked), []);
     
