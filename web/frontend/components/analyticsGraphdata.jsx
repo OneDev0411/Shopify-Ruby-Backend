@@ -7,7 +7,7 @@ import '@shopify/polaris-viz/build/esm/styles.css';
   
 function setKeys(period){
     if(period=='daily'){
-        return ["12:00 am", "08:00 am", "04:00 pm", "12:00pm"]
+        return ["12 am - 06 am", "06 am - 12 pm", "12 pm - 06 pm", "06 pm - 11:59 pm"]
     }
     else if(period=='monthly'){
         return ["1st week", "2nd week", "3rd week", "4th week"]

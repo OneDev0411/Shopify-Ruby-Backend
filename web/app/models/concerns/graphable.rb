@@ -100,9 +100,9 @@ module Graphable
 
     if (period=='daily')
       created_from = DateTime.now.beginning_of_day
-      created_to = created_from + 1.hours
-      interval = 8.hours
-      last = created_from + 3*interval-1.second
+      interval = 6.hours
+      created_to = created_from + interval
+      last = created_from + 4*interval-1.second
     elsif (period=='monthly')
       created_from = Date.today.beginning_of_month
       created_to = created_from + 6.days
@@ -132,9 +132,9 @@ module Graphable
     orders_value_forth = []
     if (period=='daily')
       created_from = DateTime.now.beginning_of_day
-      created_to = created_from + 1.hours
-      interval = 8.hours
-      last = created_from + 3*interval-1.second
+      interval = 6.hours
+      created_to = created_from + interval
+      last = created_from + 4*interval-1.second
     elsif (period=='monthly')
       created_from = Date.today.beginning_of_month
       created_to = created_from + 6.days
