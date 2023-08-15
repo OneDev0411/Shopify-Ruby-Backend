@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState, createContext, useContext } from "react";
 import {
   Button,
   ButtonGroup,
@@ -15,7 +15,6 @@ import {
 import { homeImage } from "../assets/index.js";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { fetchShopData } from "../services/shopService"; // Example path
 
 const ShopContext = createContext(null);
 
