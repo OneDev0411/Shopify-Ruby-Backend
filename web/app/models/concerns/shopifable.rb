@@ -368,7 +368,6 @@ module Shopifable
   def async_enable_autopilot
     j = Sidekiq::Client.push('class' => 'ShopWorker::EnableAutopilotJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i)
     PendingJob.create(shop_id: self.id, sidekiq_id: j, description: 'enableautopilot')
-    self.setup_autopilot_first_time(j)
   end
 
   def async_refresh_sales_intelligence
