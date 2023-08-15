@@ -92,6 +92,8 @@ export function EditOfferTabs(props) {
         }
     }, []);
     const handleCustomTextChange = useCallback((newChecked) => props.updateOffer("show_custom_field", newChecked), []);
+    const handleShowNoThanksChange = useCallback((newChecked) => props.updateOffer("show_nothanks", !newChecked), []);
+    
     //modal controls
     const [productModal, setProductModal] = useState(false);
     const [productData, setProductData] = useState("");
@@ -356,6 +358,11 @@ export function EditOfferTabs(props) {
                             checked={props.offer.show_custom_field}
                             onChange={handleCustomTextChange}
                             label="Add custom textbox"
+                        />
+                        <Checkbox id={"showNoThanks"}
+                            checked={!props.offer.show_nothanks}
+                            onChange={handleShowNoThanksChange}
+                            label="Customer can't dismiss offer"
                         />
                     </LegacyStack>
                 </LegacyCard.Section>
