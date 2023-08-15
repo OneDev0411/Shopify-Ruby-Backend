@@ -397,6 +397,7 @@ export default function EditPage() {
           ots.interval_unit = offer.interval_unit;
           ots.interval_frequency = offer.interval_frequency;
         }
+        setIsLoading(true);
         if(location.state != null && location.state?.offerID == null) {
             fetch(`/api/offers/create/${shop?.shop_id}`, {
                 method: 'POST',
@@ -409,6 +410,7 @@ export default function EditPage() {
             .then( (data) => {
                 setOffer(data.offer);
                 location.state.offerID = data.offer.id;
+                setIsLoading(false);
             })
             .catch((error) => {
             })
@@ -430,6 +432,7 @@ export default function EditPage() {
                     data.offer.offerable_product_details[i].preview_mode = true;
                 }
                 setOffer(data.offer);
+                setIsLoading(false);
             })
             .catch((error) => {
             })
@@ -446,6 +449,7 @@ export default function EditPage() {
             .then( (response) => { return response.json(); })
             .then( (data) => {
                 setShop(data.shop);
+                setIsLoading(false);
             })
             .catch((error) => {
             })
