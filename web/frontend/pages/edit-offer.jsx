@@ -551,7 +551,7 @@ export default function EditPage() {
                                 : "" }
                                 {selected == 1 ?
                                     // page was imported from components folder
-                                    <SecondTab offer={offer} shop={shop} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateShop={updateShop} shopifyThemeName={shopifyThemeName}/>
+                                    <SecondTab offer={offer} shop={shop} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateShop={updateShop} shopifyThemeName={shopifyThemeName} autopilotCheck={autopilotCheck}/>
                                 : "" }
                                 {selected == 2 ?
                                     // page was imported from components folder
