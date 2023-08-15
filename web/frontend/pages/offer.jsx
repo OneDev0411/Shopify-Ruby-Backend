@@ -36,8 +36,8 @@ import {
     const [filteredData, setFilteredData] = useState([]);
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
-
     const navigateTo = useNavigate();
+    
     const handleOpenOfferPage = () => {
       navigateTo('/edit-offer', { state: { offerID: null } });
     }

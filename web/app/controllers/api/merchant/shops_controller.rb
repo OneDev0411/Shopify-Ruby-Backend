@@ -137,6 +137,27 @@ module Api
       end
     end
 
+    # GET autopilot details of the shop GET /api/merchant/autopilot_details
+    def autopilot_details
+      render json:
+      {
+        shop_autopilot: @icushop.has_autopilot?,
+        isPending: @icushop.enable_autopilot_status,
+        autopilot_offer_id: @icushop&.offers&.where(offerable_type: 'auto')&.first&.id
+      }
+    end
+
+    # POST  api/merchant/enable_autopilot
+    def enable_autopilot
+      @icushop.async_enable_autopilot
+      render json: {message: 'pending'}
+    end
+
+    # GET api/merchant/enable_autopilot_status
+    def enable_autopilot_status
+      render json: { message: @icushop.enable_autopilot_status }
+    end
+
       private
 
       def shop_params

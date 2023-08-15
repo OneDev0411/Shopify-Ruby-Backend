@@ -14,15 +14,19 @@ import {
     ColorPicker,
     Stack,
     Icon,
+    Tooltip,
+    RadioButton,
     Text,
     Badge,
-    Image
+    Image,
+    Spinner
 } from "@shopify/polaris";
 import {
-    CancelMajor
-} from '@shopify/polaris-icons';
-import { ModalAddProduct } from "./modal_AddProduct";
-import { ModalAddConditions } from "./modal_AddConditions";
+    CancelMajor,
+    InfoMinor
+  } from '@shopify/polaris-icons';
+import {ModalAddProduct} from "./modal_AddProduct";
+import {ModalAddConditions} from "./modal_AddConditions";
 import HomePage from "../pages/subscription";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { SketchPicker } from 'react-color';
@@ -33,9 +37,10 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { elementSearch, productsMulti } from "../services/products/actions/product";
 import { useLocation } from 'react-router-dom';
+import { useAppQuery, useAuthenticatedFetch } from "../hooks";
+import { useNavigate } from 'react-router-dom';
 import SelectProductsModal from "../components/SelectProductsModal";
 import { SelectCollectionsModal } from "../components/SelectCollectionsModal";
-import { useAuthenticatedFetch } from "../hooks";
 import customCss from '../assets/custom.css';
 import product_page_image_1 from "../assets/images/product_page_image_1.png";
 import product_page_image_2 from "../assets/images/product_page_image_2.png";
@@ -50,6 +55,7 @@ import ajax_cart_image_3 from "../assets/images/ajax_cart_image_3.png";
 export function EditOfferTabs(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [altOfferText, setAltOfferText] = useState("");
     const [altBtnTitle, setAltBtnTitle] = useState("");
@@ -212,195 +218,363 @@ export function EditOfferTabs(props) {
         handleModal();
     }
 
+    //For autopilot section
+
+    const [autopilotButtonText, setAutopilotButtonText] = useState(props.autopilotCheck.isPending);
+    const [autopilotQuantity, setAutopilotQuantity] = useState(props.offer?.autopilot_quantity);
+    const autopilotQuantityOptions = [
+      {label: '1 (recommended)', value: 1},
+      {label: '2', value: 2},
+      {label: '3', value: 3},
+      {label: '4', value: 4},
+      {label: '5', value: 5}
+    ];
+
+    const navigateTo = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        setAutopilotButtonText(
+            props.autopilotCheck.isPending === "complete" 
+            ? "Configure Autopilot Settings" 
+            : props.autopilotCheck.isPending === "in progress"
+            ? "setting up..."
+            : "Launch Autopilot"
+        );
+    }, [props.autopilotCheck])
+
+    const handleAutoPilotQuantityChange = useCallback((value) => {
+        setAutopilotQuantity(parseInt(value));
+        props.updateOffer("autopilot_quantity", parseInt(value));
+    }, []);
+
+    const handleAutopilotExcludedTags = useCallback((value) => {
+        props.updateOffer("excluded_tags", value);
+    }, []);
+
+    const handleLayoutRadioClicked = useCallback((value) => {
+        props.updateOffer("multi_layout", value);
+    }, []);
+
+    // Called to enable the autopilot feature
+    function enableAutopilot() {
+        if(autopilotButtonText === "Configure Autopilot Settings") {
+            if(!props.openAutopilotSection) {
+                fetch(`/api/merchant/autopilot_details?shop=${shopAndHost.shop}`, {
+                    method: 'GET',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                })
+                .then( (response) => { return response.json() })
+                .then( (data) => {
+                    location.state.offerID = data.autopilot_offer_id;
+                    props.updateOpenAutopilotSection(true);
+                })
+                .catch((error) => {
+                    console.log("# Error AutopilotDetails > ", JSON.stringify(error));
+                })
+            }
+        }
+        else {
+            setIsLoading(true);
+            fetch(`/api/merchant/enable_autopilot`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ shop_id: props.shop.shop_id, shop: shopAndHost.shop}),
+            })
+            .then( (response) => { return response.json() })
+            .then( (data) => {
+               checkAutopilotStatus();
+               setIsLoading(false);
+            })
+            .catch((error) => {
+                console.log("# Error updateProducts > ", JSON.stringify(error));
+            })
+        }
+    }
+
+
+    function checkAutopilotStatus() {
+        fetch(`/api/merchant/enable_autopilot_status?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+        })
+        .then( (response) => { return response.json() })
+        .then( (data) => {
+            setAutopilotButtonText(
+                data.message === "complete" 
+                ? "Configure Autopilot Settings" 
+                : data.message === "in progress"
+                ? "setting up..."
+                : "Launch Autopilot"
+            );
+            if(data.message != 'complete') {
+                checkAutopilotStatus();
+            }
+        })
+        .catch((error) => {
+            console.log("# Error updateProducts > ", JSON.stringify(error));
+        })
+    }
+
 
     //Collapsible controls
     const [open, setOpen] = useState(false);
     const handleToggle = useCallback(() => setOpen((open) => !open), []);
+    const [showToolTip, setShowToolTip] = useState(false);
+    const handleShowToolTip = useCallback((value) => {
+        setShowToolTip(value);
+    }, [])
 
     return (
         <div>
-        <LegacyCard title="Offer Product" actions={[{content: 'Learn about Autopilot'}]} sectioned >
-            <p>What product would you like to have in the offer?</p>
-            <LegacyCard.Section>
-                <LegacyStack spacing="loose" vertical>
-                    <b>Selected Products:
-                    {props.offer.offerable_product_details.length > 0 ? (
-                        <>
-                            {props.offer.offerable_product_details.map((value, index) => (
-                                <>  
-                                    <Badge><p style={{color: 'blue'}}>{props.offer.offerable_product_details[index].title}</p></Badge>
+            {isLoading ? (
+                <div style={{ overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', }}>
+                    <Spinner size="large" color="teal"/>
+                </div>
+            )   :   (
+            <>
+                <LegacyCard title="Offer Product" actions={[{content: 'Learn about Autopilot'}]} sectioned >
+                    <LegacyCard.Section>
+                        <LegacyStack spacing="loose" vertical>
+                                {props.offer.id == null ? (
+                                    <>  
+                                        <p>What product would you like to have in the offer?</p>
+                                        <br/>
+                                        <ButtonGroup>
+                                            <Button id={"btnSelectProduct"} onClick={ () => { handleModal(); getProducts(); } } ref={modalRef}>Select product manually</Button>
+                                            <Button id={"btnLaunchAI"} disabled={!props.autopilotCheck?.shop_autopilot} primary onClick={() => enableAutopilot()}>{autopilotButtonText}</Button>
+                                        </ButtonGroup>
+                                    </>
+                                    ) : (props.offer.id != null && props.offer.id != props.autopilotCheck?.autopilot_offer_id) ? (
+                                    <>
+                                        <p>What product would you like to have in the offer?</p>
+                                        <br/>
+                                        <ButtonGroup>
+                                            <Button id={"btnSelectProduct"} onClick={ () => { handleModal(); getProducts(); } } ref={modalRef}>Select product manually</Button> 
+                                        </ButtonGroup>
+                                    </>
+                                    ) : (<></>) 
+                                }
+                            <ButtonGroup>
+                            {(props.offer.id == null && props.autopilotCheck?.shop_autopilot == false) ? (
+                                <>
+                                    <div
+                                        onMouseEnter={() => handleShowToolTip(true)}
+                                        onMouseLeave={() => handleShowToolTip(false)}
+                                    >
+                                    {showToolTip ? (
+                                        <div style={{display: 'flex'}}>
+                                            <Icon source={InfoMinor} color="base"/>
+                                            <Link to="/subscription" style={{ marginLeft: '5px' }}>
+                                                Autopilot is available on the Paid Plane.
+                                            </Link>
+                                        </div>
+                                        ) : (<><Icon source={InfoMinor} color="base"/></>)}
+                                    </div>
                                 </>
-                            ))}
+                                ) : (<></>)}
+                        </ButtonGroup>
+                            <b>Selected Products:
+                            {props.offer.offerable_product_details.length > 0 ? (
+                                <>
+                                    {props.offer.offerable_product_details.map((value, index) => (
+                                        <>  
+                                            <Badge><p style={{color: 'blue'}}>{props.offer.offerable_product_details[index].title}</p></Badge>
+                                        </>
+                                    ))}
+                                </>
+                                ) : (
+                                    <></>
+                                )}
+                            </b>
+                        </LegacyStack>
+                    </LegacyCard.Section>
+                    {props.openAutopilotSection || (props.offer.id != null && props.autopilotCheck?.autopilot_offer_id == props.offer.id) ? (
+                        <>
+                            <LegacyCard.Section title="Number of recommended products">
+                                <LegacyStack spacing="loose" vertical>
+                                    <Select
+                                        label="How many products would you like the customer to be able to choose from in the offer?"
+                                        options={autopilotQuantityOptions}
+                                        onChange={handleAutoPilotQuantityChange}
+                                        value={autopilotQuantity}
+                                    />
+                                </LegacyStack>
+                            </LegacyCard.Section>
+                            <LegacyCard.Section title="Layout">
+                                <LegacyStack vertical>
+                                    <RadioButton
+                                        label="Stack"
+                                        checked={props.offer.multi_layout === 'stack'}
+                                        onChange={() => handleLayoutRadioClicked('stack')}
+                                    />
+                                    <RadioButton
+                                        label="Carousel"
+                                        checked={props.offer.multi_layout === 'carousel'}
+                                        onChange={() => handleLayoutRadioClicked('carousel')}
+                                    />
+                                </LegacyStack>
+                            </LegacyCard.Section>
+                            <LegacyCard.Section>
+                                <LegacyStack spacing="loose" vertical>
+                                    <TextField 
+                                        label="Exclude products with a tag"
+                                        helpText="Autopilot will not suggest any product with this tag."
+                                        value={props.offer?.excluded_tags}
+                                        onChange={handleAutopilotExcludedTags}
+                                    />
+                                </LegacyStack>
+                            </LegacyCard.Section>
                         </>
-                        ) : (
-                            <></>
-                        )}
-                    </b>
-                    <ButtonGroup>
-                        <Button id={"btnSelectProduct"} onClick={ () => { handleModal(); getProducts(); } } ref={modalRef}>
-                        {props.offer.offerable_product_details.length > 0 ? (
-                            <span>Change product</span>
-                        ) : (
-                            <span>Select product manually</span>
-                        )}
-                        </Button>
-                        <Button id={"btnLaunchAI"} primary>Launch Autopilot</Button>
-                    </ButtonGroup>
+                    ) : (<></>)}
+                </LegacyCard>
+                <LegacyCard title="Text" sectioned >
+                    <LegacyCard.Section>
+                        <LegacyStack spacing="loose" vertical>
+                            {(props.offer.id != props.autopilotCheck?.autopilot_offer_id) && (
+                                <>
+                                <TextField
+                                    label="Offer title"
+                                    placeholder='Offer #1'
+                                    value={props.offer.title}
+                                    onChange={handleTitleChange}
+                                    autoComplete="off"
+                                    helpText="This title will only be visible to you so you can reference it internally"
+                                />
+                                </>
+                            )}
+                            <TextField
+                                label="Offer text"
+                                placeholder='Take advantage of this limited offer'
+                                autoComplete="off"
+                                value={props.offer.text_a}
+                                onChange={handleTextChange}
+                            />
+                            <TextField
+                                label="Button text"
+                                placeholder='Add to cart'
+                                value={props.offer.cta_a}
+                                onChange={handleBtnChange}
+                                autoComplete="off"
+                            />
+                            <Checkbox id={"abTesting"}
+                                label="Enable A/B testing"
+                                checked={abTestCheck}
+                                onChange={handleAbChange}
+                            />
+                            <Collapsible
+                                open={abTestCheck}
+                                id="basic-collapsible"
+                                transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
+                            // expandOnPrint
+                            >
+                                <Collapsible
+                                    open={!props.offerSettings.has_ab_testing}
+                                    id="ab-testing-not-present-collapsible"
+                                    transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
+                                    expandOnPrint
+                                >
+                                    <VerticalStack>
+                                        <p>
+                                            A/B testing is available on our Professional plan. Please <Link to="/subscription">upgrade your subscription</Link> to enable it.
+                                        </p>
+                                    </VerticalStack>
+                                </Collapsible>
+                                <Collapsible
+                                    open={props.offerSettings.has_ab_testing}
+                                    id="ab-testing-present-collapsible"
+                                    transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
+                                    expandOnPrint
+                                >
+                                    <TextField
+                                        label="Alternative offer text"
+                                        placeholder='Take advantage of this limited offer'
+                                        autoComplete="off"
+                                        value={props.offer.text_b}
+                                        onChange={handleAltTextChange}
+                                    />
+                                    <TextField
+                                        label="Alternative button text"
+                                        placeholder='Add to cart'
+                                        autoComplete="off"
+                                        value={props.offer.cta_b}
+                                        onChange={handleAltBtnChange}
+                                    />
+                                </Collapsible>
+                            </Collapsible>
+                        </LegacyStack>
+                    </LegacyCard.Section>
+                </LegacyCard>
+                <LegacyCard title="Display options" sectioned>
+                    <LegacyCard.Section>
+                        <LegacyStack vertical>
+                            <Checkbox id={"removeImg"}
+                                checked={!props.offer.show_product_image}
+                                onChange={handleImageChange}
+                                label="Remove product image"
+                            />
+                            <Checkbox id={"removePrice"}
+                                checked={!props.offer.show_product_price}
+                                onChange={handlePriceChange}
+                                label="Remove price"
+                            />
+                            <Checkbox id={"removeComparePrice"}
+                                checked={!props.offer.show_compare_at_price}
+                                onChange={handleCompareChange}
+                                label="Remove compare at price"
+                            />
+                            <Checkbox id={"removeProductPage"}
+                                checked={!props.offer.link_to_product}
+                                onChange={handleProductPageChange}
+                                label="Remove link to product page"
+                            />
+                            <Checkbox id={"autoDiscount"}
+                                label="Automatically apply discount code"
+                                checked={props.offer.discount_target_type == "code"}
+                                onChange={handleDiscountChange}
+                            />
+                            <Checkbox id={"removeQtySelector"}
+                                checked={!props.offer.show_quantity_selector}
+                                onChange={handleQtySelectorChange}
+                                label="Remove quantity selector"
+                            />
+                            <Checkbox id={"addCustomtext"}
+                                checked={props.offer.show_custom_field}
+                                onChange={handleCustomTextChange}
+                                label="Add custom textbox"
+                            />
+                        </LegacyStack>
+                    </LegacyCard.Section>
+                </LegacyCard>
+                <div className="space-4"></div>
+                <LegacyStack distribution="center">
+                    <Button id={"btnAddProduct"} onClick={handleModal} ref={modalRef}>Add product</Button>
                 </LegacyStack>
-            </LegacyCard.Section>
-        </LegacyCard>
-        <LegacyCard title="Text" sectioned >
-            <LegacyCard.Section>
-                <LegacyStack spacing="loose" vertical>
-                        <TextField
-                            label="Offer title"
-                            placeholder='Offer #1'
-                            value={props.offer.title}
-                            onChange={handleTitleChange}
-                            autoComplete="off"
-                            helpText="This title will only be visible to you so you can reference it internally"
-                        />
-                        <TextField
-                            label="Offer text"
-                            placeholder='Take advantage of this limited offer'
-                            autoComplete="off"
-                            value={props.offer.text_a}
-                            onChange={handleTextChange}
-                        />
-                        <TextField
-                            label="Button text"
-                            placeholder='Add to cart'
-                            value={props.offer.cta_a}
-                            onChange={handleBtnChange}
-                            autoComplete="off"
-                        />
-                        <Checkbox id={"abTesting"}
-                            label="Enable A/B testing"
-                            checked={abTestCheck}
-                            onChange={handleAbChange}
-                        />
-                        <Collapsible
-                            open={abTestCheck}
-                            id="basic-collapsible"
-                            transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
-                        // expandOnPrint
-                        >
-                            <Collapsible
-                                open={!props.offerSettings.has_ab_testing}
-                                id="ab-testing-not-present-collapsible"
-                                transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
-                                expandOnPrint
-                            >
-                                <VerticalStack>
-                                    <p>
-                                        A/B testing is available on our Professional plan. Please <Link to="/subscription">upgrade your subscription</Link> to enable it.
-                                    </p>
-                                </VerticalStack>
-                            </Collapsible>
-                            <Collapsible
-                                open={props.offerSettings.has_ab_testing}
-                                id="ab-testing-present-collapsible"
-                                transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
-                                expandOnPrint
-                            >
-                                <TextField
-                                    label="Alternative offer text"
-                                    placeholder='Take advantage of this limited offer'
-                                    autoComplete="off"
-                                    value={props.offer.text_b}
-                                    onChange={handleAltTextChange}
-                                />
-                                <TextField
-                                    label="Alternative button text"
-                                    placeholder='Add to cart'
-                                    autoComplete="off"
-                                    value={props.offer.cta_b}
-                                    onChange={handleAltBtnChange}
-                                />
-                            </Collapsible>
-                        </Collapsible>
-                    </LegacyStack>
-                </LegacyCard.Section>
-            </LegacyCard>
-            <LegacyCard title="Display options" sectioned>
-                <LegacyCard.Section>
-                    <LegacyStack vertical>
-                        <Checkbox id={"removeImg"}
-                            checked={!props.offer.show_product_image}
-                            onChange={handleImageChange}
-                            label="Remove product image"
-                        />
-                        <Checkbox id={"removePrice"}
-                            checked={!props.offer.show_product_price}
-                            onChange={handlePriceChange}
-                            label="Remove price"
-                        />
-                        <Checkbox id={"removeComparePrice"}
-                            checked={!props.offer.show_compare_at_price}
-                            onChange={handleCompareChange}
-                            label="Remove compare at price"
-                        />
-                        <Checkbox id={"removeProductPage"}
-                            checked={!props.offer.link_to_product}
-                            onChange={handleProductPageChange}
-                            label="Remove link to product page"
-                        />
-                        <Checkbox id={"autoDiscount"}
-                            label="Automatically apply discount code"
-                            checked={props.offer.discount_target_type == "code"}
-                            onChange={handleDiscountChange}
-                        />
-                        {props.offer.discount_target_type == "code" ? ( 
-                            <>
-                                <TextField
-                                    label="Discount Code"
-                                    value={props.offer.discount_code}
-                                    onChange={handleDiscountCodeChange}
-                                    autoComplete="off"
-                                />
-                                <p>Make sure you have already set up this <Link to={`https://admin.shopify.com/store/${shopAndHost.shop.replace(/\.myshopify\.com$/, '')}/discounts`} target="blank">discount code</Link> in your discount code section.
-                                    The discount will apply automatically at checkout
-                                </p>
-                            </>
-                            ) : null}
-                        <Checkbox id={"removeQtySelector"}
-                            checked={!props.offer.show_quantity_selector}
-                            onChange={handleQtySelectorChange}
-                            label="Remove quantity selector"
-                        />
-                        <Checkbox id={"addCustomtext"}
-                            checked={props.offer.show_custom_field}
-                            onChange={handleCustomTextChange}
-                            label="Add custom textbox"
-                        />
-                        <Checkbox id={"showNoThanks"}
-                            checked={!props.offer.show_nothanks}
-                            onChange={handleShowNoThanksChange}
-                            label="Customer can't dismiss offer"
-                        />
-                    </LegacyStack>
-                </LegacyCard.Section>
-            </LegacyCard>
-            <div className="space-4"></div>
-            <LegacyStack distribution="center">
-                <Button id={"btnAddProduct"} onClick={handleModal} ref={modalRef}>Add product</Button>
-            </LegacyStack>
-            <div className="space-10"></div>
-            {/* Modal */}
-            <Modal
-                activator={activator}
-                open={productModal}
-                onClose={handleModalCloseEvent}
-                title="Select products from your store"
-                primaryAction={{
-                    content: 'Save',
-                    onAction: updateProducts,
-                }}
-            >
-                <Modal.Section>
-                    <ModalAddProduct selectedItems={selectedItems} setSelectedItems={setSelectedItems} offer={props.offer} updateQuery={updateQuery} shop_id={props.shop.shop_id} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct} />
-                </Modal.Section>
-            </Modal>
+
+                <div className="space-10"></div>
+                {/* Modal */}
+                <Modal
+                    activator={activator}
+                    open={productModal}
+                    onClose={handleModalCloseEvent}
+                    title="Select products from your store"
+                    primaryAction={{
+                        content: 'Save',
+                        onAction: updateProducts,
+                    }}
+                >
+                    <Modal.Section>
+                        <ModalAddProduct selectedItems={selectedItems} setSelectedItems={setSelectedItems} offer={props.offer} updateQuery={updateQuery} shop_id={props.shop.shop_id} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProduct={updateSelectedProduct} />
+                    </Modal.Section>
+                </Modal>
+            </>
+            )}
         </div>
     );
 }
@@ -761,7 +935,6 @@ export function SecondTab(props) {
         }
         setSelected(value);
     }, []);
-
 
     const options = [
         { label: 'Cart page', value: 'cartpage' },
@@ -1343,8 +1516,12 @@ export function SecondTab(props) {
                             />
                         </Grid.Cell>
                     </Grid>
-                    <div className="space-4"></div>
-                    <Button onClick={handleSelectProductsModal} ref={modalProd} >Select Product</Button>
+                    {props.offer.id != props.autopilotCheck?.autopilot_offer_id && (
+                    <>
+                        <div className="space-4"></div>
+                        <Button onClick={handleSelectProductsModal} ref={modalProd} >Select Product</Button>
+                    </>
+                    )}
                     <Modal 
                         open={productModal}
                         onClose={handleProductsModal}
@@ -1357,8 +1534,12 @@ export function SecondTab(props) {
                             <SelectProductsModal selectedItems={selectedItems} setSelectedItems={setSelectedItems} offer={props.offer} shop={props.shop} handleProductsModal={handleProductsModal} selectedProducts={selectedProducts} setSelectedProducts={setSelectedProducts} />
                         </Modal.Section>
                     </Modal>
-                    <div className="space-4"></div>
-                    <Button onClick={handleSelectCollectionsModal} ref={modalColl}>Select Collection</Button>
+                    {props.offer.id != props.autopilotCheck?.autopilot_offer_id && (
+                    <>
+                        <div className="space-4"></div>
+                        <Button onClick={handleSelectCollectionsModal} ref={modalColl}>Select Collection</Button>
+                    </>
+                    )}
                     <Modal
                         open={collectionModal}
                         onClose={handleCollectionsModal}
@@ -1610,7 +1791,7 @@ export function SecondTab(props) {
             </LegacyCard>
             <LegacyCard title="Display Conditions" sectioned>
                 <LegacyCard.Section>
-                    {props.offer.rules_json.length === 0 ? (
+                    {props.offer?.rules_json?.length===0 ? (
                         <p>None selected (show offer to all customer)</p>
                     ) : (
                         <>{Array.isArray(props.offer.rules_json) && props.offer.rules_json.map((rule, index) => (
@@ -1806,17 +1987,25 @@ export function ThirdTab(props) {
         <div>
             <LegacyCard title="Offer box" sectioned>
                 <LegacyCard.Section>
-                    <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                            <Select
-                                label="Layout"
-                                options={options}
-                                onChange={handleLayout}
-                                value={props.offer.multi_layout}
-                            />
-                        </Grid.Cell>
-                    </Grid>
-                    <br />
+                    {(props.offer.id != null && props.autopilotCheck?.autopilot_offer_id == props.offer.id) ? (
+                        <>
+                        </>
+                        ) : (
+                        <>
+                            <Grid>
+                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                                    <Select
+                                        label="Layout"
+                                        options={options}
+                                        onChange={handleLayout}
+                                        value={props.offer.multi_layout}
+                                    />
+                                </Grid.Cell>
+                            </Grid>
+                            <br/>
+                        </>
+                        )
+                    }
                     <Grid>
                         <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField

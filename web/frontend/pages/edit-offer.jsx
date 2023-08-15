@@ -27,6 +27,10 @@ export default function EditPage() {
     );
     const [checkKeysValidity, setCheckKeysValidity] = useState({});
     const [initialVariants, setInitialVariants] = useState({});
+    const [autopilotCheck, setAutopilotCheck] = useState({
+        isPending: "Launch Autopilot",
+    });
+    const [openAutopilotSection, setOpenAutopilotSection] = useState(false);
 
     const [offer, setOffer] = useState({
     offerId: undefined,
@@ -215,7 +219,21 @@ export default function EditPage() {
                 console.log("Error > ", error);
             })
         }
-
+        setIsLoading(true);
+        fetch(`/api/merchant/autopilot_details?shop=${shopAndHost.shop}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+        })
+        .then( (response) => { return response.json() })
+        .then( (data) => {
+            setAutopilotCheck(data);
+            setIsLoading(false);
+        })
+        .catch((error) => {
+            console.log("# Error AutopilotDetails > ", JSON.stringify(error));
+        })
 
         fetch(`/api/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
             method: 'GET',
@@ -236,7 +254,7 @@ export default function EditPage() {
             console.log("# Error updateProducts > ", JSON.stringify(error));
         })
 
-    },[]);
+    },[openAutopilotSection]);
 
 
     //Called whenever the checkKeysValidity changes in any child component
@@ -318,9 +336,13 @@ export default function EditPage() {
         setInitialVariants({...value});
     }
 
+
+    //Called to update the openAutopilotSection attribute
+    function updateOpenAutopilotSection(value) {
+        setOpenAutopilotSection(value);
+    }
+
     function save(status) {
-        console.log("Shop >>",shop);
-        console.log("Offer >>", offer)
         var ots = {
             active: status,
             checkout_after_accepted: offer.checkout_after_accepted,
@@ -340,7 +362,9 @@ export default function EditPage() {
             multi_layout: offer.multi_layout,
             must_accept: offer.must_accept,
             offerable_product_shopify_ids: offer.offerable_product_shopify_ids,
-            offerable_type: 'multi',
+            offerable_type: offer.offerable_type,
+            autopilot_quantity: offer.autopilot_quantity,
+            excluded_tags: offer.excluded_tags,
             offer_css: offer.css,
             offer_cta: offer.cta_a,
             offer_cta_alt: offer.cta_b,
@@ -373,6 +397,7 @@ export default function EditPage() {
           ots.interval_unit = offer.interval_unit;
           ots.interval_frequency = offer.interval_frequency;
         }
+        setIsLoading(true);
         if(location.state != null && location.state?.offerID == null) {
             fetch(`/api/offers/create/${shop?.shop_id}`, {
                 method: 'POST',
@@ -385,6 +410,7 @@ export default function EditPage() {
             .then( (data) => {
                 setOffer(data.offer);
                 location.state.offerID = data.offer.id;
+                setIsLoading(false);
             })
             .catch((error) => {
             })
@@ -406,6 +432,7 @@ export default function EditPage() {
                     data.offer.offerable_product_details[i].preview_mode = true;
                 }
                 setOffer(data.offer);
+                setIsLoading(false);
             })
             .catch((error) => {
             })
@@ -422,6 +449,7 @@ export default function EditPage() {
             .then( (response) => { return response.json(); })
             .then( (data) => {
                 setShop(data.shop);
+                setIsLoading(false);
             })
             .catch((error) => {
             })
@@ -523,15 +551,15 @@ export default function EditPage() {
 
                                 {selected == 0 ?
                                     // page was imported from components folder
-                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity} initialVariants={initialVariants} updateInitialVariants={updateInitialVariants} />
+                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity} initialVariants={initialVariants} updateInitialVariants={updateInitialVariants} autopilotCheck={autopilotCheck} openAutopilotSection={openAutopilotSection} updateOpenAutopilotSection={updateOpenAutopilotSection}/>
                                 : "" }
                                 {selected == 1 ?
                                     // page was imported from components folder
-                                    <SecondTab offer={offer} shop={shop} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateShop={updateShop} shopifyThemeName={shopifyThemeName}/>
+                                    <SecondTab offer={offer} shop={shop} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateShop={updateShop} shopifyThemeName={shopifyThemeName} autopilotCheck={autopilotCheck}/>
                                 : "" }
                                 {selected == 2 ?
                                     // page was imported from components folder
-                                    <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} saveDraft={saveDraft} publishOffer={publishOffer}/>
+                                    <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} saveDraft={saveDraft} publishOffer={publishOffer} autopilotCheck={autopilotCheck}/>
                                 : "" }
                                 {selected == 3 ?
                                     // page was imported from components folder
