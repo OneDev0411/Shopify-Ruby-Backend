@@ -11,13 +11,23 @@ import Stack from './layouts/template_multi_stack';
 import Carousel from './layouts/template_multi_carousel';
 import Flex from './layouts/template_multi_flex';
 import Siema from 'siema'
+import { Spinner } from '@shopify/polaris';
 
 
 export function OfferPreview(props) {
 
+	const [carouselLoading, setCarouselLoading] = useState(false);
+
 	useEffect(() => {
+		setCarouselLoading(true);
 		combinedCss();
+		setTimeout(function(){ setCarouselLoading(false) }, 500);
 	},[props.shop]);
+
+	useEffect(() => {
+		setCarouselLoading(true);
+		setTimeout(function(){ setCarouselLoading(false) }, 500);
+	}, [props.offer]);
 
 	// Called everytime when any attribute in shop changes.
 	function combinedCss () {
@@ -158,10 +168,16 @@ export function OfferPreview(props) {
 				) : props.offer.multi_layout == "stack" ? (
 					<Stack offer={props.offer} shop={props.shop} checkKeysValidity={props.checkKeysValidity}/>
 				) : props.offer.multi_layout == "carousel" ? (
-					<Carousel offer={props.offer} shop={props.shop} checkKeysValidity={props.checkKeysValidity} updateCheckKeysValidity={props.updateCheckKeysValidity}/>
+					carouselLoading ? (
+						<div style={{ marginTop: props.shop.css_options.main.marginTop, marginLeft: '40%' }}>
+							<Spinner></Spinner>
+						</div>
+					) : (
+						<Carousel offer={props.offer} shop={props.shop} checkKeysValidity={props.checkKeysValidity} updateCheckKeysValidity={props.updateCheckKeysValidity}/>
+					)
 				) : props.offer.multi_layout == "flex" ? (
 					<Flex offer={props.offer} shop={props.shop} checkKeysValidity={props.checkKeysValidity}/>
-				)	: (
+				) : (
 					<div></div>
 				)
 			}
