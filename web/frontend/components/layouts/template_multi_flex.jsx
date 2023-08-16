@@ -1,8 +1,11 @@
 import { forwardRef, useState, useEffect, useRef } from "react";
 import TemplateComponent from 'react-mustache-template-component';
 import themeCss from '../../assets/theme.css';
+import { useSelector } from 'react-redux';
 
 export default function Flex(props) {
+	const shopAndHost = useSelector(state => state.shopAndHost);
+
 	const template = `<div id="nudge-offer-{{ id }}" style="background-color: {{ css_options.main.backgroundColor }}; color: {{ css_options.main.color}}; {{#mainMarginTop }} margin-top: {{css_options.main.marginTop}}; {{/mainMarginTop}} {{#mainMarginBottom }} margin-bottom: {{css_options.main.marginBottom}}; {{/mainMarginBottom}} {{#mainBorderWidth}} border: {{css_options.main.borderWidth}}px {{css_options.main.borderStyle}}; {{/mainBorderWidth}} {{#mainBorderRadius}} border-radius: {{css_options.main.borderRadius}}px; {{/mainBorderRadius}} {{ #mobileViewWidth }} width: 320px {{/ mobileViewWidth}}" class="nudge-offer {{ theme }}{{#show_product_image}} with-image {{/show_product_image}} multi flex {{ multi_layout }} {{shop.extra_css_classes}}"
      data-offerid="{{ id }}">
   {{#show_nothanks}}
@@ -21,7 +24,7 @@ export default function Flex(props) {
         
       	<div class="product-title-wrapper">
 		  {{#link_to_product }}
-		    <a href="/products/{{ url }}">
+			<a href="https://admin.shopify.com/store/${shopAndHost.shop.replace(/\.myshopify\.com$/, '')}/products/{{ id }}" target="_blank">
 		  {{/link_to_product}}
 		  {{#show_product_title}}
 		      <span class="product-title">
@@ -131,6 +134,6 @@ export default function Flex(props) {
 	
 
 	return( 
-		<TemplateComponent template={template} data={({...props.offer, ...props.shop, ...props.checkKeysValidity})}/>
+		<TemplateComponent template={template} data={({...props.offer, ...props.shop, ...props.checkKeysValidity})} sanitize={false}/>
 	);
 }
