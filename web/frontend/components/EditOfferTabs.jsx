@@ -604,6 +604,7 @@ export function EditOfferTabs(props) {
         </div>
     );
 }
+
 export function SecondTab(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
