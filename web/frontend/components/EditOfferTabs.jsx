@@ -66,6 +66,9 @@ export function EditOfferTabs(props) {
         if (props.offer.offerable_product_details.length > 0) {
             props.updateCheckKeysValidity("text", newValue.replace("{{ product_title }}", props.offer.offerable_product_details[0].title));
         }
+        else {
+            props.updateCheckKeysValidity("text", newValue);
+        }
     }, [props.offer.offerable_product_details]);
     const handleAltTextChange = useCallback((newValue) => props.updateOffer("text_b", newValue), []);
     const handleBtnChange = useCallback((newValue) => {
@@ -114,8 +117,9 @@ export function EditOfferTabs(props) {
                 productData[i].variants = [];
             }
         }
+        setSelectedItems(props.offer.offerable_product_shopify_ids);
         setProductModal(false);
-    }, [props.initialVariants, productData]);
+    }, [props.initialVariants, productData, props.offer.offerable_product_shopify_ids]);
     const modalRef = useRef(null);
     const activator = modalRef;
 
@@ -177,6 +181,7 @@ export function EditOfferTabs(props) {
                     }
                 }
                 setProductData(data);
+                setSelectedItems(props.offer.offerable_product_shopify_ids);
                 setResourceListLoading(false);
             })
             .catch((error) => {
@@ -189,6 +194,7 @@ export function EditOfferTabs(props) {
         if (selectedProducts.length == 0) {
             props.updateOffer("included_variants", {});
             setProductData("");
+            props.updateCheckKeysValidity("text", "Would you like to add a {{ product_title }}?");
         }
         props.updateOffer("offerable_product_details", []);
         props.updateOffer("offerable_product_shopify_ids", []);
@@ -220,6 +226,7 @@ export function EditOfferTabs(props) {
 
     //For autopilot section
 
+    const [sampleProducts, setSampleProducts] = useState(props.offer.offerable_product_details);
     const [autopilotButtonText, setAutopilotButtonText] = useState(props.autopilotCheck.isPending);
     const [autopilotQuantity, setAutopilotQuantity] = useState(props.offer?.autopilot_quantity);
     const autopilotQuantityOptions = [
@@ -243,10 +250,29 @@ export function EditOfferTabs(props) {
         );
     }, [props.autopilotCheck])
 
+    useEffect(() => {
+        if(props.offer.id == props.autopilotCheck?.autopilot_offer_id) {
+            var tempArray = [];
+            for(var i=0; i<props.offer?.autopilot_quantity ; i++) {
+                if(props.offer.offerable_product_details.length > i) {
+                    tempArray[i] = props.offer.offerable_product_details[i];
+                }
+            }
+            props.updateOffer("offerable_product_details", tempArray);
+        }
+    }, [props.autopilotCheck?.autopilot_offer_id, props.offer.offerable_product_shopify_ids]);
+
     const handleAutoPilotQuantityChange = useCallback((value) => {
+        var tempArray = [];
+        for(var i=0; i<parseInt(value) ; i++) {
+            if(sampleProducts.length > i) {
+                tempArray[i] = sampleProducts[i];
+            }
+        }
+        props.updateOffer("offerable_product_details", tempArray);
         setAutopilotQuantity(parseInt(value));
         props.updateOffer("autopilot_quantity", parseInt(value));
-    }, []);
+    }, [sampleProducts]);
 
     const handleAutopilotExcludedTags = useCallback((value) => {
         props.updateOffer("excluded_tags", value);
@@ -1293,7 +1319,6 @@ export function SecondTab(props) {
     });
 
     const handleImageClick = useCallback((pageName, clickedImageNum) => {
-        debugger;
         if(pageName === 'product_page') {
             const newArray = [...productIsClicked];
             newArray[0] = false;
@@ -1789,38 +1814,42 @@ export function SecondTab(props) {
                     </LegacyCard.Section>
                 )}
             </LegacyCard>
-            <LegacyCard title="Display Conditions" sectioned>
-                <LegacyCard.Section>
-                    {props.offer?.rules_json?.length===0 ? (
-                        <p>None selected (show offer to all customer)</p>
-                    ) : (
-                        <>{Array.isArray(props.offer.rules_json) && props.offer.rules_json.map((rule, index) => (
-                            <li key={index} style={{ display: 'flex', alignItems: 'center' }}>{getLabelFromValue(rule.rule_selector)} {rule.quantity} <b>{rule.item_name}</b>
-                                <p onClick={() => deleteRule(index)}>
-                                    <Icon source={CancelMajor} color="critical" />
-                                </p>
-                            </li>
-                        ))}</>
-                    )}
-                    <br />
-                    <Button onClick={handleConditionModal} ref={modalCon}>Add condition</Button>
-                </LegacyCard.Section>
-                <LegacyCard.Section title="Condition options">
-                    <LegacyStack vertical>
-                        <Checkbox
-                            label="Disable checkout button until offer is accepted"
-                            helpText="This is useful for products that can only be purchased in pairs."
-                            checked={props.offer.must_accept}
-                            onChange={handleDisableCheckoutBtn}
-                        />
-                        <Checkbox
-                            label="If the offer requirements are no longer met. Remove the item from the cart."
-                            checked={props.offer.remove_if_no_longer_valid}
-                            onChange={handleRemoveItiem}
-                        />
-                    </LegacyStack>
-                </LegacyCard.Section>
-            </LegacyCard>
+            {props.offer.id != props.autopilotCheck?.autopilot_offer_id && (
+                <>
+                    <LegacyCard title="Display Conditions" sectioned>
+                        <LegacyCard.Section>
+                            {props.offer?.rules_json?.length===0 ? (
+                                <p>None selected (show offer to all customer)</p>
+                            ) : (
+                                <>{Array.isArray(props.offer.rules_json) && props.offer.rules_json.map((rule, index) => (
+                                    <li key={index} style={{ display: 'flex', alignItems: 'center' }}>{getLabelFromValue(rule.rule_selector)} {rule.quantity} <b>{rule.item_name}</b>
+                                        <p onClick={() => deleteRule(index)}>
+                                            <Icon source={CancelMajor} color="critical" />
+                                        </p>
+                                    </li>
+                                ))}</>
+                            )}
+                            <br />
+                            <Button onClick={handleConditionModal} ref={modalCon}>Add condition</Button>
+                        </LegacyCard.Section>
+                        <LegacyCard.Section title="Condition options">
+                            <LegacyStack vertical>
+                                <Checkbox
+                                    label="Disable checkout button until offer is accepted"
+                                    helpText="This is useful for products that can only be purchased in pairs."
+                                    checked={props.offer.must_accept}
+                                    onChange={handleDisableCheckoutBtn}
+                                />
+                                <Checkbox
+                                    label="If the offer requirements are no longer met. Remove the item from the cart."
+                                    checked={props.offer.remove_if_no_longer_valid}
+                                    onChange={handleRemoveItiem}
+                                />
+                            </LegacyStack>
+                        </LegacyCard.Section>
+                    </LegacyCard>
+                </>
+                )}
             <div className="space-4"></div>
             <LegacyStack distribution="center">
                 <Button disabled="true">Continue to Appearance</Button>
