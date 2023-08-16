@@ -6,10 +6,11 @@ import {
 } from '@shopify/polaris';
 import TemplateComponent from 'react-mustache-template-component';
 import themeCss from '../../assets/theme.css';
+import { useSelector } from 'react-redux';
 
 
 export default function Compact(props) {
-
+	const shopAndHost = useSelector(state => state.shopAndHost);
 
 	const template = `<div id="nudge-offer-{{ id }}" style="background-color: {{ css_options.main.backgroundColor }}; color: {{ css_options.main.color}}; {{#mainMarginTop }} margin-top: {{css_options.main.marginTop}}; {{/mainMarginTop}} {{#mainMarginBottom }} margin-bottom: {{css_options.main.marginBottom}}; {{/mainMarginBottom}} {{#mainBorderWidth}} border: {{css_options.main.borderWidth}}px {{css_options.main.borderStyle}}; {{/mainBorderWidth}} {{#mainBorderRadius}} border-radius: {{css_options.main.borderRadius}}px; {{/mainBorderRadius}} {{ #mobileViewWidth }} width: 320px {{/ mobileViewWidth}}" class="nudge-offer custom with-image  multi compact" data-offerid="163416">
 					{{#show_nothanks}}<a class="dismiss-button" onclick="InCartUpsell.dismissOffer({{ id }}); return false;">&times;</a>{{/show_nothanks}}
@@ -26,7 +27,7 @@ export default function Compact(props) {
                 {{/show_product_image}}
 	            </div>
 	            {{#link_to_product }}
-					    	<a href="/products/{{ url }}">
+					    	<a href="https://admin.shopify.com/store/${shopAndHost.shop.replace(/\.myshopify\.com$/, '')}/products/{{ id }}" target="_blank">
 					  	{{/link_to_product}}
 	            <div class="product-title-wrapper">
 	                  <span class="product-title">
@@ -121,6 +122,6 @@ export default function Compact(props) {
 	
 
 	return( 
-		<TemplateComponent template={template} data={({...props.offer, ...props.shop, ...props.checkKeysValidity})}/>
+		<TemplateComponent template={template} data={({...props.offer, ...props.shop, ...props.checkKeysValidity})} sanitize={false}/>
 	);
 };
