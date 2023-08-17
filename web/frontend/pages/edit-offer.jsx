@@ -31,6 +31,7 @@ export default function EditPage() {
         isPending: "Launch Autopilot",
     });
     const [openAutopilotSection, setOpenAutopilotSection] = useState(false);
+    const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState({});
 
     const [offer, setOffer] = useState({
     offerId: undefined,
@@ -180,6 +181,7 @@ export default function EditPage() {
                     data.offerable_product_details[i].preview_mode = true;
                 }
                 setOffer({...data});
+                setInitialOfferableProductDetails(data.offerable_product_details);
                 setIsLoading(false);
             })
             .catch((error) => {
@@ -555,7 +557,7 @@ export default function EditPage() {
 
                                 {selected == 0 ?
                                     // page was imported from components folder
-                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity} handleTabChange={changeTab} initialVariants={initialVariants} updateInitialVariants={updateInitialVariants} autopilotCheck={autopilotCheck} openAutopilotSection={openAutopilotSection} updateOpenAutopilotSection={updateOpenAutopilotSection}/>
+                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity} handleTabChange={changeTab} initialVariants={initialVariants} updateInitialVariants={updateInitialVariants} autopilotCheck={autopilotCheck} openAutopilotSection={openAutopilotSection} updateOpenAutopilotSection={updateOpenAutopilotSection} initialOfferableProductDetails={initialOfferableProductDetails}/>
                                 : "" }
                                 {selected == 1 ?
                                     // page was imported from components folder

@@ -59,7 +59,8 @@ export function EditOfferTabs(props) {
 
     const [altOfferText, setAltOfferText] = useState("");
     const [altBtnTitle, setAltBtnTitle] = useState("");
-    const [selectedItems, setSelectedItems] = useState(props.offer.offerable_product_shopify_ids);
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [selectedProducts, setSelectedProducts] = useState([]);
     const handleTitleChange = useCallback((newValue) => props.updateOffer("title", newValue), []);
     const handleTextChange = useCallback((newValue) => {
         props.updateOffer("text_a", newValue);
@@ -117,7 +118,6 @@ export function EditOfferTabs(props) {
                 productData[i].variants = [];
             }
         }
-        setSelectedItems(props.offer.offerable_product_shopify_ids);
         setProductModal(false);
     }, [props.initialVariants, productData, props.offer.offerable_product_shopify_ids]);
     const modalRef = useRef(null);
@@ -126,7 +126,6 @@ export function EditOfferTabs(props) {
     //Available Products
     const [query, setQuery] = useState("");
     const [resourceListLoading, setResourceListLoading] = useState(false);
-    const [selectedProducts, setSelectedProducts] = useState(props.offer.offerable_product_shopify_ids);
 
     //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
     function updateQuery(childData) {
@@ -165,6 +164,7 @@ export function EditOfferTabs(props) {
 
     //Called when "select product manually button clicked"
     function getProducts() {
+        debugger;
         setResourceListLoading(true);
         fetch(`/api/merchant/element_search`, {
             method: 'POST',
@@ -175,6 +175,7 @@ export function EditOfferTabs(props) {
         })
             .then((response) => { return response.json() })
             .then((data) => {
+                debugger;
                 for (var i = 0; i < data.length; i++) {
                     if (!Object.keys(props.offer.included_variants).includes(data[i].id.toString())) {
                         data[i].variants = [];
@@ -182,6 +183,7 @@ export function EditOfferTabs(props) {
                 }
                 setProductData(data);
                 setSelectedItems(props.offer.offerable_product_shopify_ids);
+                setSelectedProducts(props.offer.offerable_product_shopify_ids)
                 setResourceListLoading(false);
             })
             .catch((error) => {
@@ -191,6 +193,7 @@ export function EditOfferTabs(props) {
 
     //Called when the save button of popup modal is clicked
     function updateProducts() {
+        debugger;
         if (selectedProducts.length == 0) {
             props.updateOffer("included_variants", {});
             setProductData("");
@@ -209,6 +212,7 @@ export function EditOfferTabs(props) {
             })
                 .then((response) => { return response.json() })
                 .then((data) => {
+                    debugger;
                     data.available_json_variants = data.available_json_variants.filter((o) => props.offer.included_variants[data.id].includes(o.id))
                     props.updateProductsOfOffer(data);
                     if (responseCount == 0) {
@@ -226,7 +230,6 @@ export function EditOfferTabs(props) {
 
     //For autopilot section
 
-    const [sampleProducts, setSampleProducts] = useState(props.offer.offerable_product_details);
     const [autopilotButtonText, setAutopilotButtonText] = useState(props.autopilotCheck.isPending);
     const [autopilotQuantity, setAutopilotQuantity] = useState(props.offer?.autopilot_quantity);
     const autopilotQuantityOptions = [
@@ -251,7 +254,7 @@ export function EditOfferTabs(props) {
     }, [props.autopilotCheck])
 
     useEffect(() => {
-        if(props.offer.id == props.autopilotCheck?.autopilot_offer_id) {
+        if(props.offer.id != null && props.offer.id == props.autopilotCheck?.autopilot_offer_id && props.offer.autopilot_quantity != props.offer.offerable_product_details.length) {
             var tempArray = [];
             for(var i=0; i<props.offer?.autopilot_quantity ; i++) {
                 if(props.offer.offerable_product_details.length > i) {
@@ -265,14 +268,14 @@ export function EditOfferTabs(props) {
     const handleAutoPilotQuantityChange = useCallback((value) => {
         var tempArray = [];
         for(var i=0; i<parseInt(value) ; i++) {
-            if(sampleProducts.length > i) {
-                tempArray[i] = sampleProducts[i];
+            if(props.initialOfferableProductDetails.length > i) {
+                tempArray[i] = props.initialOfferableProductDetails[i];
             }
         }
         props.updateOffer("offerable_product_details", tempArray);
         setAutopilotQuantity(parseInt(value));
         props.updateOffer("autopilot_quantity", parseInt(value));
-    }, [sampleProducts]);
+    }, [props.initialOfferableProductDetails]);
 
     const handleAutopilotExcludedTags = useCallback((value) => {
         props.updateOffer("excluded_tags", value);
