@@ -49,6 +49,11 @@ Rails.application.routes.draw do
     end
   end
 
+  # Mandatory Shopify Webhooks (don't remove them even if not used)
+  post 'custom_webhooks/redact_shop', to: 'custom_webhooks#redact_shop'
+  post 'custom_webhooks/request_customer', to: 'custom_webhooks#request_customer'
+  post 'custom_webhooks/redact_customer', to: 'custom_webhooks#redact_customer'
+
 
 
   # Any other routes will just render the react app
