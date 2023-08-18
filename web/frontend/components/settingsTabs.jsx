@@ -5,10 +5,10 @@ import React from "react";
 export function SettingTabs(props){
  
    const options = [
-     {label: 'Prepend', value: 'prepend'},
-     {label: 'Append', value: 'append'},
-     {label: 'Before', value: 'before'},
-     {label: 'After', value: 'after'},
+     {label: 'prepend()', value: 'prepend'},
+     {label: 'append()', value: 'append'},
+     {label: 'after()', value: 'after'},
+     {label: 'before()', value: 'before'},
    ];
   
     // Tabs

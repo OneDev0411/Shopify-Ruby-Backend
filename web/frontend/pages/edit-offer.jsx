@@ -157,6 +157,12 @@ export default function EditPage() {
                 if (data.redirect_to) {
                     redirect.dispatch(Redirect.Action.APP, data.redirect_to);
                 }
+                if(Object.keys(data.shop_settings.css_options.main).length == 0) {
+                    data.shop_settings.css_options.main.color = "#2B3D51";
+                    data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
+                    data.shop_settings.css_options.button.color = "#FFFFFF";
+                    data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
+                }
                 setShop(data.shop_settings);
             })
             .catch((error) => {   
@@ -214,6 +220,12 @@ export default function EditPage() {
             .then( (data) => {
                 if (data.redirect_to) {
                     redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                }
+                if(Object.keys(data.shop_settings.css_options.main).length == 0) {
+                    data.shop_settings.css_options.main.color = "#2B3D51";
+                    data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
+                    data.shop_settings.css_options.button.color = "#FFFFFF";
+                    data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
                 }
                 setShop(data.shop_settings);
             })
@@ -532,7 +544,7 @@ export default function EditPage() {
     }
 
     return (
-        <div style={{ overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', }}>
+        <div className="edit-offer" style={{ overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', }}>
             {isLoading ? (
                 <Spinner size="large" color="teal"/>
             )   :   (
