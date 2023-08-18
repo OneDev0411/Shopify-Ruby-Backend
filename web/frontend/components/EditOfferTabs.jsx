@@ -2213,10 +2213,10 @@ export function FourthTab(props) {
     const handleOfferCss = useCallback((newValue) => props.updateShop(newValue, "offer_css"), []);
 
     const options = [
-        {label: 'Prepend', value: 'prepend'},
-        {label: 'Append', value: 'append'},
-        {label: 'Before', value: 'before'},
-        {label: 'After', value: 'after'},
+        {label: 'prepend()', value: 'prepend'},
+        {label: 'append()', value: 'append'},
+        {label: 'after()', value: 'after'},
+        {label: 'before()', value: 'before'}
     ];
 
     return (

@@ -159,7 +159,7 @@ export default function EditPage() {
                 }
                 if(Object.keys(data.shop_settings.css_options.main).length == 0) {
                     data.shop_settings.css_options.main.color = "#2B3D51";
-                    data.shop_settings.css_options.main.backgroundColor = "#ECF0F1";
+                    data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
                     data.shop_settings.css_options.button.color = "#FFFFFF";
                     data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
                 }
@@ -223,7 +223,7 @@ export default function EditPage() {
                 }
                 if(Object.keys(data.shop_settings.css_options.main).length == 0) {
                     data.shop_settings.css_options.main.color = "#2B3D51";
-                    data.shop_settings.css_options.main.backgroundColor = "#ECF0F1";
+                    data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
                     data.shop_settings.css_options.button.color = "#FFFFFF";
                     data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
                 }
