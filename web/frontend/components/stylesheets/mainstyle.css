@@ -47,6 +47,10 @@ h1{
     max-width: 100px;
 }
 
+.edit-offer #appearance input[type=number]{
+    max-width: unset;
+}
+
 .flex-tab{
     position: relative;
     display: flex;

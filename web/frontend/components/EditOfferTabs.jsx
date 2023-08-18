@@ -164,7 +164,6 @@ export function EditOfferTabs(props) {
 
     //Called when "select product manually button clicked"
     function getProducts() {
-        debugger;
         setResourceListLoading(true);
         fetch(`/api/merchant/element_search`, {
             method: 'POST',
@@ -175,7 +174,6 @@ export function EditOfferTabs(props) {
         })
             .then((response) => { return response.json() })
             .then((data) => {
-                debugger;
                 for (var i = 0; i < data.length; i++) {
                     if (!Object.keys(props.offer.included_variants).includes(data[i].id.toString())) {
                         data[i].variants = [];
@@ -193,7 +191,6 @@ export function EditOfferTabs(props) {
 
     //Called when the save button of popup modal is clicked
     function updateProducts() {
-        debugger;
         if (selectedProducts.length == 0) {
             props.updateOffer("included_variants", {});
             setProductData("");
@@ -212,7 +209,6 @@ export function EditOfferTabs(props) {
             })
                 .then((response) => { return response.json() })
                 .then((data) => {
-                    debugger;
                     data.available_json_variants = data.available_json_variants.filter((o) => props.offer.included_variants[data.id].includes(o.id))
                     props.updateProductsOfOffer(data);
                     if (responseCount == 0) {
@@ -2107,7 +2103,7 @@ export function ThirdTab(props) {
                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                             expandOnPrint
                         >
-                            <br /><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main.backgroundColor} />
+                            <br /><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main?.backgroundColor} />
                             {/*<br/><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main.backgroundColor} />*/}
                         </Collapsible>
                     </Stack>
@@ -2216,20 +2212,45 @@ export function FourthTab(props) {
     const handleAjaxRefreshCode = useCallback((newValue) => props.updateShop(newValue, "ajax_refresh_code"), []);
     const handleOfferCss = useCallback((newValue) => props.updateShop(newValue, "offer_css"), []);
 
+    const options = [
+        {label: 'Prepend', value: 'prepend'},
+        {label: 'Append', value: 'append'},
+        {label: 'Before', value: 'before'},
+        {label: 'After', value: 'after'},
+    ];
+
     return (
         <>
             <LegacyCard sectioned title="Offer placement - advanced settings" actions={[{ content: 'View help doc' }]}>
                 <LegacyCard.Section title="Product page">
                     <TextField label="DOM Selector" value={props.shop.custom_product_page_dom_selector} onChange={handleProductDomSelector} type="text"></TextField>
-                    <TextField label="DOM Action" value={props.shop.custom_product_page_dom_action} onChange={handleProductDomAction}></TextField>
+                    <Select
+                        label="DOM action"
+                        id="productDomAction"
+                        options={options}
+                        onChange={handleProductDomAction}
+                        value={props.shop.custom_product_page_dom_action}
+                    />
                 </LegacyCard.Section>
                 <LegacyCard.Section title="Cart page">
                     <TextField label="DOM Selector" value={props.shop.custom_cart_page_dom_selector} onChange={handleCartDomSelector}></TextField>
-                    <TextField label="DOM Action" value={props.shop.custom_cart_page_dom_action} onChange={handleCartDomAction}></TextField>
+                    <Select
+                        label="DOM action"
+                        id="productDomAction"
+                        options={options}
+                        onChange={handleCartDomAction}
+                        value={props.shop.custom_cart_page_dom_action}
+                    />
                 </LegacyCard.Section>
                 <LegacyCard.Section title="AJAX/Slider cart">
                     <TextField label="DOM Selector" value={props.shop.custom_ajax_dom_selector} onChange={handleAjaxDomSelector}></TextField>
-                    <TextField label="DOM Action" value={props.shop.custom_ajax_dom_action} onChange={handleAjaxDomAction}></TextField>
+                    <Select
+                        label="DOM action"
+                        id="productDomAction"
+                        options={options}
+                        onChange={handleAjaxDomAction}
+                        value={props.shop.custom_ajax_dom_action}
+                    />
                     <TextField label="AJAX refresh code" value={props.shop.ajax_refresh_code} onChange={handleAjaxRefreshCode} multiline={6}></TextField>
                 </LegacyCard.Section>
                 <LegacyCard.Section title="Custom CSS">
