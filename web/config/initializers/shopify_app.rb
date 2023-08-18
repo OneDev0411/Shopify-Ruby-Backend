@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
 ShopifyApp.configure do |config|
-  config.webhooks = [
-    # After a store owner uninstalls your app, Shopify invokes the APP_UNINSTALLED webhook
-    # to let your app know.
-    { topic: 'app/uninstalled', address: 'api/webhooks/app_uninstalled' },
-  ]
   config.application_name = 'ICU and Cross-Sell App'
   config.old_secret = ''
   config.scope = 'read_orders,read_products,write_script_tags,read_themes' # See shopify.app.toml for scopes
@@ -62,42 +57,5 @@ Rails.application.config.after_initialize do
       user_agent_prefix: "ShopifyApp/#{ShopifyApp::VERSION}",
     )
 
-    add_gdpr_webhooks
-    ShopifyApp::WebhooksManager.add_registrations
   end
-end
-
-def add_gdpr_webhooks
-  gdpr_webhooks = [
-    # NOTE: To register the URLs for the three GDPR topics that follow, please set the appropriate
-    # webhook endpoint in the 'GDPR mandatory webhooks' section of 'App setup' in the Partners Dashboard.
-    # The code that processes these webhooks is located in the `app/jobs` directory.
-    #
-    # 48 hours after a store owner uninstalls your app, Shopify invokes this SHOP_REDACT webhook.
-    # https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks#shop-redact
-    { topic: 'shop/redact', address: 'api/webhooks/shop_redact' },
-
-    # Store owners can request that data is deleted on behalf of a customer. When this happens,
-    # Shopify invokes this CUSTOMERS_REDACT webhook to let your app know.
-    # https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks#customers-redact
-    { topic: 'customers/redact', address: 'api/webhooks/customers_redact' },
-
-    # Customers can request their data from a store owner. When this happens, Shopify invokes
-    # this CUSTOMERS_DATA_REQUEST webhook to let your app know.
-    # https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks#customers-data_request
-    { topic: 'customers/data_request', address: 'api/webhooks/customers_data_request' },
-    # { topic: 'app/uninstalled', address: 'api/webhooks/app_uninstalled', format: 'json' },
-    # { topic: 'orders/create',  address: 'api/webhooks/orders_create', format: 'json' },
-    # { topic: 'shop/update', address: 'api/webhooks/shop_update', format: 'json' },
-    # { topic: 'products/create', address: 'api/webhooks/products_create', format: 'json' },
-    # { topic: 'products/update', address: 'api/webhooks/products_update', format: 'json' },
-    # { topic: 'collections/create', address: 'api/webhooks/collections_create', format: 'json' },
-    # { topic: 'collections/update', address: 'api/webhooks/collections_update', format: 'json' }
-  ]
-
-  ShopifyApp.configuration.webhooks = if ShopifyApp.configuration.has_webhooks?
-                                        ShopifyApp.configuration.webhooks.concat(gdpr_webhooks)
-                                      else
-                                        gdpr_webhooks
-                                      end
 end

@@ -8,10 +8,8 @@ class RegisterWebhooksForActiveShops < ApplicationJob
   private
 
   def register_webhooks_for_active_shops
-    Shop.find_each do |shop|
-      if shop.shopify_token.present?  
-        ShopWorker::EnsureInCartUpsellWebhooksJob.perform_async(shop.id)
-      end
+    Shop.active.find_each do |shop|
+      ShopWorker::EnsureInCartUpsellWebhooksJob.perform_async(shop.id)
     end
   end
 end
