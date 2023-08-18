@@ -32,9 +32,10 @@ module Shopifable
   # Returns boolean.
   def async_setup
     fetch_shopify_settings
-    ShopWorker::EnsureInCartUpsellWebhooksJob.perform_async(id)
-    ShopWorker::CreateScriptTagJob.perform_async(id)
-    ShopWorker::FetchOrdersJob.perform_async(id)
+    Sidekiq::Client.push('class' => 'ShopWorker::EnsureInCartUpsellWebhooksJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i)
+    Sidekiq::Client.push('class' => 'ShopWorker::CreateScriptTagJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i)
+    Sidekiq::Client.push('class' => 'ShopWorker::FetchOrdersJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i)
+
   end
 
   # Public: Updates our DB shop data with the Shopify's info.
@@ -372,7 +373,7 @@ module Shopifable
 
   def async_refresh_sales_intelligence
     self.companions_status = 'pending'
-    j = ShopWorker::RefreshSalesIntelligenceJob.perform_async(id)
+    j = Sidekiq::Client.push('class' => 'ShopWorker::RefreshSalesIntelligenceJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i)
     PendingJob.create(shop_id: id, sidekiq_id: j, description: 'refreshsalesintel')
   end
 
@@ -405,7 +406,7 @@ module Shopifable
 
   # Public. Refresh all the inventory
   def async_check_offerable_inventory
-    j = ShopWorker::CheckOfferableStatusJob.perform_async(id)
+    j = Sidekiq::Client.push('class' => 'ShopWorker::CheckOfferableStatusJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i)
     PendingJob.create(shop_id: id, sidekiq_id: j, description: 'inventorysync')
   end
 
@@ -631,7 +632,7 @@ module Shopifable
     rescue StandardError => error
       Rollbar.error('Error while creating script tag', error)
       Rails.logger.info("Enqueuing to ShopWorker::CreateScriptTagJob for shop # #{self.id} : #{self.shopify_domain}")
-      ShopWorker::CreateScriptTagJob.perform_async(self.id)
+      Sidekiq::Client.push('class' => 'ShopWorker::CreateScriptTagJob', 'args' => [self.id], 'queue' => 'default', 'at' => Time.now.to_i)
     end
    
     update_column(soft_purge_only, opts[:soft_purge_only]) if opts[:soft_purge_only]

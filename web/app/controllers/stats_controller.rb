@@ -14,9 +14,9 @@ class StatsController < ApplicationController
                  cart_token: offer_params['cart_token'],
                  variant_id: offer_params['selectedShopifyVariant'] }
 
-    ShopWorker::SaveOfferStatJob.perform_async(new_stat)
+    Sidekiq::Client.push('class' => 'ShopWorker::SaveOfferStatJob', 'args' => [new_stat], 'queue' => 'stats', 'at' => Time.now.to_i)
     if offer_params['action'] == 'click' && offer_params['cart_token'].present?
-      ShopWorker::SaveOfferEventJob.perform_async(offer_params)
+      Sidekiq::Client.push('class' => 'ShopWorker::SaveOfferEventJob', 'args' => [offer_params], 'queue' => 'stats', 'at' => Time.now.to_i)
     end
 
     render json: { message: 'OK', error: false }
