@@ -43,32 +43,28 @@ module Shopifable
   # Returns boolean.
   def fetch_shopify_settings
     activate_session
-    begin
-      shop = ShopifyAPI::Shop.all[0]
-      self.name = shop.name
-      self.shopify_id = shop.id
-      self.email = shop.email
-      self.timezone = shop.timezone
-      self.iana_timezone = shop.iana_timezone
-      self.money_format = shop.money_format
-      self.currency = shop.currency
-      self.phone_number = shop.phone if shop.phone.present?
-      if self.shopify_plan_name != shop.plan_display_name
-        ShopEvent.create(shop_id: id, title: 'Shopify Plan Changed',
-                         body: "From #{shopify_plan_name}
- (#{shopify_plan_internal_name}) to #{shop.plan_display_name} (#{shop.plan_name})", revenue_impact: 0)
-      end
-      self.shopify_plan_name = shop.plan_display_name
-      self.shopify_plan_internal_name = shop.plan_name
-      self.enabled_presentment_currencies = shop.enabled_presentment_currencies
-      self.default_presentment_currency = shop.currency
-      self.custom_domain = shop.domain  # Our offers only work on this domain btw
-      self.opened_at = shop.created_at
-
-      save
-    rescue StandardError => e
-      return false
+    shop = ShopifyAPI::Shop.all[0]
+    self.name = shop.name
+    self.shopify_id = shop.id
+    self.email = shop.email
+    self.timezone = shop.timezone
+    self.iana_timezone = shop.iana_timezone
+    self.money_format = shop.money_format
+    self.currency = shop.currency
+    self.phone_number = shop.phone if shop.phone.present?
+    if self.shopify_plan_name != shop.plan_display_name
+      ShopEvent.create(shop_id: id, title: 'Shopify Plan Changed',
+                       body: "From #{shopify_plan_name} (#{shopify_plan_internal_name}) to #{shop.plan_display_name} (#{shop.plan_name})",
+                       revenue_impact: 0)
     end
+    self.shopify_plan_name = shop.plan_display_name
+    self.shopify_plan_internal_name = shop.plan_name
+    self.enabled_presentment_currencies = shop.enabled_presentment_currencies
+    self.default_presentment_currency = shop.currency
+    self.custom_domain = shop.domain  # Our offers only work on this domain btw
+    self.opened_at = shop.created_at
+
+    save
   end
 
   # Public. Calculate a prorated usage charge based on what portion of the month
