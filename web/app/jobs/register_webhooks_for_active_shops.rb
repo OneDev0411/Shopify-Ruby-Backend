@@ -9,8 +9,8 @@ class RegisterWebhooksForActiveShops < ApplicationJob
 
   def register_webhooks_for_active_shops
     Shop.find_each do |shop|
-      if shop.shopify_token.present?  
-        ShopWorker::EnsureInCartUpsellWebhooksJob.perform_async(shop.id)
+      if shop.shopify_token.present?
+        Sidekiq::Client.push('class' => 'ShopWorker::EnsureInCartUpsellWebhooksJob', 'args' => [shop.id], 'queue' => 'default', 'at' => Time.now.to_i)
       end
     end
   end

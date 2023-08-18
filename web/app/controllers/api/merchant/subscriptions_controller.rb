@@ -63,7 +63,7 @@ module Api
                 @subscription.update_attribute(:bill_on, @subscription.days_remaining_in_trial.days.from_now)
               else
                 # Charge 1 hour from now, to guard against quick install/uninstall
-                ShopWorker::AddInitialChargeToSubscriptionJob.perform_in(1.hour, @subscription.id)
+                Sidekiq::Client.push('class' => 'ShopWorker::AddInitialChargeToSubscriptionJob', 'args' => [@subscription.id], 'queue' => 'default', 'at' => (Time.now + 1.hour).to_i)
               end
             end
           else
