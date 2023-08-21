@@ -7,7 +7,7 @@ import { useState, useCallback, useEffect } from 'react';
 import React from 'react';
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 import { offerActivate, loadOfferDetails, getOfferSettings } from "../services/offers/actions/offer";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from "react-redux";
 import { OfferPreview } from "../components/OfferPreview";
 import { useAppBridge } from '@shopify/app-bridge-react'
@@ -19,6 +19,7 @@ export default function EditPage() {
     const app = useAppBridge();
 
     // Content section tab data
+    const navigateTo = useNavigate();
     const location = useLocation();
     const [selected, setSelected] = useState(0);
     const handleTabChange = useCallback(
@@ -181,7 +182,9 @@ export default function EditPage() {
             .then( (response) => { return response.json() })
             .then( (data) => {
                 setInitialVariants({...data.included_variants});
-                updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0].title));
+                if(data.offerable_product_details.length > 0) {
+                    updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
+                }
                 updateCheckKeysValidity('cta', data.cta_a);
                 for(var i=0; i<data.offerable_product_details.length; i++) {
                     data.offerable_product_details[i].preview_mode = true;
@@ -356,7 +359,7 @@ export default function EditPage() {
         setOpenAutopilotSection(value);
     }
 
-    function save(status) {
+    const save = async(status) =>  {
         var ots = {
             active: status,
             checkout_after_accepted: offer.checkout_after_accepted,
@@ -413,46 +416,43 @@ export default function EditPage() {
         }
         setIsLoading(true);
         if(location.state != null && location.state?.offerID == null) {
-            fetch(`/api/offers/create/${shop?.shop_id}`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({offer: ots})
-            })
-            .then( (response) => { return response.json(); })
-            .then( (data) => {
-                setOffer(data.offer);
-                location.state.offerID = data.offer.id;
+            try {
+                const response = await fetch(`/api/offers/create/${shop?.shop_id}`, {
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({offer: ots})
+                });
+                const responseData = await response.json();
+                setOffer(responseData.offer);
+                location.state.offerID = responseData.offer.id;
                 setIsLoading(false);
-            })
-            .catch((error) => {
-            })
-            // offerUpdate(fetch, offer.id, shopId, ots);
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
         else {
-            fetch(`/api/offers/${offer.id}/update/${shop.shop_id}`, {
-                method: 'PATCH',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({offer: ots, shop: shopAndHost.shop, host: shopAndHost.host}),
-            })
-            .then( (response) => { return response.json(); })
-            .then( (data) => {
-                data.text = data.text_a.replace("{{ product_title }}", data.offerable_product_details[0].title)
-                data.cta = data.cta_a;
-                for(var i=0; i<data.offer.offerable_product_details.length; i++) {
-                    data.offer.offerable_product_details[i].preview_mode = true;
+            try {
+                const response = await fetch(`/api/offers/${offer.id}/update/${shop.shop_id}`, {
+                    method: 'PATCH',
+                    headers: {
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({offer: ots, shop: shopAndHost.shop, host: shopAndHost.host})
+                });
+                const responseData = await response.json();
+                responseData.text = responseData.text_a.replace("{{ product_title }}", responseData.offerable_product_details[0].title)
+                responseData.cta = responseData.cta_a;
+                for(var i=0; i<responseData.offer.offerable_product_details.length; i++) {
+                    responseData.offer.offerable_product_details[i].preview_mode = true;
                 }
-                setOffer(data.offer);
+                setOffer(responseData.offer);
                 setIsLoading(false);
-            })
-            .catch((error) => {
-            })
-            // offerUpdate(fetch, offer.id, shopId, ots);
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
-
         fetch('/api/merchant/update_shop_settings', {
              method: 'PATCH',
                 headers: {
@@ -460,16 +460,17 @@ export default function EditPage() {
                 },
                 body: JSON.stringify( {shop_attr: shop, shop: shopAndHost.shop, admin: shop.admin, json: true }),
             })
-            .then( (response) => { return response.json(); })
-            .then( (data) => {
-                setShop(data.shop);
-                setIsLoading(false);
-            })
-            .catch((error) => {
-            })
+        .then( (response) => { return response.json(); })
+        .then( (data) => {
+            setShop(data.shop);
+            setIsLoading(false);
+        })
+        .catch((error) => {
+        })
+        navigateTo('/offer');
     }
 
-    function saveDraft(){
+    function saveDraft() {
         save(false);
     }
 
@@ -535,7 +536,7 @@ export default function EditPage() {
         }
     ];
 
-    async function publishOffer() {
+    function publishOffer() {
         save(true);
     };
 
@@ -581,7 +582,7 @@ export default function EditPage() {
                                 : "" }
                                 {selected == 3 ?
                                     // page was imported from components folder
-                                    <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings}/>
+                                    <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings} saveDraft={saveDraft} publishOffer={publishOffer}/>
                                 : "" }
                             </Tabs>
                         </Layout.Section>
