@@ -462,7 +462,7 @@ export function EditOfferTabs(props) {
                 <LegacyCard title="Text" sectioned >
                     <LegacyCard.Section>
                         <LegacyStack spacing="loose" vertical>
-                            {(props.offer.id != props.autopilotCheck?.autopilot_offer_id) && (
+                            {(props.offer.id == null || props.offer.id != props.autopilotCheck?.autopilot_offer_id) && (
                                 <>
                                 <TextField
                                     label="Offer title"
@@ -1948,15 +1948,15 @@ export function ThirdTab(props) {
     ];
 
     //Font weight
-    const handleFontWeight = useCallback((newValue) => {
-        props.updateShop(`${newValue}px`, "css_options", "text", "fontWeightInPixel");
-        if (parseInt(newValue) > 400 && props.shop.css_options.text.fontWeight != "bold") {
-            props.updateShop("bold", "css_options", "text", "fontWeight");
-        }
-        else if (parseInt(newValue) <= 400 && props.shop.css_options.text.fontWeight != "Normal" && props.shop.css_options.text.fontWeight != "inherit") {
-            props.updateShop("Normal", "css_options", "text", "fontWeight");
-        }
-    }, []);
+    // const handleFontWeight = useCallback((newValue) => {
+    //     props.updateShop(`${newValue}px`, "css_options", "text", "fontWeightInPixel");
+    //     if (parseInt(newValue) > 400 && props.shop.css_options.text.fontWeight != "bold") {
+    //         props.updateShop("bold", "css_options", "text", "fontWeight");
+    //     }
+    //     else if (parseInt(newValue) <= 400 && props.shop.css_options.text.fontWeight != "Normal" && props.shop.css_options.text.fontWeight != "inherit") {
+    //         props.updateShop("Normal", "css_options", "text", "fontWeight");
+    //     }
+    // }, []);
 
     //Font sizes
     const handleFontSize = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "text", "fontSize"), []);
@@ -1989,15 +1989,15 @@ export function ThirdTab(props) {
     ];
 
     //Button weight
-    const handleBtnWeight = useCallback((newValue) => {
-        props.updateShop(`${newValue}px`, "css_options", "button", "fontWeightInPixel");
-        if (parseInt(newValue) > 400 && props.shop.css_options.button.fontWeight != "bold") {
-            props.updateShop("bold", "css_options", "button", "fontWeight");
-        }
-        else if (parseInt(newValue) <= 400 && props.shop.css_options.button.fontWeight != "Normal" && props.shop.css_options.button.fontWeight != "inherit") {
-            props.updateShop("Normal", "css_options", "button", "fontWeight");
-        }
-    }, []);
+    // const handleBtnWeight = useCallback((newValue) => {
+    //     props.updateShop(`${newValue}px`, "css_options", "button", "fontWeightInPixel");
+    //     if (parseInt(newValue) > 400 && props.shop.css_options.button.fontWeight != "bold") {
+    //         props.updateShop("bold", "css_options", "button", "fontWeight");
+    //     }
+    //     else if (parseInt(newValue) <= 400 && props.shop.css_options.button.fontWeight != "Normal" && props.shop.css_options.button.fontWeight != "inherit") {
+    //         props.updateShop("Normal", "css_options", "button", "fontWeight");
+    //     }
+    // }, []);
 
     //Button size
     const handleBtnSize = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "button", "fontSize"), []);
@@ -2094,7 +2094,7 @@ export function ThirdTab(props) {
                             ariaExpanded={open}
                             ariaControls="basic-collapsible"
                         >Manually select colors</Button>
-                        <Button primary>Choose template</Button>
+                        {/*<Button primary>Choose template</Button>*/}
                     </ButtonGroup>
                     <Stack vertical>
                         <Collapsible
@@ -2120,7 +2120,7 @@ export function ThirdTab(props) {
                                 value={props.shop.css_options.text.fontFamily}
                             />
                         </Grid.Cell>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Weight"
                                 type="number"
@@ -2129,7 +2129,7 @@ export function ThirdTab(props) {
                                 onChange={handleFontWeight}
                                 value={parseInt(props.shop.css_options.text.fontWeightInPixel)}
                             />
-                        </Grid.Cell>
+                        </Grid.Cell>*/}
                         <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Size"
@@ -2152,7 +2152,7 @@ export function ThirdTab(props) {
                                 value={props.shop.css_options.button.fontFamily}
                             />
                         </Grid.Cell>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Weight"
                                 type="number"
@@ -2161,7 +2161,7 @@ export function ThirdTab(props) {
                                 onChange={handleBtnWeight}
                                 value={parseInt(props.shop.css_options.button.fontWeightInPixel)}
                             />
-                        </Grid.Cell>
+                        </Grid.Cell>*/}
                         <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Size"
@@ -2268,8 +2268,8 @@ export function FourthTab(props) {
             <div className="space-4"></div>
             <LegacyStack distribution="center">
                 <ButtonGroup>
-                    <Button>Save draft</Button>
-                    <Button primary>Publish</Button>
+                    <Button onClick={() => props.saveDraft()}>Save Draft</Button>
+                    <Button primary onClick={() => props.publishOffer()}>Publish</Button>
                 </ButtonGroup>
             </LegacyStack>
             <div className="space-10"></div>
