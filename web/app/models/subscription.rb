@@ -303,7 +303,7 @@ class Subscription < ApplicationRecord
   end
 
   def async_update_offers_if_needed
-    ShopWorker::UpdateOffersIfNeededJob.perform_async(id) if self.id.present?
+    Sidekiq::Client.push('class' => 'ShopWorker::UpdateOffersIfNeededJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i) if self.id.present?
     if self.id.blank?
       Rollbar.error("Cant update offers - id is blank: #{id}")
     end

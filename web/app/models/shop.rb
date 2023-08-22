@@ -214,32 +214,32 @@ class Shop < ApplicationRecord
 
   # Public. DOM element to anchor the offer on the popup drawer
   def ajax_dom_selector
-    custom_ajax_dom_selector.present? ? custom_ajax_dom_selector : nil
+    custom_ajax_dom_selector.present? ? custom_ajax_dom_selector :  ".ajaxcart__row:first"
   end
 
   # Public. Where to put offer relative to the ajax_dom_selector: 'prepend', 'append', 'after' or 'before'
   def ajax_dom_action
-    custom_ajax_dom_action.present? ? custom_ajax_dom_action : nil
+    custom_ajax_dom_action.present? ? custom_ajax_dom_action : 'prepend'
   end
 
   # Public. DOM element to anchor the offer on the cart page
   def cart_page_dom_selector
-    custom_cart_page_dom_selector.present? ? custom_cart_page_dom_selector : nil
+    custom_cart_page_dom_selector.present? ? custom_cart_page_dom_selector : "form[action^='/cart']"
   end
 
   # Public. Where to put offer relative to the cart_page_dom_selector: 'prepend', 'append', 'after' or 'before'
   def cart_page_dom_action
-    custom_cart_page_dom_action.present? ? custom_cart_page_dom_action : nil
+    custom_cart_page_dom_action.present? ? custom_cart_page_dom_action : 'prepend'
   end
 
   # Public. DOM element to anchor the offer on the product page
   def product_page_dom_selector
-    custom_product_page_dom_selector.present? ? custom_product_page_dom_selector : nil
+    custom_product_page_dom_selector.present? ? custom_product_page_dom_selector : "[class*='description']"
   end
 
   # Public. Where to put offer relative to the product_page_dom_selector: 'prepend', 'append', 'after' or 'before'
   def product_page_dom_action
-    custom_product_page_dom_action.present? ? custom_product_page_dom_action : nil
+    custom_product_page_dom_action.present? ? custom_product_page_dom_action : 'after'
   end
 
   # Checkout page is for now deprecated

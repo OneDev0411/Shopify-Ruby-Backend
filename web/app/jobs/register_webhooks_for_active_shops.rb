@@ -9,7 +9,7 @@ class RegisterWebhooksForActiveShops < ApplicationJob
 
   def register_webhooks_for_active_shops
     Shop.active.find_each do |shop|
-      ShopWorker::EnsureInCartUpsellWebhooksJob.perform_async(shop.id)
+      Sidekiq::Client.push('class' => 'ShopWorker::EnsureInCartUpsellWebhooksJob', 'args' => [shop.id], 'queue' => 'default', 'at' => Time.now.to_i)
     end
   end
 end

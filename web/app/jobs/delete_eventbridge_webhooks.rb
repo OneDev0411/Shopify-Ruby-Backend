@@ -11,7 +11,7 @@ class DeleteEventbridgeWebhooks < ApplicationJob
     Shop.find_each do |shop|
       begin
         if shop.shopify_token.present?  
-          ShopWorker::DeleteInCartUpsellEventbridgeWebhooksJob.perform_async(shop.id)
+          Sidekiq::Client.push('class' => 'ShopWorker::DeleteInCartUpsellEventbridgeWebhooksJob', 'args' => [shop.id], 'queue' => 'default', 'at' => Time.now.to_i)
         end
       rescue Exception => e
         Rollbar.error('Error while deleting webhooks', e)

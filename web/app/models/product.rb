@@ -214,7 +214,7 @@ class Product < ApplicationRecord
     begin
       self.update_from_shopify_new
     rescue ActiveResource::ClientError => e
-      ShopWorker::UpdateProductJob.perform_async(id)
+      Sidekiq::Client.push('class' => 'ShopWorker::UpdateProductJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i)
     end
   end
 

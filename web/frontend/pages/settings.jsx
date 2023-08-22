@@ -33,12 +33,12 @@ export default function Settings() {
                 }
                 setCurrentShop(data.shop_settings);
                 setFormData({
-                    productDomSelector: data.shop_settings?.custom_product_page_dom_selector || "[class*='description']",
-                    productDomAction: data.shop_settings?.custom_product_page_dom_action || 'prepend',
-                    cartDomSelector: data.shop_settings?.custom_cart_page_dom_selector || "form[action^='/cart']",
-                    cartDomAction: data.shop_settings?.custom_cart_page_dom_action || 'prepend',
-                    ajaxDomSelector: data.shop_settings?.custom_ajax_dom_selector || ".ajaxcart__row:first",
-                    ajaxDomAction: data.shop_settings?.custom_ajax_dom_action || 'prepend',
+                    productDomSelector: data.shop_settings?.custom_product_page_dom_selector,
+                    productDomAction: data.shop_settings?.custom_product_page_dom_action,
+                    cartDomSelector: data.shop_settings?.custom_cart_page_dom_selector,
+                    cartDomAction: data.shop_settings?.custom_cart_page_dom_action,
+                    ajaxDomSelector: data.shop_settings?.custom_ajax_dom_selector,
+                    ajaxDomAction: data.shop_settings?.custom_ajax_dom_action,
                 })
             })
             .catch((error) => {
