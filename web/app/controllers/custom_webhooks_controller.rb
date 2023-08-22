@@ -5,8 +5,6 @@
 
 class CustomWebhooksController < ApplicationController
   include ShopifyApp::WebhookVerification
-  skip_before_action :set_host
-  skip_before_action :set_shopify_api_key
 
   # before_action :verify_webhook
 
