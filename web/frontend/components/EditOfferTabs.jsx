@@ -1317,6 +1317,8 @@ export function SecondTab(props) {
         }
     });
 
+
+    // Called on clickedImages that opened after checking Use Template checkbox
     const handleImageClick = useCallback((pageName, clickedImageNum) => {
         if(pageName === 'product_page') {
             const newArray = [...productIsClicked];
@@ -1336,7 +1338,7 @@ export function SecondTab(props) {
             newArray[clickedImageNum-1] = true;
             setCartIsClicked(newArray);
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_selector[clickedImageNum-1], "custom_cart_page_dom_selector");
-            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_action[clickedImageNum-1], "custom_product_page_dom_action");
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_action[clickedImageNum-1], "custom_cart_page_dom_action");
         }
         else if(pageName === 'ajax_cart') {
             const newArray = [...ajaxIsClicked];
@@ -1366,7 +1368,7 @@ export function SecondTab(props) {
             newArray[clickedImageNum-1] = true;
             setCartIsClicked(newArray);
             props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_selector[clickedImageNum-1], "custom_cart_page_dom_selector");
-            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_action[clickedImageNum-1], "custom_product_page_dom_action");
+            props.updateShop(useTemplatesToDisplayOffer[props.shopifyThemeName].cart_page_action[clickedImageNum-1], "custom_cart_page_dom_action");
         }
         else if(props.offer.in_ajax_cart) {
             const newArray = [...ajaxIsClicked];
