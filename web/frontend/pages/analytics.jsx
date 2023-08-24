@@ -55,54 +55,6 @@ export default function AnalyticsOffers() {
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
             <OrderOverTimeData/>
           </Grid.Cell>
-          {/* A/B testing report */}
-          <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <LegacyCard title="A/B testing" sectioned>
-              <h3 className="report-money"><strong>$0.00</strong></h3>
-              <div className="space-4"></div>
-              <p>SALES OVER TIME</p>
-              <br/>
-              <p>placeholder for AbTestingData component</p>
-            </LegacyCard>
-            <div className={'space-4'}></div>
-            <LegacyStack distribution="center">
-              <Button>Select offer to compare</Button>
-          </LegacyStack>
-          </Grid.Cell>
-          {/*Click through rate*/}
-          <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <LegacyCard title="Click through rate" sectioned>
-              <h3 className="report-money"><strong>0</strong></h3>
-              <div className="space-4"></div>
-              <p>CLICK THROUGH RATE</p>
-              <br/>
-              <p>placeholder for ClickThroughtRateData component</p>
-            </LegacyCard>
-          </Grid.Cell>
-          {/* top performing offers */}
-          <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <LegacyCard title="Top performing offers" sectioned>
-              <h3 className="report-money"><strong>0</strong></h3>
-              <div className="space-4"></div>
-              <LegacyStack distribution='equalSpacing'>
-                <LegacyStack.Item>
-                  <p><strong>Offer name</strong></p>
-                  <p><strong>Offer name</strong></p>
-                  <p><strong>Offer name</strong></p>
-                  <p><strong>Offer name</strong></p>
-                  <p><strong>Offer name</strong></p>
-                  <p><strong>Offer name</strong></p>
-                </LegacyStack.Item>
-                <LegacyStack.Item>
-                  <Image 
-                    source={"./assets/Analytics.png"}
-                    width={"150px"}
-                    max-Width={"150px"}
-                  />
-                </LegacyStack.Item>
-              </LegacyStack>
-            </LegacyCard>
-          </Grid.Cell>
         </Grid>
         </div>
         <div className='space-10'></div>
