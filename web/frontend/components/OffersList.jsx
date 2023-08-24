@@ -10,7 +10,7 @@ import {
   FooterHelp,
   Pagination,
   Select,
-  LegacyCard, LegacyStack, Image, VerticalStack, Text, ButtonGroup, MediaCard, VideoThumbnail
+  LegacyCard, LegacyStack, Image, VerticalStack, Text, ButtonGroup, MediaCard, VideoThumbnail, Layout
 } from '@shopify/polaris';
 
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -297,7 +297,7 @@ export function OffersList(props) {
   }
 
   return (
-    <Page>
+    <div>
       { offersData.length === 0 ?
         <CreateOfferCard />
         :
@@ -363,13 +363,7 @@ export function OffersList(props) {
         </>
       }
       <div className="space-10"></div>
-      <FooterHelp>
-        Learn more about{' '}
-        <Link url="#">
-          Offers
-        </Link>
-      </FooterHelp><div> </div>
-    </Page>
+    </div>
   );
 
   function disambiguateLabel(key, value) {

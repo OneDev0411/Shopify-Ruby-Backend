@@ -120,7 +120,7 @@ export default function Settings() {
     return (
         <>
             <Page>
-                <GenericTitleBar title='Settings' image={SettingsMajor} buttonText='Save' handleButtonClick={handleSave} />
+                <GenericTitleBar title='Settings' icon={SettingsMajor} buttonText='Save' handleButtonClick={handleSave} />
                 <LegacyCard sectioned>
                     {(currentShop?.activated) ? (
                         <Grid>
