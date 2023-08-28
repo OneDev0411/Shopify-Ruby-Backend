@@ -77,7 +77,6 @@ import {
         {hasOffers ? <GenericTitleBar icon={AddProductMajor} title='Offers' buttonText='Create offer' handleButtonClick={handleOpenOfferPage} /> : null}
         <OffersList></OffersList>
         <div className="space-10"></div>
-        {hasOffers ? <GenericFooter text='Learn more about ' linkUrl='#' linkText='offers'></GenericFooter> : null}
       </Page>
     );
   }

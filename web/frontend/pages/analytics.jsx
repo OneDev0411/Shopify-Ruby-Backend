@@ -107,7 +107,6 @@ export default function AnalyticsOffers() {
         </Grid>
         </div>
         <div className='space-10'></div>
-        <GenericFooter text='Learn more about ' linkUrl='#' linkText='analytics'></GenericFooter>
       </Page>
     );
   }
