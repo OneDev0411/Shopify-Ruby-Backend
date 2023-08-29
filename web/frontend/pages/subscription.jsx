@@ -79,7 +79,7 @@ export default function Subscription() {
     
   return (
     <Page>
-        <GenericTitleBar title='Billing' image={BillingStatementDollarMajor}/>
+        <GenericTitleBar title='Billing' icon={BillingStatementDollarMajor}/>
         <div className="auto-height">
             <Layout>
                 <Layout.Section>

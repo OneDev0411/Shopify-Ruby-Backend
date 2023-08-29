@@ -1,9 +1,12 @@
-import {Link,Icon,Modal, Button, MediaCard, VideoThumbnail,Card, Page, Layout, Image, Stack, Grid, List} from "@shopify/polaris";
+import {Link,Icon,Modal, MediaCard, VideoThumbnail, LegacyCard, Page, Layout, Image, LegacyStack, Grid, List} from "@shopify/polaris";
 import {helpImage} from "../assets";
 import {HintMajor,TroubleshootMajor} from '@shopify/polaris-icons';
-import { TitleBar } from "@shopify/app-bridge-react";
 import {useRef, useState, useCallback} from 'react';
 import "../components/stylesheets/mainstyle.css";
+import { GenericTitleBar } from "../components";
+import {
+    QuestionMarkMinor
+  } from '@shopify/polaris-icons';
 
 export default function HelpPage() {
     const [active, setActive] = useState(false);
@@ -21,19 +24,17 @@ export default function HelpPage() {
 
   return (
     <Page>
-        <TitleBar
-            title="Help"
-        /> 
+      <GenericTitleBar title='Help' icon={QuestionMarkMinor} />
       <Layout>
             <Layout.Section>
                 {/* card for image and text */}
-                <Card title={
-                    <Stack>
+                <LegacyCard title={
+                    <LegacyStack>
                         <Icon source={HintMajor} />
                         <p variant="headingXs" as="h3">
                            <strong>Here is a list of relevant articles you may find helpful</strong> 
                         </p>
-                    </Stack>
+                    </LegacyStack>
                     } sectioned>
                     <p>There are more help articles in our <Link url="https://help.incartupsell.com/en/collections/3263755-all" external>Help Docs</Link> page</p>
                     <div className="space-4"></div>
@@ -61,16 +62,16 @@ export default function HelpPage() {
                             />
                         </Grid.Cell>
                     </Grid>
-                </Card>
+                </LegacyCard>
                 {/* Second section with video */}
-                <Card 
+                <LegacyCard 
                     title={
-                        <Stack>
+                        <LegacyStack>
                             <Icon source={TroubleshootMajor} />
                             <p variant="headingXs" as="h3">
                                <strong>Setup videos</strong>
                             </p>
-                        </Stack>
+                        </LegacyStack>
                     } sectioned
                 >
                 <Grid>
@@ -96,7 +97,7 @@ export default function HelpPage() {
                             
                     </Grid.Cell>
                 </Grid>  
-                </Card>
+                </LegacyCard>
                 
 
                 <Modal

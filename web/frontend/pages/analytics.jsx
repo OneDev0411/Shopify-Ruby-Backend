@@ -5,7 +5,10 @@ import "../components/stylesheets/mainstyle.css";
 import {useState, useCallback} from 'react';
 import React from 'react';
 import { GenericFooter } from '../components/GenericFooter';
-import { TotalSalesData, ConversionRate, OrderOverTimeData} from "../components";
+import { TotalSalesData, ConversionRate, OrderOverTimeData, GenericTitleBar} from "../components";
+import {
+  AnalyticsMinor
+} from '@shopify/polaris-icons';
   
 export default function AnalyticsOffers() { 
     const [active, setActive] = useState(false);
@@ -20,9 +23,7 @@ export default function AnalyticsOffers() {
 
     return (
       <Page> 
-        <TitleBar
-            title="Analytics"
-        /> 
+         <GenericTitleBar title='Analytics' icon={AnalyticsMinor} />  
         <div className="space-10"></div>
         <Popover
             active={active}
@@ -106,7 +107,6 @@ export default function AnalyticsOffers() {
         </Grid>
         </div>
         <div className='space-10'></div>
-        <GenericFooter text='Learn more about ' linkUrl='#' linkText='analytics'></GenericFooter>
       </Page>
     );
   }
