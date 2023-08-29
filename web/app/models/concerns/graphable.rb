@@ -101,7 +101,7 @@ module Graphable
     elsif (period=='weekly')
       created_from = Date.today-7.days
       interval = 2.days
-      last = created_from.end_of_week
+      last = created_from + 6.days
     elsif (period=='monthly')
       created_from = Date.today.beginning_of_month-1.month
       interval = 1.weeks
@@ -172,7 +172,7 @@ module Graphable
     elsif (period=='weekly')
       created_from = Date.today-7.days
       interval = 2.days
-      last = created_from.end_of_week
+      last = created_from + 6.days
     elsif (period=='monthly')
       created_from = Date.today.beginning_of_month-1.month
       interval = 1.weeks
@@ -232,7 +232,7 @@ module Graphable
     elsif (period=='weekly')
       created_from = Date.today-7.days
       interval = 2.days
-      last = created_from.end_of_week
+      last = created_from + 6.days
     elsif (period=='monthly')
       created_from = Date.today.beginning_of_month-1.month
       interval = 1.weeks
