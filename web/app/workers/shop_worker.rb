@@ -1,6 +1,15 @@
-# frozen_string_literal: true
-
 module ShopWorker
+
+  class ForcePurgeCacheJob
+    include Sidekiq::Worker
+    include Sidekiq::Status::Worker
+    sidekiq_options queue: 'shop', retry: 2
+    def perform(shop_id)
+      icushop = Shop.find_by(id: shop_id)
+      return if icushop.blank?
+      icushop.force_purge_cache
+    end
+  end
 
   class SaveOfferStatJob
     include Sidekiq::Worker
@@ -32,9 +41,12 @@ module ShopWorker
   class CheckOfferableStatusJob
     include Sidekiq::Worker
     def perform(shop_id)
-      icushop = Shop.find(shop_id)
+      icushop = Shop.find_by(id: shop_id)
+      return if icushop.blank?
       icushop.check_offerable_inventory
       PendingJob.find_by(shop_id: shop_id, sidekiq_id: self.jid).try(:destroy)
+      rescue ShopifyAPI::Errors::NoActiveSessionError => e
+        PendingJob.find_by(shop_id: shop_id, sidekiq_id: self.jid).try(:destroy)
     end
   end
 
@@ -42,6 +54,7 @@ module ShopWorker
     include Sidekiq::Worker
     def perform(shop_id)
       icushop = Shop.find_by(id: shop_id)
+      return if icushop.blank?
       icushop.fetch_data_on_companions
       PendingJob.find_by(shop_id: shop_id, sidekiq_id: self.jid).try(:destroy)
     end
@@ -50,7 +63,8 @@ module ShopWorker
   class EnableAutopilotJob
     include Sidekiq::Worker
     def perform(shop_id)
-      icushop = Shop.find(shop_id)
+      icushop = Shop.find_by(id: shop_id)
+      return if icushop.blank?
       icushop.setup_autopilot_first_time(jid)
     end
   end
@@ -58,7 +72,9 @@ module ShopWorker
   class FetchOrdersJob
     include Sidekiq::Worker
     def perform(shop_id)
-      Shop.find(shop_id).fetch_shopify_orders
+      icushop = Shop.find_by(id: shop_id)
+      return if icushop.blank?
+      icushop.fetch_shopify_orders
       PendingJob.find_by(shop_id: shop_id, sidekiq_id: self.jid).try(:destroy)
     end
   end
@@ -66,7 +82,8 @@ module ShopWorker
   class EnsureInCartUpsellWebhooksJob
     include Sidekiq::Worker
     def perform(shop_id)
-      icushop = Shop.find(shop_id)
+      icushop = Shop.find_by(id: shop_id)
+      return if icushop.blank?
       icushop.ensure_incartupsell_webhooks
       icushop.update_attribute(:script_tag_location, 'icu_webhooks')
     end
@@ -75,15 +92,19 @@ module ShopWorker
   class DeleteInCartUpsellEventbridgeWebhooksJob
     include Sidekiq::Worker
     def perform(shop_id)
-      icushop = Shop.find(shop_id)
+      icushop = Shop.find_by(id: shop_id)
+      return if icushop.blank?
       icushop.delete_webhooks
     end
   end
 
   class CreateScriptTagJob
     include Sidekiq::Worker
+    sidekiq_options queue: 'scripts'
+
     def perform(shop_id)
-      icushop = Shop.find(shop_id)
+      icushop = Shop.find_by(id: shop_id)
+      return if icushop.blank?
       icushop.create_script_tag if icushop.active? && icushop.shopify_token.present?
     end
   end
@@ -91,21 +112,27 @@ module ShopWorker
   class UpdateOffersIfNeededJob
     include Sidekiq::Worker
     def perform(subscription_id)
-      Subscription.find(subscription_id).update_offers_if_needed
+      subscription = Subscription.find_by(id: subscription_id)
+      return if subscription.blank?
+      subscription.update_offers_if_needed
     end
   end
 
   class UpdateCollectionJob
     include Sidekiq::Worker
     def perform(id)
-      Collection.find(id).update_from_shopify_new
+      collection = Collection.find_by(id: id)
+      return if collection.blank?
+      collection.update_from_shopify_new
     end
   end
 
   class UpdateProductJob
     include Sidekiq::Worker
     def perform(id)
-      Product.find(id).update_from_shopify_new
+      product = Product.find_by(id: id)
+      return if product.blank?
+      product.update_from_shopify_new
     end
   end
 
@@ -199,7 +226,8 @@ module ShopWorker
   class AddInitialChargeToSubscriptionJob
     include Sidekiq::Worker
     def perform(subscription_id)
-      sub = Subscription.find(subscription_id)
+      sub = Subscription.find_by(id: subscription_id)
+      return if sub.blank?
       return if sub.plan.try(:internal_name) != 'plan_based_billing'
 
       if sub.usage_charges.empty?
@@ -248,6 +276,18 @@ module ShopWorker
       shop.save
       shop.force_purge_cache if should_republish
       shop.fetch_shopify_settings # we are duplicating efforts and code here
+    end
+  end
+
+  class ForcePurgeCacheForRakeJob
+    include Sidekiq::Worker
+    sidekiq_options queue: 'shop'
+    def perform(shop_id)
+      shop = Shop.find_by(id: shop_id)
+      return if shop.blank?
+      shop.activate_session
+      shop.create_script_tag
+      shop.force_purge_cache
     end
   end
 end
