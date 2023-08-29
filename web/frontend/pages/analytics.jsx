@@ -1,4 +1,4 @@
-import {LegacyCard,Page,FooterHelp,Link,Grid,Popover, ActionList, Button,LegacyStack,Image} from '@shopify/polaris';
+import {LegacyCard,Page,FooterHelp,Link,Grid,Popover, ActionList, Button,LegacyStack,Image, Select} from '@shopify/polaris';
 import { TitleBar } from "@shopify/app-bridge-react";
 import {CalendarMinor} from '@shopify/polaris-icons';
 import "../components/stylesheets/mainstyle.css";
@@ -8,15 +8,20 @@ import { GenericFooter } from '../components/GenericFooter';
 import { TotalSalesData, ConversionRate, OrderOverTimeData} from "../components";
   
 export default function AnalyticsOffers() { 
-    const [active, setActive] = useState(false);
+    const [period, setPeriod] = useState('daily');
+    const setTimePeriod = useCallback((val) => {
+      setPeriod(val)
+    },[]);
 
-    const toggleActive = useCallback(() => setActive((active) => !active), []);
-  
-    const activator = (
-      <Button onClick={toggleActive} disclosure>
-        Today
-      </Button>
-    );
+    const options = [
+      {label: 'Today', value: 'daily'},
+      {label: 'Last week', value: 'weekly'},
+      {label: 'Last Month', value: 'monthly'},
+      {label: 'This 3 Months', value: '3-months'},
+      {label: 'This 6 Months', value: '6-months'},
+      {label: 'This year', value: 'yearly'},
+      {label: 'All time', value: 'all'},
+    ];
 
     return (
       <Page> 
@@ -24,36 +29,27 @@ export default function AnalyticsOffers() {
             title="Analytics"
         /> 
         <div className="space-10"></div>
-        <Popover
-            active={active}
-            activator={activator}
-            autofocusTarget="first-node"
-            onClose={toggleActive}
-        >
-            <ActionList
-            actionRole="menuitem"
-            items={[
-                {content: 'Today', icon: CalendarMinor},
-                {content: 'Last week', icon: CalendarMinor},
-                {content: 'Last Month', icon: CalendarMinor},
-                {content: 'This 3 Months', icon: CalendarMinor},
-                {content: 'This 6 Months', icon: CalendarMinor},
-                {content: 'This year', icon: CalendarMinor},
-                {content: 'All time', icon: CalendarMinor},
-            ]}
+        <Grid>
+          <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
+            <Select
+              label="Date range"
+              options={options}
+              onChange={setTimePeriod}
+              value={period}
             />
-        </Popover>
+          </Grid.Cell>
+        </Grid>
         <div className="space-10"></div>
         <div id={"graphs"}>
         <Grid>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <TotalSalesData/>
+            <TotalSalesData period={period}/>
           </Grid.Cell>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <ConversionRate/>
+            <ConversionRate period={period}/>
           </Grid.Cell>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <OrderOverTimeData/>
+            <OrderOverTimeData period={period}/>
           </Grid.Cell>
           {/* A/B testing report */}
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>

@@ -129,7 +129,7 @@ module Api
     # Gets all Shops. POST  /api/merchant/shops_last_stats
     def shop_offers_stats
       begin
-        @offers_stats = @icushop.recent_stats
+        @offers_stats = @icushop.offers_stats(params[:period])
         render "shops/shop_offers_stats"
       rescue StandardError => e
         Rails.logger.debug "Error Message: #{e.message}"
