@@ -564,6 +564,19 @@ export function EditOfferTabs(props) {
                                 checked={props.offer.discount_target_type == "code"}
                                 onChange={handleDiscountChange}
                             />
+                            {props.offer.discount_target_type == "code" ? ( 
+                            <>
+                                <TextField
+                                    label="Discount Code"
+                                    value={props.offer.discount_code}
+                                    onChange={handleDiscountCodeChange}
+                                    autoComplete="off"
+                                />
+                                <p>Make sure you have already set up this discount code in your <Link to={`https://admin.shopify.com/store/${shopAndHost.shop.replace(/\.myshopify\.com$/, '')}/discounts`} target="blank">discount code</Link> section.
+                                    The discount will apply automatically at checkout
+                                </p>
+                            </>
+                            ) : null}
                             <Checkbox id={"removeQtySelector"}
                                 checked={!props.offer.show_quantity_selector}
                                 onChange={handleQtySelectorChange}
@@ -573,6 +586,11 @@ export function EditOfferTabs(props) {
                                 checked={props.offer.show_custom_field}
                                 onChange={handleCustomTextChange}
                                 label="Add custom textbox"
+                            />
+                            <Checkbox id={"showNoThanks"}
+                                checked={!props.offer.show_nothanks}
+                                onChange={handleShowNoThanksChange}
+                                label="Customer can't dismiss offer"
                             />
                         </LegacyStack>
                     </LegacyCard.Section>
