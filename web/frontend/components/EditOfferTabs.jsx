@@ -353,7 +353,7 @@ export function EditOfferTabs(props) {
 
     useEffect(() => {
         if(publishButtonFuntional){
-            (props.offer.offerable_product_details.length > 0 && props.offer.title !== '') ? publishButtonFuntional(false) : publishButtonFuntional(true);
+            publishButtonFuntional(!(props.offer.offerable_product_details.length > 0 && props.offer.title !== ''))
           }
     }, [props.offer.offerable_product_details.length, props.offer.title]);
 
