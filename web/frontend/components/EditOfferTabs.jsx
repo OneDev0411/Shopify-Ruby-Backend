@@ -347,6 +347,16 @@ export function EditOfferTabs(props) {
         })
     }
 
+    const publishButtonFuntional =
+    props.enableOrDisablePublish &&
+    useCallback((newValue) => props.enableOrDisablePublish(newValue), []);
+
+    useEffect(() => {
+        if(publishButtonFuntional){
+            publishButtonFuntional(!(props.offer.offerable_product_details.length > 0 && props.offer.title !== ''))
+          }
+    }, [props.offer.offerable_product_details.length, props.offer.title]);
+
 
     //Collapsible controls
     const [open, setOpen] = useState(false);
@@ -2210,7 +2220,7 @@ export function ThirdTab(props) {
             <LegacyStack distribution="center">
                 <ButtonGroup>
                     <Button onClick={() => props.saveDraft()}>Save Draft</Button>
-                    <Button primary onClick={() => props.publishOffer()}>Publish</Button>
+                    <Button primary disabled={props.enablePublish} onClick={() => props.publishOffer()}>Publish</Button>
                 </ButtonGroup>
             </LegacyStack>
             <div className="space-10"></div>
@@ -2289,7 +2299,7 @@ export function FourthTab(props) {
             <LegacyStack distribution="center">
                 <ButtonGroup>
                     <Button onClick={() => props.saveDraft()}>Save Draft</Button>
-                    <Button primary onClick={() => props.publishOffer()}>Publish</Button>
+                    <Button primary disabled={props.enablePublish} onClick={() => props.publishOffer()}>Publish</Button>
                 </ButtonGroup>
             </LegacyStack>
             <div className="space-10"></div>

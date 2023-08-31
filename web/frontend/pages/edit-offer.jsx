@@ -15,6 +15,8 @@ import { Redirect } from '@shopify/app-bridge/actions';
 
 export default function EditPage() {
 
+    const [enablePublish, setEnablePublish] = useState(false)
+
     const shopAndHost = useSelector(state => state.shopAndHost);
     const app = useAppBridge();
 
@@ -548,6 +550,10 @@ export default function EditPage() {
         handleTabChange(selected + 1)
     }
 
+    const enableOrDisablePublish = (enable) => {
+        setEnablePublish(enable);
+      };
+
     return (
         <div className="edit-offer" style={{ overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', }}>
             {isLoading ? (
@@ -556,7 +562,7 @@ export default function EditPage() {
                 <Page
                     breadcrumbs={[{content: 'Products', url: '/'}]}
                     title="Create new offer"
-                    primaryAction={{content: 'Publish', disabled: false, onClick: publishOffer}}
+                    primaryAction={{content: 'Publish', disabled: enablePublish, onClick: publishOffer}}
                     secondaryActions={[{content: 'Save Draft', disabled: false, onAction: () => saveDraft()}]}
                     style={{ overflow: 'hidden' }}
                 >
@@ -574,7 +580,7 @@ export default function EditPage() {
 
                                 {selected == 0 ?
                                     // page was imported from components folder
-                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity} handleTabChange={changeTab} initialVariants={initialVariants} updateInitialVariants={updateInitialVariants} autopilotCheck={autopilotCheck} openAutopilotSection={openAutopilotSection} updateOpenAutopilotSection={updateOpenAutopilotSection} initialOfferableProductDetails={initialOfferableProductDetails}/>
+                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity} handleTabChange={changeTab} initialVariants={initialVariants} updateInitialVariants={updateInitialVariants} autopilotCheck={autopilotCheck} openAutopilotSection={openAutopilotSection} updateOpenAutopilotSection={updateOpenAutopilotSection} initialOfferableProductDetails={initialOfferableProductDetails} enableOrDisablePublish={enableOrDisablePublish}/>
                                 : "" }
                                 {selected == 1 ?
                                     // page was imported from components folder
@@ -582,11 +588,11 @@ export default function EditPage() {
                                 : "" }
                                 {selected == 2 ?
                                     // page was imported from components folder
-                                    <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} saveDraft={saveDraft} publishOffer={publishOffer} autopilotCheck={autopilotCheck}/>
+                                    <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} saveDraft={saveDraft} publishOffer={publishOffer} autopilotCheck={autopilotCheck} enablePublish={enablePublish}/>
                                 : "" }
                                 {selected == 3 ?
                                     // page was imported from components folder
-                                    <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings} saveDraft={saveDraft} publishOffer={publishOffer}/>
+                                    <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings} saveDraft={saveDraft} publishOffer={publishOffer} enablePublish={enablePublish}/>
                                 : "" }
                             </Tabs>
                         </Layout.Section>
