@@ -191,10 +191,18 @@ export function EditOfferTabs(props) {
 
     //Called when the save button of popup modal is clicked
     function updateProducts() {
+        var product_title_str = "Would you like to add a {{ product_title }}?";
+
         if (selectedProducts.length == 0) {
             props.updateOffer("included_variants", {});
             setProductData("");
-            props.updateCheckKeysValidity("text", "Would you like to add a {{ product_title }}?");
+            props.updateCheckKeysValidity("text", product_title_str);
+        } else if (selectedProducts.length > 1) {
+            props.updateCheckKeysValidity("text", "");
+            props.updateOffer("text_a", "");
+        } else if (selectedProducts.length <= 1) {
+            props.updateCheckKeysValidity("text", product_title_str);
+            props.updateOffer("text_a", product_title_str);
         }
         props.updateOffer("offerable_product_details", []);
         props.updateOffer("offerable_product_shopify_ids", []);
@@ -211,7 +219,7 @@ export function EditOfferTabs(props) {
                 .then((data) => {
                     data.available_json_variants = data.available_json_variants.filter((o) => props.offer.included_variants[data.id].includes(o.id))
                     props.updateProductsOfOffer(data);
-                    if (responseCount == 0) {
+                    if (responseCount == 0 && selectedProducts.length <= 1) {
                         props.updateCheckKeysValidity("text", props.offer.text_a.replace("{{ product_title }}", data.title));
                         props.updateCheckKeysValidity('cta', props.offer.cta_a);
                     }
