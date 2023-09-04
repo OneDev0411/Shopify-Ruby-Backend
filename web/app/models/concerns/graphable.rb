@@ -93,67 +93,150 @@ module Graphable
   end
 
   def sales_stats(period)
-    sales_value_first = []
-    sales_value_second = []
-    sales_value_third = []
-    sales_value_forth = []
+    results = []
 
-    if (period=='daily')
-      created_from = DateTime.now.beginning_of_day
-      interval = 6.hours
-      created_to = created_from + interval
-      last = created_from + 4*interval-1.second
-    elsif (period=='monthly')
-      created_from = Date.today.beginning_of_month
-      created_to = created_from + 6.days
-      interval = 1.weeks
-      last = created_from.end_of_month
-    elsif (period=='yearly')
-      created_from = Date.today.beginning_of_year
-      created_to = created_from + (3.months-1.days)
-      interval = 3.months
-      last = created_from.end_of_year
-    end
+    period_hash = {
+      'daily' => { interval: 6.hours, start_date: DateTime.now.beginning_of_day, last: DateTime.now.end_of_day },
+      'weekly' => { interval: 2.days, start_date: Date.today - 7.days, last: (Date.today - 1.day) },
+      'monthly' => { interval: 1.week, start_date: (Date.today.beginning_of_month - 1.month), last: (Date.today-1.months).end_of_month },
+      '3-months' => { interval: 1.month, start_date: (Date.today.beginning_of_month - 2.months), last: Date.today.end_of_month },
+      '6-months' => { interval: 2.months, start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
+      'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
+      'all' => { interval: 6.months, start_date: self.orders.present? ? self.orders.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
+    }
+    
+    i = 0
+    start_date = period_hash[period][:start_date]
+    last = period_hash[period][:last]
+    interval = period_hash[period][:interval]
 
-    offers.includes(:offer_events).each do |offer|
-      sales_value_first << offer.offer_events.where('action = ? and created_at >= ? and created_at < ?', "sale", created_from, created_to).sum(:amount)
-      sales_value_second << offer.offer_events.where('action = ? and created_at >= ? and created_at < ?', "sale", created_from + interval, created_to + interval).sum(:amount)
-      sales_value_third << offer.offer_events.where('action = ? and created_at >= ? and created_at < ?', "sale", created_from + 2*interval, created_to + 2*interval).sum(:amount)
-      sales_value_forth << offer.offer_events.where('action = ? and created_at >= ? and created_at < ?', "sale", created_from + 3*interval-(period=='daily'? (1.hours): 0), last).sum(:amount)
+    total = 0
+    while (start_date <= last) do
+      if (start_date + interval > last)
+        end_date = last
+      else
+        end_date = start_date + interval
+      end
+      label_hash = {
+        'daily' => ->(start_date, end_date) { "#{start_date.hour} - #{end_date.hour}" },
+        'weekly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
+        'monthly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
+        '3-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+        '6-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+        'yearly' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+        'all' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" }
+      }
+      results[i]
+      results[i] = {
+        key: label_hash[period].call(start_date, end_date),
+        value: 0
+      }
+      self.offers.includes(:offer_events).each do |offer|
+        stats = offer.offer_events.where('action = ? and created_at >= ? and created_at < ?', "sale", start_date, end_date).sum(:amount)
+        results[i][:value] += stats
+        total += stats
+      end
+      start_date = start_date + interval
+      i+=1;
     end
-    { "sales_value_first": sales_value_first.sum, "sales_value_second": sales_value_second.sum, "sales_value_third": sales_value_third.sum, 
-      "sales_value_forth": sales_value_forth.sum, sales_total: sales_value_first.sum+sales_value_second.sum+sales_value_third.sum+sales_value_forth.sum }
+    { results: results, sales_total: total}
+  end
+
+
+  def offers_stats(period)
+    results = {
+      click_revenue: 0,
+      times_loaded: 0,
+      times_clicked: 0,
+      times_checkedout: 0
+    }
+
+    period_hash = {
+      'daily' => { interval: 6.hours, start_date: DateTime.now.beginning_of_day, last: DateTime.now.end_of_day },
+      'weekly' => { interval: 2.days, start_date: Date.today - 7.days, last: (Date.today - 1.day) },
+      'monthly' => { interval: 1.week, start_date: (Date.today.beginning_of_month - 1.month), last: (Date.today-1.months).end_of_month },
+      '3-months' => { interval: 1.month, start_date: (Date.today.beginning_of_month - 2.months), last: Date.today.end_of_month },
+      '6-months' => { interval: 2.months, start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
+      'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
+      'all' => { interval: 6.months, start_date: self.daily_stats.present? ? self.daily_stats.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
+    }
+
+
+    start_date = period_hash[period][:start_date]
+    last = period_hash[period][:last]
+    interval = period_hash[period][:interval]
+
+    total = 0
+    if daily_stats.present?
+      while (start_date <= last) do
+        if (start_date + interval > last)
+          end_date = last
+        else
+          end_date = start_date + interval
+        end
+
+        [:click_revenue, :times_loaded, :times_clicked, :times_checkedout].map do |field|
+          total = daily_stats.where('created_at >= ? and created_at < ?', start_date, end_date).sum(field)
+          results[field] += total
+        end
+        start_date = start_date + interval
+      end
+    end
+    results
   end
 
   def orders_stats(period)
-    orders_value_first = []
-    orders_value_second = []
-    orders_value_third = []
-    orders_value_forth = []
-    if (period=='daily')
-      created_from = DateTime.now.beginning_of_day
-      interval = 6.hours
-      created_to = created_from + interval
-      last = created_from + 4*interval-1.second
-    elsif (period=='monthly')
-      created_from = Date.today.beginning_of_month
-      created_to = created_from + 6.days
-      interval = 1.weeks
-      last = created_from.end_of_month
-    elsif (period=='yearly')
-      created_from = Date.today.beginning_of_year
-      created_to = created_from + (3.months-1.days)
-      interval = 3.months
-      last = created_from.end_of_year
-    end
+    results = []
+
+    period_hash = {
+      'daily' => { interval: 6.hours, start_date: DateTime.now.beginning_of_day, last: DateTime.now.end_of_day },
+      'weekly' => { interval: 2.days, start_date: Date.today - 7.days, last: (Date.today - 1.day) },
+      'monthly' => { interval: 1.week, start_date: (Date.today.beginning_of_month - 1.month), last: (Date.today-1.months).end_of_month },
+      '3-months' => { interval: 1.month, start_date: (Date.today.beginning_of_month - 2.months), last: Date.today.end_of_month },
+      '6-months' => { interval: 2.months, start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
+      'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
+      'all' => { interval: 6.months, start_date: self.orders.present? ? self.orders.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
+    }
+    
     if orders.present?
-      orders_value_first << orders.where('created_at >= ? and created_at < ?', created_from, created_to).count
-      orders_value_second << orders.where('created_at >= ? and created_at < ?', created_from + interval, created_to + interval).count
-      orders_value_third << orders.where('created_at >= ? and created_at < ?', created_from + 2*interval, created_to + 2*interval).count
-      orders_value_forth << orders.where('created_at >= ? and created_at < ?', created_from + 3*interval-(period=='daily'? (1.hours): 0), created_from + 3*interval-(period=='daily'? (1.second): 0)).count
+      start_date = period_hash[period][:start_date]
+      last = period_hash[period][:last]
+      interval = period_hash[period][:interval]
+      i = 0;
+      total = 0
+      while (start_date <= last) do
+        
+        if (start_date + interval > last)
+          end_date = last
+        else
+          end_date = start_date + interval
+        end
+
+        label_hash = {
+          'daily' => ->(start_date, end_date) { "#{start_date.hour} - #{end_date.hour}" },
+          'weekly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
+          'monthly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
+          '3-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+          '6-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+          'yearly' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+          'all' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" }
+        }
+        results[i]
+        results[i] = {
+          key: label_hash[period].call(start_date, end_date),
+          value: 0
+        }
+
+        stats = orders.where('created_at >= ? and created_at < ?', start_date, end_date).count
+
+        results[i][:value] = stats
+        total += stats
+
+        start_date = start_date + interval
+        i+=1;
+      end
     end
-    { "orders_value_first": orders_value_first.sum, "orders_value_second": orders_value_second.sum, "orders_value_third": orders_value_third.sum, 
-      "orders_value_forth": orders_value_forth.sum, orders_total: orders_value_first.sum+orders_value_second.sum+orders_value_third.sum+orders_value_forth.sum }
+    {results: results, orders_total: total}
   end
 
   def sale_stats
