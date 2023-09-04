@@ -117,18 +117,18 @@ module Graphable
       else
         end_date = start_date + interval
       end
-      if (period=='daily')
-        label = start_date.hour.to_s + ' - ' + end_date.hour.to_s
-      elsif (period=='weekly')
-        label = start_date.to_s + ' - ' + end_date.to_s
-      elsif (period == 'monthly')
-        label = start_date.to_s + ' - ' + (end_date).to_s
-      else
-        label = start_date.month.to_s + ' - ' + (end_date).month.to_s + ' months of ' + start_date.year.to_s
-      end
+      label_hash = {
+        'daily' => ->(start_date, end_date) { "#{start_date.hour} - #{end_date.hour}" },
+        'weekly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
+        'monthly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
+        '3-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+        '6-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+        'yearly' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+        'all' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" }
+      }
       results[i]
       results[i] = {
-        key: label,
+        key: label_hash[period].call(start_date, end_date),
         value: 0
       }
       self.offers.includes(:offer_events).each do |offer|
@@ -174,15 +174,6 @@ module Graphable
         else
           end_date = start_date + interval
         end
-        if (period=='daily')
-          label = start_date.hour.to_s + ' - ' + end_date.hour.to_s
-        elsif (period=='weekly')
-          label = start_date.to_s + ' - ' + end_date.to_s
-        elsif (period == 'monthly')
-          label = start_date.to_s + ' - ' + (end_date).to_s
-        else
-          label = start_date.month.to_s + ' - ' + (end_date).month.to_s + ' months of ' + start_date.year.to_s
-        end
 
         [:click_revenue, :times_loaded, :times_clicked, :times_checkedout].map do |field|
           total = daily_stats.where('created_at >= ? and created_at < ?', start_date, end_date).sum(field)
@@ -221,20 +212,18 @@ module Graphable
           end_date = start_date + interval
         end
 
-        if (period=='daily')
-          label = start_date.hour.to_s + ' - ' + end_date.hour.to_s
-        elsif (period=='weekly')
-          label = start_date.to_s + ' - ' + end_date.to_s
-        elsif (period == 'monthly')
-          label = start_date.to_s + ' - ' + (end_date).to_s
-        elsif (period == '3-months' || period == '6-months' || period == 'yearly')
-          label = start_date.month.to_s + ' - ' + (end_date).month.to_s + ' months of ' + start_date.year.to_s
-        else
-          label = start_date.month.to_s + ' - ' + (end_date).month.to_s + ' months of ' + start_date.year.to_s
-        end
+        label_hash = {
+          'daily' => ->(start_date, end_date) { "#{start_date.hour} - #{end_date.hour}" },
+          'weekly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
+          'monthly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
+          '3-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+          '6-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+          'yearly' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+          'all' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" }
+        }
         results[i]
         results[i] = {
-          key: label,
+          key: label_hash[period].call(start_date, end_date),
           value: 0
         }
 
