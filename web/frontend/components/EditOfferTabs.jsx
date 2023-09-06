@@ -1438,7 +1438,9 @@ export function SecondTab(props) {
     };
 
     async function handleSelectProductsModal() {
-        await getSelectedItems('product');
+        if(props.offer.id!=null){
+            await getSelectedItems('product');
+        }
         handleProductsModal();
     }
     const modalProd = useRef(null);
@@ -1452,7 +1454,9 @@ export function SecondTab(props) {
     }, [collectionModal]);
 
     async function handleSelectCollectionsModal() {
-        await getSelectedItems('collection');
+        if(props.offer.id!=null){
+            await getSelectedItems('collection');
+        }
         handleCollectionsModal();
     }
     const modalColl = useRef(null);
@@ -1578,7 +1582,7 @@ export function SecondTab(props) {
                             />
                         </Grid.Cell>
                     </Grid>
-                    {props.offer.id != props.autopilotCheck?.autopilot_offer_id && (
+                    {(props.offer.id == null || props.offer.id != props.autopilotCheck?.autopilot_offer_id) && (
                     <>
                         <div className="space-4"></div>
                         <Button onClick={handleSelectProductsModal} ref={modalProd} >Select Product</Button>
@@ -1596,7 +1600,7 @@ export function SecondTab(props) {
                             <SelectProductsModal selectedItems={selectedItems} setSelectedItems={setSelectedItems} offer={props.offer} shop={props.shop} handleProductsModal={handleProductsModal} selectedProducts={selectedProducts} setSelectedProducts={setSelectedProducts} />
                         </Modal.Section>
                     </Modal>
-                    {props.offer.id != props.autopilotCheck?.autopilot_offer_id && (
+                    {(props.offer.id == null || props.offer.id != props.autopilotCheck?.autopilot_offer_id) && (
                     <>
                         <div className="space-4"></div>
                         <Button onClick={handleSelectCollectionsModal} ref={modalColl}>Select Collection</Button>
@@ -1851,7 +1855,7 @@ export function SecondTab(props) {
                     </LegacyCard.Section>
                 )}
             </LegacyCard>
-            {props.offer.id != props.autopilotCheck?.autopilot_offer_id && (
+            {(props.offer.id == null || props.offer.id != props.autopilotCheck?.autopilot_offer_id) && (
                 <>
                     <LegacyCard title="Display Conditions" sectioned>
                         <LegacyCard.Section>
