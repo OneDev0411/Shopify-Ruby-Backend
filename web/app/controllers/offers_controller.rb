@@ -117,7 +117,7 @@ class OffersController < AuthenticatedController
                                                :rule_selector, :item_type_name, :_destroy],
                                   included_variants: {},
                                   offerable_product_shopify_ids: [],
-                                  products_to_remove: []).to_h
+                                  products_to_remove: [], css_options: {}).to_h
   end
  
 end

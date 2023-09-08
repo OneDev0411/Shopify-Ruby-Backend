@@ -1916,7 +1916,7 @@ export function SecondTab(props) {
 
 export function ThirdTab(props) {
 
-    const [selected, setSelected] = useState(props.shop.css_options.main.borderStyle);
+    const [selected, setSelected] = useState(props.offer.css_options?.main?.borderStyle);
     const options = [
         { label: 'Compact', value: 'compact' },
         { label: 'Stack', value: 'stack' },
@@ -1930,12 +1930,12 @@ export function ThirdTab(props) {
     const handleSelectChange = useCallback((value) => setSelected(value), []);
 
     // Space above the offer
-    const handleAboveSpace = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "main", "marginTop"), []);
+    const handleAboveSpace = useCallback((newValue) => props.updateOfferNestedHash(`${newValue}px`, "css_options", "main", "marginTop"), []);
     // Space below the offer
-    const handleBelowSpace = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "main", "marginBottom"), []);
+    const handleBelowSpace = useCallback((newValue) => props.updateOfferNestedHash(`${newValue}px`, "css_options", "main", "marginBottom"), []);
     //Border style drop-down menu
     const handleBorderStyle = useCallback((newValue) => {
-        props.updateShop(newValue, "css_options", "main", "borderStyle");
+        props.updateOfferNestedHash(newValue, "css_options", "main", "borderStyle");
         setSelected(newValue);
     }, []);
     const BorderOptions = [
@@ -1952,10 +1952,10 @@ export function ThirdTab(props) {
     ];
 
     //Border width
-    const handleBorderWidth = useCallback((newValue) => props.updateShop(parseInt(newValue), "css_options", "main", "borderWidth"), []);
+    const handleBorderWidth = useCallback((newValue) => props.updateOfferNestedHash(parseInt(newValue), "css_options", "main", "borderWidth"), []);
 
     //Border range slider
-    const handlesetBorderRange = useCallback((newValue) => props.updateShop(parseInt(newValue), "css_options", "main", "borderRadius"), []);
+    const handlesetBorderRange = useCallback((newValue) => props.updateOfferNestedHash(parseInt(newValue), "css_options", "main", "borderRadius"), []);
 
     // Toggle for manually added color
     const [open, setOpen] = useState(false);
@@ -1964,7 +1964,7 @@ export function ThirdTab(props) {
 
     //Font options
     // const [fontSelect, setFontSelect] = useState("Dummy font 1");
-    const handleFontSelect = useCallback((value) => props.updateShop(value, "css_options", "text", "fontFamily"), []);
+    const handleFontSelect = useCallback((value) => props.updateOfferNestedHash(value, "css_options", "text", "fontFamily"), []);
     const fontOptions = [
         { label: 'None', value: 'None' },
         { label: 'Arial', value: 'Arial' },
@@ -2001,11 +2001,11 @@ export function ThirdTab(props) {
     // }, []);
 
     //Font sizes
-    const handleFontSize = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "text", "fontSize"), []);
+    const handleFontSize = useCallback((newValue) => props.updateOfferNestedHash(`${newValue}px`, "css_options", "text", "fontSize"), []);
 
 
     //Button options
-    const handleBtnSelect = useCallback((value) => props.updateShop(value, "css_options", "button", "fontFamily"), []);
+    const handleBtnSelect = useCallback((value) => props.updateOfferNestedHash(value, "css_options", "button", "fontFamily"), []);
     const btnOptions = [
         { label: 'None', value: 'None' },
         { label: 'Arial', value: 'Arial' },
@@ -2042,15 +2042,15 @@ export function ThirdTab(props) {
     // }, []);
 
     //Button size
-    const handleBtnSize = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "button", "fontSize"), []);
+    const handleBtnSize = useCallback((newValue) => props.updateOfferNestedHash(`${newValue}px`, "css_options", "button", "fontSize"), []);
 
     // Btn radius
     const [rangeValue, setRangeValue] = useState(20);
-    const handleRangeSliderChange = useCallback((newValue) => props.updateShop(parseInt(newValue), "css_options", "button", "borderRadius"), []);
+    const handleRangeSliderChange = useCallback((newValue) => props.updateOfferNestedHash(parseInt(newValue), "css_options", "button", "borderRadius"), []);
 
     //Sketch picker
     const handleOfferBackgroundColor = useCallback((newValue) => {
-        props.updateShop(newValue.hex, "css_options", "main", "backgroundColor");
+        props.updateOfferNestedHash(newValue.hex, "css_options", "main", "backgroundColor");
     }, []);
 
     return (
@@ -2082,7 +2082,7 @@ export function ThirdTab(props) {
                                 label="Space above offer"
                                 type="number"
                                 onChange={handleAboveSpace}
-                                value={parseInt(props.shop.css_options.main.marginTop)}
+                                value={parseInt(props.offer.css_options?.main?.marginTop)}
                                 suffix="px"
                             />
                         </Grid.Cell>
@@ -2091,7 +2091,7 @@ export function ThirdTab(props) {
                                 label="Space below offer"
                                 type="number"
                                 onChange={handleBelowSpace}
-                                value={parseInt(props.shop.css_options.main.marginBottom)}
+                                value={parseInt(props.offer.css_options?.main?.marginBottom)}
                                 suffix="px"
                             />
                         </Grid.Cell>
@@ -2110,7 +2110,7 @@ export function ThirdTab(props) {
                                 label="Border width"
                                 type="number"
                                 onChange={handleBorderWidth}
-                                value={parseInt(props.shop.css_options.main.borderWidth)}
+                                value={parseInt(props.offer.css_options?.main?.borderWidth)}
                                 suffix="px"
                             />
                         </Grid.Cell>
@@ -2120,7 +2120,7 @@ export function ThirdTab(props) {
                         <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <RangeSlider
                                 label="Corner Radius"
-                                value={parseInt(props.shop.css_options.main.borderRadius)}
+                                value={parseInt(props.offer.css_options?.main?.borderRadius)}
                                 onChange={handlesetBorderRange}
                                 output
                             />
@@ -2145,7 +2145,7 @@ export function ThirdTab(props) {
                             transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                             expandOnPrint
                         >
-                            <br /><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main?.backgroundColor} />
+                            <br /><SketchPicker onChange={handleOfferBackgroundColor} color={props.offer.css_options?.main?.backgroundColor} />
                             {/*<br/><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main.backgroundColor} />*/}
                         </Collapsible>
                     </Stack>
@@ -2159,7 +2159,7 @@ export function ThirdTab(props) {
                                 label="Font"
                                 options={fontOptions}
                                 onChange={handleFontSelect}
-                                value={props.shop.css_options.text.fontFamily}
+                                value={props.offer.css_options?.text?.fontFamily}
                             />
                         </Grid.Cell>
                         {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
@@ -2179,7 +2179,7 @@ export function ThirdTab(props) {
                                 suffix="px"
                                 autoComplete="off"
                                 onChange={handleFontSize}
-                                value={parseInt(props.shop.css_options.text.fontSize)}
+                                value={parseInt(props.offer.css_options?.text?.fontSize)}
                             />
                         </Grid.Cell>
                     </Grid>
@@ -2191,7 +2191,7 @@ export function ThirdTab(props) {
                                 label="Font"
                                 options={btnOptions}
                                 onChange={handleBtnSelect}
-                                value={props.shop.css_options.button.fontFamily}
+                                value={props.offer.css_options?.button?.fontFamily}
                             />
                         </Grid.Cell>
                         {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
@@ -2211,7 +2211,7 @@ export function ThirdTab(props) {
                                 suffix="px"
                                 autoComplete="off"
                                 onChange={handleBtnSize}
-                                value={parseInt(props.shop.css_options.button.fontSize)}
+                                value={parseInt(props.offer.css_options?.button?.fontSize)}
                             />
                         </Grid.Cell>
                     </Grid>
@@ -2220,7 +2220,7 @@ export function ThirdTab(props) {
                         <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <RangeSlider
                                 label="Border Radius"
-                                value={props.shop.css_options.button.borderRadius}
+                                value={props.offer.css_options?.button?.borderRadius}
                                 onChange={handleRangeSliderChange}
                                 output
                             />

@@ -427,7 +427,8 @@ class Offer < ApplicationRecord
       show_product_title: show_product_title?,
       in_cart_page: in_cart_page?,
       in_ajax_cart: in_ajax_cart?,
-      in_product_page: in_product_page?
+      in_product_page: in_product_page?,
+      css_options: css_options || {}
     }
     # todo: hide title from published version
     res[:winning_version] = winner if winner.present?

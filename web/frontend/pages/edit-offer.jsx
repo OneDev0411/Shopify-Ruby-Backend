@@ -100,6 +100,17 @@ export default function EditPage() {
     custom_field_3_name: '',
     custom_field_3_placeholder: '',
     custom_field_3_required: '',
+    css_options: {
+        main: {
+            color: "#2B3D51",
+            backgroundColor: "#ECF0F1"
+        },
+        text: {},
+        button: {
+            color: "#FFFFFF", 
+            backgroundColor: "#2B3D51"
+        },
+    }
     });
 
     const [offerSettings, setOfferSettings] = useState({
@@ -295,6 +306,36 @@ export default function EditPage() {
         });
     }
 
+    //Called whenever the offer changes in any child component
+    function updateOfferNestedHash(updatedValue, ...updatedKey) {
+        if(updatedKey.length == 1) {
+            setOffer(previousState => {
+                return { ...previousState, [updatedKey[0]]: updatedValue };
+            });
+        }
+        else if(updatedKey.length == 2) {
+            setOffer(previousState => ({
+                ...previousState,
+                [updatedKey[0]]: {
+                    ...previousState[updatedKey[0]],
+                    [updatedKey[1]]: updatedValue 
+                }
+            }));
+        }
+        else if(updatedKey.length == 3) {
+            setOffer(previousState => ({
+                ...previousState,
+                [updatedKey[0]]: {
+                    ...previousState[updatedKey[0]],
+                    [updatedKey[1]]: {
+                        ...previousState[updatedKey[0]][updatedKey[1]],
+                        [updatedKey[2]]: updatedValue
+                    }
+                }
+            }));
+        }
+    }
+
     //Called whenever the offer settings for shop changes in any child component
     function updateOfferSettings(updatedShop) {
         setOfferSettings(updatedShop);
@@ -414,6 +455,7 @@ export default function EditPage() {
             in_cart_page: offer.in_cart_page,
             in_ajax_cart: offer.in_ajax_cart,
             in_product_page: offer.in_product_page,
+            css_options: offer.css_options
         };
         if (shop.has_recharge && offer.recharge_subscription_id) {
           ots.recharge_subscription_id = offer.recharge_subscription_id;
@@ -588,7 +630,7 @@ export default function EditPage() {
                                 : "" }
                                 {selected == 2 ?
                                     // page was imported from components folder
-                                    <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} saveDraft={saveDraft} publishOffer={publishOffer} autopilotCheck={autopilotCheck} enablePublish={enablePublish}/>
+                                    <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer} updateOfferNestedHash={updateOfferNestedHash} updateShop={updateShop} saveDraft={saveDraft} publishOffer={publishOffer} autopilotCheck={autopilotCheck} enablePublish={enablePublish}/>
                                 : "" }
                                 {selected == 3 ?
                                     // page was imported from components folder
