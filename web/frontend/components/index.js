@@ -2,7 +2,7 @@ export { ProductsCard } from "./ProductsCard";
 export { OffersList } from "./OffersList";
 export { OfferEdit } from "./OfferEdit";
 export * from "./providers";
-export { EditOfferTabs, SecondTab, ThirdTab, FourthTab } from "./EditOfferTabs";
+export { FirstTab, SecondTab, ThirdTab, FourthTab } from "./EditOffer";
 export {ModalAddProduct} from "./modal_AddProduct";
 export {ModalAddConditions} from "./modal_AddConditions";
 export {SettingTabs} from "./settingsTabs";
