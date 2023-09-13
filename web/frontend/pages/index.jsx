@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { Banner, Grid, Layout, Page } from "@shopify/polaris";
 
-import { isSubscriptionActive } from "../services/actions/subscription";
 import { useAuthenticatedFetch } from "../hooks";
+import { isSubscriptionActive } from "../services/actions/subscription";
 import { ConversionRate, CustomTitleBar, OffersList, OrderOverTimeData, TotalSalesData } from "../components";
+
 import { iculogo } from "../assets";
 import "../components/stylesheets/mainstyle.css";
 
