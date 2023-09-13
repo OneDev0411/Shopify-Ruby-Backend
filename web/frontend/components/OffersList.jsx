@@ -10,7 +10,8 @@ import {
   FooterHelp,
   Pagination,
   Select,
-  LegacyCard, LegacyStack, Image, VerticalStack, Text, ButtonGroup, MediaCard, VideoThumbnail, Layout
+  LegacyCard, LegacyStack, Image, VerticalStack, Text, ButtonGroup, MediaCard, VideoThumbnail, Layout,
+  Spinner,
 } from '@shopify/polaris';
 
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -66,6 +67,7 @@ export function OffersList(props) {
         // localStorage.setItem('icushopify_domain', data.shopify_domain);
         setOffersData(data.offers);
         setFilteredData(data.offers);
+        setIsLoading(false);
         if(sendOfferList){
           data.offers.length > 0 ? sendOfferList(true) : sendOfferList(false);
         }
@@ -297,71 +299,88 @@ export function OffersList(props) {
   }
 
   return (
-    <div className="narrow-width-layout">
-      { offersData.length === 0 ?
-        <CreateOfferCard />
-        :
+    <div>
+      {isLoading ? (
+        <div
+          style={{
+            overflow: "hidden",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+          }}
+        className="narrow-width-layout"
+        >
+          <Spinner size="large" color="teal" />
+        </div>
+      ) : (
         <>
-          <LegacyCard sectioned>
+          {offersData.length === 0 ? (
+            <CreateOfferCard />
+          ) : (
+            <>
+              <LegacyCard sectioned>
             <div style={{ display: 'flex' }}>
-              <div style={{ flex: 1 }}>
-                <Filters
-                  queryValue={queryValue}
-                  filters={filters}
-                  appliedFilters={appliedFilters}
-                  onQueryChange={handleQueryValueChange}
-                  onQueryClear={handleQueryValueRemove}
-                  onClearAll={handleClearAll}
-                />
-              </div>
+                  <div style={{ flex: 1 }}>
+                    <Filters
+                      queryValue={queryValue}
+                      filters={filters}
+                      appliedFilters={appliedFilters}
+                      onQueryChange={handleQueryValueChange}
+                      onQueryClear={handleQueryValueRemove}
+                      onClearAll={handleClearAll}
+                    />
+                  </div>
               <div style={{ paddingLeft: '0.25rem' }}>
-                <Select
-                  labelInline
-                  label="Sort"
-                  options={sortOptions}
-                  value={sortValue}
-                  onChange={handleSortChange}
-                />
-              </div>
-            </div>
-            <IndexTable
-              sortOptions={sortOptions}
-              sortable={[false, false, true, true, true]}
+                    <Select
+                      labelInline
+                      label="Sort"
+                      options={sortOptions}
+                      value={sortValue}
+                      onChange={handleSortChange}
+                    />
+                  </div>
+                </div>
+                <IndexTable
+                  sortOptions={sortOptions}
+                  sortable={[false, false, true, true, true]}
               sortDirection={'descending'}
-              sortColumnIndex={4}
-              sort={{ handleSorting }}
-              resourceName={resourceName}
-              itemCount={paginatedData.length}
-              selectedItemsCount={
+                  sortColumnIndex={4}
+                  sort={{ handleSorting }}
+                  resourceName={resourceName}
+                  itemCount={paginatedData.length}
+                  selectedItemsCount={
                 allResourcesSelected ? 'All' : selectedResources.length
-              }
-              onSelectionChange={handleSelectionChange}
-              hasZebraStriping
-              bulkActions={bulkActions}
-              promotedBulkActions={promotedBulkActions}
-              headings={[
+                  }
+                  onSelectionChange={handleSelectionChange}
+                  hasZebraStriping
+                  bulkActions={bulkActions}
+                  promotedBulkActions={promotedBulkActions}
+                  headings={[
                 { title: 'Offer' },
                 { title: 'Status' },
                 { title: 'Clicks' },
                 { title: 'Views' },
                 { title: 'Revenue', hidden: false },
-              ]}
-            >
-              {rowMarkup}
-            </IndexTable>
-            <div className="space-4"></div>
-            <div className="offer-table-footer">
-              <Pagination
-                label={`${currentPage} of ${totalPages}`}
-                hasPrevious={currentPage > 1}
-                hasNext={currentPage < totalPages}
-                onPrevious={() => handlePageChange(currentPage - 1)}
-                onNext={() => handlePageChange(currentPage + 1)}
-              />
-            </div>
-          </LegacyCard>
+                  ]}
+                >
+                  {rowMarkup}
+                </IndexTable>
+                <div className="space-4"></div>
+                <div className="offer-table-footer">
+                  <Pagination
+                    label={`${currentPage} of ${totalPages}`}
+                    hasPrevious={currentPage > 1}
+                    hasNext={currentPage < totalPages}
+                    onPrevious={() => handlePageChange(currentPage - 1)}
+                    onNext={() => handlePageChange(currentPage + 1)}
+                  />
+                </div>
+              </LegacyCard>
+            </>
+          )}
         </>
-      }
+      )}
       <div className="space-10"></div>
     </div>
   );
