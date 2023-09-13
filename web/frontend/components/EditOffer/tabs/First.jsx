@@ -17,13 +17,13 @@ import {
 import {
     InfoMinor
   } from '@shopify/polaris-icons';
-import {ModalAddProduct} from "./modal_AddProduct";
+import {ModalAddProduct} from "./../../modal_AddProduct";
 import { useState, useCallback, useRef, useEffect } from "react";
 import React from "react";
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { useAuthenticatedFetch } from "../hooks";
+import { useAuthenticatedFetch } from "../../../hooks";
 import { useNavigate } from 'react-router-dom';
 
 export function FirstTab(props) {
