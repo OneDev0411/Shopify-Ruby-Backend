@@ -2,7 +2,7 @@ import { Page, LegacyCard, Layout, Tabs, Icon, Grid, Spinner, Toast } from '@sho
 import { DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
 import { TitleBar } from "@shopify/app-bridge-react";
 import "../components/stylesheets/mainstyle.css";
-import { EditOfferTabs, SecondTab, ThirdTab, FourthTab } from "../components";
+import { FirstTab, SecondTab, ThirdTab, FourthTab } from "../components";
 import { useState, useCallback, useEffect } from 'react';
 import React from 'react';
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
@@ -624,7 +624,7 @@ export default function EditPage() {
 
                                 {selected == 0 ?
                                     // page was imported from components folder
-                                    <EditOfferTabs offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity} handleTabChange={changeTab} initialVariants={initialVariants} updateInitialVariants={updateInitialVariants} autopilotCheck={autopilotCheck} openAutopilotSection={openAutopilotSection} updateOpenAutopilotSection={updateOpenAutopilotSection} initialOfferableProductDetails={initialOfferableProductDetails} enableOrDisablePublish={enableOrDisablePublish}/>
+                                    <FirstTab offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity} handleTabChange={changeTab} initialVariants={initialVariants} updateInitialVariants={updateInitialVariants} autopilotCheck={autopilotCheck} openAutopilotSection={openAutopilotSection} updateOpenAutopilotSection={updateOpenAutopilotSection} initialOfferableProductDetails={initialOfferableProductDetails} enableOrDisablePublish={enableOrDisablePublish}/>
                                 : "" }
                                 {selected == 1 ?
                                     // page was imported from components folder
