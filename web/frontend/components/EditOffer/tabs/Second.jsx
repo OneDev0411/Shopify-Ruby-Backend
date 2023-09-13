@@ -11,22 +11,22 @@ import {
     Image} from "@shopify/polaris";
 import {
     CancelMajor  } from '@shopify/polaris-icons';
-import {ModalAddConditions} from "./modal_AddConditions";
+import {ModalAddConditions} from "./../../modal_AddConditions";
 import { useState, useCallback, useRef, useEffect } from "react";
 import React from "react";
 import { useSelector } from 'react-redux';
-import { useAuthenticatedFetch } from "../hooks";
-import SelectProductsModal from "../components/SelectProductsModal";
-import { SelectCollectionsModal } from "../components/SelectCollectionsModal";
-import product_page_image_1 from "../assets/images/product_page_image_1.png";
-import product_page_image_2 from "../assets/images/product_page_image_2.png";
-import product_page_image_3 from "../assets/images/product_page_image_3.png";
-import cart_page_image_1 from "../assets/images/cart_page_image_1.png";
-import cart_page_image_2 from "../assets/images/cart_page_image_2.png";
-import cart_page_image_3 from "../assets/images/cart_page_image_3.png";
-import ajax_cart_image_1 from "../assets/images/ajax_cart_image_1.png";
-import ajax_cart_image_2 from "../assets/images/ajax_cart_image_2.png";
-import ajax_cart_image_3 from "../assets/images/ajax_cart_image_3.png";
+import { useAuthenticatedFetch } from "../../../hooks";
+import SelectProductsModal from "../../SelectProductsModal";
+import { SelectCollectionsModal } from "../../SelectCollectionsModal";
+import product_page_image_1 from "../../../assets/images/product_page_image_1.png";
+import product_page_image_2 from "../../../assets/images/product_page_image_2.png";
+import product_page_image_3 from "../../../assets/images/product_page_image_3.png";
+import cart_page_image_1 from "../../../assets/images/cart_page_image_1.png";
+import cart_page_image_2 from "../../../assets/images/cart_page_image_2.png";
+import cart_page_image_3 from "../../../assets/images/cart_page_image_3.png";
+import ajax_cart_image_1 from "../../../assets/images/ajax_cart_image_1.png";
+import ajax_cart_image_2 from "../../../assets/images/ajax_cart_image_2.png";
+import ajax_cart_image_3 from "../../../assets/images/ajax_cart_image_3.png";
 
 export function SecondTab(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);

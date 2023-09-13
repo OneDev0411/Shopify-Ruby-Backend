@@ -2,7 +2,7 @@ import { Page, LegacyCard, Layout, Tabs, Icon, Grid, Spinner, Toast } from '@sho
 import { DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
 import { TitleBar } from "@shopify/app-bridge-react";
 import "../components/stylesheets/mainstyle.css";
-import { FirstTab, SecondTab, ThirdTab, FourthTab, FirstTab } from "../components";
+import { FirstTab, SecondTab, ThirdTab, FourthTab } from "../components";
 import { useState, useCallback, useEffect } from 'react';
 import React from 'react';
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
