@@ -111,7 +111,7 @@ class OffersController < AuthenticatedController
                                   :show_custom_field, :custom_field_name, :custom_field_placeholder,
                                   :discount_target_type, :discount_value, :discount_value_type,
                                   :discount_target_selection, :discount_prerequisite_quantity,
-                                  :discount_allocation_method, :shop_id, :offer_id,
+                                  :discount_allocation_method, :shop_id, :offer_id, :custom_css,
                                   rules_json: [:item_type, :uuid, :item_shopify_id, :rule_type,
                                                :item_shopify_title, :quantity, :item_name,
                                                :rule_selector, :item_type_name, :_destroy],

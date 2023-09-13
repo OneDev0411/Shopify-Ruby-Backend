@@ -110,7 +110,8 @@ export default function EditPage() {
             color: "#FFFFFF", 
             backgroundColor: "#2B3D51"
         },
-    }
+    },
+    custom_css: ''
     });
 
     const [offerSettings, setOfferSettings] = useState({
@@ -455,7 +456,8 @@ export default function EditPage() {
             in_cart_page: offer.in_cart_page,
             in_ajax_cart: offer.in_ajax_cart,
             in_product_page: offer.in_product_page,
-            css_options: offer.css_options
+            css_options: offer.css_options,
+            custom_css: offer.custom_css
         };
         if (shop.has_recharge && offer.recharge_subscription_id) {
           ots.recharge_subscription_id = offer.recharge_subscription_id;
@@ -634,7 +636,7 @@ export default function EditPage() {
                                 : "" }
                                 {selected == 3 ?
                                     // page was imported from components folder
-                                    <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings} saveDraft={saveDraft} publishOffer={publishOffer} enablePublish={enablePublish}/>
+                                    <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateOfferNestedHash={updateOfferNestedHash} updateShop={updateShop} updateOfferSettings={updateOfferSettings} saveDraft={saveDraft} publishOffer={publishOffer} enablePublish={enablePublish}/>
                                 : "" }
                             </Tabs>
                         </Layout.Section>
@@ -648,9 +650,9 @@ export default function EditPage() {
                             >
                                 <div className='space-4'></div>
                                 {selectedPre == 0 ?
-                                    <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity}/>
+                                    <OfferPreview offer={offer} updateOffer={updateOffer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity}/>
                                 : 
-                                    <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity}/>  }
+                                    <OfferPreview offer={offer} updateOffer={updateOffer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity}/>  }
                             </Tabs>
                         </Layout.Section>
                     </Layout>

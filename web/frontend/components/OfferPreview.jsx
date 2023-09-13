@@ -22,11 +22,6 @@ export function OfferPreview(props) {
 		setCarouselLoading(true);
 		combinedCss();
 		setTimeout(function(){ setCarouselLoading(false) }, 500);
-	},[props.shop]);
-
-	useEffect(() => {
-		setCarouselLoading(true);
-		setTimeout(function(){ setCarouselLoading(false) }, 500);
 	}, [props.offer]);
 
 	// Called everytime when any attribute in shop changes.
@@ -169,11 +164,11 @@ export function OfferPreview(props) {
 					<Stack offer={props.offer} checkKeysValidity={props.checkKeysValidity}/>
 				) : props.offer.multi_layout == "carousel" ? (
 					carouselLoading ? (
-						<div style={{ marginTop: props.shop.css_options?.main.marginTop, marginLeft: '40%' }}>
+						<div style={{ marginTop: props.offer.css_options?.main?.marginTop, marginLeft: '40%' }}>
 							<Spinner></Spinner>
 						</div>
 					) : (
-						<Carousel offer={props.offer} shop={props.shop} checkKeysValidity={props.checkKeysValidity} updateCheckKeysValidity={props.updateCheckKeysValidity}/>
+						<Carousel offer={props.offer} checkKeysValidity={props.checkKeysValidity} updateCheckKeysValidity={props.updateCheckKeysValidity}/>
 					)
 				) : props.offer.multi_layout == "flex" ? (
 					<Flex offer={props.offer} checkKeysValidity={props.checkKeysValidity}/>

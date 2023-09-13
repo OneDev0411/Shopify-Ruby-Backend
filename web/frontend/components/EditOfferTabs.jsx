@@ -1959,7 +1959,9 @@ export function ThirdTab(props) {
 
     // Toggle for manually added color
     const [open, setOpen] = useState(false);
+    const [buttonBackgroundColorOpen, setButtonBackgroundColorOpen] = useState(false);
     const handleToggle = useCallback(() => setOpen((open) => !open), []);
+    const handleButtonBackgroundColorChange = useCallback (() => setButtonBackgroundColorOpen((buttonBackgroundColorOpen) => !buttonBackgroundColorOpen), [])
 
 
     //Font options
@@ -2051,6 +2053,10 @@ export function ThirdTab(props) {
     //Sketch picker
     const handleOfferBackgroundColor = useCallback((newValue) => {
         props.updateOfferNestedHash(newValue.hex, "css_options", "main", "backgroundColor");
+    }, []);
+
+    const handleOfferButtonBackgroundColor = useCallback((newValue) => {
+        props.updateOfferNestedHash(newValue.hex, "css_options", "button", "backgroundColor");
     }, []);
 
     return (
@@ -2225,6 +2231,25 @@ export function ThirdTab(props) {
                                 output
                             />
                         </Grid.Cell>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                                <ButtonGroup>
+                                    <Button
+                                        onClick={handleButtonBackgroundColorChange}
+                                        ariaExpanded={buttonBackgroundColorOpen}
+                                        ariaControls="basic-collapsible"
+                                    >Select Button Background Color</Button>
+                                </ButtonGroup>
+                                <Stack vertical>
+                                    <Collapsible
+                                        open={buttonBackgroundColorOpen}
+                                        id="basic-collapsible"
+                                        transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
+                                        expandOnPrint
+                                    >
+                                        <br /><SketchPicker onChange={handleOfferButtonBackgroundColor} color={props.offer.css_options?.button?.backgroundColor} />
+                                    </Collapsible>
+                                </Stack>
+                        </Grid.Cell>
                     </Grid>
                 </LegacyCard.Section>
             </LegacyCard>
@@ -2251,8 +2276,7 @@ export function FourthTab(props) {
     const handleCartDomAction = useCallback((newValue) => props.updateShop(newValue, "custom_cart_page_dom_action"), []);
     const handleAjaxDomSelector = useCallback((newValue) => props.updateShop(newValue, "custom_ajax_dom_selector"), []);
     const handleAjaxDomAction = useCallback((newValue) => props.updateShop(newValue, "custom_ajax_dom_action"), []);
-    const handleAjaxRefreshCode = useCallback((newValue) => props.updateShop(newValue, "ajax_refresh_code"), []);
-    const handleOfferCss = useCallback((newValue) => props.updateShop(newValue, "offer_css"), []);
+    const handleOfferCss = useCallback((newValue) => props.updateOfferNestedHash(newValue, "custom_css"), []);
 
     const options = [
         {label: 'prepend()', value: 'prepend'},
@@ -2293,10 +2317,9 @@ export function FourthTab(props) {
                         onChange={handleAjaxDomAction}
                         value={props.shop.custom_ajax_dom_action}
                     />
-                    <TextField label="AJAX refresh code" value={props.shop.ajax_refresh_code} onChange={handleAjaxRefreshCode} multiline={6}></TextField>
                 </LegacyCard.Section>
                 <LegacyCard.Section title="Custom CSS">
-                    <TextField value={props.shop.offer_css} onChange={handleOfferCss} multiline={6}></TextField>
+                    <TextField value={props.offer?.custom_css} onChange={handleOfferCss} multiline={6}></TextField>
                     <br />
                     <Checkbox
                         label="Save as default settings"
