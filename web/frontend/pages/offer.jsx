@@ -45,29 +45,33 @@ export default function IndexTableWithAllElementsExample() {
     }
 
     return (
-      <Page fullWidth>
-        {hasOffers ? (
-          <CustomTitleBar
-            image={AddProductMajor}
-            title='Offers'
-            buttonText='Create offer'
-            handleButtonClick={handleOpenOfferPage}
-          />
-        ): (
-          <CustomTitleBar
-            title="In Cart Upsell & Cross Sell"
-            image={iculogo}
-          />
-        )}
-        <Layout>
-          <Layout.Section>
-            <div style={{marginTop: '54px'}}>
-              <OffersList />
-            </div>
-          </Layout.Section>
-        </Layout>
-        <div className="space-10"></div>
+      <>
+        <div className="min-height-container">
+          <Page fullWidth>
+            {hasOffers ? (
+              <CustomTitleBar
+                image={AddProductMajor}
+                title='Offers'
+                buttonText='Create offer'
+                handleButtonClick={handleOpenOfferPage}
+              />
+            ): (
+              <CustomTitleBar
+                title="In Cart Upsell & Cross Sell"
+                image={iculogo}
+              />
+            )}
+            <Layout>
+              <Layout.Section>
+                <div style={{marginTop: '54px'}}>
+                  <OffersList />
+                </div>
+              </Layout.Section>
+            </Layout>
+            <div className="space-10"></div>
+          </Page>
+        </div>
         <GenericFooter text='Need more help? ' linkUrl='#' linkText='Watch the help video' />
-      </Page>
+      </>
     );
   }

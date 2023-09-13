@@ -116,11 +116,8 @@
     max-width: 62rem;
 }
 
-.custom-footer {
-    position: fixed;
-    bottom: 3%;
-    left: 0;
-    right: 0;
+.min-height-container {
+    min-height: 92vh;
 }
 
 .custom-footer .Polaris-Link {
