@@ -5,7 +5,7 @@ import {billingImg} from "../assets";
 import {
 	BillingStatementDollarMajor
 } from '@shopify/polaris-icons';
-import { Reviews, GenericTitleBar } from "../components";
+import { Reviews, CustomTitleBar } from "../components";
 import "../components/stylesheets/mainstyle.css";
 import React from 'react';
 import { useSelector } from 'react-redux';
@@ -79,7 +79,7 @@ export default function Subscription() {
     
   return (
     <Page>
-        <GenericTitleBar title='Billing' icon={BillingStatementDollarMajor}/>
+        <CustomTitleBar title='Billing' icon={BillingStatementDollarMajor}/>
         <div className="auto-height">
             <Layout>
                 <Layout.Section>

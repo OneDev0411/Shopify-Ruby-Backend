@@ -3,7 +3,7 @@ import {helpImage} from "../assets";
 import {HintMajor,TroubleshootMajor} from '@shopify/polaris-icons';
 import {useRef, useState, useCallback} from 'react';
 import "../components/stylesheets/mainstyle.css";
-import { GenericTitleBar } from "../components";
+import { CustomTitleBar } from "../components";
 import {
     QuestionMarkMinor
   } from '@shopify/polaris-icons';
@@ -24,7 +24,7 @@ export default function HelpPage() {
 
   return (
     <Page>
-      <GenericTitleBar title='Help' icon={QuestionMarkMinor} />
+      <CustomTitleBar title='Help' icon={QuestionMarkMinor} />
       <Layout>
             <Layout.Section>
                 {/* card for image and text */}
