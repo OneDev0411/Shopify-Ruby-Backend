@@ -299,7 +299,7 @@ export function OffersList(props) {
   }
 
   return (
-    <div>
+    <div className="narrow-width-layout">
       {isLoading ? (
         <div
           style={{
@@ -309,7 +309,6 @@ export function OffersList(props) {
             alignItems: "center",
             minHeight: "100vh",
           }}
-        className="narrow-width-layout"
         >
           <Spinner size="large" color="teal" />
         </div>
