@@ -57,8 +57,6 @@ export default function IndexTableWithAllElementsExample() {
           <CustomTitleBar
             title="In Cart Upsell & Cross Sell"
             image={iculogo}
-            buttonText={"Create offer"}
-            handleButtonClick={handleOpenOfferPage}
           />
         )}
         <Layout>
