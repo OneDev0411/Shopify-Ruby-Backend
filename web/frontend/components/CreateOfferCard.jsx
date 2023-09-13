@@ -1,20 +1,18 @@
-import React, { useEffect, useCallback, useState, createContext, useContext } from "react";
+import React, {createContext, useCallback, useContext, useEffect, useState} from "react";
 import {
   Button,
   ButtonGroup,
+  AlphaCard,
   Image,
-  LegacyCard,
-  LegacyStack,
-  Link,
   MediaCard,
   Modal,
   Text,
   VerticalStack,
   VideoThumbnail,
 } from "@shopify/polaris";
-import { homeImage } from "../assets/index.js";
-import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import {homeImage} from "../assets/index.js";
+import {useNavigate} from "react-router-dom";
+import {useSelector} from "react-redux";
 
 const ShopContext = createContext(null);
 
@@ -50,7 +48,9 @@ export function CreateOfferCard() {
   // Though not necessary, this should serve as an example of how to use the Context API
   return (
     <ShopContext.Provider value={{ shopData, setShopData }}>
-      <OfferCard  handleCreateOffer={handleCreateOffer} />
+      <div style={{marginBottom: '47px'}}>
+        <OfferCard  handleCreateOffer={handleCreateOffer} />
+      </div>
       <HelpSection />
       <VideoModal active={active} handleClose={handleClose} handleOpen={handleOpen} />
     </ShopContext.Provider>
@@ -60,42 +60,41 @@ export function CreateOfferCard() {
 // Splitting into smaller components
 function OfferCard({ handleCreateOffer }) {
   return (
-    <LegacyCard sectioned>
-      <LegacyStack distribution="center">
-        <LegacyStack.Item>
-          <div className="center-content">
-            <Image
-              source={homeImage}
-              alt="Create your first offer"
-              width={219}
-            />
-            <VerticalStack gap="5">
-              <Text variant="headingMd" as="h2" element="h1">
-                Here is where you'll view your offers
-              </Text>
-              <Text as="h3">
-                Start by creating your first offer and publishing it to your store
-              </Text>
-            </VerticalStack>
-            <div className="space-10"></div>
-            <div className="center-btn">
-              <ButtonGroup>
-                <Button primary onClick={handleCreateOffer}>
-                  Create offer
-                </Button>
-                <Button
-                  url="https://help.incartupsell.com/en/collections/3263755-all"
-                  external
-                  target="_blank"
-                >
-                  View Help Docs
-                </Button>
-              </ButtonGroup>
-            </div>
+    <AlphaCard>
+      <VerticalStack inlineAlign="center">
+        <div className="center-content">
+          <Image
+            source={homeImage}
+            alt="Create your first offer"
+            width={219}
+            style={{marginBottom: '11px'}}
+          />
+          <div style={{marginBottom: '11px'}}>
+            <Text variant="headingLg" as="h2" fontWeight="regular">
+              Here is where you'll view your offers
+            </Text>
           </div>
-        </LegacyStack.Item>
-      </LegacyStack>
-    </LegacyCard>
+          <div style={{marginBottom: '35px'}}>
+            <Text variant="headingSm" as="p" fontWeight="regular" color="subdued">
+              Start by creating your first offer and publishing it to your store
+            </Text>
+          </div>
+          <div className="center-btn">
+            <ButtonGroup>
+              <Button primary onClick={handleCreateOffer}>
+                Create offer
+              </Button>
+              <Button
+                url="https://help.incartupsell.com/en/collections/3263755-all"
+                target="_blank"
+              >
+                View Help Docs
+              </Button>
+            </ButtonGroup>
+          </div>
+        </div>
+      </VerticalStack>
+    </AlphaCard>
   );
 }
 
@@ -124,22 +123,37 @@ function HelpSection({ handleOpen }) {
 
   return (
     <MediaCard
-      title="Need help creating your offer?"
+      title={
+        <div>
+          <div style={{marginBottom: '20px'}}>
+            <Text variant="headingMd" as="span" fontWeight="medium" >
+              Need help creating an offer?&nbsp;
+            </Text>
+            <Text variant="headingMd" as="span" fontWeight="regular" >
+              Our support team can help walk you through it.
+            </Text>
+          </div>
+          <div>
+            <Text variant="headingSm" as="p" fontWeight="regular" >
+              Chat support is open 5am to 10pm EST.
+            </Text>
+            <Text variant="headingSm" as="p" fontWeight="regular" >
+              Or you can send us an email any time and we’ll get back to you within 48 hours.
+            </Text>
+          </div>
+        </div>
+      }
       primaryAction={{
         content: "Learn more",
         onAction: showIntercomWidget,
       }}
-      description={
-        "Our support team a can help walk you through it." +
-        "\n" +
-        "Chat support is open 5am to 10pm EST. Or you can send us an email anytime and we'll get back to you within 48hours."
-      }
+      description={""}
       popoverActions={[{ content: "Dismiss", onAction: () => {} }]}
     >
       <VideoThumbnail
         onClick={handleOpen}
         videoLength={80}
-        thumbnailUrl="./../assets/business-woman-smiling-in-office.jpeg"
+        thumbnailUrl="/assets/business-woman-smiling-in-office.jpeg"
       />
     </MediaCard>
   );

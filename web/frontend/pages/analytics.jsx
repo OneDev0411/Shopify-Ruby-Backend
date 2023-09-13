@@ -5,7 +5,7 @@ import "../components/stylesheets/mainstyle.css";
 import {useState, useCallback} from 'react';
 import React from 'react';
 import { GenericFooter } from '../components/GenericFooter';
-import { TotalSalesData, ConversionRate, OrderOverTimeData, GenericTitleBar} from "../components";
+import { TotalSalesData, ConversionRate, OrderOverTimeData, CustomTitleBar} from "../components";
 import {
   AnalyticsMinor
 } from '@shopify/polaris-icons';
@@ -28,7 +28,7 @@ export default function AnalyticsOffers() {
 
     return (
       <Page> 
-         <GenericTitleBar title='Analytics' icon={AnalyticsMinor} />  
+         <CustomTitleBar title='Analytics' icon={AnalyticsMinor} />  
         <div className="space-10"></div>
         <Grid>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>

@@ -20,7 +20,7 @@ import {
   import { GenericFooter } from '../components';
   import { useAppQuery, useAuthenticatedFetch } from "../hooks";
   import { useSelector } from "react-redux";
-  import { OffersList, GenericTitleBar } from '../components';
+  import { OffersList, CustomTitleBar } from '../components';
   import { useAppBridge } from '@shopify/app-bridge-react';
   import { Redirect } from '@shopify/app-bridge/actions';
   import {
@@ -74,7 +74,7 @@ import {
 
     return (
       <Page>
-        {hasOffers ? <GenericTitleBar icon={AddProductMajor} title='Offers' buttonText='Create offer' handleButtonClick={handleOpenOfferPage} /> : null}
+        {hasOffers ? <CustomTitleBar icon={AddProductMajor} title='Offers' buttonText='Create offer' handleButtonClick={handleOpenOfferPage} /> : null}
         <OffersList></OffersList>
         <div className="space-10"></div>
       </Page>

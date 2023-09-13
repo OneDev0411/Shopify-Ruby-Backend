@@ -6,7 +6,7 @@ import { useAppBridge } from '@shopify/app-bridge-react'
 import { useSelector } from 'react-redux';
 import React, { useState, useEffect, useCallback } from "react";
 import { Redirect, Toast } from '@shopify/app-bridge/actions';
-import { Partners, SettingTabs, GenericTitleBar } from "../components";
+import { Partners, SettingTabs, CustomTitleBar } from "../components";
 import { useAuthenticatedFetch } from "../hooks";
 
 export default function Settings() {
@@ -120,7 +120,7 @@ export default function Settings() {
     return (
         <>
             <Page>
-                <GenericTitleBar title='Settings' icon={SettingsMajor} buttonText='Save' handleButtonClick={handleSave} />
+                <CustomTitleBar title='Settings' icon={SettingsMajor} buttonText='Save' handleButtonClick={handleSave} />
                 <LegacyCard sectioned>
                     {(currentShop?.activated) ? (
                         <Grid>
