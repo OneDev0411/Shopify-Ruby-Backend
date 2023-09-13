@@ -297,7 +297,7 @@ export function OffersList(props) {
   }
 
   return (
-    <div className="narrow-width-layout">
+    <div className="narrow-width-layout" style={{marginTop: '32px'}}>
       { offersData.length === 0 ?
         <CreateOfferCard />
         :

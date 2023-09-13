@@ -119,3 +119,14 @@ h1{
     margin: 0 auto;
     max-width: 62rem;
 }
+
+.custom-footer {
+    position: fixed;
+    bottom: 3%;
+    left: 0;
+    right: 0;
+}
+
+.custom-footer .Polaris-Link {
+    display: inline-flex;
+}
