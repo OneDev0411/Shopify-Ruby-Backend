@@ -1110,19 +1110,21 @@ export function SecondTab(props) {
                             <LegacyCard.Section title="Where on this page would you like the offer to appear?">
                             <Grid>
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                                    <Checkbox
+                                    <RadioButton
                                         label="Use default settings for Ajax Cart"
                                         checked={props.shop.default_template_settings?.defaultSettingsForAjaxCart}
                                         onChange={(event) => handleDefaultSettingChange(event, 'ajax')}
+                                        name="ajax-cart-settings"
                                     />
                                 </Grid.Cell>
                             </Grid>
                             <Grid>
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                                    <Checkbox
+                                    <RadioButton
                                         label="Use Template for Ajax Cart"
                                         checked={props.shop.default_template_settings?.templateForAjaxCart}
                                         onChange={(event) => handleUseTemplateChange(event, 'ajax')}
+                                        name="ajax-cart-settings"
                                     />
                                 </Grid.Cell>
                             </Grid>
@@ -1155,19 +1157,21 @@ export function SecondTab(props) {
                             <LegacyCard.Section title="Where on this page would you like the offer to appear?">
                             <Grid>
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                                    <Checkbox
+                                    <RadioButton
                                         label="Use default settings for Cart Page"
                                         checked={props.shop.default_template_settings?.defaultSettingsForCartPage}
                                         onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
+                                        name="cart-page-settings"
                                     />
                                 </Grid.Cell>
                             </Grid>
                             <Grid>
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                                    <Checkbox
+                                    <RadioButton
                                         label="Use Template for Cart Page"
                                         checked={props.shop.default_template_settings?.templateForCartPage}
                                         onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
+                                        name="cart-page-settings"
                                     />
                                 </Grid.Cell>
                             </Grid>
@@ -1203,19 +1207,21 @@ export function SecondTab(props) {
                     <LegacyCard.Section title="Where on this page would you like the offer to appear?">
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <Checkbox
+                            <RadioButton
                                 label="Use default settings"
                                 checked={defaultSetting}
                                 onChange={(event) => handleDefaultSettingChange(event, null)}
+                                name="product-settings"
                             />
                         </Grid.Cell>
                     </Grid>
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <Checkbox
+                            <RadioButton
                                 label="Use Template"
                                 checked={useTemplate}
                                 onChange={(event) => handleUseTemplateChange(event, null)}
+                                name="product-settings"
                             />
                         </Grid.Cell>
                     </Grid>

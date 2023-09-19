@@ -448,7 +448,7 @@ export default function EditPage() {
                     body: JSON.stringify({offer: ots, shop: shopAndHost.shop, host: shopAndHost.host})
                 });
                 const responseData = await response.json();
-                responseData.text = responseData.text_a.replace("{{ product_title }}", responseData.offerable_product_details[0].title)
+                responseData.text = responseData.offer.text_a.replace("{{ product_title }}", responseData.offer.offerable_product_details[0].title)
                 responseData.cta = responseData.cta_a;
                 for(var i=0; i<responseData.offer.offerable_product_details.length; i++) {
                     responseData.offer.offerable_product_details[i].preview_mode = true;

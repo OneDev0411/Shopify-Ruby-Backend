@@ -41,6 +41,7 @@ module Api
         @icushop.money_format = opts['money_format']
         @icushop.show_spinner = opts['show_spinner']
         @icushop.stats_from = opts['stats_from'].present? ? Time.parse(opts['stats_from']) : nil
+        @icushop.default_template_settings = opts['default_template_settings'].to_h
   
         # ADMIN OPTS
         if @admin
@@ -61,6 +62,7 @@ module Api
           @icushop.has_reviewed = opts['has_reviewed']
           @icushop.js_version = opts['js_version']
           @icushop.has_custom_rules = opts['has_custom_rules']
+          @icushop.default_template_settings = opts['default_template_settings'].to_h
         end
         if @icushop.save
           @icushop.publish_async  # trigger update
@@ -163,7 +165,8 @@ module Api
       def shop_params
         all_names = Shop.column_names + ['date_min', 'date_max', 'canonical_domain',
                                          'path_to_cart', 'has_branding', 'custom_theme_css',
-                                         'image', 'stats_from', css_options]
+                                         'image', 'stats_from', css_options, 
+                                         'default_template_settings': [:defaultSettingsForProductPage, :defaultSettingsForAjaxCart, :defaultSettingsForCartPage, :templateForProductPage, :templateForAjaxCart, :templateForCartPage]]
         params.require('shop_attr').permit(all_names)
       end
 
