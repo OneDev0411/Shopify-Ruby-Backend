@@ -12,7 +12,8 @@ import {
     Icon,
     RadioButton,
     Badge,
-    Spinner
+    Spinner,
+    Text
 } from "@shopify/polaris";
 import {
     InfoMinor
@@ -52,7 +53,6 @@ export function FirstTab(props) {
     }, []);
     const handleAltBtnChange = useCallback((newValue) => props.updateOffer("cta_b", newValue), []);
     //checkbox controls
-    const [abTestCheck, setAbTestCheck] = useState(false);
     // const [removeImg, setRemoveImg] = useState(false);
     // const [removePriceCheck, setRemovePriceCheck] = useState(false);
     const [removeComparePrice, setRemoveComparePrice] = useState(false);
@@ -61,7 +61,7 @@ export function FirstTab(props) {
     const [autoDiscount, setAutoDiscount] = useState(false);
     const [addCustomtext, setAddCustomtext] = useState(false);
 
-    const handleAbChange = useCallback((newChecked) => setAbTestCheck(newChecked), []);
+    const handleAbChange = useCallback((newChecked) => props.updateOffer("uses_ab_test", newChecked), []);
     const handleImageChange = useCallback((newChecked) => props.updateOffer("show_product_image", !newChecked), []);
     const handlePriceChange = useCallback((newChecked) => props.updateOffer("show_product_price", !newChecked), []);
     const handleCompareChange = useCallback((newChecked) => props.updateOffer("show_compare_at_price", !newChecked), []);
@@ -334,10 +334,10 @@ export function FirstTab(props) {
     useCallback((newValue) => props.enableOrDisablePublish(newValue), []);
 
     useEffect(() => {
-        if(publishButtonFuntional){
-            publishButtonFuntional(!(props.offer.offerable_product_details.length > 0 && props.offer.title !== ''))
-          }
-    }, [props.offer.offerable_product_details.length, props.offer.title]);
+        if (publishButtonFuntional) {
+            publishButtonFuntional(!(props.offer.offerable_product_details.length > 0 && props.offer.title !== '' && (props.offer.uses_ab_test ? (props.offer.text_b.length > 0 && props.offer.cta_b.length > 0) : true)))
+        }
+    }, [props.offer.offerable_product_details.length, props.offer.title, props.offer.uses_ab_test, props.offer.text_b, props.offer.cta_b]);
 
 
     //Collapsible controls
@@ -482,11 +482,11 @@ export function FirstTab(props) {
                             />
                             <Checkbox id={"abTesting"}
                                 label="Enable A/B testing"
-                                checked={abTestCheck}
+                                checked={props.offer.uses_ab_test}
                                 onChange={handleAbChange}
                             />
                             <Collapsible
-                                open={abTestCheck}
+                                open={props.offer.uses_ab_test}
                                 id="basic-collapsible"
                                 transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                             // expandOnPrint
@@ -523,6 +523,16 @@ export function FirstTab(props) {
                                         value={props.offer.cta_b}
                                         onChange={handleAltBtnChange}
                                     />
+                                </Collapsible>
+                                <Collapsible
+                                    open = {(props.offer.cta_b === '' && props.offer.text_b != '') || (props.offer.cta_b != '' && props.offer.text_b === '')}
+                                    transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
+                                    expandOnPrint
+                                >
+                                    <br/>
+                                    <Text color="critical">
+                                        If you are A/B testing, you must have a B version of both the Offer Text and the Button Text.
+                                    </Text>
                                 </Collapsible>
                             </Collapsible>
                         </LegacyStack>
