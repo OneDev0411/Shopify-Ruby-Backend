@@ -115,3 +115,11 @@
     margin: 0 auto;
     max-width: 62rem;
 }
+
+.min-height-container {
+    min-height: 92vh;
+}
+
+.custom-footer .Polaris-Link {
+    display: inline-flex;
+}

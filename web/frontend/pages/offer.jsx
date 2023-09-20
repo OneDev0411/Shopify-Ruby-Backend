@@ -1,82 +1,77 @@
+import React, { useEffect, useState} from 'react';
+import {useSelector} from "react-redux";
+import {useNavigate} from 'react-router-dom';
+
+import {Banner, Grid, Layout, Page} from '@shopify/polaris';
+import {AddProductMajor} from '@shopify/polaris-icons';
+
 import {
-    TextField,
-    IndexTable,
-    Card,
-    Filters,
-    Select,
-    useIndexResourceState,
-    Page,
-    Badge,
-    Link,
-    FooterHelp,
-    Pagination,
-    Grid,
-    LegacyCard
-  } from '@shopify/polaris';
-  import { TitleBar } from "@shopify/app-bridge-react";
-  import {useState, useCallback, useEffect} from 'react';
-  import React from 'react';
-  import { useNavigate } from 'react-router-dom';
-  import { GenericFooter } from '../components';
-  import { useAppQuery, useAuthenticatedFetch } from "../hooks";
-  import { useSelector } from "react-redux";
-  import { OffersList, CustomTitleBar } from '../components';
-  import { useAppBridge } from '@shopify/app-bridge-react';
-  import { Redirect } from '@shopify/app-bridge/actions';
-  import {
-    AddProductMajor
-  } from '@shopify/polaris-icons';
-  
-  export default function IndexTableWithAllElementsExample() {
+  ConversionRate,
+  CustomTitleBar,
+  GenericFooter,
+  OffersList,
+  OrderOverTimeData,
+  TotalSalesData
+} from '../components';
+import {useAuthenticatedFetch} from "../hooks";
+import {iculogo} from "../assets/index.js";
+import {isSubscriptionActive} from "../services/actions/subscription.js";
 
-    const app = useAppBridge();
-    const emptyToastProps = { content: null };
-    const [isLoading, setIsLoading] = useState(true);
-    const [toastProps, setToastProps] = useState(emptyToastProps);
-    const info = { offer: { shop_domain: window.location.host } };
-    const [currentShop, setCurrentShop] = useState();
-    const [hasOffers, setHasOffers] = useState();
-  
-    const [taggedWith, setTaggedWith] = useState('');
-    const [queryValue, setQueryValue] = useState(null);
-    const [offersData, setOffersData] = useState([]);
-    const [sortValue, setSortValue] = useState('today');
-    const [filteredData, setFilteredData] = useState([]);
-    const shopAndHost = useSelector(state => state.shopAndHost);
-    const fetch = useAuthenticatedFetch(shopAndHost.host);
-    const navigateTo = useNavigate();
+export default function IndexTableWithAllElementsExample() {
+  const shopAndHost = useSelector(state => state.shopAndHost);
+  const fetch = useAuthenticatedFetch(shopAndHost.host);
+  const navigateTo = useNavigate();
 
-    const fetchCurrentShop = useCallback(async () => {
-      let redirect = Redirect.create(app);
-
-      fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
-        method: 'GET',
-           headers: {
-             'Content-Type': 'application/json',
-           },
-       })
-       .then( (response) => { return response.json(); })
-       .then( (data) => {
-          setHasOffers(data.has_offers);
-       })
-       .catch((error) => {
-          console.log("error", error);
-       })    
-    }, []);
+  const [hasOffers, setHasOffers] = useState();
 
   useEffect(() => {
-      fetchCurrentShop()
-  }, [fetchCurrentShop]);
+    fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then( (response) => { return response.json(); })
+      .then( (data) => {
+        setHasOffers(data.has_offers);
+      })
+      .catch((error) => {
+        console.log("error", error);
+      })
+  }, [setHasOffers]);
     
     const handleOpenOfferPage = () => {
       navigateTo('/edit-offer', { state: { offerID: null } });
     }
 
     return (
-      <Page>
-        {hasOffers ? <CustomTitleBar icon={AddProductMajor} title='Offers' buttonText='Create offer' handleButtonClick={handleOpenOfferPage} /> : null}
-        <OffersList></OffersList>
-        <div className="space-10"></div>
-      </Page>
+      <>
+        <div className="min-height-container">
+          <Page fullWidth>
+            {hasOffers ? (
+              <CustomTitleBar
+                image={AddProductMajor}
+                title='Offers'
+                buttonText='Create offer'
+                handleButtonClick={handleOpenOfferPage}
+              />
+            ): (
+              <CustomTitleBar
+                title="In Cart Upsell & Cross Sell"
+                image={iculogo}
+              />
+            )}
+            <Layout>
+              <Layout.Section>
+                <div style={{marginTop: '54px'}}>
+                  <OffersList />
+                </div>
+              </Layout.Section>
+            </Layout>
+            <div className="space-10"></div>
+          </Page>
+        </div>
+        <GenericFooter text='Need more help? ' linkUrl='#' linkText='Watch the help video' />
+      </>
     );
   }

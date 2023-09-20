@@ -10,14 +10,15 @@ import {
   VerticalStack,
   VideoThumbnail,
 } from "@shopify/polaris";
-import {homeImage} from "../assets/index.js";
-import {useNavigate} from "react-router-dom";
+import {homeImage, newOffersImage} from "../assets/index.js";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 
 const ShopContext = createContext(null);
 
 export function CreateOfferCard() {
   const navigateTo = useNavigate();
+  const location = useLocation();
   const shopAndHost = useSelector((state) => state.shopAndHost);
   const [shopData, setShopData] = useState({
     currentShop: null,
@@ -31,55 +32,64 @@ export function CreateOfferCard() {
   const handleCreateOffer = useCallback(() => {
     navigateTo("/edit-offer", { state: { offerID: null } });
   }, [navigateTo]);
-
-  const fetchCurrentShop = useCallback(async () => {
-    try {
-      const data = await fetchShopData(shopAndHost.shop);
-      setShopData(data);
-    } catch (error) {
-      console.log("error", error);
-    }
-  }, [shopAndHost]);
+  const isOffers = location?.pathname.includes('offer');
 
   useEffect(() => {
+    const fetchCurrentShop = async () => {
+      try {
+        const data = await fetchShopData(shopAndHost.shop);
+        setShopData(data);
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+
     fetchCurrentShop();
-  }, [fetchCurrentShop]);
+  }, [shopAndHost]);
 
   // Though not necessary, this should serve as an example of how to use the Context API
   return (
     <ShopContext.Provider value={{ shopData, setShopData }}>
       <div style={{marginBottom: '47px'}}>
-        <OfferCard  handleCreateOffer={handleCreateOffer} />
+        <OfferCard  handleCreateOffer={handleCreateOffer} isOffers={isOffers} />
       </div>
-      <HelpSection />
-      <VideoModal active={active} handleClose={handleClose} handleOpen={handleOpen} />
+      {!isOffers && (
+        <>
+          <HelpSection handleOpen={handleOpen} shopData={shopData} />
+          <VideoModal active={active} handleClose={handleClose} />
+        </>
+      )}
     </ShopContext.Provider>
   );
 }
 
 // Splitting into smaller components
-function OfferCard({ handleCreateOffer }) {
+function OfferCard({ handleCreateOffer, isOffers }) {
   return (
     <AlphaCard>
       <VerticalStack inlineAlign="center">
         <div className="center-content">
           <Image
-            source={homeImage}
+            source={isOffers ? newOffersImage : homeImage}
             alt="Create your first offer"
             width={219}
             style={{marginBottom: '11px'}}
           />
           <div style={{marginBottom: '11px'}}>
             <Text variant="headingLg" as="h2" fontWeight="regular">
-              Here is where you'll view your offers
+              {isOffers ? "This is where you’ll manage your offers" : "Here is where you'll view your offers"}
             </Text>
           </div>
           <div style={{marginBottom: '35px'}}>
             <Text variant="headingSm" as="p" fontWeight="regular" color="subdued">
-              Start by creating your first offer and publishing it to your store
+              {isOffers ?
+                "Create a new offer to get started."
+                :
+                "Start by creating your first offer and publishing it to your store"
+              }
             </Text>
           </div>
-          <div className="center-btn">
+          <div className="center-btn" style={{marginBottom: '42px'}}>
             <ButtonGroup>
               <Button primary onClick={handleCreateOffer}>
                 Create offer
