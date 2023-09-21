@@ -986,6 +986,7 @@ class Shop < ApplicationRecord
       id: id,
       shopify_id: shopify_id,
       shopify_domain: shopify_domain,
+      shop_domain: shop_domain,
       shopify_theme_name: shopify_theme_name,
       cart_type: cart_type,
       defaults_set_at: defaults_set_at,
