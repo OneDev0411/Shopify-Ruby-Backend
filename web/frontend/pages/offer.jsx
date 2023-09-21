@@ -1,23 +1,15 @@
-import React, { useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector} from "react-redux";
 import {useNavigate} from 'react-router-dom';
 
-import {Banner, Grid, Layout, Page} from '@shopify/polaris';
+import {Layout, Page} from '@shopify/polaris';
 import {AddProductMajor} from '@shopify/polaris-icons';
 
-import {
-  ConversionRate,
-  CustomTitleBar,
-  GenericFooter,
-  OffersList,
-  OrderOverTimeData,
-  TotalSalesData
-} from '../components';
+import {CustomTitleBar, GenericFooter, OffersList} from '../components';
 import {useAuthenticatedFetch} from "../hooks";
 import {iculogo} from "../assets/index.js";
-import {isSubscriptionActive} from "../services/actions/subscription.js";
 
-export default function IndexTableWithAllElementsExample() {
+export default function Offers() {
   const shopAndHost = useSelector(state => state.shopAndHost);
   const fetch = useAuthenticatedFetch(shopAndHost.host);
   const navigateTo = useNavigate();

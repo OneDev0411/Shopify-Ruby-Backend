@@ -3,9 +3,10 @@ import {
   ResourceList,
   Avatar,
   ResourceItem,
-  OptionList
+  OptionList,
+  Text, Thumbnail
 } from '@shopify/polaris';
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 
@@ -16,10 +17,6 @@ export function ModalAddProduct(props) {
   const [taggedWith, setTaggedWith] = useState(null);
   const [queryValue, setQueryValue] = useState(null);
 
-  const handleTaggedWithChange = useCallback(
-    (value) => setTaggedWith(value),
-    []
-  );
   const handleQueryValueChange = useCallback((value) => {
     setQueryValue(value);
     props.updateQuery(value);
@@ -81,46 +78,53 @@ export function ModalAddProduct(props) {
       onQueryChange={handleQueryValueChange}
       onQueryClear={handleQueryValueRemove}
       onClearAll={handleClearAll}
-    >
-    </Filters>
+    />
   ); filters
 
   return (
-    <ResourceList
-      resourceName={resourceName}
-      items={items}
-      renderItem={renderItem}
-      selectedItems={props.selectedItems}
-      onSelectionChange={selectionChange}
-      selectable
-      showHeader={false}
-      filterControl={filterControl}
-      loading={resourceListLoading}
-    />
+    <div id="right-align-polaris">
+      {console.log(props.selectedItems)}
+
+      <ResourceList
+          resourceName={resourceName}
+          items={items}
+          renderItem={renderItem}
+          selectedItems={props.selectedItems}
+          onSelectionChange={selectionChange}
+          selectable
+          showHeader={false}
+          filterControl={filterControl}
+          loading={resourceListLoading}
+      />
+    </div>
   );
 
   function renderItem(item) {
 
     const { id, title, image, variants } = item;
-    const media = <Avatar customer size="medium" name={title} />;
-    if (variants.length <= 1) {
+    const media =  <Thumbnail
+        source={image}
+        alt={title}
+        size="medium"
+    />
 
+
+    if (variants.length <= 1) {
       return (
         <ResourceItem
           id={id}
           title={title}
-          image={image}
+          verticalAlignment="center"
+          media={media}
           accessibilityLabel={`View details for ${title}`}
           persistActions
           disabled={true}
           onClick={() => selectedProduct(id)}
         >
-          <p variant="bodyMd" fontWeight="bold" as="h3">
-            <strong>{title}</strong>
-          </p>
-
+          <Text as="h3" variant="bodyMd" fontWeight="regular">
+            {title}
+          </Text>
         </ResourceItem>
-
       );
     }
     else {
@@ -139,19 +143,17 @@ export function ModalAddProduct(props) {
             persistActions
             onClick={() => selectedProduct(id)}
           >
-            <p variant="bodyMd" fontWeight="bold" as="h3">
-              <strong>{title}</strong>
-            </p>
-          </ResourceItem>
-          <div style={{ marginLeft: '30px' }}>
+            <Text as="h3" variant="bodyMd" fontWeight="regular">
+              {title}
+            </Text>
+
             <OptionList
-              options={option}
-              selected={selectedVariants[id]}
-              onChange={(selectedOptions) => handleSelectedVariant(selectedOptions, id)}
-              allowMultiple
-            >
-            </OptionList>
-          </div>
+                options={option}
+                selected={selectedVariants[id]}
+                onChange={(selectedOptions) => handleSelectedVariant(selectedOptions, id)}
+                allowMultiple
+            />
+          </ResourceItem>
         </>
       );
     }
