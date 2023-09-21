@@ -100,6 +100,11 @@ export default function EditPage() {
     custom_field_3_name: '',
     custom_field_3_placeholder: '',
     custom_field_3_required: '',
+    placement_setting: {
+        default_product_page: true,
+        default_cart_page: true,
+        default_ajax_cart: true,
+    },
     });
 
     const [offerSettings, setOfferSettings] = useState({
@@ -123,6 +128,8 @@ export default function EditPage() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [shopifyThemeName, setShopifyThemeName] = useState(null);
+    const [themeTemplateData, setThemeTemplateData] = useState(null);
+    const [templateImagesURL, setTemplateImagesURL] = useState({});
                                       
     const offerID = location?.state?.offerID;
     const fetch = useAuthenticatedFetch(shopAndHost.host);
@@ -267,7 +274,25 @@ export default function EditPage() {
         .then( (response) => { return response.json() })
         .then( (data) => {
             if(data.themeExist) {
-                setShopifyThemeName(data.shopify_theme_name)
+                setShopifyThemeName(data.shopify_theme_name);
+                setThemeTemplateData(data.templatesOfCurrentTheme);
+                data.templatesOfCurrentTheme.forEach(function(value, index) {
+                    if(value.page_type == "cart") {
+                        setTemplateImagesURL(previousState => {
+                            return { ...previousState, ["cart_page_image_".concat(value.position)]: value.image_url};
+                        });
+                    }
+                    else if(value.page_type == "product") {
+                        setTemplateImagesURL(previousState => {
+                            return { ...previousState, ["product_page_image_".concat(value.position)]: value.image_url};
+                        });
+                    }
+                    else if(value.page_type == "ajax") {
+                        setTemplateImagesURL(previousState => {
+                            return { ...previousState, ["ajax_cart_image_".concat(value.position)]: value.image_url};
+                        });
+                    }
+                });
             }
             else {
                 setShopifyThemeName(null);
@@ -276,7 +301,6 @@ export default function EditPage() {
         .catch((error) => {
             console.log("# Error updateProducts > ", JSON.stringify(error));
         })
-
     },[openAutopilotSection]);
 
 
@@ -293,6 +317,37 @@ export default function EditPage() {
         setOffer(previousState => {
             return { ...previousState, [updatedKey]: updatedValue };
         });
+    }
+
+
+    //Called whenever the shop changes in any child component
+    function updateNestedAttributeOfOffer(updatedValue, ...updatedKey) {
+        if(updatedKey.length == 1) {
+            setOffer(previousState => {
+                return { ...previousState, [updatedKey[0]]: updatedValue };
+            });
+        }
+        else if(updatedKey.length == 2) {
+            setOffer(previousState => ({
+                ...previousState,
+                [updatedKey[0]]: {
+                    ...previousState[updatedKey[0]],
+                    [updatedKey[1]]: updatedValue 
+                }
+            }));
+        }
+        else if(updatedKey.length == 3) {
+            setOffer(previousState => ({
+                ...previousState,
+                [updatedKey[0]]: {
+                    ...previousState[updatedKey[0]],
+                    [updatedKey[1]]: {
+                        ...previousState[updatedKey[0]][updatedKey[1]],
+                        [updatedKey[2]]: updatedValue
+                    }
+                }
+            }));
+        }
     }
 
     //Called whenever the offer settings for shop changes in any child component
@@ -366,6 +421,57 @@ export default function EditPage() {
     }
 
     const save = async(status) =>  {
+        var placement_setting;
+        if(offer.in_product_page && offer.in_cart_page) {
+            placement_setting = {
+                default_product_page: offer.placement_setting?.default_product_page,
+                default_cart_page: offer.placement_setting?.default_cart_page,
+                default_ajax_cart: true,
+                template_product_id: offer.placement_setting?.template_product_id,
+                template_cart_id: offer.placement_setting?.template_cart_id,
+                template_ajax_id: null,
+            }
+        }
+        else if (offer.in_ajax_cart && offer.in_cart_page) {
+            placement_setting = {
+                default_product_page: true,
+                default_cart_page: offer.placement_setting?.default_cart_page,
+                default_ajax_cart: offer.placement_setting?.default_ajax_cart,
+                template_product_id: null,
+                template_cart_id: offer.placement_setting?.template_cart_id,
+                template_ajax_id: offer.placement_setting?.template_ajax_id,
+            }
+        }
+        else if (offer.in_cart_page) {
+            placement_setting = {
+                default_product_page: true,
+                default_cart_page: offer.placement_setting?.default_cart_page,
+                default_ajax_cart: true,
+                template_product_id: null,
+                template_cart_id: offer.placement_setting?.template_cart_id,
+                template_ajax_id: null,
+            }
+        }
+        else if (offer.in_product_page) {
+            placement_setting = {
+                default_product_page: offer.placement_setting?.default_product_page,
+                default_cart_page: true,
+                default_ajax_cart: true,
+                template_product_id: offer.placement_setting?.default_product_page,
+                template_cart_id: null,
+                template_ajax_id: null,
+            }
+        }
+        else if (offer.in_ajax_cart) {
+            placement_setting = {
+                default_product_page: true,
+                default_cart_page: true,
+                default_ajax_cart: offer.placement_setting?.default_ajax_cart,
+                template_product_id: null,
+                template_cart_id: null,
+                template_ajax_id: offer.placement_setting?.template_ajax_id,
+            }
+        }
         var ots = {
             active: status,
             checkout_after_accepted: offer.checkout_after_accepted,
@@ -414,6 +520,7 @@ export default function EditPage() {
             in_cart_page: offer.in_cart_page,
             in_ajax_cart: offer.in_ajax_cart,
             in_product_page: offer.in_product_page,
+            placement_setting_attributes: placement_setting,
         };
         if (shop.has_recharge && offer.recharge_subscription_id) {
           ots.recharge_subscription_id = offer.recharge_subscription_id;
@@ -448,8 +555,8 @@ export default function EditPage() {
                     body: JSON.stringify({offer: ots, shop: shopAndHost.shop, host: shopAndHost.host})
                 });
                 const responseData = await response.json();
-                responseData.text = responseData.text_a.replace("{{ product_title }}", responseData.offerable_product_details[0].title)
-                responseData.cta = responseData.cta_a;
+                responseData.text = responseData?.text_a?.replace("{{ product_title }}", responseData.offerable_product_details[0]?.title)
+                responseData.cta = responseData?.cta_a;
                 for(var i=0; i<responseData.offer.offerable_product_details.length; i++) {
                     responseData.offer.offerable_product_details[i].preview_mode = true;
                 }
@@ -584,7 +691,7 @@ export default function EditPage() {
                                 : "" }
                                 {selected == 1 ?
                                     // page was imported from components folder
-                                    <SecondTab offer={offer} shop={shop} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateShop={updateShop} shopifyThemeName={shopifyThemeName} autopilotCheck={autopilotCheck} handleTabChange={changeTab}/>
+                                    <SecondTab offer={offer} shop={shop} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateNestedAttributeOfOffer={updateNestedAttributeOfOffer} updateShop={updateShop} shopifyThemeName={shopifyThemeName} autopilotCheck={autopilotCheck} handleTabChange={changeTab} themeTemplateData={themeTemplateData} templateImagesURL={templateImagesURL} enableOrDisablePublish={enableOrDisablePublish}/>
                                 : "" }
                                 {selected == 2 ?
                                     // page was imported from components folder

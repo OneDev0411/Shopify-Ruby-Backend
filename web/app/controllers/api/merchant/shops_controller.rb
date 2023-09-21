@@ -84,9 +84,11 @@ module Api
         begin
           res = @icushop.active_theme_for_dafault_template
           if res[:result] == true
+            templatesOfCurrentTheme = ThemeSettingForTemplate.where(theme_name: res[:message])
             render json: {
               themeExist: res[:result],
-              shopify_theme_name: res[:message]
+              shopify_theme_name: res[:message],
+              templatesOfCurrentTheme: templatesOfCurrentTheme
             }
           else
             render json: {

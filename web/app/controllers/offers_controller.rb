@@ -117,7 +117,8 @@ class OffersController < AuthenticatedController
                                                :rule_selector, :item_type_name, :_destroy],
                                   included_variants: {},
                                   offerable_product_shopify_ids: [],
-                                  products_to_remove: []).to_h
+                                  products_to_remove: [],
+                                  placement_setting_attributes: [:default_product_page, :default_cart_page, :default_ajax_cart, :template_product_id, :template_cart_id, :template_ajax_id]).to_h
   end
  
 end
