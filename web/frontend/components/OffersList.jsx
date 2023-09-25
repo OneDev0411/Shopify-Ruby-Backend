@@ -299,7 +299,7 @@ export function OffersList(props) {
   }
 
   return (
-    <div>
+    <div className="narrow-width-layout">
       {isLoading ? (
         <div
           style={{
