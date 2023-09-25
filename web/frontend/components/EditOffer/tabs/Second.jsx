@@ -1000,6 +1000,7 @@ export function SecondTab(props) {
                                         name="ajax-settings"
                                         onChange={(event) => handleDefaultSettingChange(event, 'ajax')}
                                         disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                                        name="ajax-cart-settings"
                                     />
                                 </Grid.Cell>
                             </Grid>
@@ -1011,6 +1012,7 @@ export function SecondTab(props) {
                                         name="ajax-settings"
                                         onChange={(event) => handleUseTemplateChange(event, 'ajax')}
                                         disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                                        name="ajax-cart-settings"
                                     />
                                 </Grid.Cell>
                             </Grid>
@@ -1049,6 +1051,7 @@ export function SecondTab(props) {
                                         name="cart-settings"
                                         onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
                                         disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                                        name="cart-page-settings"
                                     />
                                 </Grid.Cell>
                             </Grid>
@@ -1060,6 +1063,7 @@ export function SecondTab(props) {
                                         name="cart-settings"
                                         onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
                                         disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                                        name="cart-page-settings"
                                     />
                                 </Grid.Cell>
                             </Grid>
@@ -1100,6 +1104,7 @@ export function SecondTab(props) {
                                 checked={defaultSetting}
                                 onChange={(event) => handleDefaultSettingChange(event, null)}
                                 disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                                name="product-settings"
                             />
                         </Grid.Cell>
                     </Grid>
@@ -1110,6 +1115,7 @@ export function SecondTab(props) {
                                 checked={useTemplate}
                                 onChange={(event) => handleUseTemplateChange(event, null)}
                                 disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                                name="product-settings"
                             />
                         </Grid.Cell>
                     </Grid>

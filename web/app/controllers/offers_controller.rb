@@ -2,7 +2,9 @@
 
 
 class OffersController < AuthenticatedController
+  skip_before_action :verify_authenticity_token
 
+  protect_from_forgery with: :null_session
   before_action :set_shop, only: [:update_from_builder, :create_from_builder, :duplicate, :destroy]
 
   # POST   /offers/:shop_id/builder(.:format)
@@ -15,6 +17,20 @@ class OffersController < AuthenticatedController
     if offer_params['publish_status'] == 'published'
       offer.published_at = Time.now.utc
       offer.active = true
+    end
+
+    if offer_params['save_as_default_setting']
+      @icushop.offers.where.not(id: params[:id]).update(save_as_default_setting: false)
+
+      advanced_placement_setting = my_params[:advanced_placement_setting_attributes]
+
+      @icushop.custom_product_page_dom_selector = advanced_placement_setting[:custom_product_page_dom_selector]
+      @icushop.custom_product_page_dom_action = advanced_placement_setting[:custom_product_page_dom_action]
+      @icushop.custom_cart_page_dom_selector = advanced_placement_setting[:custom_cart_page_dom_selector]
+      @icushop.custom_cart_page_dom_action = advanced_placement_setting[:custom_cart_page_dom_action]
+      @icushop.custom_ajax_dom_selector = advanced_placement_setting[:custom_ajax_dom_selector]
+      @icushop.custom_ajax_dom_action = advanced_placement_setting[:custom_ajax_dom_action]
+      @icushop.save
     end
 
     if offer.save
@@ -59,12 +75,14 @@ class OffersController < AuthenticatedController
     if offer_params['save_as_default_setting']
       @icushop.offers.where.not(id: params[:id]).update(save_as_default_setting: false)
 
-      @icushop.custom_product_page_dom_selector = my_params[:advanced_placement_setting_attributes][:custom_product_page_dom_selector]
-      @icushop.custom_product_page_dom_action = my_params[:advanced_placement_setting_attributes][:custom_product_page_dom_action]
-      @icushop.custom_cart_page_dom_selector = my_params[:advanced_placement_setting_attributes][:custom_cart_page_dom_selector]
-      @icushop.custom_cart_page_dom_action = my_params[:advanced_placement_setting_attributes][:custom_cart_page_dom_action]
-      @icushop.custom_ajax_dom_selector = my_params[:advanced_placement_setting_attributes][:custom_ajax_dom_selector]
-      @icushop.custom_ajax_dom_action = my_params[:advanced_placement_setting_attributes][:custom_ajax_dom_action]
+      advanced_placement_setting = my_params[:advanced_placement_setting_attributes]
+
+      @icushop.custom_product_page_dom_selector = advanced_placement_setting[:custom_product_page_dom_selector]
+      @icushop.custom_product_page_dom_action = advanced_placement_setting[:custom_product_page_dom_action]
+      @icushop.custom_cart_page_dom_selector = advanced_placement_setting[:custom_cart_page_dom_selector]
+      @icushop.custom_cart_page_dom_action = advanced_placement_setting[:custom_cart_page_dom_action]
+      @icushop.custom_ajax_dom_selector = advanced_placement_setting[:custom_ajax_dom_selector]
+      @icushop.custom_ajax_dom_action = advanced_placement_setting[:custom_ajax_dom_action]
       @icushop.save
     end
 

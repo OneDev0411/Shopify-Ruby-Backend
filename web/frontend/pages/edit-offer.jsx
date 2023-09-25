@@ -1,33 +1,27 @@
-import { Page, LegacyCard, Layout, Tabs, Icon, Grid, Spinner, Toast } from '@shopify/polaris';
-import { DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
-import { TitleBar } from "@shopify/app-bridge-react";
+import React, {useCallback, useEffect, useState} from 'react';
+import {useSelector} from "react-redux";
+import {useLocation, useNavigate} from 'react-router-dom';
+
+import {Icon, Layout, Page, Spinner, Tabs} from '@shopify/polaris';
+import {DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
+import {TitleBar, useAppBridge} from "@shopify/app-bridge-react";
+import {Redirect} from '@shopify/app-bridge/actions';
+
+import {useAuthenticatedFetch} from "../hooks";
+import {FirstTab, FourthTab, SecondTab, ThirdTab} from "../components";
+import {OfferPreview} from "../components/OfferPreview";
 import "../components/stylesheets/mainstyle.css";
-import { FirstTab, SecondTab, ThirdTab, FourthTab } from "../components";
-import { useState, useCallback, useEffect } from 'react';
-import React from 'react';
-import { useAppQuery, useAuthenticatedFetch } from "../hooks";
-import { offerActivate, loadOfferDetails, getOfferSettings } from "../services/offers/actions/offer";
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useSelector } from "react-redux";
-import { OfferPreview } from "../components/OfferPreview";
-import { useAppBridge } from '@shopify/app-bridge-react'
-import { Redirect } from '@shopify/app-bridge/actions';
 
 export default function EditPage() {
+    const shopAndHost = useSelector(state => state.shopAndHost);
+    const app = useAppBridge();
+    const navigateTo = useNavigate();
+    const location = useLocation();
 
     const [enablePublish, setEnablePublish] = useState(false)
 
-    const shopAndHost = useSelector(state => state.shopAndHost);
-    const app = useAppBridge();
-
     // Content section tab data
-    const navigateTo = useNavigate();
-    const location = useLocation();
     const [selected, setSelected] = useState(0);
-    const handleTabChange = useCallback(
-        (selectedTabIndex) => setSelected(selectedTabIndex),
-        [],
-    );
     const [checkKeysValidity, setCheckKeysValidity] = useState({});
     const [initialVariants, setInitialVariants] = useState({});
     const [autopilotCheck, setAutopilotCheck] = useState({
@@ -113,6 +107,7 @@ export default function EditPage() {
         custom_ajax_dom_selector: ".ajaxcart__row:first",
         custom_ajax_dom_action: 'prepend',
     },
+
     });
 
     const [offerSettings, setOfferSettings] = useState({
@@ -128,9 +123,9 @@ export default function EditPage() {
         shop_id: undefined,
         offer_css: '',
         css_options: {
-          main: {},
-          text: {},
-          button: {},
+            main: {},
+            text: {},
+            button: {},
         }
     });
 
@@ -145,138 +140,149 @@ export default function EditPage() {
     //Call on initial render
     useEffect(() => {
         let redirect = Redirect.create(app);
-        if(location?.state?.offerID == null) {
+        if (location?.state?.offerID == null) {
             setIsLoading(true);
             fetch(`/api/merchant/offer_settings`, {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ offer: {include_sample_products: 0}, shop: shopAndHost.shop }),
+                body: JSON.stringify({offer: {include_sample_products: 0}, shop: shopAndHost.shop}),
             })
-            .then( (response) => { return response.json() })
-            .then( (data) => {
-                setOfferSettings(data);
-                setIsLoading(false);
-            })
-            .catch((error) => {
-                console.log("Error > ", error);
-            })
+                .then((response) => {
+                    return response.json()
+                })
+                .then((data) => {
+                    setOfferSettings(data);
+                    setIsLoading(false);
+                })
+                .catch((error) => {
+                    console.log("Error > ", error);
+                })
             setIsLoading(true);
             fetch(`/api/merchant/shop_settings`, {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ shop_attr: { admin: null }, shop: shopAndHost.shop}),
+                body: JSON.stringify({shop_attr: {admin: null}, shop: shopAndHost.shop}),
             })
-            .then( (response) => { return response.json() })
-            .then( (data) => {
-                if (data.redirect_to) {
-                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
-                }
-                else {
-                    if(Object.keys(data.shop_settings.css_options.main).length == 0) {
-                        data.shop_settings.css_options.main.color = "#2B3D51";
-                        data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
-                        data.shop_settings.css_options.button.color = "#FFFFFF";
-                        data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
+                .then((response) => {
+                    return response.json()
+                })
+                .then((data) => {
+                    if (data.redirect_to) {
+                        redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                    } else {
+                        if (Object.keys(data.shop_settings.css_options.main).length == 0) {
+                            data.shop_settings.css_options.main.color = "#2B3D51";
+                            data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
+                            data.shop_settings.css_options.button.color = "#FFFFFF";
+                            data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
+                            data.shop_settings.css_options.widows = '100%';
+                        }
                     }
-                }
-                setShop(data.shop_settings);
-            })
-            .catch((error) => {   
-                console.log("Error > ", error);
-            })
-        }
-        else {
+                    setShop(data.shop_settings);
+                })
+                .catch((error) => {
+                    console.log("Error > ", error);
+                })
+        } else {
             setIsLoading(true);
             fetch(`/api/merchant/load_offer_details`, {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ offer: { offer_id: offerID } , shop: shopAndHost.shop}),
+                body: JSON.stringify({offer: {offer_id: offerID}, shop: shopAndHost.shop}),
             })
-            .then( (response) => { return response.json() })
-            .then( (data) => {
-                setInitialVariants({...data.included_variants});
-                if(data.offerable_product_details.length > 0) {
-                    updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
-                }
-                updateCheckKeysValidity('cta', data.cta_a);
-                for(var i=0; i<data.offerable_product_details.length; i++) {
-                    data.offerable_product_details[i].preview_mode = true;
-                }
-                setOffer({...data});
-                setInitialOfferableProductDetails(data.offerable_product_details);
-                setIsLoading(false);
-            })
-            .catch((error) => {
-                console.log("Error > ", error);
-            })
+                .then((response) => {
+                    return response.json()
+                })
+                .then((data) => {
+                    setInitialVariants({...data.included_variants});
+                    if (data.offerable_product_details.length > 0) {
+                        updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
+                    }
+                    updateCheckKeysValidity('cta', data.cta_a);
+                    for (var i = 0; i < data.offerable_product_details.length; i++) {
+                        data.offerable_product_details[i].preview_mode = true;
+                    }
+                    setOffer({...data});
+                    setInitialOfferableProductDetails(data.offerable_product_details);
+                    setIsLoading(false);
+                })
+                .catch((error) => {
+                    console.log("Error > ", error);
+                })
             setIsLoading(true);
             fetch(`/api/merchant/offer_settings`, {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ offer: {include_sample_products: 0}, shop: shopAndHost.shop}),
+                body: JSON.stringify({offer: {include_sample_products: 0}, shop: shopAndHost.shop}),
             })
-            .then( (response) => { return response.json() })
-            .then( (data) => {
-                setOfferSettings(data);
-            })
-            .catch((error) => {
-                console.log("Error > ", error);
-            })
+                .then((response) => {
+                    return response.json()
+                })
+                .then((data) => {
+                    setOfferSettings(data);
+                })
+                .catch((error) => {
+                    console.log("Error > ", error);
+                })
             setIsLoading(true);
             fetch(`/api/merchant/shop_settings`, {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ shop_attr: { admin: null }, shop: shopAndHost.shop }),
+                body: JSON.stringify({shop_attr: {admin: null}, shop: shopAndHost.shop}),
             })
-            .then( (response) => { return response.json() })
-            .then( (data) => {
-                if (data.redirect_to) {
-                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
-                }
-                else {
-                    if(Object.keys(data.shop_settings.css_options.main).length == 0) {
-                        data.shop_settings.css_options.main.color = "#2B3D51";
-                        data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
-                        data.shop_settings.css_options.button.color = "#FFFFFF";
-                        data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
+                .then((response) => {
+                    return response.json()
+                })
+                .then((data) => {
+                    if (data.redirect_to) {
+                        redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                    } else {
+                        if (Object.keys(data.shop_settings.css_options.main).length == 0) {
+                            data.shop_settings.css_options.main.color = "#2B3D51";
+                            data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
+                            data.shop_settings.css_options.button.color = "#FFFFFF";
+                            data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
+                            data.shop_settings.css_options.widows = '100%';
+                        }
                     }
-                }
-                setShop(data.shop_settings);
-            })
-            .catch((error) => {
-                console.log("Error > ", error);
-            })
+                    setShop(data.shop_settings);
+                })
+                .catch((error) => {
+                    console.log("Error > ", error);
+                })
         }
         setIsLoading(true);
         fetch(`/api/merchant/autopilot_details?shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
-              'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
             },
         })
-        .then( (response) => { return response.json() })
-        .then( (data) => {
-            setAutopilotCheck(data);
-            setIsLoading(false);
-        })
-        .catch((error) => {
-            console.log("# Error AutopilotDetails > ", JSON.stringify(error));
-        })
+            .then((response) => {
+                return response.json()
+            })
+            .then((data) => {
+                setAutopilotCheck(data);
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.log("# Error AutopilotDetails > ", JSON.stringify(error));
+            })
 
         fetch(`/api/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
-              'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
             },
         })
         .then( (response) => { return response.json() })
@@ -315,7 +321,7 @@ export default function EditPage() {
     //Called whenever the checkKeysValidity changes in any child component
     function updateCheckKeysValidity(updatedKey, updatedValue) {
         setCheckKeysValidity(previousState => {
-        return { ...previousState, [updatedKey]: updatedValue };
+            return {...previousState, [updatedKey]: updatedValue};
         });
     }
 
@@ -323,7 +329,7 @@ export default function EditPage() {
     //Called whenever the offer changes in any child component
     function updateOffer(updatedKey, updatedValue) {
         setOffer(previousState => {
-            return { ...previousState, [updatedKey]: updatedValue };
+            return {...previousState, [updatedKey]: updatedValue};
         });
     }
 
@@ -366,12 +372,11 @@ export default function EditPage() {
     // Called to update the included variants in offer
     function updateIncludedVariants(selectedItem, selectedVariants) {
         const updatedOffer = {...offer};
-        if(Array.isArray(selectedItem)) {
-            for(var key in selectedVariants) {
+        if (Array.isArray(selectedItem)) {
+            for (var key in selectedVariants) {
                 updatedOffer.included_variants[key] = selectedVariants[key];
             }
-        }
-        else {
+        } else {
             updatedOffer.included_variants[selectedItem] = selectedVariants;
         }
         setOffer({...updatedOffer});
@@ -380,30 +385,31 @@ export default function EditPage() {
     // Called to update offerable_product_details and offerable_product_shopify_ids of offer
     function updateProductsOfOffer(data) {
         setOffer(previousState => {
-          return { ...previousState, offerable_product_details: [...previousState.offerable_product_details, data], };
+            return {...previousState, offerable_product_details: [...previousState.offerable_product_details, data],};
         });
         setOffer(previousState => {
-          return { ...previousState, offerable_product_shopify_ids: [...previousState.offerable_product_shopify_ids, data.id], };
+            return {
+                ...previousState,
+                offerable_product_shopify_ids: [...previousState.offerable_product_shopify_ids, data.id],
+            };
         });
     }
 
     //Called whenever the shop changes in any child component
     function updateShop(updatedValue, ...updatedKey) {
-        if(updatedKey.length == 1) {
+        if (updatedKey.length == 1) {
             setShop(previousState => {
-                return { ...previousState, [updatedKey[0]]: updatedValue };
+                return {...previousState, [updatedKey[0]]: updatedValue};
             });
-        }
-        else if(updatedKey.length == 2) {
+        } else if (updatedKey.length == 2) {
             setShop(previousState => ({
                 ...previousState,
                 [updatedKey[0]]: {
                     ...previousState[updatedKey[0]],
-                    [updatedKey[1]]: updatedValue 
+                    [updatedKey[1]]: updatedValue
                 }
             }));
-        }
-        else if(updatedKey.length == 3) {
+        } else if (updatedKey.length == 3) {
             setShop(previousState => ({
                 ...previousState,
                 [updatedKey[0]]: {
@@ -430,6 +436,7 @@ export default function EditPage() {
 
     const save = async(status) =>  {
         var placement_setting;
+        var save_as_default_setting;
         if(offer.in_product_page && offer.in_cart_page) {
             placement_setting = {
                 default_product_page: offer.placement_setting?.default_product_page,
@@ -480,6 +487,12 @@ export default function EditPage() {
                 template_ajax_id: offer.placement_setting?.template_ajax_id,
             }
         }
+        if(offer.advanced_placement_setting?.advanced_placement_setting_enabled) {
+            save_as_default_setting = offer.save_as_default_setting;
+        }
+        else {
+            save_as_default_setting = false;
+        }
         var ots = {
             active: status,
             checkout_after_accepted: offer.checkout_after_accepted,
@@ -529,22 +542,22 @@ export default function EditPage() {
             in_ajax_cart: offer.in_ajax_cart,
             in_product_page: offer.in_product_page,
             placement_setting_attributes: placement_setting,
-            save_as_default_setting: offer.save_as_default_setting,
+            save_as_default_setting: save_as_default_setting,
             enable_advance_setting: offer.enable_advance_setting,
             advanced_placement_setting_attributes: offer.advanced_placement_setting
         };
         if (shop.has_recharge && offer.recharge_subscription_id) {
-          ots.recharge_subscription_id = offer.recharge_subscription_id;
-          ots.interval_unit = offer.interval_unit;
-          ots.interval_frequency = offer.interval_frequency;
+            ots.recharge_subscription_id = offer.recharge_subscription_id;
+            ots.interval_unit = offer.interval_unit;
+            ots.interval_frequency = offer.interval_frequency;
         }
         setIsLoading(true);
-        if(location.state != null && location.state?.offerID == null) {
+        if (location.state != null && location.state?.offerID == null) {
             try {
                 const response = await fetch(`/api/offers/create/${shop?.shop_id}`, {
                     method: 'POST',
                     headers: {
-                    'Content-Type': 'application/json'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({offer: ots})
                 });
@@ -555,19 +568,18 @@ export default function EditPage() {
             } catch (error) {
                 console.error('Error:', error);
             }
-        }
-        else {
+        } else {
             try {
                 const response = await fetch(`/api/offers/${offer.id}/update/${shop.shop_id}`, {
                     method: 'PATCH',
                     headers: {
-                    'Content-Type': 'application/json'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({offer: ots, shop: shopAndHost.shop, host: shopAndHost.host})
                 });
                 const responseData = await response.json();
-                responseData.text = responseData?.text_a?.replace("{{ product_title }}", responseData.offerable_product_details[0]?.title)
-                responseData.cta = responseData?.cta_a;
+                responseData.text = responseData?.offer?.text_a?.replace("{{ product_title }}", responseData.offer.offerable_product_details[0]?.title)
+                responseData.cta = responseData?.offer?.cta_a;
                 for(var i=0; i<responseData.offer.offerable_product_details.length; i++) {
                     responseData.offer.offerable_product_details[i].preview_mode = true;
                 }
@@ -609,39 +621,38 @@ export default function EditPage() {
 
     // Preview section tab data
     const [selectedPre, setSelectedPre] = useState(0);
-    const handlePreTabChange = useCallback((selectedPreTabIndex) => { 
+    const handlePreTabChange = useCallback((selectedPreTabIndex) => {
         setSelectedPre(selectedPreTabIndex);
         if (selectedPreTabIndex == 0) {
             setShop(previousState => {
-                return { ...previousState, selectedView: 'desktop' };
+                return {...previousState, selectedView: 'desktop'};
             });
-        }
-        else {
+        } else {
             setShop(previousState => {
-                return { ...previousState, selectedView: 'mobile' };
+                return {...previousState, selectedView: 'mobile'};
             });
         }
-    },[]);
+    }, []);
 
     const tabsPre = [
         {
             id: 'desktop',
-            content:  (
+            content: (
                 <div className='flex-tab'>
-                    <Icon source={DesktopMajor} />
+                    <Icon source={DesktopMajor}/>
                     <p>Desktop</p>
                 </div>
-              ),
+            ),
             panelID: 'desktop',
         },
         {
             id: 'mobile',
             content: (
                 <div className='flex-tab'>
-                    <Icon source={MobileMajor} />
+                    <Icon source={MobileMajor}/>
                     <p>Mobile</p>
                 </div>
-              ),
+            ),
             panelID: 'mobile',
         }
     ];
@@ -651,69 +662,104 @@ export default function EditPage() {
     };
 
     const changeTab = () => {
-        handleTabChange(selected + 1)
+        setSelected(selected + 1)
     }
 
     const enableOrDisablePublish = (enable) => {
         setEnablePublish(enable);
-      };
+    };
 
     return (
-        <div className="edit-offer" style={{ overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', }}>
+        <div className="edit-offer" style={{
+            overflow: 'hidden',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '100vh',
+        }}>
             {isLoading ? (
                 <Spinner size="large" color="teal"/>
-            )   :   (
+            ) : (
                 <Page
-                    breadcrumbs={[{content: 'Products', url: '/'}]}
+                    backAction={{content: 'Offers', url: '/offer'}}
                     title="Create new offer"
                     primaryAction={{content: 'Publish', disabled: enablePublish, onClick: publishOffer}}
                     secondaryActions={[{content: 'Save Draft', disabled: false, onAction: () => saveDraft()}]}
-                    style={{ overflow: 'hidden' }}
+                    style={{overflow: 'hidden'}}
                 >
-                    <TitleBar/>
                     <Layout>
                         <Layout.Section>
-                            <Tabs
-                                tabs={tabs}
-                                selected={selected}
-                                onSelect={handleTabChange}
-                                disclosureText="More views"
-                                fitted
-                            >
-                                <div className='space-4'></div>
+                            <div className="offer-tabs-no-padding">
+                                <Tabs
+                                    tabs={tabs}
+                                    selected={selected}
+                                    onSelect={setSelected}
+                                    disclosureText="More views"
+                                    fitted
+                                >
+                                    <div className='space-4'></div>
 
-                                {selected == 0 ?
-                                    // page was imported from components folder
-                                    <FirstTab offer={offer} shop={shop} offerSettings={offerSettings} updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants} updateProductsOfOffer={updateProductsOfOffer} updateCheckKeysValidity={updateCheckKeysValidity} handleTabChange={changeTab} initialVariants={initialVariants} updateInitialVariants={updateInitialVariants} autopilotCheck={autopilotCheck} openAutopilotSection={openAutopilotSection} updateOpenAutopilotSection={updateOpenAutopilotSection} initialOfferableProductDetails={initialOfferableProductDetails} enableOrDisablePublish={enableOrDisablePublish}/>
-                                : "" }
-                                {selected == 1 ?
-                                    // page was imported from components folder
-                                    <SecondTab offer={offer} shop={shop} setOffer={setOffer} offerSettings={offerSettings} updateOffer={updateOffer} updateNestedAttributeOfOffer={updateNestedAttributeOfOffer} updateShop={updateShop} shopifyThemeName={shopifyThemeName} autopilotCheck={autopilotCheck} handleTabChange={changeTab} themeTemplateData={themeTemplateData} templateImagesURL={templateImagesURL} enableOrDisablePublish={enableOrDisablePublish}/>
-                                : "" }
-                                {selected == 2 ?
-                                    // page was imported from components folder
-                                    <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} saveDraft={saveDraft} publishOffer={publishOffer} autopilotCheck={autopilotCheck} enablePublish={enablePublish}/>
-                                : "" }
-                                {selected == 3 ?
-                                    // page was imported from components folder
-                                    <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings} saveDraft={saveDraft} publishOffer={publishOffer} enablePublish={enablePublish} updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>
-                                : "" }
-                            </Tabs>
+                                    {selected == 0 ?
+                                        // page was imported from components folder
+                                        <FirstTab offer={offer} shop={shop} offerSettings={offerSettings}
+                                                  updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants}
+                                                  updateProductsOfOffer={updateProductsOfOffer}
+                                                  updateCheckKeysValidity={updateCheckKeysValidity}
+                                                  handleTabChange={changeTab} initialVariants={initialVariants}
+                                                  updateInitialVariants={updateInitialVariants}
+                                                  autopilotCheck={autopilotCheck}
+                                                  openAutopilotSection={openAutopilotSection}
+                                                  updateOpenAutopilotSection={updateOpenAutopilotSection}
+                                                  initialOfferableProductDetails={initialOfferableProductDetails}
+                                                  enableOrDisablePublish={enableOrDisablePublish}/>
+                                        : ""}
+                                    {selected == 1 ?
+                                        // page was imported from components folder
+                                        <SecondTab offer={offer} shop={shop} setOffer={setOffer}
+                                                   offerSettings={offerSettings} updateOffer={updateOffer}
+                                                   updateShop={updateShop} shopifyThemeName={shopifyThemeName}
+                                                   autopilotCheck={autopilotCheck} handleTabChange={changeTab}
+                                                   updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}
+                                                   themeTemplateData={themeTemplateData} templateImagesURL={templateImagesURL}
+                                                   enableOrDisablePublish={enableOrDisablePublish}/>
+                                        : ""}
+                                    {selected == 2 ?
+                                        // page was imported from components folder
+                                        <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer}
+                                                  updateShop={updateShop} saveDraft={saveDraft} publishOffer={publishOffer}
+                                                  autopilotCheck={autopilotCheck} enablePublish={enablePublish}/>
+                                        : ""}
+                                    {selected == 3 ?
+                                        // page was imported from components folder
+                                        <FourthTab offer={offer} shop={shop} updateOffer={updateOffer}
+                                                   updateShop={updateShop} updateOfferSettings={updateOfferSettings}
+                                                   saveDraft={saveDraft} publishOffer={publishOffer}
+                                                   enablePublish={enablePublish}
+                                                   updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>
+                                        : ""}
+                                </Tabs>
+                            </div>
                         </Layout.Section>
                         <Layout.Section secondary>
-                            <Tabs
-                                tabs={tabsPre}
-                                selected={selectedPre}
-                                onSelect={handlePreTabChange}
-                                disclosureText="More views"
-                                fitted
-                            >
-                                <div className='space-4'></div>
-                                {selectedPre == 0 ?
-                                    <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity}/>
-                                : 
-                                    <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity}/>  }
-                            </Tabs>
+                            <div className="offer-tabs-no-padding">
+                                <Tabs
+                                    tabs={tabsPre}
+                                    selected={selectedPre}
+                                    onSelect={handlePreTabChange}
+                                    disclosureText="More views"
+                                    fitted
+                                >
+                                    <div className='space-4'></div>
+                                    {selectedPre == 0 ?
+                                        <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer}
+                                                      checkKeysValidity={checkKeysValidity}
+                                                      updateCheckKeysValidity={updateCheckKeysValidity}/>
+                                        :
+                                        <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer}
+                                                      checkKeysValidity={checkKeysValidity}
+                                                      updateCheckKeysValidity={updateCheckKeysValidity}/>}
+                                </Tabs>
+                            </div>
                         </Layout.Section>
                     </Layout>
                 </Page>

@@ -46,20 +46,20 @@ export default function HomePage() {
   }, [setCurrentShop, setPlanName, setTrialDays])
 
   return (
-    <Page fullWidth={true}>
+    <Page fullWidth>
       <CustomTitleBar
         title="In Cart Upsell & Cross Sell"
         image={iculogo}
         buttonText={"Create offer"}
         handleButtonClick={handleOpenOfferPage}/>
       <Layout>
-        <Layout.Section>
-          {isSubscriptionActive(currentShop?.subscription) && planName!=='free' && trialDays>0 &&
+        {isSubscriptionActive(currentShop?.subscription) && planName!=='free' && trialDays>0 &&
+          <Layout.Section>
             <Banner icon='none' status="info">
               <p>{ trialDays } days remaining for the trial period</p>
             </Banner>
-          }
-        </Layout.Section>
+          </Layout.Section>
+        }
         <Layout.Section>
           <OffersList />
           {hasOffers && (
