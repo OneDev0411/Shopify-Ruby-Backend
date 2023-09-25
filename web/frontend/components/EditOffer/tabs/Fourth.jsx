@@ -62,7 +62,6 @@ export function FourthTab(props) {
                         onChange={handleAjaxDomAction}
                         value={props.shop.custom_ajax_dom_action}
                     />
-                    <TextField label="AJAX refresh code" value={props.shop.ajax_refresh_code} onChange={handleAjaxRefreshCode} multiline={6}></TextField>
                 </LegacyCard.Section>
                 <LegacyCard.Section title="Custom CSS">
                     <TextField value={props.shop.offer_css} onChange={handleOfferCss} multiline={6}></TextField>
