@@ -710,6 +710,10 @@ export function SecondTab(props) {
         setCollectionModal(!collectionModal);
     }, [collectionModal]);
 
+    const handleEnableAdvancedSetting = useCallback((newChecked) => {
+        props.updateNestedAttributeOfOffer(newChecked, "advanced_placement_setting", "advanced_placement_setting_enabled");
+    }, []);
+
     async function handleSelectCollectionsModal() {
         if(props.offer.id!=null){
             await getSelectedItems('collection');
@@ -838,6 +842,13 @@ export function SecondTab(props) {
                                 value={selected}
                             />
                         </Grid.Cell>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                            <Checkbox
+                                label="Enable Advanced Setting"
+                                checked={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                                onChange={handleEnableAdvancedSetting}
+                            />
+                        </Grid.Cell>
                     </Grid>
                     {(props.offer.id == null || props.offer.id != props.autopilotCheck?.autopilot_offer_id) && (
                     <>
@@ -887,6 +898,7 @@ export function SecondTab(props) {
                                         checked={props.offer.placement_setting?.default_product_page}
                                         name="prod-settings"
                                         onChange={(event) => handleDefaultSettingChange(event, 'product')}
+                                        disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                                     />
                                 </Grid.Cell>
                             </Grid>
@@ -897,10 +909,11 @@ export function SecondTab(props) {
                                         checked={!props.offer.placement_setting?.default_product_page}
                                         name="prod-settings"
                                         onChange={(event) => handleUseTemplateChange(event, 'product')}
+                                        disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                                     />
                                 </Grid.Cell>
                             </Grid>
-                            {!props.offer.placement_setting?.default_product_page && (
+                            {!props.offer.placement_setting?.default_product_page && !props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled && (
                                 <>
                                     <Image
                                         source={props.templateImagesURL.product_page_image_1}
@@ -934,6 +947,7 @@ export function SecondTab(props) {
                                         checked={props.offer.placement_setting?.default_cart_page}
                                         name="cart-settings"
                                         onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
+                                        disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                                     />
                                 </Grid.Cell>
                             </Grid>
@@ -944,10 +958,11 @@ export function SecondTab(props) {
                                         checked={!props.offer.placement_setting?.default_cart_page}
                                         name="cart-settings"
                                         onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
+                                        disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                                     />
                                 </Grid.Cell>
                             </Grid>
-                            {!props.offer.placement_setting?.default_cart_page && (
+                            {!props.offer.placement_setting?.default_cart_page && !props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled && (
                                 <>
                                     <Image
                                         source={props.templateImagesURL.cart_page_image_1}
@@ -984,6 +999,7 @@ export function SecondTab(props) {
                                         checked={props.offer.placement_setting?.default_ajax_cart}
                                         name="ajax-settings"
                                         onChange={(event) => handleDefaultSettingChange(event, 'ajax')}
+                                        disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                                     />
                                 </Grid.Cell>
                             </Grid>
@@ -994,10 +1010,11 @@ export function SecondTab(props) {
                                         checked={!props.offer.placement_setting?.default_ajax_cart}
                                         name="ajax-settings"
                                         onChange={(event) => handleUseTemplateChange(event, 'ajax')}
+                                        disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                                     />
                                 </Grid.Cell>
                             </Grid>
-                            {!props.offer.placement_setting?.default_ajax_cart && (
+                            {!props.offer.placement_setting?.default_ajax_cart && !props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled && (
                                 <>
                                     <Image
                                         source={props.templateImagesURL.ajax_cart_image_1}
@@ -1031,6 +1048,7 @@ export function SecondTab(props) {
                                         checked={props.offer.placement_setting?.default_cart_page}
                                         name="cart-settings"
                                         onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
+                                        disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                                     />
                                 </Grid.Cell>
                             </Grid>
@@ -1041,10 +1059,11 @@ export function SecondTab(props) {
                                         checked={!props.offer.placement_setting?.default_cart_page}
                                         name="cart-settings"
                                         onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
+                                        disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                                     />
                                 </Grid.Cell>
                             </Grid>
-                            {!props.offer.placement_setting?.default_cart_page && (
+                            {!props.offer.placement_setting?.default_cart_page && !props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled && (
                                 <>
                                     <Image
                                         source={props.templateImagesURL.cart_page_image_1}
@@ -1080,6 +1099,7 @@ export function SecondTab(props) {
                                 label="Use default settings"
                                 checked={defaultSetting}
                                 onChange={(event) => handleDefaultSettingChange(event, null)}
+                                disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                             />
                         </Grid.Cell>
                     </Grid>
@@ -1089,10 +1109,11 @@ export function SecondTab(props) {
                                 label="Use Template"
                                 checked={useTemplate}
                                 onChange={(event) => handleUseTemplateChange(event, null)}
+                                disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                             />
                         </Grid.Cell>
                     </Grid>
-                    {useTemplate && (
+                    {useTemplate && !props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled && (
                         <>
                             <Image
                                 source={insertedImage1}

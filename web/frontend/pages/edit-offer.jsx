@@ -105,6 +105,14 @@ export default function EditPage() {
         default_cart_page: true,
         default_ajax_cart: true,
     },
+    advanced_placement_setting: {
+        custom_product_page_dom_selector: "[class*='description']",
+        custom_product_page_dom_action: 'after',
+        custom_cart_page_dom_selector: "form[action^='/cart']",
+        custom_cart_page_dom_action: 'prepend',
+        custom_ajax_dom_selector: ".ajaxcart__row:first",
+        custom_ajax_dom_action: 'prepend',
+    },
     });
 
     const [offerSettings, setOfferSettings] = useState({
@@ -521,6 +529,9 @@ export default function EditPage() {
             in_ajax_cart: offer.in_ajax_cart,
             in_product_page: offer.in_product_page,
             placement_setting_attributes: placement_setting,
+            save_as_default_setting: offer.save_as_default_setting,
+            enable_advance_setting: offer.enable_advance_setting,
+            advanced_placement_setting_attributes: offer.advanced_placement_setting
         };
         if (shop.has_recharge && offer.recharge_subscription_id) {
           ots.recharge_subscription_id = offer.recharge_subscription_id;
@@ -566,20 +577,6 @@ export default function EditPage() {
                 console.error('Error:', error);
             }
         }
-        fetch('/api/merchant/update_shop_settings', {
-             method: 'PATCH',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify( {shop_attr: shop, shop: shopAndHost.shop, admin: shop.admin, json: true }),
-            })
-        .then( (response) => { return response.json(); })
-        .then( (data) => {
-            setShop(data.shop);
-            setIsLoading(false);
-        })
-        .catch((error) => {
-        })
         navigateTo('/offer');
     }
 
@@ -699,7 +696,7 @@ export default function EditPage() {
                                 : "" }
                                 {selected == 3 ?
                                     // page was imported from components folder
-                                    <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings} saveDraft={saveDraft} publishOffer={publishOffer} enablePublish={enablePublish}/>
+                                    <FourthTab offer={offer} shop={shop} updateOffer={updateOffer} updateShop={updateShop} updateOfferSettings={updateOfferSettings} saveDraft={saveDraft} publishOffer={publishOffer} enablePublish={enablePublish} updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>
                                 : "" }
                             </Tabs>
                         </Layout.Section>

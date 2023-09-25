@@ -56,6 +56,18 @@ class OffersController < AuthenticatedController
       my_params['rules_json'] = offer_params['rules_json'].map { |rule| rule.except('uuid') }
     end
 
+    if offer_params['save_as_default_setting']
+      @icushop.offers.where.not(id: params[:id]).update(save_as_default_setting: false)
+
+      @icushop.custom_product_page_dom_selector = my_params[:advanced_placement_setting_attributes][:custom_product_page_dom_selector]
+      @icushop.custom_product_page_dom_action = my_params[:advanced_placement_setting_attributes][:custom_product_page_dom_action]
+      @icushop.custom_cart_page_dom_selector = my_params[:advanced_placement_setting_attributes][:custom_cart_page_dom_selector]
+      @icushop.custom_cart_page_dom_action = my_params[:advanced_placement_setting_attributes][:custom_cart_page_dom_action]
+      @icushop.custom_ajax_dom_selector = my_params[:advanced_placement_setting_attributes][:custom_ajax_dom_selector]
+      @icushop.custom_ajax_dom_action = my_params[:advanced_placement_setting_attributes][:custom_ajax_dom_action]
+      @icushop.save
+    end
+
     if offer.update(my_params)
       @icushop.publish_async
       render json: { offer: offer.library_json }, status: :ok
@@ -111,14 +123,19 @@ class OffersController < AuthenticatedController
                                   :show_custom_field, :custom_field_name, :custom_field_placeholder,
                                   :discount_target_type, :discount_value, :discount_value_type,
                                   :discount_target_selection, :discount_prerequisite_quantity,
-                                  :discount_allocation_method, :shop_id, :offer_id,
+                                  :discount_allocation_method, :shop_id, :offer_id, :save_as_default_setting,
                                   rules_json: [:item_type, :uuid, :item_shopify_id, :rule_type,
                                                :item_shopify_title, :quantity, :item_name,
                                                :rule_selector, :item_type_name, :_destroy],
                                   included_variants: {},
                                   offerable_product_shopify_ids: [],
                                   products_to_remove: [],
-                                  placement_setting_attributes: [:default_product_page, :default_cart_page, :default_ajax_cart, :template_product_id, :template_cart_id, :template_ajax_id]).to_h
+                                  placement_setting_attributes: [:default_product_page, :default_cart_page, :default_ajax_cart,
+                                                                 :template_product_id, :template_cart_id, :template_ajax_id],
+                                  advanced_placement_setting_attributes: [:id, :custom_product_page_dom_selector, :custom_product_page_dom_action,
+                                                                         :custom_cart_page_dom_selector, :custom_cart_page_dom_action,
+                                                                         :custom_ajax_dom_selector, :custom_ajax_dom_action, 
+                                                                         :advanced_placement_setting_enabled],).to_h
   end
  
 end
