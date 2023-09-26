@@ -198,7 +198,12 @@
 
 .legacy-card-hr {
     margin: 30px -20px 20px;
-    border-top: 1px solid #f0f1f1;
+    border-top: 0.5px solid #BABFC3;
+}
+
+.legacy-card-hr-t20-b15 {
+    margin-top: 20px;
+    margin-bottom: 15px;
 }
 
 #appearance-offers .Polaris-TextField__Input.Polaris-TextField__Input--suffixed {

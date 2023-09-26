@@ -490,7 +490,7 @@ export function FirstTab(props) {
                                 onChange={handleBtnChange}
                                 autoComplete="off"
                             />
-                            {abTestCheck && <hr style={{marginLeft: '-20px', marginRight: '-20px', backgroundColor: '#BABFC3', marginBottom: '12px'}} />}
+                            {abTestCheck && <hr className="legacy-card-hr legacy-card-hr-t20-b15" />}
                             <Checkbox id={"abTesting"}
                                       label="Enable A/B testing"
                                       checked={abTestCheck}

@@ -36,7 +36,7 @@ export function FourthTab(props) {
             <LegacyCard sectioned title="Offer placement - advanced settings" actions={[{ content: 'View help doc' }]}>
                 <div>
                     <div style={{paddingBottom: '10px'}}>
-                        <Text variant="headingMd" as="h2">Product page</Text>
+                        <Text variant="headingSm" as="h2">Product page</Text>
                     </div>
                     <TextField
                         label="DOM Selector"
@@ -56,7 +56,7 @@ export function FourthTab(props) {
 
                 <div>
                     <div style={{paddingBottom: '10px'}}>
-                        <Text variant="headingMd" as="h2">Cart page</Text>
+                        <Text variant="headingSm" as="h2">Cart page</Text>
                     </div>
                     <TextField
                         label="DOM Selector"
@@ -76,7 +76,7 @@ export function FourthTab(props) {
 
                 <div>
                     <div style={{paddingBottom: '10px'}}>
-                        <Text variant="headingMd" as="h2">AJAX/Slider cart</Text>
+                        <Text variant="headingSm" as="h2">AJAX/Slider cart</Text>
                     </div>
                     <TextField
                         label="DOM Selector"
@@ -115,7 +115,7 @@ export function FourthTab(props) {
 
                 <div>
                     <div style={{paddingBottom: '10px'}}>
-                        <Text variant="headingMd" as="h2">Custom CSS</Text>
+                        <Text variant="headingSm" as="h2">Custom CSS</Text>
                     </div>
 
                     <TextField
