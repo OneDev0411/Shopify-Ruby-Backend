@@ -83,6 +83,18 @@
     background-color: #3049CD !important;
 }
 
+.Polaris-ActionMenu-SecondaryAction .Polaris-Button {
+    background-color: white !important;
+    box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #BABFC3 !important;
+}
+
+.Polaris-Button.Polaris-Button--primary.Polaris-Button--disabled {
+    background-color: #ebecef !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+}
+
 .title-bar-button {
     display: flex;
     justify-content: end;
@@ -122,4 +134,37 @@
 
 .custom-footer .Polaris-Link {
     display: inline-flex;
+}
+
+.offer-tabs-no-padding > div > .Polaris-Box:first-child {
+    padding: 0;
+    margin-bottom: 40px;
+}
+
+.offer-tabs-no-padding .Polaris-Tabs__TabContainer button {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.offer-tabs-no-padding .Polaris-Tabs__Tab--selected .Polaris-Tabs__Title::before {
+    background-color: #3049CD !important;
+}
+
+#first-tab-offer .Polaris-LegacyStack.Polaris-LegacyStack--vertical.Polaris-LegacyStack--spacingLoose .Polaris-LegacyStack__Item:nth-child(5) {
+    margin-top: 0;
+}
+
+#right-align-polaris span.Polaris-Thumbnail.Polaris-Thumbnail--sizeMedium {
+    position: absolute;
+    right: 10px;
+    border: 0;
+}
+
+#right-align-polaris .Polaris-Box .Polaris-HorizontalGrid  > .Polaris-HorizontalGrid {
+    position: relative;
+    min-height: 64px;
+}
+
+.Polaris-Page {
+    width: 100%;
 }
