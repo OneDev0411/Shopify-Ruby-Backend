@@ -83,8 +83,6 @@ export function ModalAddProduct(props) {
 
   return (
     <div id="right-align-polaris">
-      {console.log(props.selectedItems)}
-
       <ResourceList
           resourceName={resourceName}
           items={items}
