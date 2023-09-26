@@ -32,9 +32,24 @@ export function ThirdTab(props) {
     const handleSelectChange = useCallback((value) => setSelected(value), []);
 
     // Space above the offer
-    const handleAboveSpace = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "main", "marginTop"), []);
+    const handleAboveSpace = useCallback((newValue) => {
+        const numericValue = parseInt(newValue);
+        if (isNaN(numericValue) || numericValue > 0 && numericValue <= 100) {
+          props.updateShop(
+            `${newValue}px`,
+            "css_options",
+            "main",
+            "marginTop"
+          );
+        }
+      }, []);
     // Space below the offer
-    const handleBelowSpace = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "main", "marginBottom"), []);
+    const handleBelowSpace = useCallback((newValue) => {
+        const numericValue = parseInt(newValue);
+        if (isNaN(numericValue) || numericValue > 0 && numericValue <= 100) {
+          props.updateShop(`${newValue}px`, "css_options", "main", "marginBottom");
+        }
+      }, []);
     //Border style drop-down menu
     const handleBorderStyle = useCallback((newValue) => {
         props.updateShop(newValue, "css_options", "main", "borderStyle");
@@ -232,6 +247,7 @@ export function ThirdTab(props) {
                                 onChange={handleAboveSpace}
                                 value={parseInt(props.shop.css_options.main.marginTop)}
                                 suffix="px"
+                                placeholder="1-100px"
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
@@ -241,6 +257,7 @@ export function ThirdTab(props) {
                                 onChange={handleBelowSpace}
                                 value={parseInt(props.shop.css_options.main.marginBottom)}
                                 suffix="px"
+                                placeholder="1-100px"
                             />
                         </Grid.Cell>
                     </Grid>
