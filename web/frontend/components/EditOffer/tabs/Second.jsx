@@ -8,9 +8,10 @@ import {
     Grid,
     Icon,
     RadioButton,
-    Image} from "@shopify/polaris";
+    Image, Badge
+} from "@shopify/polaris";
 import {
-    CancelMajor  } from '@shopify/polaris-icons';
+    CancelMinor  } from '@shopify/polaris-icons';
 import {ModalAddConditions} from "./../../modal_AddConditions";
 import { useState, useCallback, useRef, useEffect } from "react";
 import React from "react";
@@ -958,9 +959,11 @@ export function SecondTab(props) {
     }
 
     return (
-        <div>
+        <div id="polaris-placement-cards">
             <LegacyCard title="Choose placement" sectioned>
-                <LegacyCard.Section>
+                <p style={{color: '#6D7175', marginTop: '-20px', marginBottom: '23px'}}>Where would you like your offer to appear?</p>
+
+                <LegacyStack spacing="loose" vertical>
                     <Grid>
                         <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <Select
@@ -971,12 +974,15 @@ export function SecondTab(props) {
                         </Grid.Cell>
                     </Grid>
                     {(props.offer.id == null || props.offer.id != props.autopilotCheck?.autopilot_offer_id) && (
-                    <>
-                        <div className="space-4"></div>
-                        <Button onClick={handleSelectProductsModal} ref={modalProd} >Select Product</Button>
-                    </>
+                        <>
+                            <div style={{marginBottom: '20px', marginTop: '16px'}}>
+                                <Button onClick={handleSelectProductsModal} ref={modalProd} >Select Product</Button>
+                            </div>
+
+                            <Button onClick={handleSelectCollectionsModal} ref={modalColl}>Select Collection</Button>
+                        </>
                     )}
-                    <Modal 
+                    <Modal
                         open={productModal}
                         onClose={handleProductsModal}
                         title="Select products from your store"
@@ -988,12 +994,6 @@ export function SecondTab(props) {
                             <SelectProductsModal selectedItems={selectedItems} setSelectedItems={setSelectedItems} offer={props.offer} shop={props.shop} handleProductsModal={handleProductsModal} selectedProducts={selectedProducts} setSelectedProducts={setSelectedProducts} />
                         </Modal.Section>
                     </Modal>
-                    {(props.offer.id == null || props.offer.id != props.autopilotCheck?.autopilot_offer_id) && (
-                    <>
-                        <div className="space-4"></div>
-                        <Button onClick={handleSelectCollectionsModal} ref={modalColl}>Select Collection</Button>
-                    </>
-                    )}
                     <Modal
                         open={collectionModal}
                         onClose={handleCollectionsModal}
@@ -1006,289 +1006,318 @@ export function SecondTab(props) {
                             <SelectCollectionsModal selectedItems={selectedItems} setSelectedItems={setSelectedItems} offer={props.offer} shop={props.shop} handleCollectionsModal={handleCollectionsModal} selectedCollections={selectedCollections} setSelectedCollections={setSelectedCollections}/>
                         </Modal.Section>
                     </Modal>
-                </LegacyCard.Section>
-                {multipleDefaultSettings ? (
-                    (props.offer.in_product_page && props.offer.in_cart_page) ? (
-                        <>
-                            <LegacyCard.Section title="Where on this page would you like the offer to appear?">
-                            <Grid>
-                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                                    <RadioButton 
-                                        label="Use default settings for Product Page"
-                                        checked={props.shop.default_template_settings?.defaultSettingsForProductPage}
-                                        name="prod-settings"
-                                        onChange={(event) => handleDefaultSettingChange(event, 'product')}
-                                    />
-                                </Grid.Cell>
-                            </Grid>
-                            <Grid>
-                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                                    <RadioButton 
-                                        label="Use Template for Product Page"
-                                        checked={props.shop.default_template_settings?.templateForProductPage}
-                                        name="prod-settings"
-                                        onChange={(event) => handleUseTemplateChange(event, 'product')}
-                                    />
-                                </Grid.Cell>
-                            </Grid>
-                            {props.shop.default_template_settings?.templateForProductPage && (
-                                <>
-                                    <Image
-                                        source={product_page_image_1}
-                                        alt="Sample Image 1"
-                                        style={{marginRight : '10px',marginTop: '10px', height: '150px', width: '165px'}}
-                                        className={ productIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                        onClick={() => handleImageClick('product_page', 1)}
-                                    />
-                                    <Image
-                                        source={product_page_image_2}
-                                        alt="Sample Image 2"
-                                        style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
-                                        className={ productIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                        onClick={() => handleImageClick('product_page', 2)}
-                                    />
-                                    <Image
-                                        source={product_page_image_3}
-                                        alt="Sample Image 3"
-                                        style={{marginLeft : '10px', height: '150px', width: '165px'}}
-                                        className={ productIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                        onClick={() => handleImageClick('product_page', 3)}
-                                    />
-                                </>
-                            )}
-                            </LegacyCard.Section>
-                            <LegacyCard.Section title="Where on this page would you like the offer to appear?">
-                            <Grid>
-                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                                    <RadioButton 
-                                        label="Use default settings for Cart Page"
-                                        checked={props.shop.default_template_settings?.defaultSettingsForCartPage}
-                                        name="cart-settings"
-                                        onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
-                                    />
-                                </Grid.Cell>
-                            </Grid>
-                            <Grid>
-                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                                    <RadioButton 
-                                        label="Use Template for Cart Page"
-                                        checked={props.shop.default_template_settings?.templateForCartPage}
-                                        name="cart-settings"
-                                        onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
-                                    />
-                                </Grid.Cell>
-                            </Grid>
-                            {props.shop.default_template_settings?.templateForCartPage && (
-                                <>
-                                    <Image
-                                        source={cart_page_image_1}
-                                        alt="Sample Image 1"
-                                        style={{marginRight : '10px',marginTop: '10px', height: '150px', width: '165px'}}
-                                        className={ cartIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                        onClick={() => handleImageClick('cart_page', 1)}
-                                    />
-                                    <Image
-                                        source={cart_page_image_2}
-                                        alt="Sample Image 2"
-                                        style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
-                                        className={ cartIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                        onClick={() => handleImageClick('cart_page', 2)}
-                                    />
-                                    <Image
-                                        source={cart_page_image_3}
-                                        alt="Sample Image 3"
-                                        style={{marginLeft : '10px', height: '150px', width: '165px'}}
-                                        className={ cartIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                        onClick={() => handleImageClick('cart_page', 3)}
-                                    />
-                                </>
-                            )}
-                            </LegacyCard.Section>
-                        </>
+                </LegacyStack>
+                {selectedItems.length !== 0 &&
+                    (multipleDefaultSettings ? (
+                        (props.offer.in_product_page && props.offer.in_cart_page) ? (
+                            <>
+                                <hr style={{marginLeft: '-20px', marginRight: '-20px', backgroundColor: '#BABFC3', marginBottom: '15px', marginTop: '20px'}} />
+                                <LegacyCard.Section title="Where on this page would you like the offer to appear?">
+                                    <Grid>
+                                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 8}}>
+                                            <RadioButton
+                                                label="Use default settings for Product Page"
+                                                checked={props.shop.default_template_settings?.defaultSettingsForProductPage}
+                                                name="prod-settings"
+                                                onChange={(event) => handleDefaultSettingChange(event, 'product')}
+                                            />
+                                        </Grid.Cell>
+                                    </Grid>
+                                    <Grid>
+                                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
+                                            <RadioButton
+                                                label="Use Template for Product Page"
+                                                checked={props.shop.default_template_settings?.templateForProductPage}
+                                                name="prod-settings"
+                                                onChange={(event) => handleUseTemplateChange(event, 'product')}
+                                            />
+                                        </Grid.Cell>
+                                    </Grid>
+                                    {props.shop.default_template_settings?.templateForProductPage && (
+                                        <>
+                                            <div className="space-4" />
+                                            <Image
+                                                source={product_page_image_1}
+                                                alt="Sample Image 1"
+                                                style={{marginRight : '10px',marginTop: '10px', cursor: 'pointer', width: '165px'}}
+                                                className={ productIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                                onClick={() => handleImageClick('product_page', 1)}
+                                            />
+                                            <Image
+                                                source={product_page_image_2}
+                                                alt="Sample Image 2"
+                                                style={{marginLeft : '10px', marginRight : '10px', cursor: 'pointer', width: '165px'}}
+                                                className={ productIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                                onClick={() => handleImageClick('product_page', 2)}
+                                            />
+                                            <Image
+                                                source={product_page_image_3}
+                                                alt="Sample Image 3"
+                                                style={{marginLeft : '10px', cursor: 'pointer', width: '165px'}}
+                                                className={ productIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                                onClick={() => handleImageClick('product_page', 3)}
+                                            />
+                                        </>
+                                    )}
+                                </LegacyCard.Section>
+
+                                <hr style={{marginLeft: '-20px', marginRight: '-20px', backgroundColor: '#BABFC3', marginBottom: '15px', marginTop: '20px'}} />
+                                <LegacyCard.Section title="Where on this page would you like the offer to appear?">
+                                    <Grid>
+                                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
+                                            <RadioButton
+                                                label="Use default settings for Cart Page"
+                                                checked={props.shop.default_template_settings?.defaultSettingsForCartPage}
+                                                name="cart-settings"
+                                                onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
+                                            />
+                                        </Grid.Cell>
+                                    </Grid>
+                                    <Grid>
+                                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
+                                            <RadioButton
+                                                label="Use Template for Cart Page"
+                                                checked={props.shop.default_template_settings?.templateForCartPage}
+                                                name="cart-settings"
+                                                onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
+                                            />
+                                        </Grid.Cell>
+                                    </Grid>
+                                    {props.shop.default_template_settings?.templateForCartPage && (
+                                        <>
+                                            <div className="space-4" />
+                                            <Image
+                                                source={cart_page_image_1}
+                                                alt="Sample Image 1"
+                                                style={{marginRight : '10px',marginTop: '10px', cursor: 'pointer', width: '165px'}}
+                                                className={ cartIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                                onClick={() => handleImageClick('cart_page', 1)}
+                                            />
+                                            <Image
+                                                source={cart_page_image_2}
+                                                alt="Sample Image 2"
+                                                style={{marginLeft : '10px', marginRight : '10px', cursor: 'pointer', width: '165px'}}
+                                                className={ cartIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                                onClick={() => handleImageClick('cart_page', 2)}
+                                            />
+                                            <Image
+                                                source={cart_page_image_3}
+                                                alt="Sample Image 3"
+                                                style={{marginLeft : '10px', cursor: 'pointer', width: '165px'}}
+                                                className={ cartIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                                onClick={() => handleImageClick('cart_page', 3)}
+                                            />
+                                        </>
+                                    )}
+                                </LegacyCard.Section>
+                            </>
                         ) : (
-                        <>
-                            <LegacyCard.Section title="Where on this page would you like the offer to appear?">
-                            <Grid>
-                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                                    <RadioButton
-                                        label="Use default settings for Ajax Cart"
-                                        checked={props.shop.default_template_settings?.defaultSettingsForAjaxCart}
-                                        onChange={(event) => handleDefaultSettingChange(event, 'ajax')}
-                                        name="ajax-cart-settings"
-                                    />
-                                </Grid.Cell>
-                            </Grid>
-                            <Grid>
-                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                                    <RadioButton
-                                        label="Use Template for Ajax Cart"
-                                        checked={props.shop.default_template_settings?.templateForAjaxCart}
-                                        onChange={(event) => handleUseTemplateChange(event, 'ajax')}
-                                        name="ajax-cart-settings"
-                                    />
-                                </Grid.Cell>
-                            </Grid>
-                            {props.shop.default_template_settings?.templateForAjaxCart && (
-                                <>
-                                    <Image
-                                        source={ajax_cart_image_1}
-                                        alt="Sample Image 1"
-                                        style={{marginRight : '10px', marginTop: '10px', height: '150px', width: '165px'}}
-                                        className={ ajaxIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                        onClick={() => handleImageClick('ajax_cart', 1)}
-                                    />
-                                    <Image
-                                        source={ajax_cart_image_2}
-                                        alt="Sample Image 2"
-                                        style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
-                                        className={ ajaxIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                        onClick={() => handleImageClick('ajax_cart', 2)}
-                                    />
-                                    <Image
-                                        source={ajax_cart_image_3}
-                                        alt="Sample Image 3"
-                                        style={{marginLeft : '10px', height: '150px', width: '165px'}}
-                                        className={ ajaxIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                        onClick={() => handleImageClick('ajax_cart', 3)}
-                                    />
-                                </>
-                            )}
-                            </LegacyCard.Section>
-                            <LegacyCard.Section title="Where on this page would you like the offer to appear?">
-                            <Grid>
-                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                                    <RadioButton
-                                        label="Use default settings for Cart Page"
-                                        checked={props.shop.default_template_settings?.defaultSettingsForCartPage}
-                                        onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
-                                        name="cart-page-settings"
-                                    />
-                                </Grid.Cell>
-                            </Grid>
-                            <Grid>
-                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                                    <RadioButton
-                                        label="Use Template for Cart Page"
-                                        checked={props.shop.default_template_settings?.templateForCartPage}
-                                        onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
-                                        name="cart-page-settings"
-                                    />
-                                </Grid.Cell>
-                            </Grid>
-                            {props.shop.default_template_settings?.templateForCartPage && (
-                                <>
-                                    <Image
-                                        source={cart_page_image_1}
-                                        alt="Sample Image 1"
-                                        style={{marginRight : '10px', marginTop: '10px', height: '150px', width: '165px'}}
-                                        className={ cartIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                        onClick={() => handleImageClick('cart_page', 1)}
-                                    />
-                                    <Image
-                                        source={cart_page_image_2}
-                                        alt="Sample Image 2"
-                                        style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
-                                        className={ cartIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                        onClick={() => handleImageClick('cart_page', 2)}
-                                    />
-                                    <Image
-                                        source={cart_page_image_3}
-                                        alt="Sample Image 3"
-                                        style={{marginLeft : '10px', height: '150px', width: '165px'}}
-                                        className={ cartIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                        onClick={() => handleImageClick('cart_page', 3)}
-                                    />
-                                </>
-                            )}
-                            </LegacyCard.Section>
-                        </>
-                    )
+                            <>
+                                <hr style={{marginLeft: '-20px', marginRight: '-20px', backgroundColor: '#BABFC3', marginBottom: '15px', marginTop: '20px'}} />
+                                <LegacyCard.Section title="Where on this page would you like the offer to appear?">
+                                    <Grid>
+                                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
+                                            <RadioButton
+                                                label="Use default settings for Ajax Cart"
+                                                checked={props.shop.default_template_settings?.defaultSettingsForAjaxCart}
+                                                onChange={(event) => handleDefaultSettingChange(event, 'ajax')}
+                                                name="ajax-cart-settings"
+                                            />
+                                        </Grid.Cell>
+                                    </Grid>
+                                    <Grid>
+                                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
+                                            <RadioButton
+                                                label="Use Template for Ajax Cart"
+                                                checked={props.shop.default_template_settings?.templateForAjaxCart}
+                                                onChange={(event) => handleUseTemplateChange(event, 'ajax')}
+                                                name="ajax-cart-settings"
+                                            />
+                                        </Grid.Cell>
+                                    </Grid>
+                                    {props.shop.default_template_settings?.templateForAjaxCart && (
+                                        <>
+                                            <div className="space-4" />
+                                            <Image
+                                                source={ajax_cart_image_1}
+                                                alt="Sample Image 1"
+                                                style={{marginRight : '10px', marginTop: '10px', cursor: 'pointer', width: '165px'}}
+                                                className={ ajaxIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                                onClick={() => handleImageClick('ajax_cart', 1)}
+                                            />
+                                            <Image
+                                                source={ajax_cart_image_2}
+                                                alt="Sample Image 2"
+                                                style={{marginLeft : '10px', marginRight : '10px', cursor: 'pointer', width: '165px'}}
+                                                className={ ajaxIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                                onClick={() => handleImageClick('ajax_cart', 2)}
+                                            />
+                                            <Image
+                                                source={ajax_cart_image_3}
+                                                alt="Sample Image 3"
+                                                style={{marginLeft : '10px', cursor: 'pointer', width: '165px'}}
+                                                className={ ajaxIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                                onClick={() => handleImageClick('ajax_cart', 3)}
+                                            />
+                                        </>
+                                    )}
+                                </LegacyCard.Section>
+
+                                <hr style={{marginLeft: '-20px', marginRight: '-20px', backgroundColor: '#BABFC3', marginBottom: '15px', marginTop: '20px'}} />
+                                <LegacyCard.Section title="Where on this page would you like the offer to appear?">
+                                    <Grid>
+                                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
+                                            <RadioButton
+                                                label="Use default settings for Cart Page"
+                                                checked={props.shop.default_template_settings?.defaultSettingsForCartPage}
+                                                onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
+                                                name="cart-page-settings"
+                                            />
+                                        </Grid.Cell>
+                                    </Grid>
+                                    <Grid>
+                                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
+                                            <RadioButton
+                                                label="Use Template for Cart Page"
+                                                checked={props.shop.default_template_settings?.templateForCartPage}
+                                                onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
+                                                name="cart-page-settings"
+                                            />
+                                        </Grid.Cell>
+                                    </Grid>
+                                    {props.shop.default_template_settings?.templateForCartPage && (
+                                        <>
+                                            <div className="space-4" />
+                                            <Image
+                                                source={cart_page_image_1}
+                                                alt="Sample Image 1"
+                                                style={{marginRight : '10px', marginTop: '10px', cursor: 'pointer', width: '165px'}}
+                                                className={ cartIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                                onClick={() => handleImageClick('cart_page', 1)}
+                                            />
+                                            <Image
+                                                source={cart_page_image_2}
+                                                alt="Sample Image 2"
+                                                style={{marginLeft : '10px', marginRight : '10px', cursor: 'pointer', width: '165px'}}
+                                                className={ cartIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                                onClick={() => handleImageClick('cart_page', 2)}
+                                            />
+                                            <Image
+                                                source={cart_page_image_3}
+                                                alt="Sample Image 3"
+                                                style={{marginLeft : '10px', cursor: 'pointer', width: '165px'}}
+                                                className={ cartIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                                onClick={() => handleImageClick('cart_page', 3)}
+                                            />
+                                        </>
+                                    )}
+                                </LegacyCard.Section>
+                            </>
+                        )
                     ) : (
-                    <LegacyCard.Section title="Where on this page would you like the offer to appear?">
-                    <Grid>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <RadioButton
-                                label="Use default settings"
-                                checked={defaultSetting}
-                                onChange={(event) => handleDefaultSettingChange(event, null)}
-                                name="product-settings"
-                            />
-                        </Grid.Cell>
-                    </Grid>
-                    <Grid>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
-                            <RadioButton
-                                label="Use Template"
-                                checked={useTemplate}
-                                onChange={(event) => handleUseTemplateChange(event, null)}
-                                name="product-settings"
-                            />
-                        </Grid.Cell>
-                    </Grid>
-                    {useTemplate && (
                         <>
-                            <Image
-                                source={insertedImage1}
-                                alt="Sample Image 1"
-                                style={{marginRight : '10px', marginTop: '10px', height: '150px', width: '165px'}}
-                                className={ props.offer.in_cart_page ? (cartIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_product_page ? (productIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_ajax_cart ? (ajaxIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : 'editOfferTabs_image_tag')) }
-                                onClick={() => handleImageClick(null, 1)}
-                            />
-                            <Image
-                                source={insertedImage2}
-                                alt="Sample Image 2"
-                                style={{marginLeft : '10px', marginRight : '10px', height: '150px', width: '165px'}}
-                                className={ props.offer.in_cart_page ? (cartIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_product_page ? (productIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_ajax_cart ? (ajaxIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : 'editOfferTabs_image_tag')) }
-                                onClick={() => handleImageClick(null, 2)}
-                            />
-                            <Image
-                                source={insertedImage3}
-                                alt="Sample Image 3"
-                                style={{marginLeft : '10px', height: '150px', width: '165px'}}
-                                className={ props.offer.in_cart_page ? (cartIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_product_page ? (productIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_ajax_cart ? (ajaxIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : 'editOfferTabs_image_tag')) }
-                                onClick={() => handleImageClick(null, 3)}
-                            />
+                            <hr style={{marginLeft: '-20px', marginRight: '-20px', backgroundColor: '#BABFC3', marginBottom: '15px', marginTop: '20px'}} />
+                            <LegacyCard.Section title="Where on this page would you like the offer to appear?">
+                                <Grid>
+                                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
+                                        <RadioButton
+                                            label="Use default settings"
+                                            checked={defaultSetting}
+                                            onChange={(event) => handleDefaultSettingChange(event, null)}
+                                            name="product-settings"
+                                        />
+                                    </Grid.Cell>
+                                </Grid>
+                                <Grid>
+                                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
+                                        <RadioButton
+                                            label="Use Template"
+                                            checked={useTemplate}
+                                            onChange={(event) => handleUseTemplateChange(event, null)}
+                                            name="product-settings"
+                                        />
+                                    </Grid.Cell>
+                                </Grid>
+                                {useTemplate && (
+                                    <>
+                                        <div className="space-4" />
+                                        <Image
+                                            source={insertedImage1}
+                                            alt="Sample Image 1"
+                                            style={{marginRight : '10px', marginTop: '10px', cursor: 'pointer', width: '165px'}}
+                                            className={ props.offer.in_cart_page ? (cartIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_product_page ? (productIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_ajax_cart ? (ajaxIsClicked[0] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : 'editOfferTabs_image_tag')) }
+                                            onClick={() => handleImageClick(null, 1)}
+                                        />
+                                        <Image
+                                            source={insertedImage2}
+                                            alt="Sample Image 2"
+                                            style={{marginLeft : '10px', marginRight : '10px', cursor: 'pointer', width: '165px'}}
+                                            className={ props.offer.in_cart_page ? (cartIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_product_page ? (productIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_ajax_cart ? (ajaxIsClicked[1] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : 'editOfferTabs_image_tag')) }
+                                            onClick={() => handleImageClick(null, 2)}
+                                        />
+                                        <Image
+                                            source={insertedImage3}
+                                            alt="Sample Image 3"
+                                            style={{marginLeft : '10px', cursor: 'pointer', width: '165px'}}
+                                            className={ props.offer.in_cart_page ? (cartIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_product_page ? (productIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (props.offer.in_ajax_cart ? (ajaxIsClicked[2] ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : 'editOfferTabs_image_tag')) }
+                                            onClick={() => handleImageClick(null, 3)}
+                                        />
+                                    </>
+                                )}
+                            </LegacyCard.Section>
                         </>
-                    )}
-                    </LegacyCard.Section>
-                )}
+                    ))
+                }
+
             </LegacyCard>
+            <div className="space-10" />
+
             {(props.offer.id == null || props.offer.id != props.autopilotCheck?.autopilot_offer_id) && (
                 <>
                     <LegacyCard title="Display Conditions" sectioned>
-                        <LegacyCard.Section>
-                            {props.offer?.rules_json?.length===0 ? (
-                                <p>None selected (show offer to all customer)</p>
-                            ) : (
-                                <>{Array.isArray(props.offer.rules_json) && props.offer.rules_json.map((rule, index) => (
-                                    <li key={index} style={{ display: 'flex', alignItems: 'center' }}>{getLabelFromValue(rule.rule_selector)} {rule.quantity} <b>{rule.item_name}</b>
-                                        <p onClick={() => deleteRule(index)}>
-                                            <Icon source={CancelMajor} color="critical" />
-                                        </p>
-                                    </li>
-                                ))}</>
-                            )}
-                            <br />
-                            <Button onClick={handleConditionModal} ref={modalCon}>Add condition</Button>
-                        </LegacyCard.Section>
-                        <LegacyCard.Section title="Condition options">
-                            <LegacyStack vertical>
-                                <Checkbox
-                                    label="Disable checkout button until offer is accepted"
-                                    helpText="This is useful for products that can only be purchased in pairs."
-                                    checked={props.offer.must_accept}
-                                    onChange={handleDisableCheckoutBtn}
-                                />
-                                <Checkbox
-                                    label="If the offer requirements are no longer met. Remove the item from the cart."
-                                    checked={props.offer.remove_if_no_longer_valid}
-                                    onChange={handleRemoveItiem}
-                                />
-                            </LegacyStack>
-                        </LegacyCard.Section>
+
+                        {props.offer?.rules_json?.length===0 ? (
+                            <p style={{color: '#6D7175', marginTop: '-10px', marginBottom: '14px'}}>None selected (show offer to all customer)</p>
+                        ) : (
+                            <>{Array.isArray(props.offer.rules_json) && props.offer.rules_json.map((rule, index) => (
+                                <li key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                                    <div style={{marginRight: '10px', display: "inline-block"}}>
+                                        {getLabelFromValue(rule.rule_selector)}: &nbsp;
+                                        <Badge>
+                                            <div style={{display: 'flex', alignItems: 'center'}}>
+                                                {rule.quantity && <p style={{color: 'blue', marginRight: '3px'}}>{rule.quantity} &nbsp; - &nbsp;</p> }
+                                                <p style={{color: 'blue', marginRight: '3px'}}><b>{rule.item_name}</b></p>
+                                                <p style={{cursor: 'pointer'}} onClick={() => deleteRule(index)}>
+                                                    <Icon source={CancelMinor} color="critical" />
+                                                </p>
+                                            </div>
+                                        </Badge>
+                                    </div>
+                                    {/*{getLabelFromValue(rule.rule_selector)}: &nbsp; {rule.quantity} <b>{rule.item_name}</b>*/}
+                                </li>
+                            ))}</>
+                        )}
+                        <Button onClick={handleConditionModal} ref={modalCon}>Add condition</Button>
+                        <div className="space-4" />
+                        <hr style={{marginLeft: '-20px', marginRight: '-20px', backgroundColor: '#BABFC3', marginBottom: '15px', marginTop: '20px'}} />
+                        <LegacyStack vertical>
+                            <Checkbox
+                                label="Disable checkout button until offer is accepted"
+                                helpText="This is useful for products that can only be purchased in pairs."
+                                checked={props.offer.must_accept}
+                                onChange={handleDisableCheckoutBtn}
+                            />
+                            <Checkbox
+                                label="If the offer requirements are no longer met. Remove the item from the cart."
+                                checked={props.offer.remove_if_no_longer_valid}
+                                onChange={handleRemoveItiem}
+                            />
+                        </LegacyStack>
                     </LegacyCard>
                 </>
                 )}
+            <div className="space-10" />
+
             <div className="space-4"></div>
                 <LegacyStack distribution="center">
                     <Button onClick={props.handleTabChange}>Continue to Appearance</Button>

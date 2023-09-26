@@ -460,7 +460,7 @@ export function FirstTab(props) {
                             </>
                         )}
                     </LegacyCard>
-                    <div className="space-10"></div>
+                    <div className="space-10" />
 
                     <LegacyCard title="Text" sectioned>
                         <LegacyStack spacing="loose" vertical>
@@ -532,7 +532,7 @@ export function FirstTab(props) {
                             </Collapsible>
                         </LegacyStack>
                     </LegacyCard>
-                    <div className="space-10"></div>
+                    <div className="space-10"/>
 
                     <LegacyCard title="Display options" sectioned>
                         <LegacyStack spacing="baseTight" vertical>
@@ -593,9 +593,9 @@ export function FirstTab(props) {
                             />
                         </LegacyStack>
                     </LegacyCard>
-                    <div className="space-10"></div>
+                    <div className="space-10"/>
 
-                    <div className="space-4"></div>
+                    <div className="space-4"/>
                     <LegacyStack distribution="center">
                         <Button onClick={props.handleTabChange}>Continue To Placement</Button>
                     </LegacyStack>

@@ -8,6 +8,7 @@ import {
     RangeSlider,
     Collapsible,
     Grid,
+    Text,
     Stack} from "@shopify/polaris";
 import { useState, useCallback } from "react";
 import { SketchPicker } from 'react-color';
@@ -153,16 +154,15 @@ export function ThirdTab(props) {
     }, []);
 
     return (
-        <div>
+        <div id="appearance-offers">
             <LegacyCard title="Offer box" sectioned>
-                <LegacyCard.Section>
                     {(props.offer.id != null && props.autopilotCheck?.autopilot_offer_id == props.offer.id) ? (
                         <>
                         </>
                         ) : (
                         <>
                             <Grid>
-                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 4, xl: 4}}>
                                     <Select
                                         label="Layout"
                                         options={options}
@@ -176,7 +176,7 @@ export function ThirdTab(props) {
                         )
                     }
                     <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
                             <TextField
                                 label="Space above offer"
                                 type="number"
@@ -185,7 +185,7 @@ export function ThirdTab(props) {
                                 suffix="px"
                             />
                         </Grid.Cell>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
                             <TextField
                                 label="Space below offer"
                                 type="number"
@@ -197,14 +197,14 @@ export function ThirdTab(props) {
                     </Grid>
                     <br />
                     <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
                             <Select label="Border style"
                                 options={BorderOptions}
                                 onChange={handleBorderStyle}
                                 value={selected}
                             />
                         </Grid.Cell>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
                             <TextField
                                 label="Border width"
                                 type="number"
@@ -213,55 +213,54 @@ export function ThirdTab(props) {
                                 suffix="px"
                             />
                         </Grid.Cell>
-                    </Grid>
-                    <br />
-                    <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                            <RangeSlider
-                                label="Corner Radius"
-                                value={parseInt(props.shop.css_options.main.borderRadius)}
-                                onChange={handlesetBorderRange}
-                                output
-                            />
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
+                            <div className="range-slider-container">
+                                <RangeSlider
+                                    label="Corner Radius"
+                                    value={parseInt(props.shop.css_options.main.borderRadius || 0)}
+                                    onChange={handlesetBorderRange}
+                                    output
+                                />
+                            </div>
                         </Grid.Cell>
                     </Grid>
-                </LegacyCard.Section>
             </LegacyCard>
+            <div className="space-10" />
+
             <LegacyCard title="Color" sectioned>
-                <LegacyCard.Section>
-                    <ButtonGroup>
-                        <Button
-                            onClick={handleToggle}
-                            ariaExpanded={open}
-                            ariaControls="basic-collapsible"
-                        >Manually select colors</Button>
-                        {/*<Button primary>Choose template</Button>*/}
-                    </ButtonGroup>
-                    <Stack vertical>
-                        <Collapsible
-                            open={open}
-                            id="basic-collapsible"
-                            transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
-                            expandOnPrint
-                        >
-                            <br /><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main?.backgroundColor} />
-                            {/*<br/><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main.backgroundColor} />*/}
-                        </Collapsible>
-                    </Stack>
-                </LegacyCard.Section>
+                <ButtonGroup>
+                    <Button
+                        onClick={handleToggle}
+                        ariaExpanded={open}
+                        ariaControls="basic-collapsible"
+                    >Manually select colors</Button>
+                    {/*<Button primary>Choose template</Button>*/}
+                </ButtonGroup>
+                <Stack vertical>
+                    <Collapsible
+                        open={open}
+                        id="basic-collapsible"
+                        transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
+                        expandOnPrint
+                    >
+                        <br /><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main?.backgroundColor} />
+                        {/*<br/><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main.backgroundColor} />*/}
+                    </Collapsible>
+                </Stack>
             </LegacyCard>
+            <div className="space-10" />
+
             <LegacyCard title="Offer text" className="input-box" sectioned>
-                <LegacyCard.Section>
-                    <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                            <Select
-                                label="Font"
-                                options={fontOptions}
-                                onChange={handleFontSelect}
-                                value={props.shop.css_options.text.fontFamily}
-                            />
-                        </Grid.Cell>
-                        {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                <Grid>
+                    <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <Select
+                            label="Font"
+                            options={fontOptions}
+                            onChange={handleFontSelect}
+                            value={props.shop.css_options.text.fontFamily}
+                        />
+                    </Grid.Cell>
+                    {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Weight"
                                 type="number"
@@ -271,29 +270,31 @@ export function ThirdTab(props) {
                                 value={parseInt(props.shop.css_options.text.fontWeightInPixel)}
                             />
                         </Grid.Cell>*/}
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                            <TextField
-                                label="Size"
-                                type="number"
-                                suffix="px"
-                                autoComplete="off"
-                                onChange={handleFontSize}
-                                value={parseInt(props.shop.css_options.text.fontSize)}
-                            />
-                        </Grid.Cell>
-                    </Grid>
-                </LegacyCard.Section>
-                <LegacyCard.Section title="Button text">
-                    <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                            <Select
-                                label="Font"
-                                options={btnOptions}
-                                onChange={handleBtnSelect}
-                                value={props.shop.css_options.button.fontFamily}
-                            />
-                        </Grid.Cell>
-                        {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                    <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <TextField
+                            label="Size"
+                            type="number"
+                            suffix="px"
+                            autoComplete="off"
+                            onChange={handleFontSize}
+                            value={parseInt(props.shop.css_options.text.fontSize || 16)}
+                        />
+                    </Grid.Cell>
+                </Grid>
+                <hr className="legacy-card-hr" />
+                <div style={{paddingBottom: '20px'}}>
+                    <Text variant="headingMd" as="h2">Button text</Text>
+                </div>
+                <Grid>
+                    <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <Select
+                            label="Font"
+                            options={btnOptions}
+                            onChange={handleBtnSelect}
+                            value={props.shop.css_options.button.fontFamily}
+                        />
+                    </Grid.Cell>
+                    {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Weight"
                                 type="number"
@@ -303,31 +304,32 @@ export function ThirdTab(props) {
                                 value={parseInt(props.shop.css_options.button.fontWeightInPixel)}
                             />
                         </Grid.Cell>*/}
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                            <TextField
-                                label="Size"
-                                type="number"
-                                suffix="px"
-                                autoComplete="off"
-                                onChange={handleBtnSize}
-                                value={parseInt(props.shop.css_options.button.fontSize)}
-                            />
-                        </Grid.Cell>
-                    </Grid>
-                    <br />
-                    <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                    <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <TextField
+                            label="Size"
+                            type="number"
+                            suffix="px"
+                            autoComplete="off"
+                            onChange={handleBtnSize}
+                            value={parseInt(props.shop.css_options.button.fontSize || 16)}
+                        />
+                    </Grid.Cell>
+                </Grid>
+                <br />
+                <Grid>
+                    <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <div className="range-slider-container">
                             <RangeSlider
                                 label="Border Radius"
-                                value={props.shop.css_options.button.borderRadius}
+                                value={props.shop.css_options.button.borderRadius || 0}
                                 onChange={handleRangeSliderChange}
                                 output
                             />
-                        </Grid.Cell>
-                    </Grid>
-                </LegacyCard.Section>
+                        </div>
+                    </Grid.Cell>
+                </Grid>
             </LegacyCard>
-            <div className="space-4"></div>
+            <div className="space-10"></div>
             <LegacyStack distribution="center">
                 <ButtonGroup>
                     <Button onClick={() => props.saveDraft()}>Save Draft</Button>

@@ -5,7 +5,8 @@ import {
     Button,
     TextField,
     Checkbox,
-    Select} from "@shopify/polaris";
+    Select, Text
+} from "@shopify/polaris";
 import { useState, useCallback } from "react";
 import React from "react";
 
@@ -33,8 +34,16 @@ export function FourthTab(props) {
     return (
         <>
             <LegacyCard sectioned title="Offer placement - advanced settings" actions={[{ content: 'View help doc' }]}>
-                <LegacyCard.Section title="Product page">
-                    <TextField label="DOM Selector" value={props.shop.custom_product_page_dom_selector} onChange={handleProductDomSelector} type="text"></TextField>
+                <div>
+                    <div style={{paddingBottom: '10px'}}>
+                        <Text variant="headingMd" as="h2">Product page</Text>
+                    </div>
+                    <TextField
+                        label="DOM Selector"
+                        value={props.shop.custom_product_page_dom_selector}
+                        onChange={handleProductDomSelector} type="text"
+                    />
+                    <div className="space-4"/>
                     <Select
                         label="DOM action"
                         id="productDomAction"
@@ -42,9 +51,19 @@ export function FourthTab(props) {
                         onChange={handleProductDomAction}
                         value={props.shop.custom_product_page_dom_action}
                     />
-                </LegacyCard.Section>
-                <LegacyCard.Section title="Cart page">
-                    <TextField label="DOM Selector" value={props.shop.custom_cart_page_dom_selector} onChange={handleCartDomSelector}></TextField>
+                </div>
+                <hr className="legacy-card-hr" />
+
+                <div>
+                    <div style={{paddingBottom: '10px'}}>
+                        <Text variant="headingMd" as="h2">Cart page</Text>
+                    </div>
+                    <TextField
+                        label="DOM Selector"
+                        value={props.shop.custom_cart_page_dom_selector}
+                        onChange={handleCartDomSelector}
+                    />
+                    <div className="space-4"/>
                     <Select
                         label="DOM action"
                         id="productDomAction"
@@ -52,9 +71,20 @@ export function FourthTab(props) {
                         onChange={handleCartDomAction}
                         value={props.shop.custom_cart_page_dom_action}
                     />
-                </LegacyCard.Section>
-                <LegacyCard.Section title="AJAX/Slider cart">
-                    <TextField label="DOM Selector" value={props.shop.custom_ajax_dom_selector} onChange={handleAjaxDomSelector}></TextField>
+                </div>
+                <hr className="legacy-card-hr" />
+
+                <div>
+                    <div style={{paddingBottom: '10px'}}>
+                        <Text variant="headingMd" as="h2">AJAX/Slider cart</Text>
+                    </div>
+                    <TextField
+                        label="DOM Selector"
+                        value={props.shop.custom_ajax_dom_selector}
+                        onChange={handleAjaxDomSelector}
+                    />
+                    <div className="space-4"/>
+
                     <Select
                         label="DOM action"
                         id="productDomAction"
@@ -62,11 +92,39 @@ export function FourthTab(props) {
                         onChange={handleAjaxDomAction}
                         value={props.shop.custom_ajax_dom_action}
                     />
-                    <TextField label="AJAX refresh code" value={props.shop.ajax_refresh_code} onChange={handleAjaxRefreshCode} multiline={6}></TextField>
-                </LegacyCard.Section>
-                <LegacyCard.Section title="Custom CSS">
-                    <TextField value={props.shop.offer_css} onChange={handleOfferCss} multiline={6}></TextField>
-                    <br />
+                    <div className="space-4"/>
+
+                    <TextField
+                        label="AJAX refresh code"
+                        value={props.shop.ajax_refresh_code}
+                        onChange={handleAjaxRefreshCode}
+                        multiline={6}
+                    />
+                    <div className="space-4"/>
+
+                    <Select
+                        label="DOM action"
+                        id="productDomAction"
+                        options={options}
+                        onChange={handleCartDomAction}
+                        value={props.shop.custom_cart_page_dom_action}
+                    />
+                </div>
+
+                <hr className="legacy-card-hr" />
+
+                <div>
+                    <div style={{paddingBottom: '10px'}}>
+                        <Text variant="headingMd" as="h2">Custom CSS</Text>
+                    </div>
+
+                    <TextField
+                        value={props.shop.offer_css}
+                        onChange={handleOfferCss}
+                        multiline={6}
+                    />
+                    <div className="space-4"/>
+
                     <Checkbox
                         label="Save as default settings"
                         helpText="This placement will apply to all offers created in the future.
@@ -74,9 +132,9 @@ export function FourthTab(props) {
                         checked={checked}
                         onChange={handleChange}
                     />
-                </LegacyCard.Section>
+                </div>
             </LegacyCard>
-            <div className="space-4"></div>
+            <div className="space-10"></div>
             <LegacyStack distribution="center">
                 <ButtonGroup>
                     <Button onClick={() => props.saveDraft()}>Save Draft</Button>
