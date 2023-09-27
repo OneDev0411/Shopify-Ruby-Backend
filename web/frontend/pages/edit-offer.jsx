@@ -749,7 +749,7 @@ export default function EditPage() {
                                     disclosureText="More views"
                                     fitted
                                 >
-                                    <div className='space-4'></div>
+                                    <div style={{paddingTop: '40px', marginTop: '-40px'}}></div>
                                     {selectedPre == 0 ?
                                         <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer}
                                                       checkKeysValidity={checkKeysValidity}
