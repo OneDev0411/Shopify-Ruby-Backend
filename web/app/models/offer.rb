@@ -13,6 +13,10 @@ class Offer < ApplicationRecord
   has_many :offer_stats, inverse_of: :offer, dependent: :delete_all
   has_many :daily_stats, -> (offer) { where("created_at > \'#{ offer.shop.stats_from || Time.parse('2000-01-01')}\'").order(for_date: :asc) }, dependent: :destroy
   has_many :offer_events, dependent: :destroy
+  has_one :placement_setting, dependent: :destroy
+  accepts_nested_attributes_for :placement_setting
+  has_one :advanced_placement_setting, dependent: :destroy
+  accepts_nested_attributes_for :advanced_placement_setting
 
   after_save :populate_object_from_shopify
 
@@ -427,7 +431,10 @@ class Offer < ApplicationRecord
       show_product_title: show_product_title?,
       in_cart_page: in_cart_page?,
       in_ajax_cart: in_ajax_cart?,
-      in_product_page: in_product_page?
+      in_product_page: in_product_page?,
+      placement_setting: placement_setting,
+      save_as_default_setting: save_as_default_setting,
+      advanced_placement_setting: advanced_placement_setting
     }
     # todo: hide title from published version
     res[:winning_version] = winner if winner.present?

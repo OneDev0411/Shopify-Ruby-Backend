@@ -1,0 +1,2 @@
+class ThemeSettingForTemplate < ApplicationRecord
+end

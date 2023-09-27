@@ -31,69 +31,83 @@ export default function EditPage() {
     const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState({});
 
     const [offer, setOffer] = useState({
-        offerId: undefined,
-        ajax_cart: '',
-        calculated_image_url: 'placebear.com/125/125',
-        cart_page: '',
-        checkout_page: '',
-        checkout_after_accepted: false,
-        css: '',
-        cta_a: 'Add To Cart',
-        cta_b: '',
-        custom_field_name: '',
-        custom_field_placeholder: '',
-        custom_field_required: false,
-        discount_code: '',
-        discount_target_type: 'none',
-        hide_variants_wrapper: '',
-        id: null,
-        link_to_product: true,
-        multi_layout: 'compact',
-        must_accept: false,
-        offerable: {},
-        offerable_type: 'multi',
-        offerable_product_shopify_ids: [],
-        offerable_product_details: [],
-        included_variants: {},
-        page_settings: '',
-        product_image_size: 'medium',
-        publish_status: 'draft',
-        products_to_remove: [],
-        powered_by_text_color: null,
-        powered_by_link_color: null,
-        remove_if_no_longer_valid: false,
-        rules_json: [],
-        ruleset_type: 'and',
-        redirect_to_product: null,
-        shop: {},
-        show_product_image: true,
-        show_variant_price: false,
-        show_product_price: true,
-        show_product_title: false,
-        show_spinner: null,
-        show_nothanks: false,
-        show_quantity_selector: true,
-        show_custom_field: false,
-        show_compare_at_price: true,
-        uses_ab_test: null,
-        stop_showing_after_accepted: false,
-        recharge_subscription_id: null,
-        interval_unit: null,
-        interval_frequency: null,
-        text_a: 'Would you like to add a {{ product_title }}?',
-        text_b: '',
-        theme: 'custom',
-        title: '',
-        in_cart_page: true,
-        in_ajax_cart: true,
-        in_product_page: true,
-        show_powered_by: false,
-        custom_field_2_name: '',
-        custom_field_2_placeholder: '',
-        custom_field_2_required: '',
-        custom_field_3_name: '',
-        custom_field_3_placeholder: '',
-        custom_field_3_required: '',
+    offerId: undefined,
+    ajax_cart: '',
+    calculated_image_url: 'placebear.com/125/125',
+    cart_page: '',
+    checkout_page: '',
+    checkout_after_accepted: false,
+    css: '',
+    cta_a: 'Add To Cart',
+    cta_b: '',
+    custom_field_name: '',
+    custom_field_placeholder: '',
+    custom_field_required: false,
+    discount_code: '',
+    discount_target_type: 'none',
+    hide_variants_wrapper: '',
+    id: null,
+    link_to_product: true,
+    multi_layout: 'compact',
+    must_accept: false,
+    offerable: {},
+    offerable_type: 'multi',
+    offerable_product_shopify_ids: [],
+    offerable_product_details: [],
+    included_variants: {},
+    page_settings: '',
+    product_image_size: 'medium',
+    publish_status: 'draft',
+    products_to_remove: [],
+    powered_by_text_color: null,
+    powered_by_link_color: null,
+    remove_if_no_longer_valid: false,
+    rules_json: [],
+    ruleset_type: 'and',
+    redirect_to_product: null,
+    shop: {},
+    show_product_image: true,
+    show_variant_price: false,
+    show_product_price: true,
+    show_product_title: false,
+    show_spinner: null,
+    show_nothanks: false,
+    show_quantity_selector: true,
+    show_custom_field: false,
+    show_compare_at_price: true,
+    uses_ab_test: null,
+    stop_showing_after_accepted: false,
+    recharge_subscription_id: null,
+    interval_unit: null,
+    interval_frequency: null,
+    text_a: 'Would you like to add a {{ product_title }}?',
+    text_b: '',
+    theme: 'custom',
+    title: '',
+    in_cart_page: true,
+    in_ajax_cart: true,
+    in_product_page: true,
+    show_powered_by: false,
+    custom_field_2_name: '',
+    custom_field_2_placeholder: '',
+    custom_field_2_required: '',
+    custom_field_3_name: '',
+    custom_field_3_placeholder: '',
+    custom_field_3_required: '',
+    placement_setting: {
+        default_product_page: true,
+        default_cart_page: true,
+        default_ajax_cart: true,
+    },
+    advanced_placement_setting: {
+        custom_product_page_dom_selector: "[class*='description']",
+        custom_product_page_dom_action: 'after',
+        custom_cart_page_dom_selector: "form[action^='/cart']",
+        custom_cart_page_dom_action: 'prepend',
+        custom_ajax_dom_selector: ".ajaxcart__row:first",
+        custom_ajax_dom_action: 'prepend',
+    },
+
     });
 
     const [offerSettings, setOfferSettings] = useState({
@@ -117,7 +131,9 @@ export default function EditPage() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [shopifyThemeName, setShopifyThemeName] = useState(null);
-
+    const [themeTemplateData, setThemeTemplateData] = useState(null);
+    const [templateImagesURL, setTemplateImagesURL] = useState({});
+                                      
     const offerID = location?.state?.offerID;
     const fetch = useAuthenticatedFetch(shopAndHost.host);
 
@@ -269,21 +285,37 @@ export default function EditPage() {
                 'Content-Type': 'application/json',
             },
         })
-            .then((response) => {
-                return response.json()
-            })
-            .then((data) => {
-                if (data.themeExist) {
-                    setShopifyThemeName(data.shopify_theme_name)
-                } else {
-                    setShopifyThemeName(null);
-                }
-            })
-            .catch((error) => {
-                console.log("# Error updateProducts > ", JSON.stringify(error));
-            })
-
-    }, [openAutopilotSection]);
+        .then( (response) => { return response.json() })
+        .then( (data) => {
+            if(data.themeExist) {
+                setShopifyThemeName(data.shopify_theme_name);
+                setThemeTemplateData(data.templatesOfCurrentTheme);
+                data.templatesOfCurrentTheme.forEach(function(value, index) {
+                    if(value.page_type == "cart") {
+                        setTemplateImagesURL(previousState => {
+                            return { ...previousState, ["cart_page_image_".concat(value.position)]: value.image_url};
+                        });
+                    }
+                    else if(value.page_type == "product") {
+                        setTemplateImagesURL(previousState => {
+                            return { ...previousState, ["product_page_image_".concat(value.position)]: value.image_url};
+                        });
+                    }
+                    else if(value.page_type == "ajax") {
+                        setTemplateImagesURL(previousState => {
+                            return { ...previousState, ["ajax_cart_image_".concat(value.position)]: value.image_url};
+                        });
+                    }
+                });
+            }
+            else {
+                setShopifyThemeName(null);
+            }
+        })
+        .catch((error) => {
+            console.log("# Error updateProducts > ", JSON.stringify(error));
+        })
+    },[openAutopilotSection]);
 
 
     //Called whenever the checkKeysValidity changes in any child component
@@ -299,6 +331,37 @@ export default function EditPage() {
         setOffer(previousState => {
             return {...previousState, [updatedKey]: updatedValue};
         });
+    }
+
+
+    //Called whenever the shop changes in any child component
+    function updateNestedAttributeOfOffer(updatedValue, ...updatedKey) {
+        if(updatedKey.length == 1) {
+            setOffer(previousState => {
+                return { ...previousState, [updatedKey[0]]: updatedValue };
+            });
+        }
+        else if(updatedKey.length == 2) {
+            setOffer(previousState => ({
+                ...previousState,
+                [updatedKey[0]]: {
+                    ...previousState[updatedKey[0]],
+                    [updatedKey[1]]: updatedValue 
+                }
+            }));
+        }
+        else if(updatedKey.length == 3) {
+            setOffer(previousState => ({
+                ...previousState,
+                [updatedKey[0]]: {
+                    ...previousState[updatedKey[0]],
+                    [updatedKey[1]]: {
+                        ...previousState[updatedKey[0]][updatedKey[1]],
+                        [updatedKey[2]]: updatedValue
+                    }
+                }
+            }));
+        }
     }
 
     //Called whenever the offer settings for shop changes in any child component
@@ -371,7 +434,65 @@ export default function EditPage() {
         setOpenAutopilotSection(value);
     }
 
-    const save = async (status) => {
+    const save = async(status) =>  {
+        var placement_setting;
+        var save_as_default_setting;
+        if(offer.in_product_page && offer.in_cart_page) {
+            placement_setting = {
+                default_product_page: offer.placement_setting?.default_product_page,
+                default_cart_page: offer.placement_setting?.default_cart_page,
+                default_ajax_cart: true,
+                template_product_id: offer.placement_setting?.template_product_id,
+                template_cart_id: offer.placement_setting?.template_cart_id,
+                template_ajax_id: null,
+            }
+        }
+        else if (offer.in_ajax_cart && offer.in_cart_page) {
+            placement_setting = {
+                default_product_page: true,
+                default_cart_page: offer.placement_setting?.default_cart_page,
+                default_ajax_cart: offer.placement_setting?.default_ajax_cart,
+                template_product_id: null,
+                template_cart_id: offer.placement_setting?.template_cart_id,
+                template_ajax_id: offer.placement_setting?.template_ajax_id,
+            }
+        }
+        else if (offer.in_cart_page) {
+            placement_setting = {
+                default_product_page: true,
+                default_cart_page: offer.placement_setting?.default_cart_page,
+                default_ajax_cart: true,
+                template_product_id: null,
+                template_cart_id: offer.placement_setting?.template_cart_id,
+                template_ajax_id: null,
+            }
+        }
+        else if (offer.in_product_page) {
+            placement_setting = {
+                default_product_page: offer.placement_setting?.default_product_page,
+                default_cart_page: true,
+                default_ajax_cart: true,
+                template_product_id: offer.placement_setting?.default_product_page,
+                template_cart_id: null,
+                template_ajax_id: null,
+            }
+        }
+        else if (offer.in_ajax_cart) {
+            placement_setting = {
+                default_product_page: true,
+                default_cart_page: true,
+                default_ajax_cart: offer.placement_setting?.default_ajax_cart,
+                template_product_id: null,
+                template_cart_id: null,
+                template_ajax_id: offer.placement_setting?.template_ajax_id,
+            }
+        }
+        if(offer.advanced_placement_setting?.advanced_placement_setting_enabled) {
+            save_as_default_setting = offer.save_as_default_setting;
+        }
+        else {
+            save_as_default_setting = false;
+        }
         var ots = {
             active: status,
             checkout_after_accepted: offer.checkout_after_accepted,
@@ -420,6 +541,10 @@ export default function EditPage() {
             in_cart_page: offer.in_cart_page,
             in_ajax_cart: offer.in_ajax_cart,
             in_product_page: offer.in_product_page,
+            placement_setting_attributes: placement_setting,
+            save_as_default_setting: save_as_default_setting,
+            enable_advance_setting: offer.enable_advance_setting,
+            advanced_placement_setting_attributes: offer.advanced_placement_setting
         };
         if (shop.has_recharge && offer.recharge_subscription_id) {
             ots.recharge_subscription_id = offer.recharge_subscription_id;
@@ -453,9 +578,9 @@ export default function EditPage() {
                     body: JSON.stringify({offer: ots, shop: shopAndHost.shop, host: shopAndHost.host})
                 });
                 const responseData = await response.json();
-                responseData.text = responseData.offer.text_a.replace("{{ product_title }}", responseData.offer.offerable_product_details[0].title)
-                responseData.cta = responseData.cta_a;
-                for (var i = 0; i < responseData.offer.offerable_product_details.length; i++) {
+                responseData.text = responseData?.offer?.text_a?.replace("{{ product_title }}", responseData.offer.offerable_product_details[0]?.title)
+                responseData.cta = responseData?.offer?.cta_a;
+                for(var i=0; i<responseData.offer.offerable_product_details.length; i++) {
                     responseData.offer.offerable_product_details[i].preview_mode = true;
                 }
                 setOffer(responseData.offer);
@@ -464,22 +589,6 @@ export default function EditPage() {
                 console.error('Error:', error);
             }
         }
-        fetch('/api/merchant/update_shop_settings', {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({shop_attr: shop, shop: shopAndHost.shop, admin: shop.admin, json: true}),
-        })
-            .then((response) => {
-                return response.json();
-            })
-            .then((data) => {
-                setShop(data.shop);
-                setIsLoading(false);
-            })
-            .catch((error) => {
-            })
         navigateTo('/offer');
     }
 
@@ -609,7 +718,10 @@ export default function EditPage() {
                                         <SecondTab offer={offer} shop={shop} setOffer={setOffer}
                                                    offerSettings={offerSettings} updateOffer={updateOffer}
                                                    updateShop={updateShop} shopifyThemeName={shopifyThemeName}
-                                                   autopilotCheck={autopilotCheck} handleTabChange={changeTab}/>
+                                                   autopilotCheck={autopilotCheck} handleTabChange={changeTab}
+                                                   updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}
+                                                   themeTemplateData={themeTemplateData} templateImagesURL={templateImagesURL}
+                                                   enableOrDisablePublish={enableOrDisablePublish}/>
                                         : ""}
                                     {selected == 2 ?
                                         // page was imported from components folder
@@ -622,7 +734,8 @@ export default function EditPage() {
                                         <FourthTab offer={offer} shop={shop} updateOffer={updateOffer}
                                                    updateShop={updateShop} updateOfferSettings={updateOfferSettings}
                                                    saveDraft={saveDraft} publishOffer={publishOffer}
-                                                   enablePublish={enablePublish}/>
+                                                   enablePublish={enablePublish}
+                                                   updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>
                                         : ""}
                                 </Tabs>
                             </div>
