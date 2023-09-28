@@ -309,132 +309,144 @@ export function ThirdTab(props) {
                     >
                         <Grid>
                             <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
-                                <TextField
-                                    label="Card"
-                                    onChange={(newValue) => handleTextFieldChanges(newValue, 'main', 'backgroundColor')}
-                                    value={props.offer.css_options?.main?.backgroundColor}
-                                    connectedRight={
-                                        <Button
-                                            onClick={() => handleToggle('cardColorPicker')}
-                                            ariaExpanded={open.cardColorPicker}
-                                            ariaControls="basic-card-collapsible"
-                                        ></Button>}
-                                />
-                                <div className="card-color-picker-style">
-                                    <CollapsibleColorPicker
-                                        open={open.cardColorPicker}
-                                        id="basic-card-collapsible"
-                                        color={hexToHsba(props.offer.css_options?.main?.backgroundColor)}
-                                        onChange={(newValue) => handleColorChanges(newValue, 'main', 'backgroundColor')}
+                                <div className="color-picker-container">
+                                    <TextField
+                                        label="Card"
+                                        onChange={(newValue) => handleTextFieldChanges(newValue, 'main', 'backgroundColor')}
+                                        value={props.offer.css_options?.main?.backgroundColor}
+                                        connectedRight={
+                                            <Button
+                                                onClick={() => handleToggle('cardColorPicker')}
+                                                ariaExpanded={open.cardColorPicker}
+                                                ariaControls="basic-card-collapsible"
+                                            ></Button>}
                                     />
+                                    <div className="color-picker-style">
+                                        <CollapsibleColorPicker
+                                            open={open.cardColorPicker}
+                                            id="basic-card-collapsible"
+                                            color={hexToHsba(props.offer.css_options?.main?.backgroundColor)}
+                                            onChange={(newValue) => handleColorChanges(newValue, 'main', 'backgroundColor')}
+                                        />
+                                    </div>
                                 </div>
                             </Grid.Cell>
                             <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
-                                <TextField
-                                    label="Border"
-                                    onChange={(newValue) => handleTextFieldChanges(newValue, 'main', 'borderColor')}
-                                    value={props.offer.css_options?.main?.borderColor}
-                                    connectedRight={
-                                        <Button
-                                            onClick={() => handleToggle('borderColorPicker')}
-                                            ariaExpanded={open.borderColorPicker}
-                                            ariaControls="basic-border-collapsible"
-                                        ></Button>}
-                                />
-                                <div className="border-color-picker-style">
-                                    <CollapsibleColorPicker
-                                        open={open.borderColorPicker}
-                                        id="basic-border-collapsible"
-                                        color={hexToHsba(props.offer.css_options?.main?.borderColor)}
-                                        onChange={(newValue) => handleColorChanges(newValue, 'main', 'borderColor')}
+                                <div className="color-picker-container">
+                                    <TextField
+                                        label="Border"
+                                        onChange={(newValue) => handleTextFieldChanges(newValue, 'main', 'borderColor')}
+                                        value={props.offer.css_options?.main?.borderColor}
+                                        connectedRight={
+                                            <Button
+                                                onClick={() => handleToggle('borderColorPicker')}
+                                                ariaExpanded={open.borderColorPicker}
+                                                ariaControls="basic-border-collapsible"
+                                            ></Button>}
                                     />
+                                    <div className="color-picker-style">
+                                        <CollapsibleColorPicker
+                                            open={open.borderColorPicker}
+                                            id="basic-border-collapsible"
+                                            color={hexToHsba(props.offer.css_options?.main?.borderColor)}
+                                            onChange={(newValue) => handleColorChanges(newValue, 'main', 'borderColor')}
+                                        />
+                                    </div>
                                 </div>
                             </Grid.Cell>
                             <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
-                                <TextField
-                                    label="Button"
-                                    onChange={(newValue) => handleTextFieldChanges(newValue, 'button', 'backgroundColor')}
-                                    value={props.offer.css_options?.button?.backgroundColor}
-                                    connectedRight={
-                                        <Button
-                                            onClick={() => handleToggle('buttonColorPicker')}
-                                            ariaExpanded={open.buttonColorPicker}
-                                            ariaControls="basic-button-collapsible"
-                                        ></Button>}
-                                />
-                                <div className="button-color-picker-style">
-                                    <CollapsibleColorPicker
-                                        open={open.buttonColorPicker}
-                                        id="basic-button-collapsible"
-                                        color={hexToHsba(props.offer.css_options?.button?.backgroundColor)}
-                                        onChange={(newValue) => handleColorChanges(newValue, 'button', 'backgroundColor')}
+                                <div className="color-picker-container">
+                                    <TextField
+                                        label="Button"
+                                        onChange={(newValue) => handleTextFieldChanges(newValue, 'button', 'backgroundColor')}
+                                        value={props.offer.css_options?.button?.backgroundColor}
+                                        connectedRight={
+                                            <Button
+                                                onClick={() => handleToggle('buttonColorPicker')}
+                                                ariaExpanded={open.buttonColorPicker}
+                                                ariaControls="basic-button-collapsible"
+                                            ></Button>}
                                     />
+                                    <div className="color-picker-style">
+                                        <CollapsibleColorPicker
+                                            open={open.buttonColorPicker}
+                                            id="basic-button-collapsible"
+                                            color={hexToHsba(props.offer.css_options?.button?.backgroundColor)}
+                                            onChange={(newValue) => handleColorChanges(newValue, 'button', 'backgroundColor')}
+                                        />
+                                    </div>
                                 </div>
                             </Grid.Cell>
                         </Grid>
                         <div style={{marginBottom: '20px'}} />
                         <Grid>
                             <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
-                                <TextField
-                                    label="Offer text"
-                                    onChange={(newValue) => handleTextFieldChanges(newValue, 'text', 'color')}
-                                    value={props.offer.css_options?.text?.color}
-                                    connectedRight={
-                                        <Button
-                                            onClick={() => handleToggle('textColorPicker')}
-                                            ariaExpanded={open.textColorPicker}
-                                            ariaControls="basic-card-collapsible"
-                                        ></Button>}
-                                />
-                                <div className="offer-text-color-picker-style">
-                                    <CollapsibleColorPicker
-                                        open={open.textColorPicker}
-                                        id="basic-card-collapsible"
-                                        color={hexToHsba(props.offer?.css_options?.text?.color)}
-                                        onChange={(newValue) => handleColorChanges(newValue, 'text', 'color')}
+                                <div className="color-picker-container">
+                                    <TextField
+                                        label="Offer text"
+                                        onChange={(newValue) => handleTextFieldChanges(newValue, 'text', 'color')}
+                                        value={props.offer.css_options?.text?.color}
+                                        connectedRight={
+                                            <Button
+                                                onClick={() => handleToggle('textColorPicker')}
+                                                ariaExpanded={open.textColorPicker}
+                                                ariaControls="basic-card-collapsible"
+                                            ></Button>}
                                     />
+                                    <div className="color-picker-style">
+                                        <CollapsibleColorPicker
+                                            open={open.textColorPicker}
+                                            id="basic-card-collapsible"
+                                            color={hexToHsba(props.offer?.css_options?.text?.color)}
+                                            onChange={(newValue) => handleColorChanges(newValue, 'text', 'color')}
+                                        />
+                                    </div>
                                 </div>
                             </Grid.Cell>
                             <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
-                                <TextField
-                                    label="Button text"
-                                    onChange={(newValue) => handleTextFieldChanges(newValue, 'button', 'color')}
-                                    value={props.offer.css_options?.button?.color}
-                                    connectedRight={
-                                        <Button
-                                            onClick={() => handleToggle('btnTextColorPicker')}
-                                            ariaExpanded={open.btnTextColorPicker}
-                                            ariaControls="basic-card-collapsible"
-                                        ></Button>}
-                                />
-                                <div className="btn-text-color-picker-style">
-                                    <CollapsibleColorPicker
-                                        open={open.btnTextColorPicker}
-                                        id="basic-border-collapsible"
-                                        color={hexToHsba(props.offer.css_options?.button?.color)}
-                                        onChange={(newValue) => handleColorChanges(newValue, 'button', 'color')}
+                                <div className="color-picker-container">
+                                    <TextField
+                                        label="Button text"
+                                        onChange={(newValue) => handleTextFieldChanges(newValue, 'button', 'color')}
+                                        value={props.offer.css_options?.button?.color}
+                                        connectedRight={
+                                            <Button
+                                                onClick={() => handleToggle('btnTextColorPicker')}
+                                                ariaExpanded={open.btnTextColorPicker}
+                                                ariaControls="basic-card-collapsible"
+                                            ></Button>}
                                     />
+                                    <div className="color-picker-style">
+                                        <CollapsibleColorPicker
+                                            open={open.btnTextColorPicker}
+                                            id="basic-border-collapsible"
+                                            color={hexToHsba(props.offer.css_options?.button?.color)}
+                                            onChange={(newValue) => handleColorChanges(newValue, 'button', 'color')}
+                                        />
+                                    </div>
                                 </div>
                             </Grid.Cell>
                             <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
-                                <TextField
-                                    label="Button border"
-                                    onChange={(newValue) => handleTextFieldChanges(newValue, 'button', 'borderColor')}
-                                    value={props.offer.css_options?.button?.borderColor}
-                                    connectedRight={
-                                        <Button
-                                            onClick={() => handleToggle('btnBorderColorPicker')}
-                                            ariaExpanded={open.btnBorderColorPicker}
-                                            ariaControls="basic-card-collapsible"
-                                        ></Button>}
-                                />
-                                <div className="btn-border-color-picker-style">
-                                    <CollapsibleColorPicker
-                                        open={open.btnBorderColorPicker}
-                                        id="basic-button-collapsible"
-                                        color={hexToHsba(props.offer.css_options?.button?.borderColor)}
-                                        onChange={(newValue) => handleColorChanges(newValue, 'button', 'borderColor')}
+                                <div className="color-picker-container">
+                                    <TextField
+                                        label="Button border"
+                                        onChange={(newValue) => handleTextFieldChanges(newValue, 'button', 'borderColor')}
+                                        value={props.offer.css_options?.button?.borderColor}
+                                        connectedRight={
+                                            <Button
+                                                onClick={() => handleToggle('btnBorderColorPicker')}
+                                                ariaExpanded={open.btnBorderColorPicker}
+                                                ariaControls="basic-card-collapsible"
+                                            ></Button>}
                                     />
+                                    <div className="color-picker-style">
+                                        <CollapsibleColorPicker
+                                            open={open.btnBorderColorPicker}
+                                            id="basic-button-collapsible"
+                                            color={hexToHsba(props.offer.css_options?.button?.borderColor)}
+                                            onChange={(newValue) => handleColorChanges(newValue, 'button', 'borderColor')}
+                                        />
+                                    </div>
                                 </div>
                             </Grid.Cell>
                         </Grid>

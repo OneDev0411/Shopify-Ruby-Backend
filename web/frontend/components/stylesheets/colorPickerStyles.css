@@ -1,41 +1,11 @@
-.card-color-picker-style { 
-    position: absolute;
-    z-index: 21;
-    left: 266px;
-    top: 800px;
+.color-picker-container{
+    position: relative;
 }
 
-.border-color-picker-style { 
+.color-picker-style {
     position: absolute;
     z-index: 21;
-    left: 450px;
-    top: 800px;
-}
-
-.button-color-picker-style { 
-    position: absolute;
-    z-index: 21;
-    left: 640px;
-    top: 800px;
-}
-
-.offer-text-color-picker-style { 
-    position: absolute;
-    z-index: 21;
-    left: 266px;
-    top: 860px;
-}
-
-.btn-text-color-picker-style { 
-    position: absolute;
-    z-index: 21;
-    left: 450px;
-    top: 860px;
-}
-
-.btn-border-color-picker-style { 
-    position: absolute;
-    z-index: 21;
-    left: 640px;
-    top: 860px;
+    left: 19%;
+    top: 77%;
+    transform: translateX(50%);
 }
