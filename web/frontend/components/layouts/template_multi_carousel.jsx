@@ -159,7 +159,7 @@ export default function Carousel(props) {
 
 	return( 
 		<>
-				<TemplateComponent template={template.current} data={({...props.offer, ...props.shop, ...props.checkKeysValidity})} sanitize={false}/>
+				<TemplateComponent template={template.current} data={({...props.offer, ...props.checkKeysValidity})} sanitize={false}/>
 		</>
 	);
 }

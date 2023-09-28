@@ -134,6 +134,6 @@ export default function Flex(props) {
 	
 
 	return( 
-		<TemplateComponent template={template} data={({...props.offer, ...props.shop, ...props.checkKeysValidity})} sanitize={false}/>
+		<TemplateComponent template={template} data={({...props.offer, ...props.checkKeysValidity})} sanitize={false}/>
 	);
 }

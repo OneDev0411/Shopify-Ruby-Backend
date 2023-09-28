@@ -131,7 +131,10 @@ export function FourthTab(props) {
                         onChange={handleOfferCss}
                         multiline={6}
                     />
-                    <div className="space-4"/>
+                </div>
+                <LegacyCard.Section title="Custom CSS">
+                    <TextField value={props.shop.offer_css} onChange={handleOfferCss} multiline={6}></TextField>
+                    <br />
 
                     <Checkbox
                         label="Save as default settings"
@@ -141,7 +144,7 @@ export function FourthTab(props) {
                         onChange={handleChange}
                         disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                     />
-                </div>
+                </LegacyCard.Section>
             </LegacyCard>
             <div className="space-10"></div>
             <LegacyStack distribution="center">

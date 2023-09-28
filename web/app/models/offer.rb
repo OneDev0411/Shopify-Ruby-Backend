@@ -432,9 +432,10 @@ class Offer < ApplicationRecord
       in_cart_page: in_cart_page?,
       in_ajax_cart: in_ajax_cart?,
       in_product_page: in_product_page?,
+      css_options: css_options || {},
       placement_setting: placement_setting,
       save_as_default_setting: save_as_default_setting,
-      advanced_placement_setting: advanced_placement_setting
+      advanced_placement_setting: advanced_placement_setting,
     }
     # todo: hide title from published version
     res[:winning_version] = winner if winner.present?

@@ -41,6 +41,12 @@ unless Rails.env.production?
   defaultSettingsToDisplayOffer = [
     { 
       name: "Dawn",
+      type: 'cart',
+      action: 'before',
+      selector: '#cart',
+    },
+    { 
+      name: "Dawn",
       type: 'product',
       action: 'after',
       selector: '.product-form',
@@ -263,7 +269,7 @@ unless Rails.env.production?
       position: 1,
       image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_1.png",
       action: 'before',
-      selector: '.cart__ctas'
+      selector: '#cart'
     },
     {
       name: "Dawn",
@@ -302,8 +308,8 @@ unless Rails.env.production?
       type: "product",
       position: 3,
       image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_3.png",
-      action: 'after',
-      selector: '.product-form__buttons'
+      action: 'before',
+      selector: '.product-form__quantity'
     },
     {
       name: "Dawn",

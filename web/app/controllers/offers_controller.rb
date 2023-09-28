@@ -141,11 +141,11 @@ class OffersController < AuthenticatedController
                                   :show_custom_field, :custom_field_name, :custom_field_placeholder,
                                   :discount_target_type, :discount_value, :discount_value_type,
                                   :discount_target_selection, :discount_prerequisite_quantity,
-                                  :discount_allocation_method, :shop_id, :offer_id, :save_as_default_setting,
+                                  :discount_allocation_method, :shop_id, :offer_id, :custom_css, :save_as_default_setting,
                                   rules_json: [:item_type, :uuid, :item_shopify_id, :rule_type,
                                                :item_shopify_title, :quantity, :item_name,
                                                :rule_selector, :item_type_name, :_destroy],
-                                  included_variants: {},
+                                  included_variants: {}, css_options: {},
                                   offerable_product_shopify_ids: [],
                                   products_to_remove: [],
                                   placement_setting_attributes: [:default_product_page, :default_cart_page, :default_ajax_cart,
@@ -153,7 +153,7 @@ class OffersController < AuthenticatedController
                                   advanced_placement_setting_attributes: [:id, :custom_product_page_dom_selector, :custom_product_page_dom_action,
                                                                          :custom_cart_page_dom_selector, :custom_cart_page_dom_action,
                                                                          :custom_ajax_dom_selector, :custom_ajax_dom_action, 
-                                                                         :advanced_placement_setting_enabled],).to_h
+                                                                         :advanced_placement_setting_enabled]).to_h
   end
  
 end

@@ -18,6 +18,7 @@ export function SettingTabs(props){
       (selectedTabIndex) => setSelected(selectedTabIndex),
       [],
     );
+    const handleAjaxRefreshCode = useCallback((newValue) => props.updateShop(newValue, "ajax_refresh_code"), []);
   
     const tabs = [
       {
@@ -79,6 +80,7 @@ export function SettingTabs(props){
                     onChange={props.handleFormChange}
                     value={props.formData.ajaxDomAction}
                 />
+                <TextField label="AJAX refresh code" value={props.currentShop.ajax_refresh_code} onChange={handleAjaxRefreshCode} multiline={6}></TextField>
             </>
       }
     ];

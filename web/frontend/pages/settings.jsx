@@ -57,6 +57,36 @@ export default function Settings() {
         });
     };
 
+    //Called whenever the shop changes in any child component
+    function updateShop(updatedValue, ...updatedKey) {
+        if(updatedKey.length == 1) {
+            setCurrentShop(previousState => {
+                return { ...previousState, [updatedKey[0]]: updatedValue };
+            });
+        }
+        else if(updatedKey.length == 2) {
+            setCurrentShop(previousState => ({
+                ...previousState,
+                [updatedKey[0]]: {
+                    ...previousState[updatedKey[0]],
+                    [updatedKey[1]]: updatedValue 
+                }
+            }));
+        }
+        else if(updatedKey.length == 3) {
+            setCurrentShop(previousState => ({
+                ...previousState,
+                [updatedKey[0]]: {
+                    ...previousState[updatedKey[0]],
+                    [updatedKey[1]]: {
+                        ...previousState[updatedKey[0]][updatedKey[1]],
+                        [updatedKey[2]]: updatedValue
+                    }
+                }
+            }));
+        }
+    }
+
     const toggleActivation = async () => {
         fetch(`/api/merchant/toggle_activation?shop=${shopAndHost.shop}`, {
             method: 'GET',
@@ -159,7 +189,7 @@ export default function Settings() {
                     <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }}>
                         <LegacyCard sectioned columnSpan={{ md: 6, lg: 6, xl: 6 }}>
                             {/* Tabs */}
-                            {currentShop ? <SettingTabs formData={formData} handleFormChange={handleFormChange} /> : 'Loading...'}
+                            {currentShop ? <SettingTabs formData={formData} currentShop={currentShop} updateShop={updateShop} handleFormChange={handleFormChange} /> : 'Loading...'}
                         </LegacyCard>
                     </Grid.Cell>
                 </Grid>
