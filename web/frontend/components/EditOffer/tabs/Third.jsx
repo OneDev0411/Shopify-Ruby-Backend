@@ -8,10 +8,14 @@ import {
     RangeSlider,
     Collapsible,
     Grid,
+    Text,
     Stack} from "@shopify/polaris";
 import { useState, useCallback } from "react";
 import { SketchPicker } from 'react-color';
 import React from "react";
+import CollapsibleColorPicker from "../../CollapsibleColorPicker";
+import tinycolor from "tinycolor2";
+import "../../../components/stylesheets/colorPickerStyles.css";
 
 export function ThirdTab(props) {
 
@@ -29,9 +33,24 @@ export function ThirdTab(props) {
     const handleSelectChange = useCallback((value) => setSelected(value), []);
 
     // Space above the offer
-    const handleAboveSpace = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "main", "marginTop"), []);
+    const handleAboveSpace = useCallback((newValue) => {
+        const numericValue = parseInt(newValue);
+        if (isNaN(numericValue) || numericValue > 0 && numericValue <= 100) {
+          props.updateShop(
+            `${newValue}px`,
+            "css_options",
+            "main",
+            "marginTop"
+          );
+        }
+      }, []);
     // Space below the offer
-    const handleBelowSpace = useCallback((newValue) => props.updateShop(`${newValue}px`, "css_options", "main", "marginBottom"), []);
+    const handleBelowSpace = useCallback((newValue) => {
+        const numericValue = parseInt(newValue);
+        if (isNaN(numericValue) || numericValue > 0 && numericValue <= 100) {
+          props.updateShop(`${newValue}px`, "css_options", "main", "marginBottom");
+        }
+      }, []);
     //Border style drop-down menu
     const handleBorderStyle = useCallback((newValue) => {
         props.updateShop(newValue, "css_options", "main", "borderStyle");
@@ -56,10 +75,38 @@ export function ThirdTab(props) {
     //Border range slider
     const handlesetBorderRange = useCallback((newValue) => props.updateShop(parseInt(newValue), "css_options", "main", "borderRadius"), []);
 
-    // Toggle for manually added color
-    const [open, setOpen] = useState(false);
-    const handleToggle = useCallback(() => setOpen((open) => !open), []);
+    const [openEditMenu, setOpenEditMenu] = useState(false)
+    const handleMenuToggle = useCallback(() => {
+        setOpenEditMenu((openEditMenu) => !openEditMenu)
+        setOpen({
+            cardColorPicker: false,
+            borderColorPicker: false,
+            buttonColorPicker: false,
+            textColorPicker: false,
+            btnTextColorPicker: false,
+            btnBorderColorPicker: false,
+        });
+    }, [])
 
+    // Toggle for color pickers
+    const [open, setOpen] = useState({
+        cardColorPicker: false,
+        borderColorPicker: false,
+        buttonColorPicker: false,
+        textColorPicker: false,
+        btnTextColorPicker: false,
+        btnBorderColorPicker: false,
+    });
+    
+    const handleToggle = useCallback(
+        (colorPickerName) => {
+            setOpen((prevState) => ({
+                ...prevState,
+                [colorPickerName]: !prevState[colorPickerName],
+          }));
+        },
+        [open]
+    );
 
     //Font options
     // const [fontSelect, setFontSelect] = useState("Dummy font 1");
@@ -148,21 +195,38 @@ export function ThirdTab(props) {
     const handleRangeSliderChange = useCallback((newValue) => props.updateShop(parseInt(newValue), "css_options", "button", "borderRadius"), []);
 
     //Sketch picker
-    const handleOfferBackgroundColor = useCallback((newValue) => {
-        props.updateShop(newValue.hex, "css_options", "main", "backgroundColor");
+    const handleColorChanges = useCallback((newValue, comp, property) => {
+        const rgbColor = tinycolor({ h: newValue.hue, s: newValue.saturation, v: newValue.brightness, a: newValue.alpha }).toRgb();
+        const hexColor = tinycolor(rgbColor).toHex();
+        props.updateShop(`#${hexColor}`, "css_options", `${comp}`, `${property}`);
     }, []);
 
+    const handleTextFieldChanges = useCallback((newValue, comp, property) => {
+        props.updateShop(newValue, "css_options", `${comp}`, `${property}`);
+    }, []);
+
+    const hexToHsba = (hexColor) =>  {
+        const color = tinycolor(hexColor);
+        const hsbColor = color.toHsv();
+        const alpha = color.getAlpha();
+        return {
+          hue: hsbColor.h,
+          saturation: hsbColor.s,
+          brightness: hsbColor.v,
+          alpha: alpha,
+        };
+    }
+
     return (
-        <div>
+        <div id="appearance-offers">
             <LegacyCard title="Offer box" sectioned>
-                <LegacyCard.Section>
                     {(props.offer.id != null && props.autopilotCheck?.autopilot_offer_id == props.offer.id) ? (
                         <>
                         </>
                         ) : (
                         <>
                             <Grid>
-                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 4, xl: 4}}>
                                     <Select
                                         label="Layout"
                                         options={options}
@@ -176,35 +240,37 @@ export function ThirdTab(props) {
                         )
                     }
                     <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
                             <TextField
                                 label="Space above offer"
                                 type="number"
                                 onChange={handleAboveSpace}
                                 value={parseInt(props.shop.css_options.main.marginTop)}
                                 suffix="px"
+                                placeholder="1-100px"
                             />
                         </Grid.Cell>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
                             <TextField
                                 label="Space below offer"
                                 type="number"
                                 onChange={handleBelowSpace}
                                 value={parseInt(props.shop.css_options.main.marginBottom)}
                                 suffix="px"
+                                placeholder="1-100px"
                             />
                         </Grid.Cell>
                     </Grid>
                     <br />
                     <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
                             <Select label="Border style"
                                 options={BorderOptions}
                                 onChange={handleBorderStyle}
                                 value={selected}
                             />
                         </Grid.Cell>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
                             <TextField
                                 label="Border width"
                                 type="number"
@@ -213,55 +279,181 @@ export function ThirdTab(props) {
                                 suffix="px"
                             />
                         </Grid.Cell>
-                    </Grid>
-                    <br />
-                    <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                            <RangeSlider
-                                label="Corner Radius"
-                                value={parseInt(props.shop.css_options.main.borderRadius)}
-                                onChange={handlesetBorderRange}
-                                output
-                            />
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
+                            <div className="range-slider-container">
+                                <RangeSlider
+                                    label="Corner Radius"
+                                    value={parseInt(props.shop.css_options.main.borderRadius || 0)}
+                                    onChange={handlesetBorderRange}
+                                    output
+                                />
+                            </div>
                         </Grid.Cell>
                     </Grid>
-                </LegacyCard.Section>
             </LegacyCard>
+            <div className="space-10" />
+
             <LegacyCard title="Color" sectioned>
-                <LegacyCard.Section>
-                    <ButtonGroup>
-                        <Button
-                            onClick={handleToggle}
-                            ariaExpanded={open}
-                            ariaControls="basic-collapsible"
-                        >Manually select colors</Button>
-                        {/*<Button primary>Choose template</Button>*/}
-                    </ButtonGroup>
-                    <Stack vertical>
-                        <Collapsible
-                            open={open}
-                            id="basic-collapsible"
-                            transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
-                            expandOnPrint
-                        >
-                            <br /><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main?.backgroundColor} />
-                            {/*<br/><SketchPicker onChange={handleOfferBackgroundColor} color={props.shop.css_options.main.backgroundColor} />*/}
-                        </Collapsible>
-                    </Stack>
-                </LegacyCard.Section>
+                <Stack vertical>
+                    <Button>Choose Template</Button>
+                    <Button
+                        onClick={handleMenuToggle}
+                        ariaExpanded={openEditMenu}
+                        ariaControls="basic-menu-collapsible"
+                    >Manually Edit Colors</Button>
+                    <Collapsible
+                        open={openEditMenu}
+                        id="basic-menu-collapsible"
+                        transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
+                        expandOnPrint
+                    >
+                        <Grid>
+                            <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
+                                <TextField
+                                    label="Card"
+                                    onChange={(newValue) => handleTextFieldChanges(newValue, 'main', 'backgroundColor')}
+                                    value={props.shop.css_options.main?.backgroundColor}
+                                    connectedRight={
+                                        <Button
+                                            onClick={() => handleToggle('cardColorPicker')}
+                                            ariaExpanded={open.cardColorPicker}
+                                            ariaControls="basic-card-collapsible"
+                                        ></Button>}
+                                />
+                                <div className="card-color-picker-style">
+                                    <CollapsibleColorPicker
+                                        open={open.cardColorPicker}
+                                        id="basic-card-collapsible"
+                                        color={hexToHsba(props.shop.css_options.main?.backgroundColor)}
+                                        onChange={(newValue) => handleColorChanges(newValue, 'main', 'backgroundColor')}
+                                    />
+                                </div>
+                            </Grid.Cell>
+                            <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
+                                <TextField
+                                    label="Border"
+                                    onChange={(newValue) => handleTextFieldChanges(newValue, 'main', 'borderColor')}
+                                    value={props.shop.css_options.main?.borderColor}
+                                    connectedRight={
+                                        <Button
+                                            onClick={() => handleToggle('borderColorPicker')}
+                                            ariaExpanded={open.borderColorPicker}
+                                            ariaControls="basic-border-collapsible"
+                                        ></Button>}
+                                />
+                                <div className="border-color-picker-style">
+                                    <CollapsibleColorPicker
+                                        open={open.borderColorPicker}
+                                        id="basic-border-collapsible"
+                                        color={hexToHsba(props.shop.css_options.main?.borderColor)}
+                                        onChange={(newValue) => handleColorChanges(newValue, 'main', 'borderColor')}
+                                    />
+                                </div>
+                            </Grid.Cell>
+                            <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
+                                <TextField
+                                    label="Button"
+                                    onChange={(newValue) => handleTextFieldChanges(newValue, 'button', 'backgroundColor')}
+                                    value={props.shop.css_options.button?.backgroundColor}
+                                    connectedRight={
+                                        <Button
+                                            onClick={() => handleToggle('buttonColorPicker')}
+                                            ariaExpanded={open.buttonColorPicker}
+                                            ariaControls="basic-button-collapsible"
+                                        ></Button>}
+                                />
+                                <div className="button-color-picker-style">
+                                    <CollapsibleColorPicker
+                                        open={open.buttonColorPicker}
+                                        id="basic-button-collapsible"
+                                        color={hexToHsba(props.shop.css_options.button?.backgroundColor)}
+                                        onChange={(newValue) => handleColorChanges(newValue, 'button', 'backgroundColor')}
+                                    />
+                                </div>
+                            </Grid.Cell>
+                        </Grid>
+                        <div style={{marginBottom: '20px'}} />
+                        <Grid>
+                            <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
+                                <TextField
+                                    label="Offer text"
+                                    onChange={(newValue) => handleTextFieldChanges(newValue, 'text', 'color')}
+                                    value={props.shop.css_options.text?.color}
+                                    connectedRight={
+                                        <Button
+                                            onClick={() => handleToggle('textColorPicker')}
+                                            ariaExpanded={open.textColorPicker}
+                                            ariaControls="basic-card-collapsible"
+                                        ></Button>}
+                                />
+                                <div className="offer-text-color-picker-style">
+                                    <CollapsibleColorPicker
+                                        open={open.textColorPicker}
+                                        id="basic-card-collapsible"
+                                        color={hexToHsba(props.shop.css_options.text?.color)}
+                                        onChange={(newValue) => handleColorChanges(newValue, 'text', 'color')}
+                                    />
+                                </div>
+                            </Grid.Cell>
+                            <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
+                                <TextField
+                                    label="Button text"
+                                    onChange={(newValue) => handleTextFieldChanges(newValue, 'button', 'color')}
+                                    value={props.shop.css_options.button?.color}
+                                    connectedRight={
+                                        <Button
+                                            onClick={() => handleToggle('btnTextColorPicker')}
+                                            ariaExpanded={open.btnTextColorPicker}
+                                            ariaControls="basic-card-collapsible"
+                                        ></Button>}
+                                />
+                                <div className="btn-text-color-picker-style">
+                                    <CollapsibleColorPicker
+                                        open={open.btnTextColorPicker}
+                                        id="basic-border-collapsible"
+                                        color={hexToHsba(props.shop.css_options.button?.color)}
+                                        onChange={(newValue) => handleColorChanges(newValue, 'button', 'color')}
+                                    />
+                                </div>
+                            </Grid.Cell>
+                            <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
+                                <TextField
+                                    label="Button border"
+                                    onChange={(newValue) => handleTextFieldChanges(newValue, 'button', 'borderColor')}
+                                    value={props.shop.css_options.button?.borderColor}
+                                    connectedRight={
+                                        <Button
+                                            onClick={() => handleToggle('btnBorderColorPicker')}
+                                            ariaExpanded={open.btnBorderColorPicker}
+                                            ariaControls="basic-card-collapsible"
+                                        ></Button>}
+                                />
+                                <div className="btn-border-color-picker-style">
+                                    <CollapsibleColorPicker
+                                        open={open.btnBorderColorPicker}
+                                        id="basic-button-collapsible"
+                                        color={hexToHsba(props.shop.css_options.button?.borderColor)}
+                                        onChange={(newValue) => handleColorChanges(newValue, 'button', 'borderColor')}
+                                    />
+                                </div>
+                            </Grid.Cell>
+                        </Grid>
+                    </Collapsible>
+                </Stack>
             </LegacyCard>
+            <div className="space-10" />
+
             <LegacyCard title="Offer text" className="input-box" sectioned>
-                <LegacyCard.Section>
-                    <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                            <Select
-                                label="Font"
-                                options={fontOptions}
-                                onChange={handleFontSelect}
-                                value={props.shop.css_options.text.fontFamily}
-                            />
-                        </Grid.Cell>
-                        {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                <Grid>
+                    <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <Select
+                            label="Font"
+                            options={fontOptions}
+                            onChange={handleFontSelect}
+                            value={props.shop.css_options.text.fontFamily}
+                        />
+                    </Grid.Cell>
+                    {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Weight"
                                 type="number"
@@ -271,29 +463,31 @@ export function ThirdTab(props) {
                                 value={parseInt(props.shop.css_options.text.fontWeightInPixel)}
                             />
                         </Grid.Cell>*/}
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                            <TextField
-                                label="Size"
-                                type="number"
-                                suffix="px"
-                                autoComplete="off"
-                                onChange={handleFontSize}
-                                value={parseInt(props.shop.css_options.text.fontSize)}
-                            />
-                        </Grid.Cell>
-                    </Grid>
-                </LegacyCard.Section>
-                <LegacyCard.Section title="Button text">
-                    <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                            <Select
-                                label="Font"
-                                options={btnOptions}
-                                onChange={handleBtnSelect}
-                                value={props.shop.css_options.button.fontFamily}
-                            />
-                        </Grid.Cell>
-                        {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                    <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <TextField
+                            label="Size"
+                            type="number"
+                            suffix="px"
+                            autoComplete="off"
+                            onChange={handleFontSize}
+                            value={parseInt(props.shop.css_options.text.fontSize || 16)}
+                        />
+                    </Grid.Cell>
+                </Grid>
+                <hr className="legacy-card-hr" />
+                <div style={{paddingBottom: '20px'}}>
+                    <Text variant="headingMd" as="h2">Button text</Text>
+                </div>
+                <Grid>
+                    <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <Select
+                            label="Font"
+                            options={btnOptions}
+                            onChange={handleBtnSelect}
+                            value={props.shop.css_options.button.fontFamily}
+                        />
+                    </Grid.Cell>
+                    {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Weight"
                                 type="number"
@@ -303,31 +497,32 @@ export function ThirdTab(props) {
                                 value={parseInt(props.shop.css_options.button.fontWeightInPixel)}
                             />
                         </Grid.Cell>*/}
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                            <TextField
-                                label="Size"
-                                type="number"
-                                suffix="px"
-                                autoComplete="off"
-                                onChange={handleBtnSize}
-                                value={parseInt(props.shop.css_options.button.fontSize)}
-                            />
-                        </Grid.Cell>
-                    </Grid>
-                    <br />
-                    <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                    <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <TextField
+                            label="Size"
+                            type="number"
+                            suffix="px"
+                            autoComplete="off"
+                            onChange={handleBtnSize}
+                            value={parseInt(props.shop.css_options.button.fontSize || 16)}
+                        />
+                    </Grid.Cell>
+                </Grid>
+                <br />
+                <Grid>
+                    <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                        <div className="range-slider-container">
                             <RangeSlider
                                 label="Border Radius"
-                                value={props.shop.css_options.button.borderRadius}
+                                value={props.shop.css_options.button.borderRadius || 0}
                                 onChange={handleRangeSliderChange}
                                 output
                             />
-                        </Grid.Cell>
-                    </Grid>
-                </LegacyCard.Section>
+                        </div>
+                    </Grid.Cell>
+                </Grid>
             </LegacyCard>
-            <div className="space-4"></div>
+            <div className="space-10"></div>
             <LegacyStack distribution="center">
                 <ButtonGroup>
                     <Button onClick={() => props.saveDraft()}>Save Draft</Button>

@@ -1,0 +1,2 @@
+class ThemeDefaultSetting < ApplicationRecord
+end

@@ -459,7 +459,7 @@ export function FirstTab(props) {
                             </>
                         )}
                     </LegacyCard>
-                    <div className="space-10"></div>
+                    <div className="space-10" />
 
                     <LegacyCard title="Text" sectioned>
                         <LegacyStack spacing="loose" vertical>
@@ -489,7 +489,7 @@ export function FirstTab(props) {
                                 onChange={handleBtnChange}
                                 autoComplete="off"
                             />
-                            {props.offer.uses_ab_test && <hr style={{marginLeft: '-20px', marginRight: '-20px', backgroundColor: '#BABFC3', marginBottom: '12px'}} />}
+                            {props.offer.uses_ab_test && <hr className="legacy-card-hr legacy-card-hr-t20-b15" />}
                             <Checkbox id={"abTesting"}
                                 label="Enable A/B testing"
                                 checked={props.offer.uses_ab_test}
@@ -541,7 +541,7 @@ export function FirstTab(props) {
                             </Collapsible>
                         </LegacyStack>
                     </LegacyCard>
-                    <div className="space-10"></div>
+                    <div className="space-10"/>
 
                     <LegacyCard title="Display options" sectioned>
                         <LegacyStack spacing="baseTight" vertical>
@@ -602,9 +602,9 @@ export function FirstTab(props) {
                             />
                         </LegacyStack>
                     </LegacyCard>
-                    <div className="space-10"></div>
+                    <div className="space-10"/>
 
-                    <div className="space-4"></div>
+                    <div className="space-4"/>
                     <LegacyStack distribution="center">
                         <Button onClick={props.handleTabChange}>Continue To Placement</Button>
                     </LegacyStack>

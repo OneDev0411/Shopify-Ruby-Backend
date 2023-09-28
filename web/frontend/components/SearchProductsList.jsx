@@ -92,7 +92,7 @@ export function SearchProductsList(props) {
         <div style={{ marginLeft: '30px' }}>
             <OptionList
             options={option}
-            selected={selectedVariants[id]}
+            selected={selectedVariants[id] || []}
             onChange={(selectedOptions) => handleSelectedVariant(selectedOptions, id)}
             >
             </OptionList>
