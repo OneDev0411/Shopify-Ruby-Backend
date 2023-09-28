@@ -2,7 +2,9 @@
 
 
 class OffersController < AuthenticatedController
+  skip_before_action :verify_authenticity_token
 
+  protect_from_forgery with: :null_session
   before_action :set_shop, only: [:update_from_builder, :create_from_builder, :duplicate, :destroy]
 
   # POST   /offers/:shop_id/builder(.:format)
@@ -15,6 +17,20 @@ class OffersController < AuthenticatedController
     if offer_params['publish_status'] == 'published'
       offer.published_at = Time.now.utc
       offer.active = true
+    end
+
+    if offer_params['save_as_default_setting']
+      @icushop.offers.where.not(id: params[:id]).update(save_as_default_setting: false)
+
+      advanced_placement_setting = my_params[:advanced_placement_setting_attributes]
+
+      @icushop.custom_product_page_dom_selector = advanced_placement_setting[:custom_product_page_dom_selector]
+      @icushop.custom_product_page_dom_action = advanced_placement_setting[:custom_product_page_dom_action]
+      @icushop.custom_cart_page_dom_selector = advanced_placement_setting[:custom_cart_page_dom_selector]
+      @icushop.custom_cart_page_dom_action = advanced_placement_setting[:custom_cart_page_dom_action]
+      @icushop.custom_ajax_dom_selector = advanced_placement_setting[:custom_ajax_dom_selector]
+      @icushop.custom_ajax_dom_action = advanced_placement_setting[:custom_ajax_dom_action]
+      @icushop.save
     end
 
     if offer.save
@@ -54,6 +70,20 @@ class OffersController < AuthenticatedController
 
     if offer.offerable_type == 'multi'
       my_params['rules_json'] = offer_params['rules_json'].map { |rule| rule.except('uuid') }
+    end
+
+    if offer_params['save_as_default_setting']
+      @icushop.offers.where.not(id: params[:id]).update(save_as_default_setting: false)
+
+      advanced_placement_setting = my_params[:advanced_placement_setting_attributes]
+
+      @icushop.custom_product_page_dom_selector = advanced_placement_setting[:custom_product_page_dom_selector]
+      @icushop.custom_product_page_dom_action = advanced_placement_setting[:custom_product_page_dom_action]
+      @icushop.custom_cart_page_dom_selector = advanced_placement_setting[:custom_cart_page_dom_selector]
+      @icushop.custom_cart_page_dom_action = advanced_placement_setting[:custom_cart_page_dom_action]
+      @icushop.custom_ajax_dom_selector = advanced_placement_setting[:custom_ajax_dom_selector]
+      @icushop.custom_ajax_dom_action = advanced_placement_setting[:custom_ajax_dom_action]
+      @icushop.save
     end
 
     if offer.update(my_params)
@@ -111,13 +141,19 @@ class OffersController < AuthenticatedController
                                   :show_custom_field, :custom_field_name, :custom_field_placeholder,
                                   :discount_target_type, :discount_value, :discount_value_type,
                                   :discount_target_selection, :discount_prerequisite_quantity,
-                                  :discount_allocation_method, :shop_id, :offer_id, :custom_css,
+                                  :discount_allocation_method, :shop_id, :offer_id, :custom_css, :save_as_default_setting,
                                   rules_json: [:item_type, :uuid, :item_shopify_id, :rule_type,
                                                :item_shopify_title, :quantity, :item_name,
                                                :rule_selector, :item_type_name, :_destroy],
-                                  included_variants: {},
+                                  included_variants: {}, css_options: {},
                                   offerable_product_shopify_ids: [],
-                                  products_to_remove: [], css_options: {}).to_h
+                                  products_to_remove: [],
+                                  placement_setting_attributes: [:default_product_page, :default_cart_page, :default_ajax_cart,
+                                                                 :template_product_id, :template_cart_id, :template_ajax_id],
+                                  advanced_placement_setting_attributes: [:id, :custom_product_page_dom_selector, :custom_product_page_dom_action,
+                                                                         :custom_cart_page_dom_selector, :custom_cart_page_dom_action,
+                                                                         :custom_ajax_dom_selector, :custom_ajax_dom_action, 
+                                                                         :advanced_placement_setting_enabled]).to_h
   end
  
 end
