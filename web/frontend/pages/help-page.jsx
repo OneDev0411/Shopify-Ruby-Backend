@@ -36,21 +36,19 @@ export default function HelpPage() {
                         </p>
                     </LegacyStack>
                     } sectioned>
-                    <p>There are more help articles in our <Link url="https://help.incartupsell.com/en/collections/3263755-all" external>Help Docs</Link> page</p>
+                    <p>There are more help articles in our <Link url="https://help.incartupsell.com/en/collections/3263755-all" external target="_blank">Help Docs</Link> page</p>
                     <div className="space-4"></div>
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 8, xl: 6}}>
                             <div className={"help-articles"}>
                                 <List>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823518-choose-product-page-offer-location" external removeUnderline>Choose product page offer location</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823509-ajax-refresh-codes-for-common-themes" external removeUnderline>AJAX Refresh Codes for Common Themes</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823523-autopilot-ajax-cart-fix" external removeUnderline>Autopilot - AJAX cart fix</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/6355185-in-cart-upsell-application-new-feature-track-conversion" external removeUnderline>In Cart UpSell Application New Feature – Track Conversion</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/6326918-a-b-testing" external removeUnderline>A/B Testing</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823538-trackifyx-integration" external removeUnderline>TrackifyX integration</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823527-how-to-override-the-product-image" external removeUnderline>How To Override the Product Image</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823513-about-offer-stats" external removeUnderline>About Offer Stats</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823535-translate-offer-using-weglot" external removeUnderline>Translate offer using Weglot</Link></List.Item>
+                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823518-choose-product-page-offer-location" external removeUnderline target="_blank">Choose product page offer location</Link></List.Item>
+                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823509-ajax-refresh-codes-for-common-themes" external removeUnderline target="_blank">AJAX Refresh Codes for Common Themes</Link></List.Item>
+                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823523-autopilot-ajax-cart-fix" external removeUnderline target="_blank">Autopilot - AJAX cart fix</Link></List.Item>
+                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/6355185-in-cart-upsell-application-new-feature-track-conversion" external removeUnderline target="_blank">In Cart UpSell Application New Feature – Track Conversion</Link></List.Item>
+                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/6326918-a-b-testing" external removeUnderline target="_blank">A/B Testing</Link></List.Item>
+                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823538-trackifyx-integration" external removeUnderline target="_blank">TrackifyX integration</Link></List.Item>
+                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823527-how-to-override-the-product-image" external removeUnderline target="_blank">How To Override the Product Image</Link></List.Item>
                                 </List>
                             </div>
                         </Grid.Cell>
