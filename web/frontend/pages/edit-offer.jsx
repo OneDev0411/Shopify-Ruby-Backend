@@ -750,7 +750,8 @@ export default function EditPage() {
                                         <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer}
                                                   updateShop={updateShop} saveDraft={saveDraft} publishOffer={publishOffer}
                                                   autopilotCheck={autopilotCheck} enablePublish={enablePublish}
-                                                  updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>
+                                                  updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}
+                                                  handleTabChange={changeTab}/>
                                         : ""}
                                     {selected == 3 ?
                                         // page was imported from components folder
