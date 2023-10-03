@@ -437,7 +437,9 @@ export function ThirdTab(props) {
                                                 onClick={() => handleToggle('btnBorderColorPicker')}
                                                 ariaExpanded={open.btnBorderColorPicker}
                                                 ariaControls="basic-card-collapsible"
+                                                disabled
                                             ></Button>}
+                                        disabled
                                     />
                                     <div className="color-picker-style">
                                         <CollapsibleColorPicker
