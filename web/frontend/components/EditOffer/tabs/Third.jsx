@@ -538,12 +538,19 @@ export function ThirdTab(props) {
                 </Grid>
             </LegacyCard>
             <div className="space-10"></div>
-            <LegacyStack distribution="center">
-                <ButtonGroup>
-                    <Button onClick={() => props.saveDraft()}>Save Draft</Button>
-                    <Button primary disabled={props.enablePublish} onClick={() => props.publishOffer()}>Publish</Button>
-                </ButtonGroup>
-            </LegacyStack>
+            {(props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled) ? (
+                <>
+                    <LegacyStack distribution="center">
+                        <Button onClick={props.handleTabChange}>Continue to Advanced</Button>
+                    </LegacyStack>
+                </>) : (
+                <LegacyStack distribution="center">
+                    <ButtonGroup>
+                        <Button onClick={() => props.saveDraft()}>Save Draft</Button>
+                        <Button primary disabled={props.enablePublish} onClick={() => props.publishOffer()}>Publish</Button>
+                    </ButtonGroup>
+                </LegacyStack>
+                )}
             <div className="space-10"></div>
         </div>
     );
