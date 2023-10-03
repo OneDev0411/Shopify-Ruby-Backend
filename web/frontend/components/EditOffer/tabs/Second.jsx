@@ -549,7 +549,6 @@ export function SecondTab(props) {
     }, []);
 
     function getSelectedItems(item_type) {
-        debugger;
         return fetch(`/api/merchant/offer/shopify_ids_from_rule`, {
             method: 'POST',
             headers: {

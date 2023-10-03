@@ -21,8 +21,7 @@ export function FourthTab(props) {
     const handleCartDomAction = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_cart_page_dom_action"), []);
     const handleAjaxDomSelector = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_ajax_dom_selector"), []);
     const handleAjaxDomAction = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_ajax_dom_action"), []);
-    const handleAjaxRefreshCode = useCallback((newValue) => props.updateShop(newValue, "advanced_placement_setting", "ajax_refresh_code"), []);
-    const handleOfferCss = useCallback((newValue) => props.updateShop(newValue, "offer_css"), []);
+    const handleOfferCss = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "custom_css"), []);
 
     const options = [
         {label: 'prepend()', value: 'prepend'},
@@ -34,6 +33,12 @@ export function FourthTab(props) {
     return (
         <>
             <LegacyCard sectioned title="Offer placement - advanced settings" actions={[{ content: 'View help doc' }]}>
+                {(!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled) && (
+                    <>
+                        <b>To edit Advanced settings, enable "Advanced Placement Settings" option on the Placement tab.</b>
+                        <br/><br/><br/>
+                    </>
+                )}
                 <div>
                     <div style={{paddingBottom: '10px'}}>
                         <Text variant="headingSm" as="h2">Product page</Text>
@@ -101,22 +106,6 @@ export function FourthTab(props) {
                         disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                     />
                     <div className="space-4"/>
-
-                    <TextField
-                        label="AJAX refresh code"
-                        value={props.shop.ajax_refresh_code}
-                        onChange={handleAjaxRefreshCode}
-                        multiline={6}
-                    />
-                    <div className="space-4"/>
-
-                    <Select
-                        label="DOM action"
-                        id="productDomAction"
-                        options={options}
-                        onChange={handleCartDomAction}
-                        value={props.shop.custom_cart_page_dom_action}
-                    />
                 </div>
 
                 <hr className="legacy-card-hr" />
@@ -127,24 +116,21 @@ export function FourthTab(props) {
                     </div>
 
                     <TextField
-                        value={props.shop.offer_css}
+                        value={props.offer?.custom_css}
                         onChange={handleOfferCss}
                         multiline={6}
                     />
                 </div>
-                <LegacyCard.Section title="Custom CSS">
-                    <TextField value={props.shop.offer_css} onChange={handleOfferCss} multiline={6}></TextField>
-                    <br />
+                <br/>
 
-                    <Checkbox
-                        label="Save as default settings"
-                        helpText="This placement will apply to all offers created in the future.
-                         They can be edited in the Settings section."
-                        checked={props.offer?.save_as_default_setting}
-                        onChange={handleChange}
-                        disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                    />
-                </LegacyCard.Section>
+                <Checkbox
+                    label="Save as default settings"
+                    helpText="This placement will apply to all offers created in the future.
+                     They can be edited in the Settings section."
+                    checked={props.offer?.save_as_default_setting}
+                    onChange={handleChange}
+                    disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                />
             </LegacyCard>
             <div className="space-10"></div>
             <LegacyStack distribution="center">

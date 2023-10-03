@@ -436,6 +436,7 @@ class Offer < ApplicationRecord
       placement_setting: placement_setting,
       save_as_default_setting: save_as_default_setting,
       advanced_placement_setting: advanced_placement_setting,
+      custom_css: custom_css,
     }
     # todo: hide title from published version
     res[:winning_version] = winner if winner.present?
