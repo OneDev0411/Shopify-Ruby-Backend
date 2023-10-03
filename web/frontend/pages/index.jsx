@@ -46,7 +46,7 @@ export default function HomePage() {
   }, [setCurrentShop, setPlanName, setTrialDays])
 
   return (
-    <Page fullWidth>
+    <Page>
       <CustomTitleBar
         title="In Cart Upsell & Cross Sell"
         image={iculogo}
