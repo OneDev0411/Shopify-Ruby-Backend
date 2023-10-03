@@ -25,6 +25,9 @@
 .space-4{
     margin-bottom: var(--p-space-4);
 }
+.space-5{
+    margin-bottom: var(--p-space-5);
+}
 .space-10{
     margin-bottom: var(--p-space-10);
 }

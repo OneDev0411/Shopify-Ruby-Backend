@@ -108,7 +108,7 @@ export function ConversionRate(props) {
             <h3 className="report-money"><strong>{totalDisplayed > 0 ? ((converted / totalDisplayed) * 100).toFixed(2) : 0}%</strong></h3>
             <div className="space-4"></div>
             <p>CONVERSION FUNNEL</p><br />
-            <VerticalStack gap="5">
+            <VerticalStack gap="10">
                 <div height="50px">
                     <span>Added to cart</span><span style={{ float: 'right' }}>{totalDisplayed > 0 ? ((addedToCart / totalDisplayed) * 100).toFixed(2) : 0}%</span>
                     <div style={{ color: 'grey' }}>{addedToCart >= 0 ? addedToCart : 0} sessions</div>
@@ -173,6 +173,7 @@ export function OrderOverTimeData(props) {
                 {ordersData ? (<h3 className="report-money"><strong>{ordersTotal}</strong></h3>) : null}
                 <div className="space-4"></div>
                 <p>ORDERS OVER TIME</p><br />
+                <div className="space-5"></div>
                 {loading ? "Loading..." : ordersData ? (<StackedAreaChart
                     comparisonMetric={{
                         accessibilityLabel: 'trending up 6%',
