@@ -346,10 +346,6 @@ export function FirstTab(props) {
     //Collapsible controls
     const [open, setOpen] = useState(false);
     const handleToggle = useCallback(() => setOpen((open) => !open), []);
-    const [showToolTip, setShowToolTip] = useState(false);
-    const handleShowToolTip = useCallback((value) => {
-        setShowToolTip(value);
-    }, [])
 
     return (
         <div id="first-tab-offer">
@@ -394,18 +390,13 @@ export function FirstTab(props) {
                             {(props.offer.id == null && props.autopilotCheck?.shop_autopilot == false) && (
                                 <ButtonGroup>
                                     <>
-                                        <div
-                                            onMouseEnter={() => handleShowToolTip(true)}
-                                            onMouseLeave={() => handleShowToolTip(false)}
-                                        >
-                                            {showToolTip ? (
-                                                <div style={{display: 'flex'}}>
-                                                    <Icon source={InfoMinor} color="base"/>
-                                                    <Link to="/subscription" style={{marginLeft: '5px'}}>
-                                                        Autopilot is available on the Paid Plane.
-                                                    </Link>
-                                                </div>
-                                            ) : (<><Icon source={InfoMinor} color="base"/></>)}
+                                        <div>
+                                            <div style={{display: 'flex'}}>
+                                                <Icon source={InfoMinor} color="base"/>
+                                                <Link to="/subscription" style={{marginLeft: '5px'}}>
+                                                    Autopilot is available on the Paid Plan.
+                                                </Link>
+                                            </div>
                                         </div>
                                     </>
                                 </ButtonGroup>
