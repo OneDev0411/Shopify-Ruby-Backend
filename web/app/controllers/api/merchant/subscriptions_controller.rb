@@ -38,12 +38,15 @@ module Api
           @subscription.remove_recurring_charge
         end
         @subscription.shop_id = @icushop.id
-        @subscription.plan_id = @plan.id
-        @subscription.update_subscription(@plan)
-        if @subscription.plan.free_plan?
-          @icushop.unpublish_extra_offers if @icushop.offers.present?
-          @subscription.status = 'approved'
+        unless @plan.flex_plan?
+          @subscription.plan_id = @plan.id
+          @subscription.update_subscription(@plan)
+          if @subscription.plan.free_plan?
+            @icushop.unpublish_extra_offers if @icushop.offers.present?
+            @subscription.status = 'approved'
+          end
         end
+
         @subscription.save
 
         render "subscriptions/update"
@@ -54,7 +57,11 @@ module Api
         @icushop.activate_session
         begin
           ShopifyAPI::RecurringApplicationCharge.find(id: params[:charge_id]).activate
+          @plan = Plan.find_by(internal_name: 'plan_based_billing')
           @subscription.status = 'approved'
+          @subscription.plan = @plan
+          @subscription.update_subscription(@plan)
+
           if @subscription.save
             @success = true
             if @subscription.plan.try(:internal_name) == 'plan_based_billing' && @subscription.bill_on.blank?

@@ -169,7 +169,7 @@ class Subscription < ApplicationRecord
     begin
       url = "https://#{icushop.shopify_domain}/admin/api/#{SHOPIFY_API_VERSION}/recurring_application_charges.json"
       res = HTTParty.post(url, body: opts.to_json, headers: icushop.api_headers)
-      update shopify_charge_id: res['recurring_application_charge']['id'], status: 'pending_charge_approval'
+      update shopify_charge_id: res['recurring_application_charge']['id']
       # res.get('recurring_application_charge.confirmation_url')
       res['recurring_application_charge']['confirmation_url']
     rescue StandardError => e
@@ -354,11 +354,11 @@ class Subscription < ApplicationRecord
     mixpanel=MixpanelEventsTracker.new
     if self.valid?
       mixpanel.track_plan_update_event(shop.shopify_id, 'Subscription Renewed', plan) and return if bill_on_changed? && status=="approved"
-      
+
       mixpanel.track_plan_update_event(shop.shopify_id, 'Subscription Cancelled', plan) and return if status_changed? && status=="cancelled"
-      
+
       if plan_id_changed? && !plan.flex_plan?
-        mixpanel.track_plan_update_event(shop.shopify_id, 'Subscription Updated', plan) 
+        mixpanel.track_plan_update_event(shop.shopify_id, 'Subscription Updated', plan)
       elsif plan.internal_name == 'plan_based_billing' && status_changed? && status=="approved"
         mixpanel.track_plan_update_event(shop.shopify_id, 'Subscription Updated', plan)
       end
