@@ -62,7 +62,8 @@ export default function HelpPage() {
                     </Grid>
                 </LegacyCard>
                 {/* Second section with video */}
-                <LegacyCard 
+                {/* Ticket https://dev.azure.com/ltv-growth/In-Cart-Upsell/_workitems/edit/678 says to temporarily hide, so commenting the code and not removing */}
+                {/* <LegacyCard
                     title={
                         <LegacyStack>
                             <Icon source={TroubleshootMajor} />
@@ -95,7 +96,7 @@ export default function HelpPage() {
                             
                     </Grid.Cell>
                 </Grid>  
-                </LegacyCard>
+                </LegacyCard> */}
                 
 
                 <Modal
