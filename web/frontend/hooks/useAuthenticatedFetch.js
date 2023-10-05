@@ -23,6 +23,9 @@ export function useAuthenticatedFetch(host) {
     const uriWithHost = hasQueryParams
       ? `${uri}&host=${host}`
       : `${uri}?host=${host}`;
+    const headers = new Headers(options.headers);
+    headers.append('SourceApp', "icu-polaris");
+    options.headers = headers;
     const response = await fetchFunction(uriWithHost, options);
     checkHeadersForReauthorization(response.headers, app);
     return response;
