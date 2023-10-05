@@ -558,20 +558,32 @@ export function SecondTab(props) {
         })
             .then((response) => { return response.json() })
             .then(data => {
-                setSelectedItems(data.item_shopify_ids);
+                const offerRulesIds = [];
+                const offerRules = [...props.offer?.rules_json];
+                offerRules?.forEach ((value) => {
+                    offerRulesIds.push(value.item_shopify_id);
+                });
+                setSelectedItems(offerRulesIds);
                 return data
             })
     }
 
     function addProductsRule() {
         if (Array.isArray(selectedProducts)) {
-            const offerRules = [...props.offer.rules_json];
+            var offerRules = [...props.offer.rules_json];
             for (var i = 0; i < selectedProducts.length; i++) {
-                console.log("Selected Prod", selectedProducts[i]);
-                if(selectedProducts[i].id){
+                if(selectedProducts[i].id && !offerRules.some(hash => hash?.item_shopify_id == selectedProducts[i].id)){
                     const offer_rule = { quantity: null, rule_selector: "on_product_this_product_or_in_collection", item_type: "product", item_shopify_id: selectedProducts[i].id, item_name: selectedProducts[i].title }
                     offerRules.push(offer_rule);
                 }
+            }
+            if(selectedProducts.length == 0) {
+                var tempOfferRules = offerRules;
+                tempOfferRules?.forEach ((value) => {
+                    if(!selectedItems.includes(value?.item_shopify_id)) {
+                       offerRules = offerRules.filter(item => item.item_shopify_id !== value.item_shopify_id);
+                    }
+                });
             }
             props.updateOffer('rules_json', offerRules);
             props.updateOffer('ruleset_type', "or");

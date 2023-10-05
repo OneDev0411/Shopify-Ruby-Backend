@@ -625,6 +625,7 @@ export function FirstTab(props) {
                         <ModalAddProduct selectedItems={selectedItems} setSelectedItems={setSelectedItems}
                                          offer={props.offer} updateQuery={updateQuery} shop_id={props.shop.shop_id}
                                          productData={productData} resourceListLoading={resourceListLoading}
+                                         setResourceListLoading={setResourceListLoading}
                                          updateSelectedProduct={updateSelectedProduct}/>
                     </Modal>
                 </>
