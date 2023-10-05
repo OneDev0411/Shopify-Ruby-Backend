@@ -163,7 +163,7 @@ function HelpSection({ handleOpen }) {
       <VideoThumbnail
         onClick={handleOpen}
         videoLength={80}
-        thumbnailUrl="/assets/business-woman-smiling-in-office.jpeg"
+        thumbnailUrl="https://burst.shopifycdn.com/photos/business-woman-smiling-in-office.jpg"
       />
     </MediaCard>
   );
