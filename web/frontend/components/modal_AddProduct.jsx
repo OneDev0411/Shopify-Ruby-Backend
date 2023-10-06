@@ -110,7 +110,6 @@ export function ModalAddProduct(props) {
           media={media}
           accessibilityLabel={`View details for ${title}`}
           persistActions
-          // disabled={true}
           onClick={() => selectedProduct(id)}
         >
           <Text as="h3" variant="bodyMd" fontWeight="regular">

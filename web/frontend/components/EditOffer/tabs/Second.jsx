@@ -559,8 +559,8 @@ export function SecondTab(props) {
             .then((response) => { return response.json() })
             .then(data => {
                 const offerRulesIds = [];
-                const offerRules = [...props.offer?.rules_json];
-                offerRules?.forEach ((value) => {
+                const offerRules = [...props.offer.rules_json];
+                offerRules.forEach ((value) => {
                     offerRulesIds.push(value.item_shopify_id);
                 });
                 setSelectedItems(offerRulesIds);
@@ -579,8 +579,8 @@ export function SecondTab(props) {
             }
             if(selectedProducts.length == 0) {
                 var tempOfferRules = offerRules;
-                tempOfferRules?.forEach ((value) => {
-                    if(!selectedItems.includes(value?.item_shopify_id)) {
+                tempOfferRules.forEach ((value) => {
+                    if(!selectedItems.includes(value.item_shopify_id)) {
                        offerRules = offerRules.filter(item => item.item_shopify_id !== value.item_shopify_id);
                     }
                 });
