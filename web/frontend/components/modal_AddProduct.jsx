@@ -12,7 +12,6 @@ import { useSelector } from 'react-redux';
 
 export function ModalAddProduct(props) {
   const shopAndHost = useSelector(state => state.shopAndHost);
-  const [resourceListLoading, setResourceListLoading] = useState(false);
   const [selectedVariants, setSelectedVariants] = useState(props.offer.included_variants);
   const [taggedWith, setTaggedWith] = useState(null);
   const [queryValue, setQueryValue] = useState(null);
@@ -28,11 +27,6 @@ export function ModalAddProduct(props) {
     handleTaggedWithRemove();
     handleQueryValueRemove();
   }, [handleQueryValueRemove, handleTaggedWithRemove]);
-
-
-  useEffect(() => {
-    setResourceListLoading(props.resourceListLoading);
-  }, [props.resourceListLoading]);
 
   const resourceName = props.isCollection ? {
     singular: 'collection',
@@ -92,7 +86,7 @@ export function ModalAddProduct(props) {
           selectable
           showHeader={false}
           filterControl={filterControl}
-          loading={resourceListLoading}
+          loading={props.resourceListLoading}
       />
     </div>
   );
@@ -116,7 +110,6 @@ export function ModalAddProduct(props) {
           media={media}
           accessibilityLabel={`View details for ${title}`}
           persistActions
-          disabled={true}
           onClick={() => selectedProduct(id)}
         >
           <Text as="h3" variant="bodyMd" fontWeight="regular">
@@ -192,7 +185,7 @@ export function ModalAddProduct(props) {
   function selectionChange(id) {
     if (!props.isCollection) {
       if (props.selectedItems.length < id.length) {
-        setResourceListLoading(true);
+        props.setResourceListLoading(true);
         let shopifyId = id[id.length - 1]
 
         fetch(`/api/merchant/products/shopify/${shopifyId}?shop_id=${props.shop_id}&shop=${shopAndHost.shop}`, {
@@ -221,7 +214,7 @@ export function ModalAddProduct(props) {
             else if (props.updateSelectedProducts) {
               props.updateSelectedProducts({ id: data.id, title: data.title }, selectedVariants);
             }
-            setResourceListLoading(false);
+            props.setResourceListLoading(false);
             props.setSelectedItems(id)
           })
           .catch((error) => {
@@ -270,7 +263,7 @@ export function ModalAddProduct(props) {
           props.updateSelectedCollection(null);
         }
       }
-      setResourceListLoading(false);
+      props.setResourceListLoading(false);
       props.setSelectedItems(id);
     }
   }

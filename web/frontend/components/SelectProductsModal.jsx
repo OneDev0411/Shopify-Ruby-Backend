@@ -79,7 +79,7 @@ export function SelectProductsModal(props) {
 
   return (
     <>
-      <ModalAddProduct selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems} offer={props.offer} updateQuery={updateQuery} shop_id={props.shop.shop_id} productData={productData} resourceListLoading={resourceListLoading} updateSelectedProducts={updateSelectedProducts} />
+      <ModalAddProduct selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems} offer={props.offer} updateQuery={updateQuery} shop_id={props.shop.shop_id} productData={productData} resourceListLoading={resourceListLoading} setResourceListLoading={setResourceListLoading} updateSelectedProducts={updateSelectedProducts} />
     </>
   );
 }
