@@ -363,7 +363,9 @@ export function FirstTab(props) {
                 <>
                     <LegacyCard title="Offer Product" actions={[{content: 'Learn about Autopilot'}]} sectioned>
                         <LegacyStack spacing="loose" vertical>
-                            <p style={{color: '#6D7175'}}>What product would you like to have in the offer?</p>
+                            {props.autopilotCheck?.autopilot_offer_id != props.offer.id  && (
+                                <p style={{color: '#6D7175'}}>What product would you like to have in the offer?</p>
+                            )}
 
                             {props.offer.id == null ? (
                                 <>
