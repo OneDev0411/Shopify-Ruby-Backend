@@ -10,7 +10,7 @@ import {
   VerticalStack,
   VideoThumbnail,
 } from "@shopify/polaris";
-import {homeImage, newOffersImage} from "../assets/index.js";
+import {homeImage} from "../assets/index.js";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 
@@ -70,7 +70,7 @@ function OfferCard({ handleCreateOffer, isOffers }) {
       <VerticalStack inlineAlign="center">
         <div className="center-content">
           <Image
-            source={isOffers ? newOffersImage : homeImage}
+            source={ homeImage }
             alt="Create your first offer"
             width={219}
             style={{marginBottom: '11px'}}

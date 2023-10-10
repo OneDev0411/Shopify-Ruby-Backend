@@ -20,7 +20,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 import { useSelector } from "react-redux";
-import {homeImage} from "../assets/index.js";
 import {CreateOfferCard} from "./CreateOfferCard.jsx";
 
 export function OffersList(props) {
