@@ -106,13 +106,13 @@ export default function EditPage() {
             },
             text: {
                 fontFamily: "Arial",
-                fontSize: '0px',
+                fontSize: '16px',
             },
             button: {
                 color: "#FFFFFF", 
                 backgroundColor: "#2B3D51",
                 fontFamily: "Arial",
-                fontSize: "15px",
+                fontSize: "16px",
                 borderRadius: 0,
             },
         },
