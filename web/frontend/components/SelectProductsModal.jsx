@@ -23,7 +23,7 @@ export function SelectProductsModal(props) {
       .then((response) => { return response.json() })
       .then((data) => {
         for (var i = 0; i < data.length; i++) {
-          if (!Object.keys(props.offer.included_variants).includes(data[i].id.toString())) {
+          if (!props.offer.rules_json.some(hash => hash?.item_shopify_id == data[i].id)) {
             data[i].variants = [];
           }
         }
@@ -49,7 +49,7 @@ export function SelectProductsModal(props) {
       .then((response) => { return response.json() })
       .then((data) => {
         for (var i = 0; i < data.length; i++) {
-          if (!Object.keys(props.offer.included_variants).includes(data[i].id.toString())) {
+          if (!props.offer.rules_json.some(hash => hash?.item_shopify_id == data[i].id)) {
             data[i].variants = [];
           }
         }
