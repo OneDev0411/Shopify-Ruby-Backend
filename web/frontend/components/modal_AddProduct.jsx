@@ -100,7 +100,7 @@ export function ModalAddProduct(props) {
         size="medium"
     />
 
-    if (variants.length <= 1) {
+    if (!variants || variants.length <= 1) {
       return (
         <ResourceItem
           id={id}
@@ -118,7 +118,7 @@ export function ModalAddProduct(props) {
       );
     }
     else {
-      const option = variants.map((currentValue) => {
+      const option = variants?.map((currentValue) => {
         const label = currentValue.title;
         const value = currentValue.id;
         return { value, label };
@@ -128,11 +128,11 @@ export function ModalAddProduct(props) {
           <ResourceItem
             id={id}
             title={title}
-            image={image}
             media={media}
             accessibilityLabel={`View details for ${title}`}
             persistActions
             onClick={() => selectedProduct(id)}
+            verticalAlignment="center"
           >
             <Text as="h3" variant="bodyMd" fontWeight="regular">
               {title}
@@ -146,6 +146,7 @@ export function ModalAddProduct(props) {
                 allowMultiple
             />
           </div>
+          <hr style={{borderTop: '0.2px solid #f0f0f0', marginBottom: 0}} />
         </>
       );
     }
@@ -202,11 +203,9 @@ export function ModalAddProduct(props) {
                 props.productData[i].variants = data.variants;
                 break;
               }
-              else {
-              }
             }
             selectedVariants[id[id.length - 1]] = [];
-            for (var i = 0; i < data.variants.length; i++) {
+            for (var i = 0; i < data.variants?.length; i++) {
               selectedVariants[id[id.length - 1]].push(data.variants[i].id);
             }
             if (props.updateSelectedProduct) {
@@ -233,7 +232,7 @@ export function ModalAddProduct(props) {
         }
         for (var i = 0; i < props.productData.length; i++) {
           if (props.productData[i].id == props.selectedItems[uncheckedIndex]) {
-            for (var j = 0; j < props.productData[i].variants.length; j++) {
+            for (var j = 0; j < props.productData[i].variants?.length; j++) {
               tempArray[j] = props.productData[i].variants[j].id;
             }
             props.productData[i].variants = [];

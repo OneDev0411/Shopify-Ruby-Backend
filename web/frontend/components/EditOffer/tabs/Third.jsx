@@ -486,7 +486,7 @@ export function ThirdTab(props) {
                             suffix="px"
                             autoComplete="off"
                             onChange={handleFontSize}
-                            value={parseInt(props.offer.css_options?.text?.fontSize || 16)}
+                            value={parseInt(props.offer.css_options?.text?.fontSize)}
                         />
                     </Grid.Cell>
                 </Grid>
@@ -520,7 +520,7 @@ export function ThirdTab(props) {
                                 suffix="px"
                                 autoComplete="off"
                                 onChange={handleBtnSize}
-                                value={parseInt(props.offer.css_options?.button?.fontSize || 16)}
+                                value={parseInt(props.offer.css_options?.button?.fontSize)}
                             />
                         </Grid.Cell>
                     </Grid>
