@@ -22,7 +22,7 @@ class OffersController < AuthenticatedController
     if offer_params['save_as_default_setting']
       @icushop.offers.where.not(id: params[:id]).update(save_as_default_setting: false)
 
-      advanced_placement_setting = my_params[:advanced_placement_setting_attributes]
+      advanced_placement_setting = offer_params[:advanced_placement_setting_attributes]
 
       @icushop.custom_product_page_dom_selector = advanced_placement_setting[:custom_product_page_dom_selector]
       @icushop.custom_product_page_dom_action = advanced_placement_setting[:custom_product_page_dom_action]

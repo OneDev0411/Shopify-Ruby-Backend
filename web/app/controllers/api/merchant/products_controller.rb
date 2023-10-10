@@ -22,6 +22,7 @@ module Api
 
        # res = ShopifyAPI::Product.find(3995784710).attrs
        res = ShopifyAPI::Product.find(id: params[:shopify_id])
+       res.variants = @icushop.products.find_by(shopify_id: params[:shopify_id])&.available_variants_for_handlebars
        render json: res
       end
 

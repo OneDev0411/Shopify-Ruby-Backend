@@ -100,7 +100,6 @@ export function ModalAddProduct(props) {
         size="medium"
     />
 
-
     if (variants.length <= 1) {
       return (
         <ResourceItem
@@ -130,6 +129,7 @@ export function ModalAddProduct(props) {
             id={id}
             title={title}
             image={image}
+            media={media}
             accessibilityLabel={`View details for ${title}`}
             persistActions
             onClick={() => selectedProduct(id)}
@@ -137,14 +137,15 @@ export function ModalAddProduct(props) {
             <Text as="h3" variant="bodyMd" fontWeight="regular">
               {title}
             </Text>
-
+          </ResourceItem>
+          <div style={{ marginLeft: '30px' }}>
             <OptionList
                 options={option}
                 selected={selectedVariants[id]}
                 onChange={(selectedOptions) => handleSelectedVariant(selectedOptions, id)}
                 allowMultiple
             />
-          </ResourceItem>
+          </div>
         </>
       );
     }
