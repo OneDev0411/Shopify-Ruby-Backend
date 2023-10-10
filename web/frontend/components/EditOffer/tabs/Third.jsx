@@ -16,6 +16,7 @@ import React from "react";
 import CollapsibleColorPicker from "../../CollapsibleColorPicker";
 import tinycolor from "tinycolor2";
 import "../../../components/stylesheets/colorPickerStyles.css";
+import ColorSwatchSelector from "../../ColorSwatchSelector";
 
 export function ThirdTab(props) {
 
@@ -315,11 +316,13 @@ export function ThirdTab(props) {
                                         onChange={(newValue) => handleTextFieldChanges(newValue, 'main', 'backgroundColor')}
                                         value={props.offer.css_options?.main?.backgroundColor}
                                         connectedRight={
-                                            <Button
+                                            <ColorSwatchSelector
                                                 onClick={() => handleToggle('cardColorPicker')}
+                                                backgroundColor={props.offer.css_options?.main?.backgroundColor}
                                                 ariaExpanded={open.cardColorPicker}
                                                 ariaControls="basic-card-collapsible"
-                                            ></Button>}
+                                            />
+                                        }
                                     />
                                     <div className="color-picker-style">
                                         <CollapsibleColorPicker
@@ -338,11 +341,13 @@ export function ThirdTab(props) {
                                         onChange={(newValue) => handleTextFieldChanges(newValue, 'main', 'borderColor')}
                                         value={props.offer.css_options?.main?.borderColor}
                                         connectedRight={
-                                            <Button
+                                            <ColorSwatchSelector
                                                 onClick={() => handleToggle('borderColorPicker')}
+                                                backgroundColor={props.offer.css_options?.main?.borderColor}
                                                 ariaExpanded={open.borderColorPicker}
                                                 ariaControls="basic-border-collapsible"
-                                            ></Button>}
+                                            />
+                                        }
                                     />
                                     <div className="color-picker-style">
                                         <CollapsibleColorPicker
@@ -361,11 +366,13 @@ export function ThirdTab(props) {
                                         onChange={(newValue) => handleTextFieldChanges(newValue, 'button', 'backgroundColor')}
                                         value={props.offer.css_options?.button?.backgroundColor}
                                         connectedRight={
-                                            <Button
+                                            <ColorSwatchSelector 
                                                 onClick={() => handleToggle('buttonColorPicker')}
+                                                backgroundColor={props.offer.css_options?.button?.backgroundColor}
                                                 ariaExpanded={open.buttonColorPicker}
                                                 ariaControls="basic-button-collapsible"
-                                            ></Button>}
+                                            />
+                                        }
                                     />
                                     <div className="color-picker-style">
                                         <CollapsibleColorPicker
@@ -387,11 +394,13 @@ export function ThirdTab(props) {
                                         onChange={(newValue) => handleTextFieldChanges(newValue, 'text', 'color')}
                                         value={props.offer.css_options?.text?.color}
                                         connectedRight={
-                                            <Button
+                                            <ColorSwatchSelector 
                                                 onClick={() => handleToggle('textColorPicker')}
+                                                backgroundColor={props.offer.css_options?.text?.color}
                                                 ariaExpanded={open.textColorPicker}
                                                 ariaControls="basic-card-collapsible"
-                                            ></Button>}
+                                            />
+                                        }
                                     />
                                     <div className="color-picker-style">
                                         <CollapsibleColorPicker
@@ -410,11 +419,13 @@ export function ThirdTab(props) {
                                         onChange={(newValue) => handleTextFieldChanges(newValue, 'button', 'color')}
                                         value={props.offer.css_options?.button?.color}
                                         connectedRight={
-                                            <Button
+                                            <ColorSwatchSelector 
                                                 onClick={() => handleToggle('btnTextColorPicker')}
+                                                backgroundColor={props.offer.css_options?.button?.color}
                                                 ariaExpanded={open.btnTextColorPicker}
                                                 ariaControls="basic-card-collapsible"
-                                            ></Button>}
+                                            />
+                                        }
                                     />
                                     <div className="color-picker-style">
                                         <CollapsibleColorPicker
@@ -433,12 +444,13 @@ export function ThirdTab(props) {
                                         onChange={(newValue) => handleTextFieldChanges(newValue, 'button', 'borderColor')}
                                         value={props.offer.css_options?.button?.borderColor}
                                         connectedRight={
-                                            <Button
+                                            <ColorSwatchSelector
                                                 onClick={() => handleToggle('btnBorderColorPicker')}
+                                                backgroundColor={props.offer.css_options?.button?.borderColor}
                                                 ariaExpanded={open.btnBorderColorPicker}
                                                 ariaControls="basic-card-collapsible"
                                                 disabled
-                                            ></Button>}
+                                            />}
                                         disabled
                                     />
                                     <div className="color-picker-style">
