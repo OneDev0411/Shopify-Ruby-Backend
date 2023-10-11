@@ -296,7 +296,7 @@ export function ThirdTab(props) {
 
             <LegacyCard title="Color" sectioned>
                 <Stack vertical>
-                    <Button>Choose Template</Button>
+                    {/*<Button>Choose Template</Button>*/}
                     <Button
                         onClick={handleMenuToggle}
                         ariaExpanded={openEditMenu}
