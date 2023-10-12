@@ -4,7 +4,7 @@
 
 .color-picker-style {
     position: absolute;
-    z-index: 21;
+    z-index: 35;
     left: 19%;
     top: 77%;
     transform: translateX(50%);

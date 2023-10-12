@@ -10,7 +10,7 @@ import {
     Grid,
     Text,
     Stack} from "@shopify/polaris";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { SketchPicker } from 'react-color';
 import React from "react";
 import CollapsibleColorPicker from "../../CollapsibleColorPicker";
@@ -108,6 +108,31 @@ export function ThirdTab(props) {
         },
         [open]
     );
+
+    const colorPickerRefs = {
+        cardColorPicker: useRef(null),
+        borderColorPicker: useRef(null),
+        buttonColorPicker: useRef(null),
+        textColorPicker: useRef(null),
+        btnTextColorPicker: useRef(null),
+        btnBorderColorPicker: useRef(null),
+    };
+
+    const handleOutsideClick = (event) => {
+        for (const [colorPickerName, ref] of Object.entries(colorPickerRefs)) {
+            if (ref.current && !ref.current.contains(event.target)) {
+            setOpen((prevState) => ({ ...prevState, [colorPickerName]: false }));
+          }
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleOutsideClick);
+
+    return () => {
+        document.removeEventListener('mousedown', handleOutsideClick);
+    };
+    }, []);
 
     //Font options
     // const [fontSelect, setFontSelect] = useState("Dummy font 1");
@@ -324,7 +349,7 @@ export function ThirdTab(props) {
                                             />
                                         }
                                     />
-                                    <div className="color-picker-style">
+                                    <div className="color-picker-style" ref={colorPickerRefs.cardColorPicker}>
                                         <CollapsibleColorPicker
                                             open={open.cardColorPicker}
                                             id="basic-card-collapsible"
@@ -349,7 +374,7 @@ export function ThirdTab(props) {
                                             />
                                         }
                                     />
-                                    <div className="color-picker-style">
+                                    <div className="color-picker-style" ref={colorPickerRefs.borderColorPicker}>
                                         <CollapsibleColorPicker
                                             open={open.borderColorPicker}
                                             id="basic-border-collapsible"
@@ -374,7 +399,7 @@ export function ThirdTab(props) {
                                             />
                                         }
                                     />
-                                    <div className="color-picker-style">
+                                    <div className="color-picker-style" ref={colorPickerRefs.buttonColorPicker}>
                                         <CollapsibleColorPicker
                                             open={open.buttonColorPicker}
                                             id="basic-button-collapsible"
@@ -402,7 +427,7 @@ export function ThirdTab(props) {
                                             />
                                         }
                                     />
-                                    <div className="color-picker-style">
+                                    <div className="color-picker-style" ref={colorPickerRefs.textColorPicker}>
                                         <CollapsibleColorPicker
                                             open={open.textColorPicker}
                                             id="basic-card-collapsible"
@@ -427,7 +452,7 @@ export function ThirdTab(props) {
                                             />
                                         }
                                     />
-                                    <div className="color-picker-style">
+                                    <div className="color-picker-style" ref={colorPickerRefs.btnTextColorPicker}>
                                         <CollapsibleColorPicker
                                             open={open.btnTextColorPicker}
                                             id="basic-border-collapsible"
@@ -453,7 +478,7 @@ export function ThirdTab(props) {
                                             />}
                                         disabled
                                     />
-                                    <div className="color-picker-style">
+                                    <div className="color-picker-style" ref={colorPickerRefs.btnBorderColorPicker}>
                                         <CollapsibleColorPicker
                                             open={open.btnBorderColorPicker}
                                             id="basic-button-collapsible"
