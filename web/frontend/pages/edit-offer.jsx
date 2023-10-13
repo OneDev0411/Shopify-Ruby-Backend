@@ -155,6 +155,8 @@ export default function EditPage() {
     const [shopifyThemeName, setShopifyThemeName] = useState(null);
     const [themeTemplateData, setThemeTemplateData] = useState(null);
     const [templateImagesURL, setTemplateImagesURL] = useState({});
+    const [updatePreviousAppOffer, setUpdatePreviousAppOffer] = useState(false);
+    const [storedThemeNames, setStoredThemeName] = useState([]);
                                       
     const offerID = location?.state?.offerID;
     const fetch = useAuthenticatedFetch(shopAndHost.host);
@@ -278,6 +280,7 @@ export default function EditPage() {
                         }
                     }
                     setShop(data.shop_settings);
+                    setUpdatePreviousAppOffer(!updatePreviousAppOffer);
                 })
                 .catch((error) => {
                     console.log("Error > ", error);
@@ -309,6 +312,7 @@ export default function EditPage() {
         })
         .then( (response) => { return response.json() })
         .then( (data) => {
+            setStoredThemeName(data.theme_names_having_data);
             if(data.themeExist) {
                 setShopifyThemeName(data.shopify_theme_name);
                 setThemeTemplateData(data.templatesOfCurrentTheme);
@@ -338,6 +342,12 @@ export default function EditPage() {
             console.log("# Error updateProducts > ", JSON.stringify(error));
         })
     },[openAutopilotSection]);
+
+    useEffect(() => {
+        if(storedThemeNames.length != 0 && shopifyThemeName != null && !storedThemeNames.includes(shopifyThemeName)) {
+            updateNestedAttributeOfOffer(true, "advanced_placement_setting", "advanced_placement_setting_enabled");
+        }
+    }, [storedThemeNames, shopifyThemeName, offer])
 
 
     //Called whenever the checkKeysValidity changes in any child component
@@ -743,7 +753,8 @@ export default function EditPage() {
                                                    autopilotCheck={autopilotCheck} handleTabChange={changeTab}
                                                    updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}
                                                    themeTemplateData={themeTemplateData} templateImagesURL={templateImagesURL}
-                                                   enableOrDisablePublish={enableOrDisablePublish}/>
+                                                   enableOrDisablePublish={enableOrDisablePublish}
+                                                   storedThemeNames={storedThemeNames}/>
                                         : ""}
                                     {selected == 2 ?
                                         // page was imported from components folder
@@ -777,11 +788,15 @@ export default function EditPage() {
                                     {selectedPre == 0 ?
                                         <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer}
                                                       checkKeysValidity={checkKeysValidity}
-                                                      updateCheckKeysValidity={updateCheckKeysValidity}/>
+                                                      updateCheckKeysValidity={updateCheckKeysValidity}
+                                                      updatePreviousAppOffer={updatePreviousAppOffer}
+                                                      updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>
                                         :
                                         <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer}
                                                       checkKeysValidity={checkKeysValidity}
-                                                      updateCheckKeysValidity={updateCheckKeysValidity}/>}
+                                                      updateCheckKeysValidity={updateCheckKeysValidity}
+                                                      updatePreviousAppOffer={updatePreviousAppOffer}
+                                                      updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>}
                                 </Tabs>
                             </div>
                         </Layout.Section>

@@ -8,7 +8,8 @@ import {
     Grid,
     Icon,
     RadioButton,
-    Image, Badge, Text
+    Image, Badge, Text,
+    Banner
 } from "@shopify/polaris";
 import {
     CancelMinor  } from '@shopify/polaris-icons';
@@ -49,6 +50,8 @@ export function SecondTab(props) {
     const [insertedImage1, setInsertedImage1] = useState(null);
     const [insertedImage2, setInsertedImage2] = useState(null);
     const [insertedImage3, setInsertedImage3] = useState(null);
+
+    const [openBanner, setOpenBanner] = useState(false);
 
     useEffect(() => {
         if(props.offer.in_product_page && props.offer.in_cart_page) {
@@ -119,6 +122,13 @@ export function SecondTab(props) {
             }
         }
     }, [props.offer.in_cart_page, props.offer.in_ajax_cart, props.offer.in_product_page]);
+
+    useEffect(() => {
+        if(props.storedThemeNames.length != 0 && props.shopifyThemeName != null)
+        {
+            setOpenBanner(!props.storedThemeNames.includes(props.shopifyThemeName));
+        }
+    }, [props.storedThemeNames, props.shopifyThemeName])
 
     function upadteCondition() {
         if (quantityArray.includes(rule.rule_selector)) {
@@ -515,8 +525,13 @@ export function SecondTab(props) {
     }, [collectionModal]);
 
     const handleEnableAdvancedSetting = useCallback((newChecked) => {
-        props.updateNestedAttributeOfOffer(newChecked, "advanced_placement_setting", "advanced_placement_setting_enabled");
-    }, []);
+        if(props.storedThemeNames.includes(props.shopifyThemeName)) {
+            props.updateNestedAttributeOfOffer(newChecked, "advanced_placement_setting", "advanced_placement_setting_enabled");
+        }
+        else {
+            props.updateNestedAttributeOfOffer(true, "advanced_placement_setting", "advanced_placement_setting_enabled");   
+        }
+    }, [props.storedThemeNames, props.shopifyThemeName]);
 
     async function handleSelectCollectionsModal() {
         if(props.offer.id!=null){
@@ -648,6 +663,14 @@ export function SecondTab(props) {
 
     return (
         <div id="polaris-placement-cards">
+            {(!props.storedThemeNames.includes(props.shopifyThemeName) && openBanner) && (
+            <div style={{marginBottom: "10px"}} className="polaris-banner-container">
+                <Banner title="Placements Unavailable" onDismiss={() => {setOpenBanner(!openBanner)}} tone='warning'>
+                    <p>Placements are not available for your theme.</p>
+                    <p>Please add selectors and actions in <b>Advanved Tab</b>.</p>
+                </Banner>
+            </div>
+            )}
             <LegacyCard title="Choose placement" sectioned>
                 <p style={{color: '#6D7175', marginTop: '-20px', marginBottom: '23px'}}>Where would you like your offer to appear?</p>
 
