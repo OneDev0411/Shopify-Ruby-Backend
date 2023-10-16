@@ -69,7 +69,7 @@ export default function EditPage() {
         show_product_image: true,
         show_variant_price: false,
         show_product_price: true,
-        show_product_title: false,
+        show_product_title: true,
         show_spinner: null,
         show_nothanks: false,
         show_quantity_selector: true,
@@ -183,7 +183,7 @@ export default function EditPage() {
                 .catch((error) => {
                     console.log("Error > ", error);
                 })
-            setIsLoading(true);
+
             fetch(`/api/merchant/shop_settings`, {
                 method: 'POST',
                 headers: {
@@ -239,7 +239,6 @@ export default function EditPage() {
                 .catch((error) => {
                     console.log("Error > ", error);
                 })
-            setIsLoading(true);
             fetch(`/api/merchant/offer_settings`, {
                 method: 'POST',
                 headers: {
@@ -286,7 +285,6 @@ export default function EditPage() {
                     console.log("Error > ", error);
                 })
         }
-        setIsLoading(true);
         fetch(`/api/merchant/autopilot_details?shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
@@ -347,7 +345,7 @@ export default function EditPage() {
         if(storedThemeNames.length != 0 && shopifyThemeName != null && !storedThemeNames.includes(shopifyThemeName)) {
             updateNestedAttributeOfOffer(true, "advanced_placement_setting", "advanced_placement_setting_enabled");
         }
-    }, [storedThemeNames, shopifyThemeName, offer])
+    }, [storedThemeNames, shopifyThemeName])
 
 
     //Called whenever the checkKeysValidity changes in any child component
