@@ -924,21 +924,21 @@ export function SecondTab(props) {
                                     <>
                                         <div className="space-4" />
                                         <Image
-                                            source={props.templateImagesURLcart_page_image_1}
+                                            source={props.templateImagesURL.cart_page_image_1}
                                             alt="Sample Image 1"
                                             style={{marginRight : '10px', marginTop: '10px', cursor: 'pointer', width: '165px'}}
                                             className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('cart_page', 1)}
                                         />
                                         <Image
-                                            source={props.templateImagesURLcart_page_image_2}
+                                            source={props.templateImagesURL.cart_page_image_2}
                                             alt="Sample Image 2"
                                             style={{marginLeft : '10px', marginRight : '10px', cursor: 'pointer', width: '165px'}}
                                             className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('cart_page', 2)}
                                         />
                                         <Image
-                                            source={props.templateImagesURLcart_page_image_3}
+                                            source={props.templateImagesURL.cart_page_image_3}
                                             alt="Sample Image 3"
                                             style={{marginLeft : '10px', cursor: 'pointer', width: '165px'}}
                                             className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
