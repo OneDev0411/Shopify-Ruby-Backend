@@ -12,3 +12,7 @@
   box-shadow: 0 0 0px 1px;
   transition: border 0.3s, box-shadow 0.3s;
 }
+
+.polaris-banner-container .Polaris-Banner {
+  background-color: #fff1b894;
+}
