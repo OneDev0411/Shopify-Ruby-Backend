@@ -207,6 +207,19 @@ export default function EditPage() {
                         }
                     }
                     setShop(data.shop_settings);
+
+                    let newOffer = {...offer};
+
+                    newOffer.advanced_placement_setting ={
+                        custom_product_page_dom_selector: data.shop_settings.custom_product_page_dom_selector,
+                        custom_product_page_dom_action: data.shop_settings.custom_product_page_dom_action,
+                        custom_cart_page_dom_selector: data.shop_settings.custom_cart_page_dom_selector,
+                        custom_cart_page_dom_action: data.shop_settings.custom_cart_page_dom_action,
+                        custom_ajax_dom_selector: data.shop_settings.custom_ajax_dom_selector,
+                        custom_ajax_dom_action: data.shop_settings.custom_ajax_dom_action,
+                    };
+
+                    setOffer(newOffer);
                 })
                 .catch((error) => {
                     console.log("Error > ", error);
