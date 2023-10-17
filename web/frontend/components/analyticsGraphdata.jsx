@@ -46,7 +46,7 @@ export function TotalSalesData(props) {
                 }
             }}
         >
-            <LegacyCard title="Total sales" sectioned>
+            <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Total Sales`} sectioned>`
                 {salesData ? (<h3 className="report-money"><strong>${salesTotal}</strong></h3>) : null}
                 <div className="space-4"></div>
                 <p>SALES OVER TIME</p><br />
@@ -104,7 +104,7 @@ export function ConversionRate(props) {
     }, [props.period])
 
     return (
-        <LegacyCard title="Conversion rate" sectioned>
+        <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Conversion Rate`} sectioned>
             <h3 className="report-money"><strong>{totalDisplayed > 0 ? ((converted / totalDisplayed) * 100).toFixed(2) : 0}%</strong></h3>
             <div className="space-4"></div>
             <p>CONVERSION FUNNEL</p><br />
@@ -169,7 +169,7 @@ export function OrderOverTimeData(props) {
                 }
             }}
         >
-            <LegacyCard title="Total orders" sectioned>
+            <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Total Orders`} sectioned>
                 {ordersData ? (<h3 className="report-money"><strong>{ordersTotal}</strong></h3>) : null}
                 <div className="space-4"></div>
                 <p>ORDERS OVER TIME</p><br />
