@@ -65,13 +65,13 @@ export default function HomePage() {
           {hasOffers && (
             <Grid>
               <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-                  <TotalSalesData period='monthly'/>
+                  <TotalSalesData period='monthly' title={true} />
               </Grid.Cell>
+              {/*  <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>*/}
+              {/*    <ConversionRate period='monthly' title={true} />*/}
+              {/*</Grid.Cell>*/}
                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-                  <ConversionRate period='monthly'/>
-              </Grid.Cell>
-                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-                  <OrderOverTimeData period='monthly'/>
+                  <OrderOverTimeData period='monthly' title={true} />
               </Grid.Cell>
             </Grid>
           )}

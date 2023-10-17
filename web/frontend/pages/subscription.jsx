@@ -162,7 +162,7 @@ export default function Subscription() {
         <Layout>
             <Layout.Section>
                 <LegacyCard sectioned>
-                    <p>Need help, have some questions, or jus want to say hi? We're available for a live chat 7 days a week from 5 AM EST - 9 PM EST.</p>
+                    <p>Need help, have some questions, or just want to say hi? We're available for a live chat 7 days a week from 5 AM EST - 9 PM EST.</p>
                     <br/>
                     <p>Not anything urgent? Fire us an email, we usually respond with 24 hours Monday to Friday</p>
                 </LegacyCard>
