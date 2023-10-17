@@ -1,4 +1,4 @@
-import {Tabs, Card, TextField,Select} from '@shopify/polaris';
+import {Tabs, Card, TextField, Select, Checkbox} from '@shopify/polaris';
 import {useState, useCallback} from 'react';
 import React from "react";
 
@@ -19,6 +19,7 @@ export function SettingTabs(props){
       [],
     );
     const handleAjaxRefreshCode = useCallback((newValue) => props.updateShop(newValue, "ajax_refresh_code"), []);
+    const handleUsesAjaxCartChange = useCallback((newValue) => props.updateShop(newValue, "uses_ajax_cart"), []);
   
     const tabs = [
       {
@@ -80,7 +81,18 @@ export function SettingTabs(props){
                     onChange={props.handleFormChange}
                     value={props.formData.ajaxDomAction}
                 />
-                <TextField label="AJAX refresh code" value={props.currentShop.ajax_refresh_code} onChange={handleAjaxRefreshCode} multiline={6}></TextField>
+                <br/>
+                <Checkbox
+                    label="My store uses an AJAX (popup or drawer-style) cart"
+                    checked={props.currentShop.uses_ajax_cart}
+                    onChange={handleUsesAjaxCartChange}
+                ></Checkbox>
+                {(props.currentShop.uses_ajax_cart) && (
+                    <>
+                        <br/><br/>
+                        <TextField label="AJAX refresh code" value={props.currentShop.ajax_refresh_code} onChange={handleAjaxRefreshCode} multiline={6}></TextField>
+                    </>
+                )}
             </>
       }
     ];
