@@ -111,7 +111,7 @@ function OfferCard({ handleCreateOffer, isOffers }) {
 function HelpSection({ handleOpen }) {
   const { shopData } = useContext(ShopContext);
 
-  const showIntercomWidget = useCallback(() => {
+  const showIntercomWidget = () => {
     // Intercom needs to be initialized/booted before it can be used.
     const { currentShop } = shopData;
     window.Intercom('boot', {
@@ -129,7 +129,7 @@ function HelpSection({ handleOpen }) {
       // dashboard: "https://incartupsell.herokuapp.com/?shop_id=#{@currentShop.id}"
     });
     window.Intercom('show');
-  }, []);
+  };
 
   return (
     <MediaCard
