@@ -15,7 +15,7 @@ export default function Stack(props) {
      data-offerid="{{ id }}">
   {{#show_nothanks}}
   <a class="dismiss-button" onclick="InCartUpsell.dismissOffer({{ id }}); return false;">&times;</a>{{/show_nothanks}}
-  <div style="{{#textFontWeight}} font-weight: {{css_options.text.fontWeight}}; {{/textFontWeight}}{{#textFontFamily}} font-family: {{css_options.text.fontFamily}}; {{/textFontFamily}} {{#textFontSize}} font-size: {{css_options.text.fontSize}}; {{/textFontSize}}" class="offer-text">{{{ text }}}</div>
+  <div style="{{#textFontWeight}} font-weight: {{css_options.text.fontWeight}}; {{/textFontWeight}}{{#textFontFamily}} font-family: {{css_options.text.fontFamily}}; {{/textFontFamily}} {{#textFontSize}} font-size: {{css_options.text.fontSize}}; {{/textFontSize}} color: {{ css_options.text.color}};" class="offer-text">{{{ text }}}</div>
   <div class="offer-collection">
     {{#offerable_product_details}}
     <div class="product-wrapper">

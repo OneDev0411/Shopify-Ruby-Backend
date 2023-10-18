@@ -16,7 +16,7 @@ export default function Carousel(props) {
     &times;
   </a>
   {{/show_nothanks}}
-  <div class="offer-text" style="{{#textFontWeight}} font-weight: {{css_options.text.fontWeight}}; {{/textFontWeight}}{{#textFontFamily}} font-family: {{css_options.text.fontFamily}}; {{/textFontFamily}} {{#textFontSize}} font-size: {{css_options.text.fontSize}}; {{/textFontSize}}">{{{ text }}}</div>
+  <div class="offer-text" style="{{#textFontWeight}} color: {{ css_options.text.color}}; font-weight: {{css_options.text.fontWeight}}; {{/textFontWeight}}{{#textFontFamily}} font-family: {{css_options.text.fontFamily}}; {{/textFontFamily}} {{#textFontSize}} font-size: {{css_options.text.fontSize}}; {{/textFontSize}}">{{{ text }}}</div>
   <div class="offer-collection" style="{{#selectedCarouselWidth}} width: {{carouselWidth}}px; {{/selectedCarouselWidth}}">
     {{#offerable_product_details}}
     <div class="product-wrapper">
