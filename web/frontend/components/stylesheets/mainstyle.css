@@ -216,3 +216,7 @@
 #appearance-offers .Polaris-TextField__Spinner {
     visibility: visible;
 }
+
+.banner-btn .Polaris-Banner__Button{
+    background-color: rgba(222, 245, 247, 1);
+}
