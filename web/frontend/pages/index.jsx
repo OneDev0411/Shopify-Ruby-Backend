@@ -25,6 +25,10 @@ export default function HomePage() {
   const handleOpenOfferPage = () => {
     navigateTo('/edit-offer', { state: { offerID: null } });
   }
+
+  const handleOpenGoogleForm = () => {
+    window.open('https://forms.gle/oRnBh3BPSAvWwLYQ7', '_blank');
+  };
   
   useEffect(() => {
     fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
@@ -56,9 +60,8 @@ export default function HomePage() {
         <Layout.Section>
           <div className="banner-btn">
             <Banner
-              action={{content: 'Take the survey', url: 'https://forms.gle/oRnBh3BPSAvWwLYQ7'}}
+              action={{content: 'Take the survey', onAction: handleOpenGoogleForm }}
               status="info"
-              onDismiss={() => {}}
             >
               <p>We're delighted to welcome you to the beta redesign of In Cart Upsell & Cross-Sell! If you encounter any unexpected issues or need assistance with the new User Interface, please don't hesitate to contact our support team. Additionally, if you can spare 5 minutes, we'd greatly appreciate your feedback. Thank you!</p>
             </Banner>
