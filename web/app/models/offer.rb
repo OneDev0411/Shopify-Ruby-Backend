@@ -367,7 +367,7 @@ class Offer < ApplicationRecord
   # Return hashmap.
   def library_json
     limit_offerables = offerable_type == 'auto' ? 10 : nil
-    my_offerable_product_details = offerable_product_details(false, false, limit_offerables)
+    my_offerable_product_details = offerable_product_details(false, true, limit_offerables)
     res = {
       id: id,
       rules_json: rules_json,
