@@ -168,6 +168,13 @@ export function OfferPreview(props) {
 		else {
 			props.updateCheckKeysValidity("mobileViewWidth", false);
 		}
+
+		if(props.offer?.css_options?.button?.borderWidth && parseInt(props.offer?.css_options?.button?.borderWidth) > 0) {
+			props.updateCheckKeysValidity("buttonBorderWidth", true);
+		}
+		else {
+			props.updateCheckKeysValidity("buttonBorderWidth", false);
+		}
 	}
 
 

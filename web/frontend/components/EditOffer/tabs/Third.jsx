@@ -220,6 +220,24 @@ export function ThirdTab(props) {
     const [rangeValue, setRangeValue] = useState(20);
     const handleRangeSliderChange = useCallback((newValue) => props.updateNestedAttributeOfOffer(parseInt(newValue), "css_options", "button", "borderRadius"), []);
 
+    const handleBtnBorderWidth =useCallback((newValue) => {
+        const numericValue = parseInt(newValue);
+        if (isNaN(numericValue) || numericValue >= 0 && numericValue <= 5) {
+          props.updateNestedAttributeOfOffer(
+            parseInt(newValue),
+            "css_options",
+            "button",
+            "borderWidth"
+          );
+        }
+    }, []);
+
+    //Button Border style drop-down menu
+    const handleBtnBorderStyle = useCallback((newValue) => {
+        props.updateNestedAttributeOfOffer(newValue, "css_options", "button", "borderStyle");
+        setSelected(newValue);
+    }, []);
+
     //Sketch picker
     const handleColorChanges = useCallback((newValue, comp, property) => {
         const rgbColor = tinycolor({ h: newValue.hue, s: newValue.saturation, v: newValue.brightness, a: newValue.alpha }).toRgb();
@@ -474,9 +492,7 @@ export function ThirdTab(props) {
                                                 backgroundColor={props.offer.css_options?.button?.borderColor}
                                                 ariaExpanded={open.btnBorderColorPicker}
                                                 ariaControls="basic-card-collapsible"
-                                                disabled
                                             />}
-                                        disabled
                                     />
                                     <div className="color-picker-style" ref={colorPickerRefs.btnBorderColorPicker}>
                                         <CollapsibleColorPicker
@@ -567,11 +583,27 @@ export function ThirdTab(props) {
                             <RangeSlider
                                 label="Border Radius"
                                 value={props.offer.css_options?.button?.borderRadius || 0}
-
                                 onChange={handleRangeSliderChange}
                                 output
                             />
                     </Grid.Cell>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                            <TextField
+                                label="Border Width"
+                                type="number"
+                                suffix="px"
+                                autoComplete="off"
+                                onChange={handleBtnBorderWidth}
+                                value={parseInt(props.offer.css_options?.button?.borderWidth)}
+                            />
+                        </Grid.Cell>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
+                            <Select label="Border style"
+                                options={BorderOptions}
+                                onChange={handleBtnBorderStyle}
+                                value={props.offer?.css_options?.button?.borderStyle}
+                            />
+                        </Grid.Cell>
                 </Grid>
             </LegacyCard>
             <div className="space-10"></div>
