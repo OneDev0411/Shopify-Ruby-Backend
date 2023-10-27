@@ -12,7 +12,7 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { GenericFooter } from "../components";
 import Summary from "../components/Summary";
-import Details from "../components/offerDetails";
+import Details from "../components/OfferDetails";
 import { OfferPreview } from "../components/OfferPreview";
 import {
   loadOfferDetails,
