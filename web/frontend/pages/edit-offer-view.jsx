@@ -175,7 +175,7 @@ const EditOfferView = () => {
               <div className="grid-space">
                 <Grid>
                   <Grid.Cell columnSpan={{xs: 6, sm: 6, md: 6, lg: 8, xl: 8}}>
-                    <OfferPreview offer={offer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity}/>
+                    <OfferPreview offer={offer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity} previewMode/>
                   </Grid.Cell>
                   <Grid.Cell columnSpan={{xs: 6, sm: 6, md: 6, lg: 4, xl: 4}}>
                     <VerticalStack gap="5">
