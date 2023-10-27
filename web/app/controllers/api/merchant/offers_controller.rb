@@ -2,7 +2,7 @@
 module Api
   module Merchant
     class OffersController < ApiMerchantBaseController
-      before_action :find_shop, only: [:offer_settings, :update_from_builder, :offers_list, :activate, :deactivate, :duplicate, :destroy]
+      before_action :find_shop, only: [:offer_settings, :update_from_builder, :offers_list, :activate, :deactivate, :duplicate, :destroy, :ab_analytics]
       before_action :set_offer, only: [:load_offer_details, :shopify_ids_from_rule]
 
       # GET /api/merchant/shop_offers
@@ -151,10 +151,20 @@ module Api
         render json: {item_shopify_ids: item_shopify_ids}
       end
 
+      def ab_analytics
+        offer = @icushop.offers.find(params[:offer_id])
+        version = params[:version]
+    
+        ctr_result = offer.ctr(version)
+        ctr_str_result = offer.ctr_string(version)
+        
+        render 'offers/ab_analytics', locals: { ctr_result: ctr_result, ctr_str_result: ctr_str_result }
+      end
+
       private
 
       def offer_params
-        params.require('offer').permit('offer_id', 'shop_id', 'include_sample_products', offers_ids: [])
+        params.require('offer').permit('offer_id', 'shop_id', 'include_sample_products', 'version', offers_ids: [])
       end
 
       def set_offer

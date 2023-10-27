@@ -189,13 +189,13 @@ export function OffersList(props) {
         selected={selectedResources.includes(id)}
         position={index}
       >
-        <IndexTable.Cell><b>{title}</b></IndexTable.Cell>
+        <IndexTable.Cell>{title}</IndexTable.Cell>
         <IndexTable.Cell>{status ? (<Badge status="success">Published</Badge>) : (<Badge>Unpublished</Badge>)}</IndexTable.Cell>
         <IndexTable.Cell>{clicks}</IndexTable.Cell>
         <IndexTable.Cell>{views}</IndexTable.Cell>
         <IndexTable.Cell>{`$${revenue}`}</IndexTable.Cell>
         <IndexTable.Cell>
-          <Button onClick={() => handleEditOffer(id)}>
+          <Button onClick={() => handleViewOffer(id)}>
             Edit
           </Button>
         </IndexTable.Cell>
@@ -295,6 +295,10 @@ export function OffersList(props) {
 
   const handleEditOffer = (offer_id) => {
     navigateTo('/edit-offer', { state: { offerID: offer_id } });
+  }
+
+  const handleViewOffer = (offer_id) => {
+    navigateTo('/edit-offer-view', { state: { offerID: offer_id } });
   }
 
   return (
