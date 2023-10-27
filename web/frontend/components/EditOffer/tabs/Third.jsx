@@ -71,7 +71,17 @@ export function ThirdTab(props) {
     ];
 
     //Border width
-    const handleBorderWidth = useCallback((newValue) => props.updateNestedAttributeOfOffer(parseInt(newValue), "css_options", "main", "borderWidth"), []);
+    const handleBorderWidth = useCallback((newValue) => {
+        const numericValue = parseInt(newValue);
+        if (isNaN(numericValue) || numericValue >= 0 && numericValue <= 10) {
+          props.updateNestedAttributeOfOffer(
+            parseInt(newValue),
+            "css_options",
+            "main",
+            "borderWidth"
+          );
+        }
+    }, []);
 
     //Border range slider
     const handlesetBorderRange = useCallback((newValue) => props.updateNestedAttributeOfOffer(parseInt(newValue), "css_options", "main", "borderRadius"), []);
@@ -303,6 +313,7 @@ export function ThirdTab(props) {
                                 onChange={handleBorderWidth}
                                 value={parseInt(props.offer.css_options?.main?.borderWidth)}
                                 suffix="px"
+                                placeholder="0-10px"
                             />
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
@@ -310,6 +321,8 @@ export function ThirdTab(props) {
                                 <RangeSlider
                                     label="Corner Radius"
                                     value={parseInt(props.offer.css_options?.main?.borderRadius)}
+                                    min={0}
+                                    max={10}
                                     onChange={handlesetBorderRange}
                                     output
                                 />
@@ -567,7 +580,8 @@ export function ThirdTab(props) {
                             <RangeSlider
                                 label="Border Radius"
                                 value={props.offer.css_options?.button?.borderRadius || 0}
-
+                                min={0}
+                                max={16}
                                 onChange={handleRangeSliderChange}
                                 output
                             />
