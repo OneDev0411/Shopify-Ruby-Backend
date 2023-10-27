@@ -367,7 +367,7 @@ export function FirstTab(props) {
                                 <p style={{color: '#6D7175'}}>What product would you like to have in the offer?</p>
                             )}
 
-                            {props.offer.id == null && props.autopilotCheck?.shop_autopilot == false ? (
+                            {props.offer.id == null ? (
                                 <>
                                     <div style={{marginBottom: '20px'}}>
                                         <Button id={"btnLaunchAI"} disabled={!props.autopilotCheck?.shop_autopilot}
