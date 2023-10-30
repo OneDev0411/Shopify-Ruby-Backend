@@ -132,7 +132,6 @@ const EditOfferView = () => {
         ) : (
           <>
             <Page
-              fullWidth
               backAction={{onAction: () => {
                 navigateTo('/offer')
               }}}
