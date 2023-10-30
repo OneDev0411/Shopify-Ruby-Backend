@@ -1,5 +1,5 @@
 import { api } from "../api";
-import { CURRENT_SHOP, UPDATE_ACTIVATION, UPDATE_SHOP_SETTINGS } from "../endpoints/shop";
+import { CURRENT_SHOP, UPDATE_ACTIVATION, UPDATE_SHOP_SETTINGS, SHOP_OFFERS_STATS } from "../endpoints/shop";
 
 export function getShop(shopify_domain) {
   return api.get(CURRENT_SHOP, {
@@ -22,4 +22,17 @@ export function toggleShopActivation(shopify_domain) {
       shopify_domain: shopify_domain
     }
   });
+}
+
+export const getShopOffersStats = async (shopify_domain, period) => {
+  try {
+    const response = await api.post(SHOP_OFFERS_STATS, {
+      shop: shopify_domain,
+      period: period,
+    });
+    return response;
+    } catch (error) {
+      console.error('An error occurred while making the API call:', error);
+      return null; 
+    }
 }
