@@ -31,7 +31,7 @@ const Summary = (props) => {
       }); 
       getShopOffersStats(shopAndHost.shop, 'daily')
         .then((response) => {
-          setTotalDisplayed(response.offers_stats.times_loaded);
+          setTotalDisplayed(response.offers_stats?.times_loaded);
           setConverted(response.orders_through_offers_count);
         })
         .catch((error) => {
