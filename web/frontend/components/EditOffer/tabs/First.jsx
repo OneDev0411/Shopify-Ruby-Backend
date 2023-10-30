@@ -363,14 +363,14 @@ export function FirstTab(props) {
                 <>
                     <LegacyCard title="Offer Product" actions={[{content: 'Learn about Autopilot'}]} sectioned>
                         <LegacyStack spacing="loose" vertical>
-                            {props.autopilotCheck?.autopilot_offer_id != props.offer.id  && (
+                            {(props.autopilotCheck?.autopilot_offer_id != props.offer.id || !props.autopilotCheck?.autopilot_offer_id) && (
                                 <p style={{color: '#6D7175'}}>What product would you like to have in the offer?</p>
                             )}
 
-                            {props.offer.id == null ? (
+                            {props.offer.id == null && !props.autopilotCheck?.autopilot_offer_id ? (
                                 <>
                                     <div style={{marginBottom: '20px'}}>
-                                        <Button id={"btnLaunchAI"} disabled={!props.autopilotCheck?.shop_autopilot}
+                                        <Button id={"btnLaunchAI"}
                                                 primary
                                                 onClick={() => enableAutopilot()}>{autopilotButtonText}</Button>
                                     </div>
@@ -380,7 +380,7 @@ export function FirstTab(props) {
                                         getProducts();
                                     }} ref={modalRef}>Select product manually</Button>
                                 </>
-                            ) : (props.offer?.id != props.autopilotCheck?.autopilot_offer_id) && (
+                            ) : (props.offer?.id != props.autopilotCheck?.autopilot_offer_id || !props.autopilotCheck?.autopilot_offer_id) && (
                                 <div>
                                     <Button id={"btnSelectProduct"} onClick={() => {
                                         handleModal();
@@ -389,7 +389,7 @@ export function FirstTab(props) {
                                 </div>
                             )}
 
-                            {(props.offer.id == null && props.autopilotCheck?.shop_autopilot == false) && (
+                            {(props.offer.id == null && !props.autopilotCheck?.autopilot_offer_id) && (
                                 <ButtonGroup>
                                     <>
                                         <div>
