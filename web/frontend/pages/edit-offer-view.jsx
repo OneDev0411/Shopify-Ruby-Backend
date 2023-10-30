@@ -7,7 +7,7 @@ import {
   Spinner,
 } from "@shopify/polaris";
 import "@shopify/polaris/build/esm/styles.css";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { GenericFooter } from "../components";
@@ -26,8 +26,7 @@ import AbAnalytics from "../components/abAnalytics";
 const EditOfferView = () => {
   const shopAndHost = useSelector((state) => state.shopAndHost);
   const [isLoading, setIsLoading] = useState(false);
-  const location = useLocation();                                      
-  const offerID = location?.state?.offerID;
+  const offerID = localStorage.getItem('Offer-ID');
   const [offerStatus, setOfferStatus] = useState('');
   const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState();
   const [checkKeysValidity, setCheckKeysValidity] = useState({});
@@ -91,23 +90,23 @@ const EditOfferView = () => {
   }
 
   useEffect(() => {
-    if (location?.state?.offerID != null) {
-        setIsLoading(true);
-        loadOfferDetails(offerID, shopAndHost.shop)
-        .then((response) => {
-          if (response) {
-            setOffer({...response});
-            setInitialOfferableProductDetails(response.offerable_product_details);
-            setIsLoading(false);
-            offer.publish_status == 'published' ? setOfferStatus('published') : setOfferStatus('draft');
-          } 
-        })
-        .catch((error) => {
+    if (offerID != null) {
+      setIsLoading(true);
+      loadOfferDetails(offerID, shopAndHost.shop)
+      .then((response) => {
+        if (response) {
+          setOffer({...response});
+          setInitialOfferableProductDetails(response.offerable_product_details);
           setIsLoading(false);
-          console.error('An error occurred while making the API call:', error);
-        });
+          offer.publish_status == 'published' ? setOfferStatus('published') : setOfferStatus('draft');
+        } 
+      })
+      .catch((error) => {
         setIsLoading(false);
-    }
+        console.error('An error occurred while making the API call:', error);
+      });
+      setIsLoading(false);
+  }
   },[offer.publish_status]);
 
   function updateCheckKeysValidity(updatedKey, updatedValue) {

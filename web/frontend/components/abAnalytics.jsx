@@ -17,7 +17,6 @@ const AbAnalytics = (props) => {
             } 
           })
           .catch((error) => {
-            setIsLoading(false);
             console.error('An error occurred while making the API call:', error);
           });
         getAbAnalytics(props.offerId, shopAndHost.shop, 'b')
@@ -27,7 +26,6 @@ const AbAnalytics = (props) => {
             } 
         })
         .catch((error) => {
-            setIsLoading(false);
             console.error('An error occurred while making the API call:', error);
         });
           

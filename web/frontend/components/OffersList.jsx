@@ -298,6 +298,7 @@ export function OffersList(props) {
   }
 
   const handleViewOffer = (offer_id) => {
+    localStorage.setItem('Offer-ID', offer_id);
     navigateTo('/edit-offer-view', { state: { offerID: offer_id } });
   }
 
