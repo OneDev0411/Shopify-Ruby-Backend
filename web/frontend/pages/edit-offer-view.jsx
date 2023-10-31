@@ -99,6 +99,10 @@ const EditOfferView = () => {
           setInitialOfferableProductDetails(response.offerable_product_details);
           setIsLoading(false);
           offer.publish_status == 'published' ? setOfferStatus('published') : setOfferStatus('draft');
+          if (response.offerable_product_details.length > 0) {
+            updateCheckKeysValidity('text', response.text_a.replace("{{ product_title }}", response.offerable_product_details[0]?.title));
+          }
+          updateCheckKeysValidity('cta', response.cta_a);
         } 
       })
       .catch((error) => {
