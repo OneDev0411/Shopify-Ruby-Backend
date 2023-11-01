@@ -27,6 +27,12 @@ class OfferEvent < ApplicationRecord
 
   belongs_to :offer, inverse_of: :offer_events
 
+  scope :sales_within_given_range, ->(start_date, end_date, shop_id) {
+    where(action: 'sale', created_at: start_date.beginning_of_day..end_date.end_of_day)
+    .joins(offer: :shop)
+    .where(shop: { id: shop_id })
+  }
+
   def self.create_offer_event(new_event)
     new_event = eval(new_event)
     new_event = { offer_id: new_event['offerId'],
