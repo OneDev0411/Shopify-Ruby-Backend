@@ -275,8 +275,8 @@ export function FirstTab(props) {
                         return response.json()
                     })
                     .then((data) => {
-                        location.state.offerID = data.autopilot_offer_id;
-                        props.updateOpenAutopilotSection(true);
+                        localStorage.setItem('Offer-ID', data.autopilot_offer_id);
+                        navigateTo('/edit-offer-view', { state: { offerID: data.autopilot_offer_id } });
                     })
                     .catch((error) => {
                         console.log("# Error AutopilotDetails > ", JSON.stringify(error));
