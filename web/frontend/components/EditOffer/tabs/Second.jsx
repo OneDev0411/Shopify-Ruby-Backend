@@ -126,9 +126,9 @@ export function SecondTab(props) {
     }, [props.offer.in_cart_page, props.offer.in_ajax_cart, props.offer.in_product_page]);
 
     useEffect(() => {
-        if(props.storedThemeNames.length != 0 && props.shopifyThemeName != null)
+        if(props.storedThemeNames?.length != 0 && props.shopifyThemeName != null)
         {
-            setOpenBanner(!props.storedThemeNames.includes(props.shopifyThemeName));
+            setOpenBanner(!props.storedThemeNames?.includes(props.shopifyThemeName));
         }
     }, [props.storedThemeNames, props.shopifyThemeName])
 
@@ -527,7 +527,7 @@ export function SecondTab(props) {
     }, [collectionModal]);
 
     const handleEnableAdvancedSetting = useCallback((newChecked) => {
-        if(props.storedThemeNames.includes(props.shopifyThemeName)) {
+        if(props.storedThemeNames?.includes(props.shopifyThemeName)) {
             props.updateNestedAttributeOfOffer(newChecked, "advanced_placement_setting", "advanced_placement_setting_enabled");
         }
         else {
@@ -637,11 +637,11 @@ export function SecondTab(props) {
 
     return (
         <div id="polaris-placement-cards">
-            {(!props.storedThemeNames.includes(props.shopifyThemeName) && openBanner) && (
+            {(!props.storedThemeNames?.includes(props.shopifyThemeName) && openBanner) && (
             <div style={{marginBottom: "10px"}} className="polaris-banner-container">
-                <Banner title="Placements Unavailable" onDismiss={() => {setOpenBanner(!openBanner)}} tone='warning'>
-                    <p>Placements are not available for your theme.</p>
-                    <p>Please add selectors and actions in <b>Advanved Tab</b>.</p>
+                <Banner title="Unsupported Theme Detected" onDismiss={() => {setOpenBanner(!openBanner)}} tone='warning'>
+                    <p>Templates and default settings are unavailable for your theme.</p>
+                    <p>Please add your selectors and actions in the Advanced Tab or contact support for assistance.</p>
                 </Banner>
             </div>
             )}
