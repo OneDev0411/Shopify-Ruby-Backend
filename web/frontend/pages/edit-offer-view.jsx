@@ -22,6 +22,7 @@ import {
   deleteOffer,
 } from "../services/offers/actions/offer";
 import AbAnalytics from "../components/abAnalytics";
+import "../components/stylesheets/mainstyle.css";
 
 const EditOfferView = () => {
   const shopAndHost = useSelector((state) => state.shopAndHost);
@@ -177,7 +178,9 @@ const EditOfferView = () => {
               <div className="grid-space">
                 <Grid>
                   <Grid.Cell columnSpan={{xs: 6, sm: 6, md: 6, lg: 8, xl: 8}}>
-                    <OfferPreview offer={offer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity} previewMode/>
+                    <div className="widget-visibility">
+                      <OfferPreview offer={offer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity} previewMode/>
+                    </div>
                   </Grid.Cell>
                   <Grid.Cell columnSpan={{xs: 6, sm: 6, md: 6, lg: 4, xl: 4}}>
                     <VerticalStack gap="5">
