@@ -269,8 +269,8 @@ export function TopPerformingOffersData(props) {
                             return (
                                 <HorizontalStack key={idx} align="space-between">
                                     <Text variant="headingSm" as="h6">{item.title}</Text>
-                                    <Text variant="headingSm" as="h6">{item.revenue}</Text>
                                     <Text variant="headingSm" as="h6">{item.clicks} clicks</Text>
+                                    <Text variant="headingSm" as="h6">$ {item.revenue}</Text>
                                 </HorizontalStack>
                             )
                         })
