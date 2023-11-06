@@ -40,7 +40,7 @@ class Shop < ApplicationRecord
 
   include ActionView::Helpers::DateHelper
   include ShopWorker
-  
+
   def shop_setup
     self.update(is_shop_active: true)
     ShopAction.create(
@@ -626,7 +626,7 @@ class Shop < ApplicationRecord
       session = activate_session
       client=ShopifyAPI::Clients::Graphql::Admin.new(session: session)
       ShopifyAPI::Webhooks::Registry.get_webhook_id(topic: "products/create", client: client)
-      
+
     rescue ActiveResource::UnauthorizedAccess
       needed = true
     end
@@ -1127,7 +1127,7 @@ class Shop < ApplicationRecord
       subscription.shop = self
       subscription.status = 'approved'
       subscription.update_subscription(plan)
-      subscription.save      
+      subscription.save
     end
     if plan.free_plan?
       self.unpublish_extra_offers if self.offers.present?
@@ -1147,6 +1147,35 @@ class Shop < ApplicationRecord
         revenue: offer.total_revenue,
         created_at: offer.created_at.to_datetime,
         offerable_type: offer.offerable_type,
+      }
+    end
+    return data
+  end
+
+  def offer_data_with_stats_by_period(period)
+    data = []
+
+    period_hash = {
+      'daily' => { start_date: DateTime.now.beginning_of_day, last: DateTime.now.end_of_day },
+      'weekly' => { start_date: Date.today - 7.days, last: (Date.today - 1.day) },
+      'monthly' => { start_date: (Date.today.beginning_of_month - 1.month), last: (Date.today-1.months).end_of_month },
+      '3-months' => { start_date: (Date.today.beginning_of_month - 2.months), last: Date.today.end_of_month },
+      '6-months' => { start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
+      'yearly' => { start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
+      'all' => { start_date: self.orders.present? ? self.orders.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
+    }
+    start_date = period_hash[period][:start_date]
+    last = period_hash[period][:last]
+
+    offers.includes(:daily_stats, :offer_events).where(created_at: start_date..last).each do |offer|
+      data << {
+        id: offer.id,
+        title: offer.title,
+        status: offer.active,
+        clicks: offer.daily_stats.map(&:times_clicked).sum,
+        views: offer.daily_stats.map(&:times_loaded).sum,
+        revenue: offer.offer_events&.where(action: 'sale')&.pluck(:amount).sum,
+        created_at: offer.created_at.to_datetime,
       }
     end
     return data

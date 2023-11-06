@@ -1,8 +1,9 @@
 import {
     LegacyCard,
+    LegacyCard,
     VerticalStack,
+    Text,
 } from '@shopify/polaris';
-import React, { useEffect, useState } from 'react';
 import { PolarisVizProvider, StackedAreaChart } from '@shopify/polaris-viz';
 import { useAuthenticatedFetch } from "../hooks";
 import { useSelector } from 'react-redux';
@@ -211,6 +212,72 @@ export function OrderOverTimeData(props) {
         </PolarisVizProvider>
     );
 
+}
+
+export function TopPerformingOffersData(props) {
+    const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
+    const [offersData, setOffersData] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    function getOffersData(period) {
+        if(loading) return;
+
+        setLoading(true)
+
+        fetch(`/api/merchant/offers_list_by_period`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ shop: shopAndHost.shop, period: period }),
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                setOffersData(data.offers.sort((a, b) => b.revenue - a.revenue));
+            })
+            .catch((error) => {
+                console.log("error", error);
+            }).finally(() => {
+                setLoading(false)
+            })
+    }
+
+    useEffect(() => {
+        getOffersData(props.period);
+    }, [props.period])
+
+    return (
+        <PolarisVizProvider
+            themes={{
+                Default: {
+                    arc: {
+                        cornerRadius: 5,
+                        thickness: 50
+                    }
+                }
+            }}
+        >
+            <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Top performing offers`} sectioned>
+                <div className="space-4"></div>
+                <VerticalStack gap={"4"}>
+                    {
+                        offersData.map((item, idx) => {
+                            return (
+                                <HorizontalStack key={idx} align="space-between">
+                                    <Text variant="headingSm" as="h6">{item.title}</Text>
+                                    <Text variant="headingSm" as="h6">{item.revenue}</Text>
+                                    <Text variant="headingSm" as="h6">{item.clicks} clicks</Text>
+                                </HorizontalStack>
+                            )
+                        })
+                    }
+                </VerticalStack>
+            </LegacyCard>
+        </PolarisVizProvider>
+    )
 }
 
 export function AbTestingData() {

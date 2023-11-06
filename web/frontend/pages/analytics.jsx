@@ -2,8 +2,8 @@ import React from 'react';
 import {useState, useCallback} from 'react';
 import { Page ,Grid, Select } from '@shopify/polaris';
 import {AnalyticsMinor} from '@shopify/polaris-icons';
-import { TotalSalesData, OrderOverTimeData, CustomTitleBar} from "../components";
 import "../components/stylesheets/mainstyle.css";
+import { TotalSalesData, ConversionRate, TopPerformingOffersData, OrderOverTimeData, CustomTitleBar} from "../components";
   
 export default function AnalyticsOffers() { 
     const [period, setPeriod] = useState('daily');
@@ -46,6 +46,7 @@ export default function AnalyticsOffers() {
           {/*</Grid.Cell>*/}
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
             <OrderOverTimeData period={period}/>
+            <TopPerformingOffersData period={period} />
           </Grid.Cell>
         </Grid>
         </div>

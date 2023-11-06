@@ -2,7 +2,7 @@
 module Api
   module Merchant
     class OffersController < ApiMerchantBaseController
-      before_action :find_shop, only: [:offer_settings, :update_from_builder, :offers_list, :activate, :deactivate, :duplicate, :destroy, :ab_analytics]
+      before_action :find_shop, only: [:offer_settings, :update_from_builder, :offers_list, :offers_list_by_period, :activate, :deactivate, :duplicate, :destroy, :ab_analytics]
       before_action :set_offer, only: [:load_offer_details, :shopify_ids_from_rule]
       before_action :ensure_plan, only: [:offer_settings, :update_from_builder, :offers_list, :activate, :deactivate, :duplicate, :destroy, :ab_analytics]
 
@@ -16,6 +16,11 @@ module Api
       # POST /api/merchant/offers_list
       def offers_list
         render json: { shopify_domain: @icushop.shopify_domain, offers: @icushop.offer_data_with_stats }
+      end
+
+      # POST /api/merchant/offers_list_by_period
+      def offers_list_by_period
+        render json: { shopify_domain: @icushop.shopify_domain, offers: @icushop.offer_data_with_stats_by_period(params[:period]) }
       end
 
       # POST /api/merchant/load_offer_details
@@ -146,7 +151,7 @@ module Api
         render json: { message: "Offer Deleted", offers: @icushop.offer_data_with_stats}
       end
 
-      def shopify_ids_from_rule   
+      def shopify_ids_from_rule
         filtered_items = @offer.rules_json.select { |item| item["rule_selector"] == params[:rule_selector] && item["item_type"] == params[:item_type] }
         item_shopify_ids = filtered_items.map { |item| item["item_shopify_id"] }
         render json: {item_shopify_ids: item_shopify_ids}
@@ -155,10 +160,10 @@ module Api
       def ab_analytics
         offer = @icushop.offers.find(params[:offer_id])
         version = params[:version]
-    
+
         ctr_result = offer.ctr(version)
         ctr_str_result = offer.ctr_string(version)
-        
+
         render 'offers/ab_analytics', locals: { ctr_result: ctr_result, ctr_str_result: ctr_str_result }
       end
 
@@ -174,6 +179,3 @@ module Api
     end
   end
 end
-
-
-
