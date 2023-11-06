@@ -22,6 +22,53 @@ export default function HelpPage() {
         {handleOpen};
     }
 
+    const helpLinks = [
+        {
+            "title": "Analytics",
+            "link": "https://help.incartupsell.com/en/articles/8515635-analytics"
+        },
+        {
+            "title": "Autopilot offer not showing in your Ajax Cart (cart drawer)",
+            "link": "https://help.incartupsell.com/en/articles/8515651-autopilot-offer-not-showing-in-your-ajax-cart-cart-drawer"
+        },
+        {
+            "title": "Selecting your offer location",
+            "link": "https://help.incartupsell.com/en/articles/8515643-selecting-your-offer-location"
+        },
+        {
+            "title": "How do I translate/customize the offer text?",
+            "link": "https://help.incartupsell.com/en/articles/8515639-how-do-i-translate-customize-the-offer-text"
+        },
+        {
+            "title": "Easy BOGO / Buy X Get Y Offers",
+            "link": "https://help.incartupsell.com/en/articles/8515636-easy-bogo-buy-x-get-y-offers"
+        },
+        {
+            "title": "Can I show more than one offer at a time?",
+            "link": "https://help.incartupsell.com/en/articles/8500252-can-i-show-more-than-one-offer-at-a-time"
+        },
+        {
+            "title": "How to Delete an Offer",
+            "link": "https://help.incartupsell.com/en/articles/8500242-how-to-delete-an-offer"
+        },
+        {
+            "title": "How to Remove a Product That Was Already Added to the Offer",
+            "link": "https://help.incartupsell.com/en/articles/8497653-how-to-remove-a-product-that-was-already-added-to-the-offer"
+        },
+        {
+            "title": "The Wrong Offer Appears",
+            "link": "https://help.incartupsell.com/en/articles/8491373-the-wrong-offer-appears"
+        },
+        {
+            "title": "Change Offer Image to the Variant Image",
+            "link": "https://help.incartupsell.com/en/articles/8491334-change-offer-image-to-the-variant-image"
+        },
+        {
+            "title": "Offer Buttons/Dropdowns missing",
+            "link": "https://help.incartupsell.com/en/articles/8491345-offer-buttons-dropdowns-missing"
+        }
+    ]
+
   return (
     <Page>
       <CustomTitleBar title='Help' icon={QuestionMarkMinor} />
@@ -36,19 +83,15 @@ export default function HelpPage() {
                         </p>
                     </LegacyStack>
                     } sectioned>
-                    <p>There are more help articles in our <Link url="https://help.incartupsell.com/en/collections/3263755-all" external target="_blank">Help Docs</Link> page</p>
+                    <p>There are more help articles in our <Link url="https://help.incartupsell.com/en/collections/6780837-help-articles-for-new-ui" external target="_blank">Help Docs</Link> page</p>
                     <div className="space-4"></div>
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 8, xl: 6}}>
                             <div className={"help-articles"}>
                                 <List>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823518-choose-product-page-offer-location" external removeUnderline target="_blank">Choose product page offer location</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823509-ajax-refresh-codes-for-common-themes" external removeUnderline target="_blank">AJAX Refresh Codes for Common Themes</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823523-autopilot-ajax-cart-fix" external removeUnderline target="_blank">Autopilot - AJAX cart fix</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/6355185-in-cart-upsell-application-new-feature-track-conversion" external removeUnderline target="_blank">In Cart UpSell Application New Feature – Track Conversion</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/6326918-a-b-testing" external removeUnderline target="_blank">A/B Testing</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823538-trackifyx-integration" external removeUnderline target="_blank">TrackifyX integration</Link></List.Item>
-                                    <List.Item><Link url="https://help.incartupsell.com/en/articles/5823527-how-to-override-the-product-image" external removeUnderline target="_blank">How To Override the Product Image</Link></List.Item>
+                                    {helpLinks.map((helpLink)=> {
+                                       return <List.Item><Link url={helpLink.link} external removeUnderline target="_blank">{helpLink.title}</Link></List.Item>
+                                    })}
                                 </List>
                             </div>
                         </Grid.Cell>
