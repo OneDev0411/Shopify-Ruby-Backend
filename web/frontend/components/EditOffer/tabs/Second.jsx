@@ -55,6 +55,8 @@ export function SecondTab(props) {
 
     const [openBanner, setOpenBanner] = useState(false);
 
+    const [ruleset, setRuleset] = useState('any');
+
     useEffect(() => {
         if(props.offer.in_product_page && props.offer.in_cart_page) {
             setSelected("cartpageproductpage");
@@ -160,6 +162,7 @@ export function SecondTab(props) {
         props.setOffer(prev => ({ ...prev, rules_json: [...prev.rules_json, rule] }));
         handleConditionModal();
     }
+
 
     const handleSelectChange = useCallback((value) => {
         if (value === "cartpage") {
@@ -635,6 +638,16 @@ export function SecondTab(props) {
         props.updateOffer('rules_json', updatedRules);
     }
 
+    function updateRuleSet (value) {
+        if (value === "any") {
+            props.updateOffer('ruleset_type', "or");
+        } else {
+            props.updateOffer('ruleset_type', "and");
+        }
+
+        setRuleset(value);
+    };
+
     return (
         <div id="polaris-placement-cards">
             {(!props.storedThemeNames?.includes(props.shopifyThemeName) && openBanner) && (
@@ -1010,6 +1023,21 @@ export function SecondTab(props) {
                         )}
                         <Button onClick={handleConditionModal} ref={modalCon}>Add condition</Button>
                         <div className="space-4" />
+                        <p style={{color: '#6D7175', marginTop: '20px', marginBottom: '23px', display: 'flex', alignItems: 'center'}}>
+                            Show offer when of these
+                            <span style={{margin: '0 6px'}}>
+                                <Select
+                                  options={[
+                                      { label: 'ANY', value: 'any' },
+                                      { label: 'ALL', value: 'all' },
+                                  ]}
+                                  onChange={updateRuleSet}
+                                  value={ruleset}
+                                />
+                            </span>
+                            rules are true at the same time.
+                        </p>
+
                         <hr className="legacy-card-hr legacy-card-hr-t20-b15" />
                         <LegacyStack vertical>
                             <Checkbox
