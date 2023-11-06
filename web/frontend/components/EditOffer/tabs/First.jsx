@@ -275,8 +275,8 @@ export function FirstTab(props) {
                         return response.json()
                     })
                     .then((data) => {
-                        localStorage.setItem('Offer-ID', data.autopilot_offer_id);
-                        navigateTo('/edit-offer-view', { state: { offerID: data.autopilot_offer_id } });
+                        props.updateOpenAutopilotSection(true);
+                        navigateTo('/edit-offer', { state: { offerID: data.autopilot_offer_id } });
                     })
                     .catch((error) => {
                         console.log("# Error AutopilotDetails > ", JSON.stringify(error));
@@ -419,7 +419,7 @@ export function FirstTab(props) {
                             )}
 
                         </LegacyStack>
-                        {props.openAutopilotSection || (props.offer.id != null && props.autopilotCheck?.autopilot_offer_id == props.offer.id) && (
+                        {(props.openAutopilotSection || (props.offer.id != null && props.autopilotCheck?.autopilot_offer_id == props.offer.id)) && (
                             <>
                                 <LegacyStack spacing="loose" vertical>
                                     <Select
