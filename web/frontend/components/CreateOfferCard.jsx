@@ -95,7 +95,7 @@ function OfferCard({ handleCreateOffer, isOffers }) {
                 Create offer
               </Button>
               <Button
-                url="https://help.incartupsell.com/en/collections/3263755-all"
+                url="https://help.incartupsell.com/en/collections/6780837-help-articles-for-new-ui"
                 target="_blank"
               >
                 View Help Docs
