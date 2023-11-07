@@ -3,9 +3,11 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Card, AppProvider, Text, Image, Grid, Link, Spinner } from '@shopify/polaris';
 import "../components/stylesheets/editOfferStyle.css";
+import { useAuthenticatedFetch } from '../hooks';
 
 const Summary = (props) => {
     const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [isLoading, setIsLoading] = useState(false);
     const [offerStats, setOfferStats] = useState({});
     const [converted, setConverted] = useState(0);
@@ -64,7 +66,7 @@ const Summary = (props) => {
       getOfferList();
       getShopOffersStats('daily');
     }, [props.offer, shopAndHost.shop]);
-    
+
     return (
       <>
         <AppProvider>
