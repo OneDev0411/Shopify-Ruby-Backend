@@ -35,7 +35,6 @@ module Shopifable
     Sidekiq::Client.push('class' => 'ShopWorker::EnsureInCartUpsellWebhooksJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i)
     Sidekiq::Client.push('class' => 'ShopWorker::CreateScriptTagJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i)
     Sidekiq::Client.push('class' => 'ShopWorker::FetchOrdersJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i)
-
   end
 
   # Public: Updates our DB shop data with the Shopify's info.
@@ -550,6 +549,7 @@ module Shopifable
             "products.json?ids=#{product_ids}&limit=250"
       remote_products = HTTParty.get(url, headers: headers).parsed_response['products']
       puts "  #{remote_products.length} products found"
+      next unless remote_products.present?
       all_products_found += remote_products.map{|p| p['id']}
       remote_products.each do |s_product|
         l_product = Product.find_or_create_by(shop_id: id, shopify_id: s_product['id'])
