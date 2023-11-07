@@ -131,11 +131,23 @@ module Graphable
         key: label_hash[period].call(start_date, end_date),
         value: 0
       }
-      self.offers.includes(:offer_events).each do |offer|
-        stats = offer.offer_events.where('action = ? and created_at >= ? and created_at < ?', "sale", start_date, end_date).sum(:amount)
-        results[i][:value] += stats
-        total += stats
+      offer_events = OfferEvent.sales_within_given_range(start_date, end_date, self.id)
+      quantities = []
+      prices = []
+
+      offer_events.each do |offer_event|
+        next if start_date == end_date
+
+        item_variants = offer_event.payload["item_variants"]
+
+        quantities.concat(item_variants.map { |item| item["quantity"] })
+        prices.concat(item_variants.map { |item| item["price"].to_f })
       end
+
+      # Calculate the total value
+      total = prices.zip(quantities).sum { |price, quantity| price * quantity }
+      results[i][:value] = total
+
       start_date = start_date + interval
       i+=1;
     end

@@ -355,7 +355,7 @@ export default function EditPage() {
     },[openAutopilotSection]);
 
     useEffect(() => {
-        if(storedThemeNames.length != 0 && shopifyThemeName != null && !storedThemeNames.includes(shopifyThemeName)) {
+        if(storedThemeNames?.length != 0 && shopifyThemeName != null && !storedThemeNames?.includes(shopifyThemeName)) {
             updateNestedAttributeOfOffer(true, "advanced_placement_setting", "advanced_placement_setting_enabled");
         }
     }, [storedThemeNames, shopifyThemeName])
@@ -479,7 +479,9 @@ export default function EditPage() {
     const save = async(status) =>  {
         var placement_setting;
         var save_as_default_setting;
+        var shop_uses_ajax_cart;
         if(offer.in_product_page && offer.in_cart_page) {
+            shop_uses_ajax_cart = offer.in_ajax_cart;
             placement_setting = {
                 default_product_page: offer.placement_setting?.default_product_page,
                 default_cart_page: offer.placement_setting?.default_cart_page,
@@ -490,6 +492,7 @@ export default function EditPage() {
             }
         }
         else if (offer.in_ajax_cart && offer.in_cart_page) {
+            shop_uses_ajax_cart = offer.in_ajax_cart;
             placement_setting = {
                 default_product_page: true,
                 default_cart_page: offer.placement_setting?.default_cart_page,
@@ -500,6 +503,7 @@ export default function EditPage() {
             }
         }
         else if (offer.in_cart_page) {
+            shop_uses_ajax_cart = offer.in_ajax_cart;
             placement_setting = {
                 default_product_page: true,
                 default_cart_page: offer.placement_setting?.default_cart_page,
@@ -510,6 +514,7 @@ export default function EditPage() {
             }
         }
         else if (offer.in_product_page) {
+            shop_uses_ajax_cart = offer.in_ajax_cart;
             placement_setting = {
                 default_product_page: offer.placement_setting?.default_product_page,
                 default_cart_page: true,
@@ -520,6 +525,7 @@ export default function EditPage() {
             }
         }
         else if (offer.in_ajax_cart) {
+            shop_uses_ajax_cart = offer.in_ajax_cart;
             placement_setting = {
                 default_product_page: true,
                 default_cart_page: true,
@@ -595,6 +601,26 @@ export default function EditPage() {
             ots.interval_frequency = offer.interval_frequency;
         }
         setIsLoading(true);
+        setShop(prev => {
+            let data = {
+                ...prev, uses_ajax_cart: shop_uses_ajax_cart
+            }
+            fetch('/api/merchant/update_shop_settings', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ shop_attr: data, shop: shopAndHost.shop, admin: data.admin, json: true }),
+            })
+                .then((response) => { return response.json(); })
+                .then((data) => {
+                    console.log('updated shop settings', data)
+                })
+                .catch((error) => {
+                    console.log('an error during api call', error)
+                })
+            return data
+        });
         if (location.state != null && location.state?.offerID == null) {
             try {
                 const response = await fetch(`/api/offers/create/${shop?.shop_id}`, {

@@ -22,22 +22,25 @@ export function OfferPreview(props) {
 		setCarouselLoading(true);
 		combinedCss();
 		setTimeout(function(){ setCarouselLoading(false) }, 500);
-		if(Object.keys(props.offer.css_options).length == 0) {
-			props.updateOffer("css_options", props.shop.css_options)
+		if (!props.previewMode) {
+			if(Object.keys(props.offer.css_options).length == 0) {
+				props.updateOffer("css_options", props.shop.css_options)
+			}
+			if(!props.offer.placement_setting) {
+				props.updateNestedAttributeOfOffer(true, "placement_setting", "default_product_page");
+				props.updateNestedAttributeOfOffer(true, "placement_setting", "default_cart_page");
+				props.updateNestedAttributeOfOffer(true, "placement_setting", "default_ajax_cart");
+			}
+			if(!props.offer.advanced_placement_setting) {
+				props.updateNestedAttributeOfOffer("[class*='description']", "advanced_placement_setting",  "custom_product_page_dom_selector")
+				props.updateNestedAttributeOfOffer('after', "advanced_placement_setting",  "custom_product_page_dom_action")
+				props.updateNestedAttributeOfOffer("form[action^='/cart']", "advanced_placement_setting",  "custom_cart_page_dom_selector")
+				props.updateNestedAttributeOfOffer('prepend', "advanced_placement_setting",  "custom_cart_page_dom_action")
+				props.updateNestedAttributeOfOffer(".ajaxcart__row:first", "advanced_placement_setting",  "custom_ajax_dom_selector")
+				props.updateNestedAttributeOfOffer('prepend', "advanced_placement_setting",  "custom_ajax_dom_action")
+			}
 		}
-		if(!props.offer.placement_setting) {
-			props.updateNestedAttributeOfOffer(true, "placement_setting", "default_product_page");
-			props.updateNestedAttributeOfOffer(true, "placement_setting", "default_cart_page");
-			props.updateNestedAttributeOfOffer(true, "placement_setting", "default_ajax_cart");
-		}
-		if(!props.offer.advanced_placement_setting) {
-			props.updateNestedAttributeOfOffer("[class*='description']", "advanced_placement_setting",  "custom_product_page_dom_selector")
-			props.updateNestedAttributeOfOffer('after', "advanced_placement_setting",  "custom_product_page_dom_action")
-			props.updateNestedAttributeOfOffer("form[action^='/cart']", "advanced_placement_setting",  "custom_cart_page_dom_selector")
-			props.updateNestedAttributeOfOffer('prepend', "advanced_placement_setting",  "custom_cart_page_dom_action")
-			props.updateNestedAttributeOfOffer(".ajaxcart__row:first", "advanced_placement_setting",  "custom_ajax_dom_selector")
-			props.updateNestedAttributeOfOffer('prepend', "advanced_placement_setting",  "custom_ajax_dom_action")
-		}
+		
 	}, [props.offer, props.updatePreviousAppOffer]);
 
 	// Called everytime when any attribute in shop changes.
@@ -167,6 +170,13 @@ export function OfferPreview(props) {
 		}
 		else {
 			props.updateCheckKeysValidity("mobileViewWidth", false);
+		}
+
+		if(props.offer?.css_options?.button?.borderWidth && parseInt(props.offer?.css_options?.button?.borderWidth) > 0) {
+			props.updateCheckKeysValidity("buttonBorderWidth", true);
+		}
+		else {
+			props.updateCheckKeysValidity("buttonBorderWidth", false);
 		}
 	}
 

@@ -18,6 +18,7 @@ Rails.application.routes.draw do
     # API V1
   namespace :api do
     namespace :merchant, defaults: { format: 'json' } do
+      post 'offers/load_ab_analytics', to: 'offers#ab_analytics'
       post 'element_search', to: 'products#element_search'
       post 'load_offer_details', to: 'offers#load_offer_details'
       post 'offer_settings', to: 'offers#offer_settings'
