@@ -14,13 +14,7 @@ import { GenericFooter } from "../components";
 import Summary from "../components/Summary";
 import Details from "../components/OfferDetails";
 import { OfferPreview } from "../components/OfferPreview";
-import {
-  loadOfferDetails,
-  activateOffer,
-  deactivateOffer,
-  createDuplicateOffer,
-  deleteOffer,
-} from "../services/offers/actions/offer";
+import { useAuthenticatedFetch } from "../hooks";
 import AbAnalytics from "../components/abAnalytics";
 import "../components/stylesheets/mainstyle.css";
 
@@ -28,6 +22,7 @@ const EditOfferView = () => {
   const shopAndHost = useSelector((state) => state.shopAndHost);
   const [isLoading, setIsLoading] = useState(false);
   const offerID = localStorage.getItem('Offer-ID');
+  const fetch = useAuthenticatedFetch(shopAndHost.host);
   const [offerStatus, setOfferStatus] = useState('');
   const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState();
   const [checkKeysValidity, setCheckKeysValidity] = useState({});
@@ -40,76 +35,102 @@ const EditOfferView = () => {
     navigateTo('/edit-offer', { state: { offerID: offer_id } });
   }
 
-  const handleOfferActivation = (shopify_domain, offer_id) => {
-    activateOffer(offer_id, shopify_domain)
-    .then((response) => {
-      if (response) {
-        offer.active = true;
-        setOfferStatus('published')
-      } 
+  const handleOfferActivation = () => {
+    fetch(`/api/merchant/offer_activate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ offer: { offer_id: offerID }, shop: shopAndHost.shop })
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      offer.active = true;
+      setOfferStatus('published');
     })
     .catch((error) => {
       console.error('An error occurred while making the API call:', error);
-    });
+    })
   }
 
-  const handleOfferDeactivation = (shopify_domain, offer_id) => {
-    deactivateOffer(offer_id, shopify_domain)
-    .then((response) => {
-      if (response) {
-        offer.active = false;
-        setOfferStatus('draft');
-      } 
+  const handleOfferDeactivation = () => {
+    fetch('/api/merchant/offer_deactivate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ offer: { offer_id: offerID }, shop: shopAndHost.shop })
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      offer.active = false;
+      setOfferStatus('draft');
     })
     .catch((error) => {
       console.error('An error occurred while making the API call:', error);
-    });
+    })
   }
 
-  const handleDuplicateOffer = (offer_id, shopify_domain) => {
-    createDuplicateOffer(offer_id, shopify_domain)
-    .then((response) => {
-      if (response) {
+  const handleDuplicateOffer = () => {
+    fetch(`/api/merchant/offers/${offerID}/duplicate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ offer_id: offerID, shop: shopAndHost.shop })
+    })
+      .then((response) => response.json())
+      .then((data) => {
         navigateTo('/offer')
-      } 
-    })
-    .catch((error) => {
-      console.error('An error occurred while making the API call:', error);
-    });
+      })
+      .catch((error) => {
+        console.error('An error occurred while making the API call:', error);
+      })
   }
 
-  const handleDeleteOffer = (offer_id, shopify_domain) => {
-    deleteOffer(offer_id, shopify_domain)
-    .then((response) => {
-      if (response) {
-        navigateTo('/offer')
-      } 
+  const handleDeleteOffer = () => {
+    fetch(`/api/merchant/offers/${offerID}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ offer_id: offerID, shop: shopAndHost.shop })
     })
-    .catch((error) => {
-      console.error('An error occurred while making the API call:', error);
-    });
+      .then((response) => response.json())
+      .then((data) => {
+        navigateTo('/offer');
+      })
+      .catch((error) => {
+        console.error('An error occurred while making the API call:', error);
+      })
   }
 
   useEffect(() => {
     if (offerID != null) {
       setIsLoading(true);
-      loadOfferDetails(offerID, shopAndHost.shop)
-      .then((response) => {
-        if (response) {
-          setOffer({...response});
-          setInitialOfferableProductDetails(response.offerable_product_details);
+      fetch(`/api/merchant/load_offer_details`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({offer: {offer_id: offerID}, shop: shopAndHost.shop}),
+      })
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+          setOffer({...data});
+          setInitialOfferableProductDetails(data.offerable_product_details);
           setIsLoading(false);
           offer.publish_status == 'published' ? setOfferStatus('published') : setOfferStatus('draft');
-          if (response.offerable_product_details.length > 0) {
-            updateCheckKeysValidity('text', response.text_a.replace("{{ product_title }}", response.offerable_product_details[0]?.title));
+          if (data.offerable_product_details.length > 0) {
+            updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
           }
-          updateCheckKeysValidity('cta', response.cta_a);
-        } 
-      })
-      .catch((error) => {
-        setIsLoading(false);
-        console.error('An error occurred while making the API call:', error);
-      });
+          updateCheckKeysValidity('cta', data.cta_a);
+        })
+        .catch((error) => {
+            console.log("Error > ", error);
+        })
       setIsLoading(false);
   }
   },[offer.publish_status]);
@@ -150,7 +171,7 @@ const EditOfferView = () => {
               secondaryActions={[
                 {
                   content: (offerStatus == 'draft') ? 'Publish' : 'Unpublish',
-                  onAction: () => offerStatus == 'draft' ? handleOfferActivation(shopAndHost.shop, offerID) : handleOfferDeactivation(shopAndHost.shop, offerID),
+                  onAction: () => offerStatus == 'draft' ? handleOfferActivation() : handleOfferDeactivation(),
                 },
                 {
                   content: 'Edit', 
@@ -164,12 +185,12 @@ const EditOfferView = () => {
                     {
                       content: 'Duplicate',
                       accessibilityLabel: 'Individual action label',
-                      onAction: () => handleDuplicateOffer(offerID, shopAndHost.shop),
+                      onAction: () => handleDuplicateOffer(),
                     },
                     {
                       content: 'Delete',
                       accessibilityLabel: 'Individual action label',
-                      onAction: () => handleDeleteOffer(offerID, shopAndHost.shop),
+                      onAction: () => handleDeleteOffer(),
                     },
                   ],
                 },

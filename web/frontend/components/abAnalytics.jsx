@@ -1,34 +1,37 @@
 import { Card, AppProvider, Text, Grid } from '@shopify/polaris';
 import "../components/stylesheets/editOfferStyle.css";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { getAbAnalytics } from '../services/offers/actions/offer';
+import { useAuthenticatedFetch } from '../hooks';
 
 const AbAnalytics = (props) => {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const [aAnalytics, setAAnalytics] = useState();
     const [bAnalytics, setBAnalytics] = useState();
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
 
-    useEffect(() => {
-        getAbAnalytics(props.offerId, shopAndHost.shop, 'a')
+    const getAbAnalytics = useCallback((offerId, shop, version, setRequiredState) => {
+        fetch(`/api/merchant/offers/load_ab_analytics`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ offer_id: offerId , shop: shop, version: version })
+        })
+        .then((response) => response.json())
         .then((data) => {
             if (data) {
-              setAAnalytics(data.ctr_str)
-            } 
-          })
-          .catch((error) => {
-            console.error('An error occurred while making the API call:', error);
-          });
-        getAbAnalytics(props.offerId, shopAndHost.shop, 'b')
-        .then((data) => {
-            if (data) {
-            setBAnalytics(data.ctr_str)
-            } 
+                setRequiredState(data.ctr_str)
+            }
         })
         .catch((error) => {
             console.error('An error occurred while making the API call:', error);
-        });
-          
+        })
+    }, []); 
+
+    useEffect(() => {
+        getAbAnalytics(props.offerId, shopAndHost.shop, 'a', setAAnalytics)
+        getAbAnalytics(props.offerId, shopAndHost.shop, 'b', setBAnalytics)
       },[]);
 
     return (

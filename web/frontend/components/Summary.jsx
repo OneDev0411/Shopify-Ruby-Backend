@@ -1,11 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Card, AppProvider, Text, Image, Grid, Link, Spinner } from '@shopify/polaris';
 import "../components/stylesheets/editOfferStyle.css";
-
-import { getOfferList } from '../services/offers/actions/offer';
-import { getShopOffersStats } from '../services/actions/shop';
 
 const Summary = (props) => {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -19,25 +16,54 @@ const Summary = (props) => {
       navigateTo('/analytics');
     }
 
-    useEffect(() => {
-      setIsLoading(true);
-      getOfferList(shopAndHost.shop)
-      .then((reponse) => {
-        const offerWithStats = reponse.offers?.find(incoming_offer => incoming_offer.id === props.offer?.id);
-        setOfferStats(offerWithStats)
-        setIsLoading(false);
-      }).catch((error) => {
-        console.error('An error occurred while making the API call:', error);
-      }); 
-      getShopOffersStats(shopAndHost.shop, 'daily')
-        .then((response) => {
-          setTotalDisplayed(response.offers_stats?.times_loaded);
-          setConverted(response.orders_through_offers_count);
+    const getOfferList = useCallback(() => {
+      fetch('/api/merchant/offers_list', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify({ shop: shopAndHost.shop }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const offerWithStats = data.offers?.find((incoming_offer) => incoming_offer.id === props.offer?.id);
+          console.log('checking if stats', offerWithStats)
+          setOfferStats(offerWithStats);
+          setIsLoading(false);
         })
         .catch((error) => {
-            console.log("error", error);
+          console.log('Fetch error >> ', error);
+        });
+    }, [shopAndHost.shop, props.offer]);
+
+    const getShopOffersStats = useCallback((period) => {
+      fetch(`/api/merchant/shop_offers_stats`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ shop: shopAndHost.shop, period: period }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setTotalDisplayed(data.offers_stats?.times_loaded);
+          setConverted(data.orders_through_offers_count);
         })
-    }, [props.offer]);
+        .catch((error) => {
+          console.log("error", error);
+        });
+    }, [shopAndHost.shop]);
+
+    useEffect(() => {
+      setIsLoading(true);
+      getOfferList();
+      getShopOffersStats('daily');
+    }, [props.offer, shopAndHost.shop]);
     
     return (
       <>
@@ -53,7 +79,7 @@ const Summary = (props) => {
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  minHeight: '100vh',
+                  minHeight: '20vh',
               }}>
                 <Spinner size="large" color="teal"/>
               </div>

@@ -31,6 +31,7 @@ import ajax_cart_image_2 from "../../../assets/images/ajax_cart_image_2.png";
 import ajax_cart_image_3 from "../../../assets/images/ajax_cart_image_3.png";
 import { condition_options } from "../../../shared/constants/ConditionOptions";
 import { getLabelFromValue } from "../../../shared/helpers/commonHelpers";
+import {Link} from 'react-router-dom';
 
 export function SecondTab(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -653,8 +654,8 @@ export function SecondTab(props) {
             {(!props.storedThemeNames?.includes(props.shopifyThemeName) && openBanner) && (
             <div style={{marginBottom: "10px"}} className="polaris-banner-container">
                 <Banner title="Unsupported Theme Detected" onDismiss={() => {setOpenBanner(!openBanner)}} tone='warning'>
-                    <p>Templates and default settings are unavailable for your theme.</p>
-                    <p>Please add your selectors and actions in the Advanced Tab or contact support for assistance.</p>
+                    <p>Templates and default settings are unavailable for your theme.</p><br/>
+                    <p>Please follow <Link to="https://help.incartupsell.com/en/articles/8558593-how-to-manually-setup-an-offer-new-ui" target="_blank">this guide</Link> to add your selectors and actions in the Advanced Tab or contact support for assistance. We will be adding support for more themes regularly!</p>
                 </Banner>
             </div>
             )}
