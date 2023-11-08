@@ -32,12 +32,12 @@ export function OfferPreview(props) {
 				props.updateNestedAttributeOfOffer(true, "placement_setting", "default_ajax_cart");
 			}
 			if(!props.offer.advanced_placement_setting) {
-				props.updateNestedAttributeOfOffer("[class*='description']", "advanced_placement_setting",  "custom_product_page_dom_selector")
-				props.updateNestedAttributeOfOffer('after', "advanced_placement_setting",  "custom_product_page_dom_action")
-				props.updateNestedAttributeOfOffer("form[action^='/cart']", "advanced_placement_setting",  "custom_cart_page_dom_selector")
-				props.updateNestedAttributeOfOffer('prepend', "advanced_placement_setting",  "custom_cart_page_dom_action")
-				props.updateNestedAttributeOfOffer(".ajaxcart__row:first", "advanced_placement_setting",  "custom_ajax_dom_selector")
-				props.updateNestedAttributeOfOffer('prepend', "advanced_placement_setting",  "custom_ajax_dom_action")
+				props.updateNestedAttributeOfOffer(props.offerSettings?.product_page_dom_selector || "[class*='description']", "advanced_placement_setting",  "custom_product_page_dom_selector")
+				props.updateNestedAttributeOfOffer(props.offerSettings?.product_page_dom_action ||'after', "advanced_placement_setting",  "custom_product_page_dom_action")
+				props.updateNestedAttributeOfOffer(props.offerSettings?.cart_page_dom_selector || "form[action^='/cart']", "advanced_placement_setting",  "custom_cart_page_dom_selector")
+				props.updateNestedAttributeOfOffer(props.offerSettings?.cart_page_dom_action || 'prepend', "advanced_placement_setting",  "custom_cart_page_dom_action")
+				props.updateNestedAttributeOfOffer(props.offerSettings?.ajax_dom_selector || ".ajaxcart__row:first", "advanced_placement_setting",  "custom_ajax_dom_selector")
+				props.updateNestedAttributeOfOffer(props.offerSettings?.ajax_dom_action || 'prepend', "advanced_placement_setting",  "custom_ajax_dom_action")
 			}
 		}
 		
