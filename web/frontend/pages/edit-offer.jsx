@@ -798,13 +798,13 @@ export default function EditPage() {
                                     <div style={{paddingTop: '40px', marginTop: '-40px'}}></div>
                                     {selectedPre == 0 ?
                                         <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer}
-                                                      checkKeysValidity={checkKeysValidity}
+                                                      checkKeysValidity={checkKeysValidity} offerSettings={offerSettings}
                                                       updateCheckKeysValidity={updateCheckKeysValidity}
                                                       updatePreviousAppOffer={updatePreviousAppOffer}
                                                       updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>
                                         :
                                         <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer}
-                                                      checkKeysValidity={checkKeysValidity}
+                                                      checkKeysValidity={checkKeysValidity} offerSettings={offerSettings}
                                                       updateCheckKeysValidity={updateCheckKeysValidity}
                                                       updatePreviousAppOffer={updatePreviousAppOffer}
                                                       updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>}
