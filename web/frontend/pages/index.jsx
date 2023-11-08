@@ -63,7 +63,7 @@ export default function HomePage() {
               action={{content: 'Take the survey', onAction: handleOpenGoogleForm }}
               status="info"
             >
-              <p>We're delighted to welcome you to the beta redesign of In Cart Upsell & Cross-Sell! If you encounter any unexpected issues or need assistance with the new User Interface, please don't hesitate to contact our support team. Additionally, if you can spare 5 minutes, we'd greatly appreciate your feedback. Thank you!</p>
+              <p>We're delighted to welcome you to the new & improved In Cart Upsell & Cross-Sell! If you encounter any unexpected issues or need assistance with the new User Interface, please don't hesitate to contact our support team. Additionally, if you can spare 5 minutes, we'd greatly appreciate your feedback. Thank you!</p>
             </Banner>
           </div>
         </Layout.Section>
