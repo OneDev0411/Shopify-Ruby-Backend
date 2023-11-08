@@ -92,6 +92,18 @@ module Graphable
     end
   end
 
+  def period_hash_to_offers
+    {
+      'daily' => { start_date: DateTime.now.beginning_of_day, end_date: DateTime.now.end_of_day },
+      'weekly' => { start_date: Date.today - 7.days, end_date: (Date.today - 1.day) },
+      'monthly' => { start_date: (Date.today.beginning_of_month - 1.month), end_date: (Date.today-1.months).end_of_month },
+      '3-months' => { start_date: (Date.today.beginning_of_month - 2.months), end_date: Date.today.end_of_month },
+      '6-months' => { start_date: (Date.today.beginning_of_month - 5.months), end_date: Date.today.end_of_month },
+      'yearly' => { start_date: Date.today.beginning_of_year, end_date: Date.today.end_of_year },
+      'all' => { start_date: self.offers.present? ? self.offers.sort.first.created_at.to_date : nil, end_date: Date.today.end_of_month }
+    }
+  end
+
   def sales_stats(period)
     results = []
 
@@ -104,7 +116,7 @@ module Graphable
       'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
       'all' => { interval: 6.months, start_date: self.orders.present? ? self.orders.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
     }
-    
+
     i = 0
     start_date = period_hash[period][:start_date]
     last = period_hash[period][:last]
@@ -209,7 +221,7 @@ module Graphable
       'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
       'all' => { interval: 6.months, start_date: self.orders.present? ? self.orders.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
     }
-    
+
     if orders.present?
       start_date = period_hash[period][:start_date]
       last = period_hash[period][:last]
@@ -217,7 +229,7 @@ module Graphable
       i = 0;
       total = 0
       while (start_date <= last) do
-        
+
         if (start_date + interval > last)
           end_date = last
         else
@@ -267,7 +279,7 @@ module Graphable
       offer_sale_weekly_diff << offer.offer_events.where(action: "sale").where(last_weeks_range(false)).sum(:amount)
     end
     diff = difference_between_weeks(offer_sale_weekly_value.sum, offer_sale_weekly_diff.sum)
-    { "offer_sale_weekly_value": offer_sale_weekly_value.sum, "offer_sale_weekly_diff": diff, "offer_sale_daily_value": offer_sale_daily_value.sum, 
+    { "offer_sale_weekly_value": offer_sale_weekly_value.sum, "offer_sale_weekly_diff": diff, "offer_sale_daily_value": offer_sale_daily_value.sum,
       "offer_sale_monthly_value": offer_sale_monthly_value.sum, "offer_sale_yearly_value": offer_sale_yearly_value.sum, "offer_sale_revenue":  offer_sale_revenue.sum}
   end
 
@@ -321,4 +333,3 @@ module Graphable
                       (Time.now.in_time_zone(iana_timezone).to_date)
   end
 end
-

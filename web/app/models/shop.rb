@@ -1155,26 +1155,17 @@ class Shop < ApplicationRecord
   def offer_data_with_stats_by_period(period)
     data = []
 
-    period_hash = {
-      'daily' => { start_date: DateTime.now.beginning_of_day, last: DateTime.now.end_of_day },
-      'weekly' => { start_date: Date.today - 7.days, last: (Date.today - 1.day) },
-      'monthly' => { start_date: (Date.today.beginning_of_month - 1.month), last: (Date.today-1.months).end_of_month },
-      '3-months' => { start_date: (Date.today.beginning_of_month - 2.months), last: Date.today.end_of_month },
-      '6-months' => { start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
-      'yearly' => { start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
-      'all' => { start_date: self.orders.present? ? self.orders.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
-    }
-    start_date = period_hash[period][:start_date]
-    last = period_hash[period][:last]
+    start_date = period_hash_to_offers[period][:start_date]
+    end_date = period_hash_to_offers[period][:end_date]
 
-    offers.includes(:daily_stats, :offer_events).where(created_at: start_date..last).each do |offer|
+    offers.includes(:daily_stats, :offer_events).where(created_at: start_date..end_date).each do |offer|
       data << {
         id: offer.id,
         title: offer.title,
         status: offer.active,
         clicks: offer.daily_stats.map(&:times_clicked).sum,
         views: offer.daily_stats.map(&:times_loaded).sum,
-        revenue: offer.offer_events&.where(action: 'sale')&.pluck(:amount).sum,
+        revenue: offer.offer_events&.select{|oe| oe.action == 'sale' ? oe.amount : 0}.sum,
         created_at: offer.created_at.to_datetime,
       }
     end
