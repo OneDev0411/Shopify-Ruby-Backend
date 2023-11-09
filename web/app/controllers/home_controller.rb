@@ -10,7 +10,7 @@ class HomeController < ApplicationController
 
   def index
     if ShopifyAPI::Context.embedded? && (!params[:embedded].present? || params[:embedded] != '1')
-      redirect_to(ShopifyAPI::Auth.embedded_app_url(params[:shop]), allow_other_host: true)
+      redirect_to(ShopifyAPI::Auth.embedded_app_url(params[:host] || params[:shop]), allow_other_host: true)
     else
       contents = File.read(File.join(Rails.env.production? ? PROD_INDEX_PATH : DEV_INDEX_PATH, 'index.html'))
 
