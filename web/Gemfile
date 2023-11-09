@@ -12,6 +12,7 @@ gem 'jbuilder' # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem 'pg'
 gem 'puma', '~> 5.0'
 gem 'rails', '~> 7.0.4'
+gem 'haml-rails'
 gem 'redis', '~> 5.0'
 gem 'rollbar'
 gem 'liquid'

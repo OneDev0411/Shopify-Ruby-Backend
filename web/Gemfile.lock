@@ -148,6 +148,15 @@ GEM
     ffi (1.15.5)
     globalid (1.1.0)
       activesupport (>= 5.0)
+    haml (6.2.3)
+      temple (>= 0.8.2)
+      thor
+      tilt
+    haml-rails (2.1.0)
+      actionpack (>= 5.1)
+      activesupport (>= 5.1)
+      haml (>= 4.0.6)
+      railties (>= 5.1)
     hash_diff (1.1.1)
     hashdiff (1.0.1)
     httparty (0.21.0)
@@ -385,6 +394,7 @@ GEM
       sprockets (>= 3.0.0)
     stimulus-rails (1.2.1)
       railties (>= 6.0.0)
+    temple (0.10.3)
     thor (1.2.2)
     tilt (2.2.0)
     timeout (0.3.2)
@@ -432,6 +442,7 @@ DEPENDENCIES
   dotenv-rails
   factory_bot_rails
   ffaker
+  haml-rails
   httparty
   importmap-rails
   jbuilder
