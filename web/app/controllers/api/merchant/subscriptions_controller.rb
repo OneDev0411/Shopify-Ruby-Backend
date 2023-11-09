@@ -81,7 +81,7 @@ module Api
           Rollbar.error('Charge Confirmation Error', e)
           @success = false
         end
-        render "subscriptions/confirm_charge"
+        redirect_to "https://#{@icushop.shop_domain}", allow_other_host: true
       end
 
       private
