@@ -156,13 +156,14 @@ module Graphable
         prices.concat(item_variants.map { |item| item["price"].to_f })
       end
 
-      # Calculate the total value
-      total = prices.zip(quantities).sum { |price, quantity| price * quantity }
-      results[i][:value] = total
+      sum = prices.zip(quantities).sum { |price, quantity| price * quantity }
+      results[i][:value] = sum
+      total += sum 
 
       start_date = start_date + interval
       i+=1;
     end
+
     { results: results, sales_total: total}
   end
 
