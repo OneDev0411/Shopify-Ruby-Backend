@@ -1,0 +1,151 @@
+<%= raw @library_string %>
+var my_settings = {};
+my_settings.shop = {
+  custom_theme_css: '<%= escape_javascript(raw @icushop.custom_theme_css) %>',
+  offer_css: '<%= escape_javascript(raw @icushop.combined_css) %>',
+  adjust_dropdown_width: false,
+  ajax_dom_selector: '<%= escape_javascript(raw @icushop.ajax_dom_selector) %>',
+  ajax_dom_action: '<%= @icushop.ajax_dom_action %>',
+  cart_page_dom_selector: '<%= escape_javascript(raw @icushop.cart_page_dom_selector) %>',
+  cart_page_dom_action: '<%= @icushop.cart_page_dom_action %>',
+  product_page_dom_selector: '<%= escape_javascript(raw @icushop.product_page_dom_selector) %>',
+  product_page_dom_action: '<%= escape_javascript(raw @icushop.product_page_dom_action) %>',
+  ajax_refresh_code: '<%= escape_javascript(raw @icushop.ajax_refresh_code) %>',
+  canonical_domain: '<%= @icushop.canonical_domain %>',
+  cart_base_url: ('https:' == document.location.protocol ? 'https://' : 'http://') + '<%= @icushop.canonical_domain %>/',
+  can_run_on_checkout_page: <%= @icushop.can_run_on_checkout_page %>,
+  <% if @icushop.can_run_on_checkout_page %>
+    checkout_dom_selector: '<%= escape_javascript(raw @icushop.checkout_dom_selector) %>',
+    checkout_dom_action: '<%= @icushop.checkout_dom_action %>',
+  <% end %>
+  custom_theme_template: '<%= escape_javascript(raw @icushop.custom_theme_template) %>',
+  debug_mode: <%= @icushop.debug_mode %>,
+  iana_timezone: '<%= @icushop.iana_timezone %>',
+  timezone_offset: '<%= @icushop.timezone_offset || 0 %>',
+  extra_css_classes: '<%= @icushop.extra_css_classes %>',
+  has_recharge: <%= @icushop.has_recharge %>,
+  has_remove_offer: <%= @icushop.has_remove_offer %>,
+  has_geo_offers: <%= @icushop.has_geo_offers %>,
+  has_shopify_multicurrency: <%= (@icushop.enabled_presentment_currencies.present? && @icushop.enabled_presentment_currencies.length > 0) %>,
+  shopify_domain: '<%= @icushop.shopify_domain %>',
+  native_stats: <%= @icushop.native_stats %>,
+  path_to_cart: '<%= @icushop.path_to_cart %>',
+  platform: '<%= @icushop.platform %>',
+  show_spinner: <%= @icushop.show_spinner? %>,
+  uses_ajax_refresh: <%= @icushop.uses_ajax_refresh %>,
+  uses_ajax_cart: <%= @icushop.uses_ajax_cart %>,
+  wizard_token: '<%= @icushop.wizard_token %>',
+  finder_token: '<%= @icushop.finder_token %>',
+  uses_customer_tags: <%= @icushop.uses_customer_tags? || false %>
+}
+
+my_settings.shop_css = '<%= escape_javascript(Rails.application.assets.find_asset('themes.css').to_s.html_safe + @icushop.custom_theme_css.to_s.html_safe + @icushop.combined_css.to_s.html_safe) %>'
+
+my_settings.dbug = (document.location.search.indexOf("InCartUpselldebug=1") != -1 || my_settings.shop.debug_mode);
+my_settings.appPath = "/apps/in-cart-upsell";
+my_settings.shopify_domain = my_settings.shop.shopify_domain;
+my_settings.shop_id = <%= @icushop.id %>;
+
+var my_offers = [
+  <% @offers.each do |o| %> {
+    id: <%= o.id %>,
+    rules: <%= o.rules_json.nil? ? raw([].to_json) : raw(o.rules_json.to_json) %>,
+    text_a: '<%= escape_javascript(raw((o.offer_text || "").gsub(/\{\{ *([A-Za-z_]+) *\}\}/, '{{{ \1 }}}'))) %>',
+    text_b: '<%= escape_javascript(raw((o.offer_text_alt || "").gsub(/\{\{ *([A-Za-z_]+) *\}\}/, '{{{ \1 }}}'))) %>',
+    cta_a: '<%= o.offer_cta %>',
+    cta_b: '<%= o.offer_cta_alt %>',
+    offerable: {
+      title: '<%= o.offerable_title %>',
+      price: '<%= o.offerable_price %>',
+      compare_at_price: '<%= o.offerable_compare_at_price %>'
+    },
+    css: '<%= escape_javascript(o.offer_css.to_s) %>',
+    show_product_image: <%= o.show_product_image %>,
+    link_to_product: <%= o.link_to_product %>,
+    theme: '<%= o.theme %>',
+    shop: {
+      path_to_cart: my_settings.shop.path_to_cart,
+      extra_css_classes: my_settings.shop.extra_css_classes
+    },
+    show_nothanks: <%= o.show_nothanks || false %>,
+    calculated_image_url: '<%= o.calculated_image_url %>',
+    <% if o.offerable_type != 'multi' && o.offerable_type != 'auto' %>
+      available_json_variants: <%= raw o.variants_for_handlebars.to_json %>,
+    <% end %>
+    <% if o.offerable_type == 'product' %>
+      hide_variants_wrapper: <%= o.offerable_type == 'product' && o.product.available_json_variants.count == 1 %>,
+    <% end %>
+    show_variant_price: <%= o.show_variant_price || false %>,
+    uses_ab_test: <%= o.uses_ab_test? %>,
+    <% if o.winner.present? %>
+      winning_version: '<%= o.winner %>',
+    <% end %>
+    ruleset_type: '<%= o.ruleset_type %>',
+    offerable_type: '<%= o.offerable_type %>',
+    offerable_product_shopify_ids: <%= o.offerable_product_shopify_ids.compact %>,
+    discount_code: <% if o.discount_target_type == 'code' %>'<%= o.discount_code %>'<% else %>false<% end %>,
+    stop_showing_after_accepted: <%= o.stop_showing_after_accepted %>,
+    show_powered_by: <%= @icushop.subscription.has_branding %>,
+    show_spinner: <%= @icushop.show_spinner? %>,
+    must_accept: <%= o.must_accept || false %>,
+    powered_by_text_color: '<%= o.powered_by_text_color %>',
+    powered_by_link_color: '<%= o.powered_by_link_color %>',
+    checkout_after_accepted: <%= o.checkout_after_accepted || false %>,
+    products_to_remove: <%= o.product_ids_to_remove %>,
+    <% if o.offerable_type == 'collection' %>
+      available_products: <%= raw o.variants_for_handlebars.to_json %>,
+      collection_layout: '<%= o.collection_layout %>',
+    <% elsif o.offerable_type == 'product' %>
+      product_url: '<%= o.product.url %>',
+    <% elsif o.offerable_type == 'multi' || o.offerable_type == 'auto' %>
+    offerable_product_details: <%= raw o.offerable_product_details(true, true).to_json %>,
+    multi_layout: '<%= o.multi_layout %>',
+    product_image_size: '<%= o.product_image_size %>',
+    show_custom_field: <%= o.show_custom_field || false %>,
+    custom_field_name: '<%= o.custom_field_name %>',
+    custom_field_placeholder: '<%= o.custom_field_placeholder %>',
+    custom_field_required: <%= o.custom_field_required || false %>,
+    custom_field_2_name: '<%= o.custom_field_2_name %>',
+    custom_field_2_placeholder: '<%= o.custom_field_2_placeholder %>',
+    custom_field_2_required: <%= o.custom_field_2_required || false %>,
+    custom_field_3_name: '<%= o.custom_field_3_name %>',
+    custom_field_3_placeholder: '<%= o.custom_field_3_placeholder %>',
+    custom_field_3_required: <%= o.custom_field_3_required || false %>,
+    autopilot_quantity: <%= o.autopilot_quantity || 1 %>,
+    show_quantity_selector: <%= o.show_quantity_selector || false %>,
+    show_product_price: <%= o.show_product_price? %>,
+    show_product_title: <%= o.show_product_title? %>,
+    show_compare_at_price: <%= o.show_compare_at_price? %>,
+    in_cart_page: <%= o.in_cart_page? %>,
+    in_ajax_cart: <%= o.in_ajax_cart? %>,
+    in_product_page: <%= o.in_product_page? %>,
+    <% end %>
+    <% if o.offerable_type == 'auto' %>
+      autopilot_data: <%= raw @icushop.autopilot_data.to_json %>,
+    <% end %>
+    <% if @icushop.has_recharge && o.recharge_subscription_id.present? %>
+      has_recharge: <%= @icushop.has_recharge && o.recharge_subscription_id.present? %>,
+      interval_unit: '<%= o.interval_unit %>',
+      interval_frequency: <%= o.interval_frequency.to_i %>,
+      recharge_subscription_id: <%= o.recharge_subscription_id.to_i %>,
+    <% end %>
+    <% if @icushop.has_remove_offer %>
+      remove_if_no_longer_valid: <%= o.remove_if_no_longer_valid ? true : false %>,
+    <% end %>
+    redirect_to_product: <%= @icushop.has_redirect_to_product? && o.redirect_to_product? %>,
+    offer_css_options: '<%= escape_javascript(Rails.application.assets.find_asset('themes.css').to_s.html_safe + o.custom_theme_css.to_s.html_safe + o.combined_css.to_s.html_safe) %>',
+    ajax_dom_selector: '<%= escape_javascript(raw o.ajax_dom_selector) %>',
+    ajax_dom_action: '<%= o.ajax_dom_action %>',
+    cart_page_dom_selector: '<%= escape_javascript(raw o.cart_page_dom_selector) %>',
+    cart_page_dom_action: '<%= o.cart_page_dom_action %>',
+    product_page_dom_selector: '<%= escape_javascript(raw o.product_page_dom_selector) %>',
+    product_page_dom_action: '<%= escape_javascript(raw o.product_page_dom_action) %>',
+  },
+  <% end %>
+];
+
+var my_products_by_collection = <%= raw @icushop.products_by_active_collection.to_json %>;
+
+window.incartupsell = new InCartUpsell(my_settings, my_offers, { products_by_collection: my_products_by_collection });
+console.log("InCartUpsell > Library <%= Time.zone.now.to_s %> loaded");
+

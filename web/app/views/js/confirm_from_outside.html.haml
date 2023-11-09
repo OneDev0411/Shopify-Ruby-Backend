@@ -1,0 +1,45 @@
+
+= javascript_include_tag "https://unpkg.com/@shopify/app-bridge@3"
+= javascript_include_tag "https://unpkg.com/@shopify/app-bridge-utils@3"
+
+= content_tag(:div, nil, id: 'shopify-app-init', data: { api_key: ShopifyApp.configuration.api_key, shop_domain: @shop_domain});
+= content_tag(:div, 'Loading...')
+
+:javascript
+  const data = document.getElementById('shopify-app-init').dataset;
+  const urlParams = new URLSearchParams(window.location.search);
+  const shopify_domain = urlParams.get('shop');
+  const charge_id = urlParams.get('charge_id');
+  const host = window.btoa(data.shopDomain);
+  let AppBridge = window['app-bridge'];
+  let createApp = AppBridge.createApp;
+  const actions = AppBridge.actions;
+  let Redirect = actions.Redirect;
+  if (window.top == window.self) {
+    // If the current window is the 'parent', change the URL by setting location.href
+    const shopifyApp = createApp({
+      apiKey: "#{ShopifyApp.configuration.api_key}",
+      shopOrigin: data.shopDomain,
+      forceRedirect: true,
+      force_iframe: true,
+      host: host
+    });
+    const redirect = Redirect.create(shopifyApp);
+
+    const confirmUrl = `/?return_to=/subscription/confirm_charge?charge_id=${charge_id}&shop=${shopify_domain}`;
+
+    redirect.dispatch(Redirect.Action.REMOTE, confirmUrl);
+
+  } else {
+    // If the current window is the 'child', change the parent's URL with Shopify App Bridge's Redirect action
+    const shopifyApp = createApp({
+      apiKey: "#{ShopifyApp.configuration.api_key}",
+      shopOrigin: data.shopDomain,
+      forceRedirect: false,
+      force_iframe: false,
+      host: host
+    });
+    const redirect = Redirect.create(shopifyApp);
+
+    redirect.dispatch(Redirect.Action.APP, `/?return_to=/subscription/confirm_charge?charge_id=${charge_id}&shop=${shopify_domain}`);
+  }
