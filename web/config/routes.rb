@@ -31,7 +31,7 @@ Rails.application.routes.draw do
       get 'toggle_activation', to: 'shops#toggle_activation'
       put 'subscription', to: 'subscriptions#update'
       get 'current_subscription', to: 'subscriptions#current_subscription'
-      get 'subscription/confirm_charge', to: 'subscriptions#confirm_charge'
+      get 'subscription/confirm_charge', to: 'subscriptions#confirm_charge', as: :confirm_charge
       get 'partners', to: 'partners#index'
       get 'autopilot_details', to: 'shops#autopilot_details'
       post 'enable_autopilot', to: 'shops#enable_autopilot'

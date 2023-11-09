@@ -95,7 +95,7 @@ module Api
       end
 
       def charge_return_url
-        confirm_from_outside_url(shop: @icushop.shopify_domain)
+        api_merchant_confirm_charge_url(shop: @icushop.shopify_domain)
       end
 
     end
