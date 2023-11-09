@@ -56,8 +56,6 @@ export function SecondTab(props) {
 
     const [openBanner, setOpenBanner] = useState(false);
 
-    const [ruleset, setRuleset] = useState('any');
-
     useEffect(() => {
         if(props.offer.in_product_page && props.offer.in_cart_page) {
             setSelected("cartpageproductpage");
@@ -640,13 +638,7 @@ export function SecondTab(props) {
     }
 
     function updateRuleSet (value) {
-        if (value === "any") {
-            props.updateOffer('ruleset_type', "or");
-        } else {
-            props.updateOffer('ruleset_type', "and");
-        }
-
-        setRuleset(value);
+        props.updateOffer('ruleset_type', value);
     };
 
     return (
@@ -1029,11 +1021,11 @@ export function SecondTab(props) {
                             <span style={{margin: '0 6px'}}>
                                 <Select
                                   options={[
-                                      { label: 'ANY', value: 'any' },
-                                      { label: 'ALL', value: 'all' },
+                                      { label: 'ANY', value: 'or' },
+                                      { label: 'ALL', value: 'and' },
                                   ]}
                                   onChange={updateRuleSet}
-                                  value={ruleset}
+                                  value={props.offer?.ruleset_type || 'or'}
                                 />
                             </span>
                             rules are true at the same time.
