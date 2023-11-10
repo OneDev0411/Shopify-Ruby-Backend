@@ -41,9 +41,9 @@ export default function AnalyticsOffers() {
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
             <TotalSalesData period={period}/>
           </Grid.Cell>
-          {/*<Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>*/}
-          {/*  <ConversionRate period={period}/>*/}
-          {/*</Grid.Cell>*/}
+          <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
+            <ConversionRate period={period}/>
+          </Grid.Cell>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
             <OrderOverTimeData period={period}/>
             <TopPerformingOffersData period={period} />
