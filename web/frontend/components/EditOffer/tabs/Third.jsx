@@ -340,7 +340,7 @@ export function ThirdTab(props) {
                                     label="Corner Radius"
                                     value={parseInt(props.offer.css_options?.main?.borderRadius)}
                                     min={0}
-                                    max={10}
+                                    max={50}
                                     onChange={handlesetBorderRange}
                                     output
                                 />
