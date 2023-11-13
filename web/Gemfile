@@ -28,6 +28,7 @@ gem 'turbo-rails' # Hotwire's SPA-like page accelerator [https://turbo.hotwired.
 gem 'tzinfo-data'
 gem 'httparty'
 gem 'devise'
+gem 'appsignal'
 
 group :development, :test do
   gem 'byebug'
