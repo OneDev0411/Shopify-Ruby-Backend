@@ -15,12 +15,19 @@ export function ModalAddProduct(props) {
   const [selectedVariants, setSelectedVariants] = useState(props.offer.included_variants);
   const [taggedWith, setTaggedWith] = useState(null);
   const [queryValue, setQueryValue] = useState(null);
+  let timer;
 
   const handleQueryValueChange = useCallback((value) => {
-    setQueryValue(value);
     props.updateQuery(value);
-  }, [],
-  );
+  }, []);
+  const WaitForQueryToComplete = useCallback((value) => {
+    setQueryValue(value);
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      handleQueryValueChange(value);
+    }, 1000);
+  }, []);
   const handleTaggedWithRemove = useCallback(() => setTaggedWith(null), []);
   const handleQueryValueRemove = useCallback(() => setQueryValue(null), []);
   const handleClearAll = useCallback(() => {
@@ -35,8 +42,6 @@ export function ModalAddProduct(props) {
     singular: 'product',
     plural: 'products',
   };
-
-  const items = props.productData;
 
   const bulkActions = [
     {
@@ -69,7 +74,7 @@ export function ModalAddProduct(props) {
       queryValue={queryValue}
       filters={appliedFilters}
       appliedFilters={appliedFilters}
-      onQueryChange={handleQueryValueChange}
+      onQueryChange={WaitForQueryToComplete}
       onQueryClear={handleQueryValueRemove}
       onClearAll={handleClearAll}
     />
@@ -79,7 +84,7 @@ export function ModalAddProduct(props) {
     <div id="right-align-polaris">
       <ResourceList
           resourceName={resourceName}
-          items={items}
+          items={props.productData}
           renderItem={renderItem}
           selectedItems={props.selectedItems}
           onSelectionChange={selectionChange}
@@ -99,7 +104,6 @@ export function ModalAddProduct(props) {
         alt={title}
         size="medium"
     />
-
     if (!variants || variants.length <= 1) {
       return (
         <ResourceItem

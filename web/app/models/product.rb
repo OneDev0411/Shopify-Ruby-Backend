@@ -321,6 +321,19 @@ class Product < ApplicationRecord
     self.removed_at = nil
   end
 
+  #Public: Returns the id and title of variants for the searchable products
+  def variants_details_for_searchable_product
+    return JSON.parse([].to_s) if variants_json.nil?
+    
+    res = variants_json.map do |v|
+      {
+        id: v['id'],
+        title: v['title'] 
+      }
+    end
+    return res
+  end
+
   private
 
   # Private: find orders with this product and at least another product (the companions).

@@ -5,13 +5,12 @@ module Api
 
       # POST /api/merchant/element_search
       def element_search
-        products_details = []
         result = product_params['type'] == 'product' ? product_search : collection_search
-        result.map do |hashedValue|
-          hashedValue[:variants] = @icushop.products.find_by(shopify_id: hashedValue[:id])&.available_variants_for_handlebars
-          products_details.push(hashedValue)
+        products = @icushop.products
+        result.each do |hashedValue|
+          hashedValue[:variants] = products.find_by(shopify_id: hashedValue[:id])&.variants_details_for_searchable_product
         end
-        render json: products_details
+        render json: result
       end
 
 
