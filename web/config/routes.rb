@@ -48,6 +48,7 @@ Rails.application.routes.draw do
       post 'shop_sale_stats', to: 'shops#shop_sale_stats'
       post 'shop_orders_stats', to: 'shops#shop_orders_stats'
       post 'shop_offers_stats', to: 'shops#shop_offers_stats'
+      post 'shop_clicks_stats', to: 'shops#shop_clicks_stats'
       post '/offers/:id/duplicate', to: 'offers#duplicate'
       delete '/offers/:id', to: 'offers#destroy'
       post 'offer/shopify_ids_from_rule', to: 'offers#shopify_ids_from_rule'

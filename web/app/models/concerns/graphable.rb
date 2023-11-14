@@ -265,6 +265,61 @@ module Graphable
     {results: results, orders_total: total}
   end
 
+  def clicks_stats(period)
+    results = []
+
+    period_hash = {
+      'daily' => { interval: 6.hours, start_date: DateTime.now.beginning_of_day, last: DateTime.now.end_of_day },
+      'weekly' => { interval: 2.days, start_date: Date.today - 7.days, last: (Date.today - 1.day) },
+      'monthly' => { interval: 1.week, start_date: (Date.today.beginning_of_month - 1.month), last: (Date.today-1.months).end_of_month },
+      '3-months' => { interval: 1.month, start_date: (Date.today.beginning_of_month - 2.months), last: Date.today.end_of_month },
+      '6-months' => { interval: 2.months, start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
+      'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
+      'all' => { interval: 6.months, start_date: self.offers.present? ? self.offers.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
+    }
+
+    i = 0
+    start_date = period_hash[period][:start_date]
+    last = period_hash[period][:last]
+    interval = period_hash[period][:interval]
+
+    total = 0
+    while (start_date <= last) do
+      if (start_date + interval > last)
+        end_date = last
+      else
+        end_date = start_date + interval
+      end
+      label_hash = {
+        'daily' => ->(start_date, end_date) { "#{start_date.hour} - #{end_date.hour}" },
+        'weekly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
+        'monthly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
+        '3-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+        '6-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+        'yearly' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+        'all' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" }
+      }
+      results[i]
+      results[i] = {
+        key: label_hash[period].call(start_date, end_date),
+        value: 0
+      }
+      sum = 0
+
+      offers.includes(:daily_stats, :offer_events).where(created_at: start_date..end_date).each do |offer|
+        sum = offer.daily_stats.map(&:times_clicked).sum
+      end
+
+      results[i][:value] = sum
+      total += sum
+
+      start_date = start_date + interval
+      i += 1;
+    end
+
+    { results: results, clicks_total: total }
+  end
+
   def sale_stats
     offer_sale_weekly_value = []
     offer_sale_daily_value = []

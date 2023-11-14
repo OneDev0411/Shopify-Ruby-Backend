@@ -51,7 +51,7 @@ module Api
         @icushop.show_spinner = opts['show_spinner']
         @icushop.stats_from = opts['stats_from'].present? ? Time.parse(opts['stats_from']) : nil
         @icushop.default_template_settings = opts['default_template_settings'].to_h
-  
+
         # ADMIN OPTS
         if @admin
           @icushop.review = opts['review']
@@ -151,6 +151,17 @@ module Api
       end
     end
 
+    # Gets all clicks stats. POST   /api/merchant/shops_clicks_stats
+    def shop_clicks_stats
+      begin
+        @clicks_stats = @icushop.clicks_stats(params[:period])
+        render "shops/shop_clicks_stats"
+      rescue StandardError => e
+        Rails.logger.debug "Error Message: #{e.message}"
+        Rollbar.error("Error", e)
+      end
+    end
+
     # GET autopilot details of the shop GET /api/merchant/autopilot_details
     def autopilot_details
       render json:
@@ -177,14 +188,14 @@ module Api
       def shop_params
         all_names = Shop.column_names + ['date_min', 'date_max', 'canonical_domain',
                                          'path_to_cart', 'has_branding', 'custom_theme_css',
-                                         'image', 'stats_from', css_options, 
+                                         'image', 'stats_from', css_options,
                                          'default_template_settings': [:defaultSettingsForProductPage, :defaultSettingsForAjaxCart, :defaultSettingsForCartPage, :templateForProductPage, :templateForAjaxCart, :templateForCartPage]]
         params.require('shop_attr').permit(all_names)
       end
 
       def set_admin
         if params['shop_attr']
-          @admin = shop_params['admin'] 
+          @admin = shop_params['admin']
         else
           @admin = params['admin']
         end
