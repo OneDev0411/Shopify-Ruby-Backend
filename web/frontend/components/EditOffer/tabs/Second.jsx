@@ -56,7 +56,51 @@ export function SecondTab(props) {
 
     const [openBanner, setOpenBanner] = useState(false);
 
+    const [shopifyThemeName, setShopifyThemeName] = useState(null);
+    const [themeTemplateData, setThemeTemplateData] = useState(null);
+    const [templateImagesURL, setTemplateImagesURL] = useState({});
+    const [storedThemeNames, setStoredThemeName] = useState([]);
+
     useEffect(() => {
+
+        fetch(`/api/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+          .then( (response) => { return response.json() })
+          .then( (data) => {
+              setStoredThemeName(data.theme_names_having_data);
+              if(data.themeExist) {
+                  setShopifyThemeName(data.shopify_theme_name);
+                  setThemeTemplateData(data.templatesOfCurrentTheme);
+                  data.templatesOfCurrentTheme.forEach(function(value, index) {
+                      if(value.page_type == "cart") {
+                          setTemplateImagesURL(previousState => {
+                              return { ...previousState, ["cart_page_image_".concat(value.position)]: value.image_url};
+                          });
+                      }
+                      else if(value.page_type == "product") {
+                          setTemplateImagesURL(previousState => {
+                              return { ...previousState, ["product_page_image_".concat(value.position)]: value.image_url};
+                          });
+                      }
+                      else if(value.page_type == "ajax") {
+                          setTemplateImagesURL(previousState => {
+                              return { ...previousState, ["ajax_cart_image_".concat(value.position)]: value.image_url};
+                          });
+                      }
+                  });
+              }
+              else {
+                  setShopifyThemeName(null);
+              }
+          })
+          .catch((error) => {
+              console.log("# Error updateProducts > ", JSON.stringify(error));
+          })
+
         if(props.offer.in_product_page && props.offer.in_cart_page) {
             setSelected("cartpageproductpage");
         }
@@ -95,9 +139,9 @@ export function SecondTab(props) {
             }
             else if(props.offer.placement_setting && !props.offer.placement_setting?.default_cart_page) {
                 setUseTemplate(true);
-                setInsertedImage1(props.templateImagesURL.cart_page_image_1);
-                setInsertedImage2(props.templateImagesURL.cart_page_image_2);
-                setInsertedImage3(props.templateImagesURL.cart_page_image_3);
+                setInsertedImage1(templateImagesURL.cart_page_image_1);
+                setInsertedImage2(templateImagesURL.cart_page_image_2);
+                setInsertedImage3(templateImagesURL.cart_page_image_3);
             }
         }
         else if (props.offer.in_product_page) {
@@ -107,9 +151,9 @@ export function SecondTab(props) {
             }
             else if(props.offer.placement_setting && !props.offer.placement_setting?.default_product_page) {
                 setUseTemplate(true);
-                setInsertedImage1(props.templateImagesURL.product_page_image_1);
-                setInsertedImage2(props.templateImagesURL.product_page_image_2);
-                setInsertedImage3(props.templateImagesURL.product_page_image_3);
+                setInsertedImage1(templateImagesURL.product_page_image_1);
+                setInsertedImage2(templateImagesURL.product_page_image_2);
+                setInsertedImage3(templateImagesURL.product_page_image_3);
             }
         }
         else if (props.offer.in_ajax_cart) {
@@ -119,19 +163,19 @@ export function SecondTab(props) {
             }
             else if(props.offer.placement_setting && !props.offer.placement_setting?.default_ajax_cart) {
                 setUseTemplate(true);
-                setInsertedImage1(props.templateImagesURL.ajax_cart_image_1);
-                setInsertedImage2(props.templateImagesURL.ajax_cart_image_2);
-                setInsertedImage3(props.templateImagesURL.ajax_cart_image_3);
+                setInsertedImage1(templateImagesURL.ajax_cart_image_1);
+                setInsertedImage2(templateImagesURL.ajax_cart_image_2);
+                setInsertedImage3(templateImagesURL.ajax_cart_image_3);
             }
         }
     }, [props.offer.in_cart_page, props.offer.in_ajax_cart, props.offer.in_product_page]);
 
     useEffect(() => {
-        if(props.storedThemeNames?.length != 0 && props.shopifyThemeName != null)
+        if(storedThemeNames?.length != 0 && shopifyThemeName != null)
         {
-            setOpenBanner(!props.storedThemeNames?.includes(props.shopifyThemeName));
+            setOpenBanner(!storedThemeNames?.includes(shopifyThemeName));
         }
-    }, [props.storedThemeNames, props.shopifyThemeName])
+    }, [storedThemeNames, shopifyThemeName])
 
     function upadteCondition() {
         if (quantityArray.includes(rule.rule_selector)) {
@@ -298,25 +342,25 @@ export function SecondTab(props) {
                 props.updateNestedAttributeOfOffer(!value, "placement_setting", "default_cart_page");
                 setDefaultSetting(!value);
                 setUseTemplate(value);
-                setInsertedImage1(props.templateImagesURL.cart_page_image_1);
-                setInsertedImage2(props.templateImagesURL.cart_page_image_2);
-                setInsertedImage3(props.templateImagesURL.cart_page_image_3);
+                setInsertedImage1(templateImagesURL.cart_page_image_1);
+                setInsertedImage2(templateImagesURL.cart_page_image_2);
+                setInsertedImage3(templateImagesURL.cart_page_image_3);
             }
             else if(props.offer.in_product_page) {
                 props.updateNestedAttributeOfOffer(!value, "placement_setting", "default_product_page");
                 setDefaultSetting(!value);
                 setUseTemplate(value);
-                setInsertedImage1(props.templateImagesURL.product_page_image_1);
-                setInsertedImage2(props.templateImagesURL.product_page_image_2);
-                setInsertedImage3(props.templateImagesURL.product_page_image_3);
+                setInsertedImage1(templateImagesURL.product_page_image_1);
+                setInsertedImage2(templateImagesURL.product_page_image_2);
+                setInsertedImage3(templateImagesURL.product_page_image_3);
             }
             else if(props.offer.in_ajax_cart) {
                 props.updateNestedAttributeOfOffer(!value, "placement_setting", "default_ajax_cart");
                 setDefaultSetting(!value);
                 setUseTemplate(value);
-                setInsertedImage1(props.templateImagesURL.ajax_cart_image_1);
-                setInsertedImage2(props.templateImagesURL.ajax_cart_image_2);
-                setInsertedImage3(props.templateImagesURL.ajax_cart_image_3);
+                setInsertedImage1(templateImagesURL.ajax_cart_image_1);
+                setInsertedImage2(templateImagesURL.ajax_cart_image_2);
+                setInsertedImage3(templateImagesURL.ajax_cart_image_3);
                 
             }
         }
@@ -450,42 +494,42 @@ export function SecondTab(props) {
     const handleImageClick = useCallback((pageName, clickedImageNum) => {
         props.enableOrDisablePublish(false);
         if(pageName === 'product_page') {
-            props.themeTemplateData.forEach(function(record){
+           themeTemplateData.forEach(function(record){
                 if(record.page_type == 'product' && record.position == clickedImageNum) {
                     props.updateNestedAttributeOfOffer(record.id, "placement_setting", "template_product_id"); 
                 }
             });
         }
         else if(pageName === 'cart_page') {
-            props.themeTemplateData.forEach(function(record){
+           themeTemplateData.forEach(function(record){
                 if(record.page_type == 'cart' && record.position == clickedImageNum) {
                     props.updateNestedAttributeOfOffer(record.id, "placement_setting", "template_cart_id");
                 }
             });
         }
         else if(pageName === 'ajax_cart') {
-            props.themeTemplateData.forEach(function(record){
+           themeTemplateData.forEach(function(record){
                 if(record.page_type == 'ajax' && record.position == clickedImageNum) {
                     props.updateNestedAttributeOfOffer(record.id, "placement_setting", "template_ajax_id");
                 }
             });
         }
         else if(props.offer.in_product_page) {
-            props.themeTemplateData.forEach(function(record){
+           themeTemplateData.forEach(function(record){
                 if(record.page_type == 'product' && record.position == clickedImageNum) {
                     props.updateNestedAttributeOfOffer(record.id, "placement_setting", "template_product_id");    
                 }
             });
         }
         else if(props.offer.in_cart_page) {
-            props.themeTemplateData.forEach(function(record){
+           themeTemplateData.forEach(function(record){
                 if(record.page_type == 'cart' && record.position == clickedImageNum) {
                     props.updateNestedAttributeOfOffer(record.id, "placement_setting", "template_cart_id");
                 }
             });
         }
         else if(props.offer.in_ajax_cart) {
-            props.themeTemplateData.forEach(function(record){
+           themeTemplateData.forEach(function(record){
                 if(record.page_type == 'ajax' && record.position == clickedImageNum) {
                     props.updateNestedAttributeOfOffer(record.id, "placement_setting", "template_ajax_id");
                 }
@@ -529,13 +573,13 @@ export function SecondTab(props) {
     }, [collectionModal]);
 
     const handleEnableAdvancedSetting = useCallback((newChecked) => {
-        if(props.storedThemeNames?.includes(props.shopifyThemeName)) {
+        if(storedThemeNames?.includes(shopifyThemeName)) {
             props.updateNestedAttributeOfOffer(newChecked, "advanced_placement_setting", "advanced_placement_setting_enabled");
         }
         else {
             props.updateNestedAttributeOfOffer(true, "advanced_placement_setting", "advanced_placement_setting_enabled");   
         }
-    }, [props.storedThemeNames, props.shopifyThemeName]);
+    }, [storedThemeNames, shopifyThemeName]);
 
     async function handleSelectCollectionsModal() {
         if(props.offer.id!=null){
@@ -643,7 +687,7 @@ export function SecondTab(props) {
 
     return (
         <div id="polaris-placement-cards">
-            {(!props.storedThemeNames?.includes(props.shopifyThemeName) && openBanner) && (
+            {(!storedThemeNames?.includes(shopifyThemeName) && openBanner) && (
             <div style={{marginBottom: "10px"}} className="polaris-banner-container">
                 <Banner title="Unsupported Theme Detected" onDismiss={() => {setOpenBanner(!openBanner)}} tone='warning'>
                     <p>Templates and default settings are unavailable for your theme.</p><br/>
@@ -740,24 +784,24 @@ export function SecondTab(props) {
                                     <>
                                         <div className="space-4" />
                                         <Image
-                                            source={props.templateImagesURL.product_page_image_1}
+                                            source={templateImagesURL.product_page_image_1}
                                             alt="Sample Image 1"
                                             style={{marginRight : '10px',marginTop: '10px', cursor: 'pointer', width: '165px'}}
-                                            className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_product_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                            className={themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_product_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('product_page', 1)}
                                         />
                                         <Image
-                                            source={props.templateImagesURL.product_page_image_2}
+                                            source={templateImagesURL.product_page_image_2}
                                             alt="Sample Image 2"
                                             style={{marginLeft : '10px', marginRight : '10px', cursor: 'pointer', width: '165px'}}
-                                            className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_product_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                            className={themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_product_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('product_page', 2)}
                                         />
                                         <Image
-                                            source={props.templateImagesURL.product_page_image_3}
+                                            source={templateImagesURL.product_page_image_3}
                                             alt="Sample Image 3"
                                             style={{marginLeft : '10px', cursor: 'pointer', width: '165px'}}
-                                            className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_product_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                            className={themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_product_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('product_page', 3)}
                                         />
                                     </>
@@ -792,24 +836,24 @@ export function SecondTab(props) {
                                     <>
                                         <div className="space-4" />
                                         <Image
-                                            source={props.templateImagesURL.cart_page_image_1}
+                                            source={templateImagesURL.cart_page_image_1}
                                             alt="Sample Image 1"
                                             style={{marginRight : '10px',marginTop: '10px', cursor: 'pointer', width: '165px'}}
-                                            className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                            className={themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('cart_page', 1)}
                                         />
                                         <Image
-                                            source={props.templateImagesURL.cart_page_image_2}
+                                            source={templateImagesURL.cart_page_image_2}
                                             alt="Sample Image 2"
                                             style={{marginLeft : '10px', marginRight : '10px', cursor: 'pointer', width: '165px'}}
-                                            className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                            className={themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('cart_page', 2)}
                                         />
                                         <Image
-                                            source={props.templateImagesURL.cart_page_image_3}
+                                            source={templateImagesURL.cart_page_image_3}
                                             alt="Sample Image 3"
                                             style={{marginLeft : '10px', cursor: 'pointer', width: '165px'}}
-                                            className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                            className={themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('cart_page', 3)}
                                         />
                                     </>
@@ -849,24 +893,24 @@ export function SecondTab(props) {
                                     <>
                                         <div className="space-4" />
                                         <Image
-                                            source={props.templateImagesURL.ajax_cart_image_1}
+                                            source={templateImagesURL.ajax_cart_image_1}
                                             alt="Sample Image 1"
                                             style={{marginRight : '10px', marginTop: '10px', cursor: 'pointer', width: '165px'}}
-                                            className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_ajax_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                            className={themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_ajax_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('ajax_cart', 1)}
                                         />
                                         <Image
-                                            source={props.templateImagesURL.ajax_cart_image_2}
+                                            source={templateImagesURL.ajax_cart_image_2}
                                             alt="Sample Image 2"
                                             style={{marginLeft : '10px', marginRight : '10px', cursor: 'pointer', width: '165px'}}
-                                            className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_ajax_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                            className={themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_ajax_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('ajax_cart', 2)}
                                         />
                                         <Image
-                                            source={props.templateImagesURL.ajax_cart_image_3}
+                                            source={templateImagesURL.ajax_cart_image_3}
                                             alt="Sample Image 3"
                                             style={{marginLeft : '10px', cursor: 'pointer', width: '165px'}}
-                                            className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_ajax_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                            className={themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_ajax_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('ajax_cart', 3)}
                                         />
                                     </>
@@ -904,24 +948,24 @@ export function SecondTab(props) {
                                     <>
                                         <div className="space-4" />
                                         <Image
-                                            source={props.templateImagesURL.cart_page_image_1}
+                                            source={templateImagesURL.cart_page_image_1}
                                             alt="Sample Image 1"
                                             style={{marginRight : '10px', marginTop: '10px', cursor: 'pointer', width: '165px'}}
-                                            className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                            className={themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('cart_page', 1)}
                                         />
                                         <Image
-                                            source={props.templateImagesURL.cart_page_image_2}
+                                            source={templateImagesURL.cart_page_image_2}
                                             alt="Sample Image 2"
                                             style={{marginLeft : '10px', marginRight : '10px', cursor: 'pointer', width: '165px'}}
-                                            className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                            className={themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('cart_page', 2)}
                                         />
                                         <Image
-                                            source={props.templateImagesURL.cart_page_image_3}
+                                            source={templateImagesURL.cart_page_image_3}
                                             alt="Sample Image 3"
                                             style={{marginLeft : '10px', cursor: 'pointer', width: '165px'}}
-                                            className={ props.themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
+                                            className={themeTemplateData?.find(item => item['id'] === props.offer.placement_setting?.template_cart_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
                                             onClick={() => handleImageClick('cart_page', 3)}
                                         />
                                     </>

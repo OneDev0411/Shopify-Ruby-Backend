@@ -396,6 +396,7 @@ class Offer < ApplicationRecord
       hide_variants_wrapper: offerable_type == 'product' && product.available_json_variants.count == 1,
       show_variant_price: show_variant_price,
       uses_ab_test: uses_ab_test?,
+      has_ab_testing: shop.subscription.try(:has_ab_testing) || false,
       ruleset_type: ruleset_type,
       offerable_type:  offerable_type,
       offerable_product_shopify_ids: offerable_product_shopify_ids,
