@@ -29,7 +29,12 @@ export function ModalAddProduct(props) {
     }, 1000);
   }, []);
   const handleTaggedWithRemove = useCallback(() => setTaggedWith(null), []);
-  const handleQueryValueRemove = useCallback(() => setQueryValue(null), []);
+  const handleQueryValueRemove = useCallback(() => {
+    setQueryValue("");
+    timer = setTimeout(() => {
+      handleQueryValueChange("");
+    }, 1000);
+  }, []);
   const handleClearAll = useCallback(() => {
     handleTaggedWithRemove();
     handleQueryValueRemove();
@@ -108,6 +113,7 @@ export function ModalAddProduct(props) {
       return (
         <ResourceItem
           id={id}
+          key={id}
           title={title}
           verticalAlignment="center"
           media={media}
@@ -131,6 +137,7 @@ export function ModalAddProduct(props) {
         <>
           <ResourceItem
             id={id}
+            key={id}
             title={title}
             media={media}
             accessibilityLabel={`View details for ${title}`}
