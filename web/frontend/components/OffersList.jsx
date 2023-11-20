@@ -43,10 +43,6 @@ export function OffersList(props) {
     setModalActive(!modalActive)
   }, [modalActive]);
 
-  const sendOfferList =
-    props.getOfferListData &&
-    useCallback((newValue) => props.getOfferListData(newValue), []);
-
   useEffect(() => {
     let redirect = Redirect.create(app);
     fetch('/api/merchant/offers_list', {
@@ -71,9 +67,6 @@ export function OffersList(props) {
         setOffersData(data.offers);
         setFilteredData(data.offers);
         setIsLoading(false);
-        if(sendOfferList){
-          data.offers.length > 0 ? sendOfferList(true) : sendOfferList(false);
-        }
       }}).catch((error) => {
         console.log('Fetch error >> ', error);
       });

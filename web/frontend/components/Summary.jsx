@@ -18,32 +18,7 @@ const Summary = (props) => {
       navigateTo('/analytics');
     }
 
-    const getOfferList = useCallback(() => {
-      fetch('/api/merchant/offers_list', {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer',
-        body: JSON.stringify({ shop: shopAndHost.shop }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          const offerWithStats = data.offers?.find((incoming_offer) => incoming_offer.id === props.offer?.id);
-          console.log('checking if stats', offerWithStats)
-          setOfferStats(offerWithStats);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.log('Fetch error >> ', error);
-        });
-    }, [shopAndHost.shop, props.offer]);
-
-    const getShopOffersStats = useCallback((period) => {
+    const getShopOffersStats = (period) => {
       fetch(`/api/merchant/shop_offers_stats`, {
         method: 'POST',
         headers: {
@@ -55,17 +30,19 @@ const Summary = (props) => {
         .then((data) => {
           setTotalDisplayed(data.offers_stats?.times_loaded);
           setConverted(data.orders_through_offers_count);
+          setIsLoading(false);
         })
         .catch((error) => {
           console.log("error", error);
         });
-    }, [shopAndHost.shop]);
+    };
 
     useEffect(() => {
+      console.log(props.offer)
+
       setIsLoading(true);
-      getOfferList();
       getShopOffersStats('daily');
-    }, [props.offer, shopAndHost.shop]);
+    }, [shopAndHost.shop]);
 
     return (
       <>
