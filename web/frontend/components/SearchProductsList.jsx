@@ -83,7 +83,7 @@ export function SearchProductsList(props) {
           image={image}
           accessibilityLabel={`View details for ${title}`}
           persistActions
-          onClick={() => selectedProduct(currentValue)}
+          onClick={() => selectedProduct(item)}
         >
           <p variant="bodyMd" fontWeight="bold" as="h3">
             <strong>{title}</strong>
