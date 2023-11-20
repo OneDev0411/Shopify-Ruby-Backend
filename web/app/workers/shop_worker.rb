@@ -62,6 +62,8 @@ module ShopWorker
 
   class EnableAutopilotJob
     include Sidekiq::Worker
+    sidekiq_options queue: 'autopilot'
+    
     def perform(shop_id)
       icushop = Shop.find_by(id: shop_id)
       return if icushop.blank?
