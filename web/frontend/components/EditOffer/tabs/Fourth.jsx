@@ -32,7 +32,8 @@ export function FourthTab(props) {
 
     return (
         <>
-            <LegacyCard sectioned title="Offer placement - advanced settings" actions={[{ content: 'View help doc' }]}>
+            {/* <LegacyCard sectioned title="Offer placement - advanced settings" actions={[{ content: 'View help doc' }]}> */}
+            <LegacyCard sectioned title="Offer placement - advanced settings">
                 {(!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled) && (
                     <>
                         <b>To edit Advanced settings, enable "Advanced Placement Settings" option on the Placement tab.</b>
