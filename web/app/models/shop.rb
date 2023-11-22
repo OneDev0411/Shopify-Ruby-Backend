@@ -1137,8 +1137,8 @@ class Shop < ApplicationRecord
 
   def offer_data_with_stats
     data = []
-    offers.each do |offer|
-      data << {
+    Offer.limit(20).includes(:daily_stats, :offer_events).map do |offer|
+      {
         id: offer.id,
         title: offer.title,
         status: offer.active,
@@ -1158,9 +1158,12 @@ class Shop < ApplicationRecord
     start_date = period_hash_to_offers[period][:start_date]
     end_date = period_hash_to_offers[period][:end_date]
 
-    offer_list = offers.includes(:daily_stats, :offer_events)
+    offers = Offer
     .where(created_at: start_date..end_date)
-    .select('offers.id, offers.title, offers.active, offers.created_at,
+    .where(shop_id: self.id)
+    .joins('JOIN daily_stats ON daily_stats.offer_id = offers.id')
+    .joins('JOIN offer_events ON offer_events.offer_id = offers.id AND offer_events.action = \'sale\'')
+    .select('offers.id, offers.shop_id, offers.title, offers.active, offers.created_at,
              SUM(daily_stats.times_clicked) AS total_clicks,
              SUM(daily_stats.times_loaded) AS total_views,
              SUM(offer_events.amount) AS total_revenue')
@@ -1168,8 +1171,7 @@ class Shop < ApplicationRecord
     .where(offer_events: { action: 'sale' })
     .order('total_revenue DESC')
     .limit(3)
-
-    offer_list.each do |offer|
+    .each do |offer|
       data << {
         id: offer.id,
         title: offer.title,
