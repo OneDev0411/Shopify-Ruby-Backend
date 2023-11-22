@@ -1137,8 +1137,8 @@ class Shop < ApplicationRecord
 
   def offer_data_with_stats
     data = []
-    Offer.limit(20).includes(:daily_stats, :offer_events).map do |offer|
-      {
+    offers.each do |offer|
+      data << {
         id: offer.id,
         title: offer.title,
         status: offer.active,
