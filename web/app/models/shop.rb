@@ -1082,14 +1082,14 @@ class Shop < ApplicationRecord
 
   def offer_data_with_stats
     data = []
-    offers.includes(:daily_stats, :offer_events).each do |offer|
+    offers.each do |offer|
       data << {
         id: offer.id,
         title: offer.title,
         status: offer.active,
-        clicks: offer.daily_stats.map(&:times_clicked).sum,
-        views: offer.daily_stats.map(&:times_loaded).sum,
-        revenue: offer.offer_events&.where(action: 'sale')&.pluck(:amount).sum,
+        clicks: offer.total_clicks,
+        views: offer.total_views,
+        revenue: offer.total_revenue,
         created_at: offer.created_at.to_datetime,
       }
     end
