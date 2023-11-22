@@ -1158,17 +1158,15 @@ class Shop < ApplicationRecord
     start_date = period_hash_to_offers[period][:start_date]
     end_date = period_hash_to_offers[period][:end_date]
 
-    Offer
+    offers
     .where(created_at: start_date..end_date)
-    .where(shop_id: self.id)
-    .joins('JOIN daily_stats ON daily_stats.offer_id = offers.id')
-    .joins('JOIN offer_events ON offer_events.offer_id = offers.id AND offer_events.action = \'sale\'')
+    .joins('LEFT OUTER JOIN daily_stats ON daily_stats.offer_id = offers.id')
+    .joins('LEFT OUTER JOIN offer_events ON offer_events.offer_id = offers.id AND offer_events.action = \'sale\'')
     .select('offers.id, offers.shop_id, offers.title, offers.active, offers.created_at,
              SUM(daily_stats.times_clicked) AS total_clicks,
              SUM(daily_stats.times_loaded) AS total_views,
              SUM(offer_events.amount) AS total_revenue')
     .group('offers.id')
-    .where(offer_events: { action: 'sale' })
     .order('total_revenue DESC')
     .limit(3)
     .each do |offer|
