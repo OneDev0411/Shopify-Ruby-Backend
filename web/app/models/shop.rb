@@ -1158,14 +1158,25 @@ class Shop < ApplicationRecord
     start_date = period_hash_to_offers[period][:start_date]
     end_date = period_hash_to_offers[period][:end_date]
 
-    offers.includes(:daily_stats, :offer_events).where(created_at: start_date..end_date).each do |offer|
+    offer_list = offers.includes(:daily_stats, :offer_events)
+    .where(created_at: start_date..end_date)
+    .select('offers.id, offers.title, offers.active, offers.created_at,
+             SUM(daily_stats.times_clicked) AS total_clicks,
+             SUM(daily_stats.times_loaded) AS total_views,
+             SUM(offer_events.amount) AS total_revenue')
+    .group('offers.id')
+    .where(offer_events: { action: 'sale' })
+    .order('total_revenue DESC')
+    .limit(3)
+
+    offer_list.each do |offer|
       data << {
         id: offer.id,
         title: offer.title,
         status: offer.active,
-        clicks: offer.daily_stats.map(&:times_clicked).sum,
-        views: offer.daily_stats.map(&:times_loaded).sum,
-        revenue: offer.offer_events&.select{|oe| oe.action == 'sale' ? oe.amount : 0}.sum,
+        clicks: offer.total_clicks,
+        views: offer.total_views,
+        revenue: offer.total_revenue,
         created_at: offer.created_at.to_datetime,
       }
     end
