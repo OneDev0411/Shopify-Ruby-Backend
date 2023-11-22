@@ -27,6 +27,7 @@ export default function EditPage() {
     const [autopilotCheck, setAutopilotCheck] = useState({
         isPending: "Launch Autopilot",
     });
+    const [openAutopilotSection, setOpenAutopilotSection] = useState(false);
     const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState({});
 
     const [offer, setOffer] = useState({
@@ -108,7 +109,7 @@ export default function EditPage() {
                 fontSize: '16px',
             },
             button: {
-                color: "#FFFFFF",
+                color: "#FFFFFF", 
                 backgroundColor: "#2B3D51",
                 fontFamily: "Arial",
                 fontSize: "16px",
@@ -131,6 +132,15 @@ export default function EditPage() {
         },
     });
 
+    const [offerSettings, setOfferSettings] = useState({
+        customTheme: "",
+        css_options: {
+            main: {},
+            text: {},
+            button: {},
+        },
+    });
+
     const [shop, setShop] = useState({
         shop_id: undefined,
         offer_css: '',
@@ -142,9 +152,12 @@ export default function EditPage() {
     });
 
     const [isLoading, setIsLoading] = useState(false);
-
+    const [shopifyThemeName, setShopifyThemeName] = useState(null);
+    const [themeTemplateData, setThemeTemplateData] = useState(null);
+    const [templateImagesURL, setTemplateImagesURL] = useState({});
     const [updatePreviousAppOffer, setUpdatePreviousAppOffer] = useState(false);
-
+    const [storedThemeNames, setStoredThemeName] = useState([]);
+                                      
     const offerID = location?.state?.offerID;
     const fetch = useAuthenticatedFetch(shopAndHost.host);
 
@@ -153,6 +166,23 @@ export default function EditPage() {
         let redirect = Redirect.create(app);
         if (location?.state?.offerID == null) {
             setIsLoading(true);
+            fetch(`/api/merchant/offer_settings`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({offer: {include_sample_products: 0}, shop: shopAndHost.shop}),
+            })
+                .then((response) => {
+                    return response.json()
+                })
+                .then((data) => {
+                    setOfferSettings(data);
+                    setIsLoading(false);
+                })
+                .catch((error) => {
+                    console.log("Error > ", error);
+                })
 
             fetch(`/api/merchant/shop_settings`, {
                 method: 'POST',
@@ -222,7 +252,22 @@ export default function EditPage() {
                 .catch((error) => {
                     console.log("Error > ", error);
                 })
-
+            fetch(`/api/merchant/offer_settings`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({offer: {include_sample_products: 0}, shop: shopAndHost.shop}),
+            })
+                .then((response) => {
+                    return response.json()
+                })
+                .then((data) => {
+                    setOfferSettings(data);
+                })
+                .catch((error) => {
+                    console.log("Error > ", error);
+                })
             setIsLoading(true);
             fetch(`/api/merchant/shop_settings`, {
                 method: 'POST',
@@ -253,7 +298,68 @@ export default function EditPage() {
                     console.log("Error > ", error);
                 })
         }
-    },[]);
+        fetch(`/api/merchant/autopilot_details?shop=${shopAndHost.shop}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((response) => {
+                return response.json()
+            })
+            .then((data) => {
+                setAutopilotCheck(data);
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.log("# Error AutopilotDetails > ", JSON.stringify(error));
+            })
+
+        fetch(`/api/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then( (response) => { return response.json() })
+        .then( (data) => {
+            setStoredThemeName(data.theme_names_having_data);
+            if(data.themeExist) {
+                setShopifyThemeName(data.shopify_theme_name);
+                setThemeTemplateData(data.templatesOfCurrentTheme);
+                data.templatesOfCurrentTheme.forEach(function(value, index) {
+                    if(value.page_type == "cart") {
+                        setTemplateImagesURL(previousState => {
+                            return { ...previousState, ["cart_page_image_".concat(value.position)]: value.image_url};
+                        });
+                    }
+                    else if(value.page_type == "product") {
+                        setTemplateImagesURL(previousState => {
+                            return { ...previousState, ["product_page_image_".concat(value.position)]: value.image_url};
+                        });
+                    }
+                    else if(value.page_type == "ajax") {
+                        setTemplateImagesURL(previousState => {
+                            return { ...previousState, ["ajax_cart_image_".concat(value.position)]: value.image_url};
+                        });
+                    }
+                });
+            }
+            else {
+                setShopifyThemeName(null);
+            }
+        })
+        .catch((error) => {
+            console.log("# Error updateProducts > ", JSON.stringify(error));
+        })
+    },[openAutopilotSection]);
+
+    useEffect(() => {
+        if(storedThemeNames?.length != 0 && shopifyThemeName != null && !storedThemeNames?.includes(shopifyThemeName)) {
+            updateNestedAttributeOfOffer(true, "advanced_placement_setting", "advanced_placement_setting_enabled");
+        }
+    }, [storedThemeNames, shopifyThemeName])
+
 
     //Called whenever the checkKeysValidity changes in any child component
     function updateCheckKeysValidity(updatedKey, updatedValue) {
@@ -261,6 +367,7 @@ export default function EditPage() {
             return {...previousState, [updatedKey]: updatedValue};
         });
     }
+
 
     //Called whenever the offer changes in any child component
     function updateOffer(updatedKey, updatedValue) {
@@ -281,7 +388,7 @@ export default function EditPage() {
                 ...previousState,
                 [updatedKey[0]]: {
                     ...previousState[updatedKey[0]],
-                    [updatedKey[1]]: updatedValue
+                    [updatedKey[1]]: updatedValue 
                 }
             }));
         }
@@ -297,6 +404,11 @@ export default function EditPage() {
                 }
             }));
         }
+    }
+
+    //Called whenever the offer settings for shop changes in any child component
+    function updateOfferSettings(updatedShop) {
+        setOfferSettings(updatedShop);
     }
 
     // Called to update the included variants in offer
@@ -356,6 +468,12 @@ export default function EditPage() {
     //Called to update the initial variants of the offer
     function updateInitialVariants(value) {
         setInitialVariants({...value});
+    }
+
+
+    //Called to update the openAutopilotSection attribute
+    function updateOpenAutopilotSection(value) {
+        setOpenAutopilotSection(value);
     }
 
     const save = async(status) =>  {
@@ -649,27 +767,31 @@ export default function EditPage() {
                                     fitted
                                 >
                                     <div className='space-4'></div>
-
+                                    
                                     {selected == 0 ?
                                         // page was imported from components folder
-                                        <FirstTab offer={offer} shop={shop}
+                                        <FirstTab offer={offer} shop={shop} offerSettings={offerSettings}
                                                   updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants}
                                                   updateProductsOfOffer={updateProductsOfOffer}
                                                   updateCheckKeysValidity={updateCheckKeysValidity}
                                                   handleTabChange={changeTab} initialVariants={initialVariants}
                                                   updateInitialVariants={updateInitialVariants}
                                                   autopilotCheck={autopilotCheck}
+                                                  openAutopilotSection={openAutopilotSection}
+                                                  updateOpenAutopilotSection={updateOpenAutopilotSection}
                                                   initialOfferableProductDetails={initialOfferableProductDetails}
                                                   enableOrDisablePublish={enableOrDisablePublish}/>
                                         : ""}
                                     {selected == 1 ?
                                         // page was imported from components folder
                                         <SecondTab offer={offer} shop={shop} setOffer={setOffer}
-                                                   updateOffer={updateOffer} updateShop={updateShop}
+                                                   offerSettings={offerSettings} updateOffer={updateOffer}
+                                                   updateShop={updateShop} shopifyThemeName={shopifyThemeName}
                                                    autopilotCheck={autopilotCheck} handleTabChange={changeTab}
                                                    updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}
+                                                   themeTemplateData={themeTemplateData} templateImagesURL={templateImagesURL}
                                                    enableOrDisablePublish={enableOrDisablePublish}
-                                        />
+                                                   storedThemeNames={storedThemeNames}/>
                                         : ""}
                                     {selected == 2 ?
                                         // page was imported from components folder
@@ -682,7 +804,7 @@ export default function EditPage() {
                                     {selected == 3 ?
                                         // page was imported from components folder
                                         <FourthTab offer={offer} shop={shop} updateOffer={updateOffer}
-                                                   updateShop={updateShop}
+                                                   updateShop={updateShop} updateOfferSettings={updateOfferSettings}
                                                    saveDraft={saveDraft} publishOffer={publishOffer}
                                                    enablePublish={enablePublish}
                                                    updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>
@@ -702,13 +824,13 @@ export default function EditPage() {
                                     <div style={{paddingTop: '40px', marginTop: '-40px'}}></div>
                                     {selectedPre == 0 ?
                                         <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer}
-                                                      checkKeysValidity={checkKeysValidity}
+                                                      checkKeysValidity={checkKeysValidity} offerSettings={offerSettings}
                                                       updateCheckKeysValidity={updateCheckKeysValidity}
                                                       updatePreviousAppOffer={updatePreviousAppOffer}
                                                       updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>
                                         :
                                         <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer}
-                                                      checkKeysValidity={checkKeysValidity}
+                                                      checkKeysValidity={checkKeysValidity} offerSettings={offerSettings}
                                                       updateCheckKeysValidity={updateCheckKeysValidity}
                                                       updatePreviousAppOffer={updatePreviousAppOffer}
                                                       updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>}

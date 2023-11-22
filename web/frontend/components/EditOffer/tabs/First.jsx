@@ -206,7 +206,6 @@ export function FirstTab(props) {
 
     //For autopilot section
 
-    const [openAutopilotSection, setOpenAutopilotSection] = useState(false);
     const [autopilotButtonText, setAutopilotButtonText] = useState(props.autopilotCheck.isPending);
     const [autopilotQuantity, setAutopilotQuantity] = useState(props.offer?.autopilot_quantity);
     const autopilotQuantityOptions = [
@@ -221,31 +220,14 @@ export function FirstTab(props) {
     const location = useLocation();
 
     useEffect(() => {
-        fetch(`/api/merchant/autopilot_details?shop=${shopAndHost.shop}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-          .then((response) => {
-              return response.json()
-          })
-          .then((data) => {
-              props.setAutopilotCheck(data);
-              setAutopilotButtonText(
-                data.isPending === "complete"
-                  ? "Configure Autopilot Settings"
-                  : data.isPending === "in progress"
+        setAutopilotButtonText(
+            props.autopilotCheck.isPending === "complete"
+                ? "Configure Autopilot Settings"
+                : props.autopilotCheck.isPending === "in progress"
                     ? "setting up..."
                     : "Launch Autopilot"
-              );
-              setIsLoading(false);
-          })
-          .catch((error) => {
-              console.log("# Error AutopilotDetails > ", JSON.stringify(error));
-          })
-
-    }, [openAutopilotSection])
+        );
+    }, [props.autopilotCheck])
 
     useEffect(() => {
         if (props.offer.id != null && props.offer.id == props.autopilotCheck?.autopilot_offer_id && props.offer.autopilot_quantity != props.offer.offerable_product_details.length) {
@@ -282,7 +264,7 @@ export function FirstTab(props) {
     // Called to enable the autopilot feature
     function enableAutopilot() {
         if (autopilotButtonText === "Configure Autopilot Settings") {
-            if (!openAutopilotSection) {
+            if (!props.openAutopilotSection) {
                 fetch(`/api/merchant/autopilot_details?shop=${shopAndHost.shop}`, {
                     method: 'GET',
                     headers: {
@@ -293,7 +275,7 @@ export function FirstTab(props) {
                         return response.json()
                     })
                     .then((data) => {
-                        updateOpenAutopilotSection(true);
+                        props.updateOpenAutopilotSection(true);
                         navigateTo('/edit-offer', { state: { offerID: data.autopilot_offer_id } });
                     })
                     .catch((error) => {
@@ -348,11 +330,6 @@ export function FirstTab(props) {
             .catch((error) => {
                 console.log("# Error updateProducts > ", JSON.stringify(error));
             })
-    }
-
-    //Called to update the openAutopilotSection attribute
-    function updateOpenAutopilotSection(value) {
-        setOpenAutopilotSection(value);
     }
 
     const publishButtonFuntional =
@@ -443,7 +420,7 @@ export function FirstTab(props) {
                             )}
 
                         </LegacyStack>
-                        {(openAutopilotSection || (props.offer.id != null && props.autopilotCheck?.autopilot_offer_id == props.offer.id)) && (
+                        {(props.openAutopilotSection || (props.offer.id != null && props.autopilotCheck?.autopilot_offer_id == props.offer.id)) && (
                             <>
                                 <LegacyStack spacing="loose" vertical>
                                     <Select
@@ -517,7 +494,7 @@ export function FirstTab(props) {
                                 id="basic-collapsible"
                                 transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                             >
-                                {!props.offer.has_ab_testing ? (
+                                {!props.offerSettings.has_ab_testing ? (
                                     <div style={{maxWidth: '476px', marginTop: '10px'}}>
                                         <Text as="p" variant="headingSm" fontWeight="regular">
                                             A/B testing is available on our Professional plan. Please <Link
