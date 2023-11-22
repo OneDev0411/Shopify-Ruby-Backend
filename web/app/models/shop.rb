@@ -1158,7 +1158,7 @@ class Shop < ApplicationRecord
     start_date = period_hash_to_offers[period][:start_date]
     end_date = period_hash_to_offers[period][:end_date]
 
-    offers = Offer
+    Offer
     .where(created_at: start_date..end_date)
     .where(shop_id: self.id)
     .joins('JOIN daily_stats ON daily_stats.offer_id = offers.id')
