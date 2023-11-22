@@ -495,6 +495,8 @@ export function SecondTab(props) {
 
     const handleDisableCheckoutBtn = useCallback((newChecked) => props.updateOffer("must_accept", newChecked), []);
     const handleRemoveItiem = useCallback((newChecked) => props.updateOffer("remove_if_no_longer_valid", newChecked), []);
+    const handleStopShowingAfterAccepted = (newChecked) => props.updateOffer("stop_showing_after_accepted", newChecked);
+
     //Modal controllers
     const [conditionModal, setConditionModal] = useState(false);
     const handleConditionModal = useCallback(() => {
@@ -1043,6 +1045,11 @@ export function SecondTab(props) {
                                 label="If the offer requirements are no longer met. Remove the item from the cart."
                                 checked={props.offer.remove_if_no_longer_valid}
                                 onChange={handleRemoveItiem}
+                            />
+                            <Checkbox
+                              label="Don't continue to show the offer after it has been accepted"
+                              checked={props.offer.stop_showing_after_accepted}
+                              onChange={handleStopShowingAfterAccepted}
                             />
                         </LegacyStack>
                     </LegacyCard>
