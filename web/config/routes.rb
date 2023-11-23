@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  root to: 'home#index'
+  root to: 'splash#index'
 
   mount ShopifyApp::Engine, at: '/api'
   get '/api', to: redirect(path: '/') # Needed because our engine root is /api but that breaks FE routing
@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   # them in web/frontend/vite.config.js
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  get ShopifyApp.configuration.login_url, to: 'shopify_app/sessions#new', as: :login
 
   get '/confirm_from_outside', to: 'js#confirm_from_outside'
   get '/js/offer', to: 'js#offer'
