@@ -103,7 +103,8 @@ export default function Settings() {
                 };
                 const toastNotice = Toast.create(app, toastOptions);
                 toastNotice.dispatch(Toast.Action.SHOW);
-                window.location.reload();
+                // This caused the user to be logged out of the app
+                // window.location.reload();
             })
             .catch((error) => {
                 console.log("Error", error);
