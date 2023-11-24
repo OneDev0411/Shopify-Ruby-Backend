@@ -29,6 +29,21 @@ export default function HomePage() {
   const handleOpenGoogleForm = () => {
     window.open('https://forms.gle/oRnBh3BPSAvWwLYQ7', '_blank');
   };
+
+  const notifyIntercom = (icu_shop) => {
+    window.Intercom('boot', {
+      app_id: window.CHAT_APP_ID,
+      id: icu_shop.id,
+      email: icu_shop.email,
+      phone: icu_shop.phone_number,
+      installed_at: icu_shop.created_at,
+      active: icu_shop.active,
+      shopify_plan: icu_shop.shopify_plan_name,
+      shop_url: `https://${icu_shop.shopify_domain}`,
+      theme: icu_shop.shopify_theme_name,
+      currency: icu_shop.currency
+    });
+  }
   
   useEffect(() => {
     fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
@@ -43,6 +58,9 @@ export default function HomePage() {
         setCurrentShop(data.shop);
         setPlanName(data.plan);
         setTrialDays(data.days_remaining_in_trial);
+
+        // notify intercom as soon as app is loaded and shop info is fetched
+        notifyIntercom(data.shop);
       })
       .catch((error) => {
         console.log("error", error);
