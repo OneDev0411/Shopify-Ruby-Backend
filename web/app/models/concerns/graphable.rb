@@ -299,15 +299,14 @@ module Graphable
         'yearly' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
         'all' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" }
       }
-      results[i]
       results[i] = {
         key: label_hash[period].call(start_date, end_date),
         value: 0
       }
       sum = 0
 
-      offers.includes(:daily_stats, :offer_events).where(created_at: start_date..end_date).each do |offer|
-        sum = offer.daily_stats.map(&:times_clicked).sum
+      offers.includes(:daily_stats).where(created_at: start_date..end_date).each do |offer|
+        sum = offer.daily_stats.sum(:times_clicked)
       end
 
       results[i][:value] = sum
