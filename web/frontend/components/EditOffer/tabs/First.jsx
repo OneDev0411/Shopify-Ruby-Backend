@@ -252,12 +252,11 @@ export function FirstTab(props) {
                     ? "setting up..."
                     : "Launch Autopilot"
               );
-              setIsLoading(false);
           })
           .catch((error) => {
               console.log("# Error AutopilotDetails > ", JSON.stringify(error));
           })
-    }, [openAutopilotSection])
+    }, [])
 
     useEffect(() => {
         if (props.offer.id != null && props.offer.id == props.autopilotCheck?.autopilot_offer_id && props.offer.autopilot_quantity != props.offer.offerable_product_details.length) {

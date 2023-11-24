@@ -190,6 +190,7 @@ export default function EditPage() {
                     };
 
                     setOffer(newOffer);
+                    setIsLoading(false);
                 })
                 .catch((error) => {
                     console.log("Error > ", error);
@@ -248,6 +249,8 @@ export default function EditPage() {
                     }
                     setShop(data.shop_settings);
                     setUpdatePreviousAppOffer(!updatePreviousAppOffer);
+
+                    setIsLoading(false);
                 })
                 .catch((error) => {
                     console.log("Error > ", error);
@@ -661,7 +664,7 @@ export default function EditPage() {
                                                   updateCheckKeysValidity={updateCheckKeysValidity}
                                                   handleTabChange={changeTab} initialVariants={initialVariants}
                                                   updateInitialVariants={updateInitialVariants}
-                                                  autopilotCheck={autopilotCheck}
+                                                  autopilotCheck={autopilotCheck} setAutopilotCheck={setAutopilotCheck}
                                                   initialOfferableProductDetails={initialOfferableProductDetails}
                                                   enableOrDisablePublish={enableOrDisablePublish}/>
                                         : ""}
