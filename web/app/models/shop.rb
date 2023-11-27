@@ -1137,29 +1137,23 @@ class Shop < ApplicationRecord
 
   def offer_data_with_stats
     data = []
-    offers.each do |offer|
-      data << {
-        id: offer.id,
-        title: offer.title,
-        status: offer.active,
-        clicks: offer.total_clicks,
-        views: offer.total_views,
-        revenue: offer.total_revenue,
-        created_at: offer.created_at.to_datetime,
-        offerable_type: offer.offerable_type,
-      }
-    end
-    return data
-  end
-
-  def active_offers
-    data = []
-    offers.each do |offer|
-      offer.active && data << {
-        id: offer.id,
-        title: offer.title,
-        status: offer.active
-      }
+    offers
+      .joins('LEFT OUTER JOIN daily_stats ON daily_stats.offer_id = offers.id')
+      .select('offers.id, offers.shop_id, offers.title, offers.active, offers.created_at,
+               SUM(daily_stats.times_clicked) AS total_clicks,
+               SUM(daily_stats.times_loaded) AS total_views,
+               SUM(daily_stats.click_revenue) AS total_revenue')
+      .group('offers.id')
+      .each do |offer|
+        data << {
+          id: offer.id,
+          title: offer.title,
+          status: offer.active,
+          clicks: offer.total_clicks,
+          views: offer.total_views,
+          revenue: offer.total_revenue,
+          created_at: offer.created_at.to_datetime,
+        }
     end
     return data
   end
