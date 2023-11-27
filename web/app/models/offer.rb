@@ -112,11 +112,11 @@ class Offer < ApplicationRecord
     }
 
     deets = shop.products.where(shopify_id: offerable_product_shopify_ids).active.limit(limit).map do |p|
-              if filter_included_variants && included_variants.present?
-                product_opts[:included_variants] = included_variants[p.shopify_id.to_s] || []
-              end
-              p.offerable_details(product_opts)
-            end
+      if filter_included_variants && included_variants.present?
+        product_opts[:included_variants] = included_variants[p.shopify_id.to_s] || []
+      end
+      p.offerable_details(product_opts)
+    end
     if instock_only
       deets.map { |d| d if d[:available_json_variants].length > 0 }.compact.sort_by { |a|
                     offerable_product_shopify_ids.index(a[:id]) }
@@ -134,18 +134,18 @@ class Offer < ApplicationRecord
     elsif offerable_type =='collection'
       offerable_shopify_title || collection.try(:title) || '(Collection Deleted From Store)'
     elsif offerable_type == 'multi'
-      if offerable_product_details.empty?
+      if @my_offerable_product_details.empty?
         ''
       else
-        offerable_product_details.first[:title]
+        @my_offerable_product_details.first[:title]
       end
     end
   end
 
   def offerable_price
     if offerable_type == 'multi'
-      if offerable_product_details.present?
-        offerable_product_details.first[:price]
+      if @my_offerable_product_details.present?
+        @my_offerable_product_details.first[:price]
       else
         0.0
       end
@@ -172,8 +172,8 @@ class Offer < ApplicationRecord
 
   def offerable_compare_at_price
     if offerable_type == 'multi'
-      if offerable_product_details.present?
-        offerable_product_details.first[:compare_at_price]
+      if @my_offerable_product_details.present?
+        @my_offerable_product_details.first[:compare_at_price]
       else
         0.0
       end
@@ -368,7 +368,7 @@ class Offer < ApplicationRecord
   # Return hashmap.
   def library_json
     limit_offerables = offerable_type == 'auto' ? 10 : nil
-    my_offerable_product_details = offerable_product_details(false, true, limit_offerables)
+    @my_offerable_product_details = offerable_product_details(false, true, limit_offerables)
     res = {
       id: id,
       rules_json: rules_json,
@@ -401,7 +401,7 @@ class Offer < ApplicationRecord
       ruleset_type: ruleset_type,
       offerable_type:  offerable_type,
       offerable_product_shopify_ids: offerable_product_shopify_ids,
-      offerable_product_details: my_offerable_product_details,
+      offerable_product_details: @my_offerable_product_details,
       checkout_after_accepted: checkout_after_accepted || false,
       discount_code:  discount_code || '',
       discount_target_type:  discount_target_type || 'none',
@@ -711,7 +711,7 @@ class Offer < ApplicationRecord
   #
   # Returns float.
   def average_product_price
-    prices = offerable_product_details.map { |d| d[:price].to_f }
+    prices = @my_offerable_product_details.map { |d| d[:price].to_f }
     prices.reduce(:+).to_f / prices.size # average
   end
 
