@@ -161,8 +161,11 @@ module Api
         offer = @icushop.offers.find(params[:offer_id])
         version = params[:version]
 
-        ctr_result = offer.ctr(version)
-        ctr_str_result = offer.ctr_string(version)
+        shown = version == 'a' ? offer.total_times_shown('orig') : version == 'b' ? offer.total_times_shown('alt') : offer.total_times_shown
+        clicked = version == 'a' ? offer.total_times_clicked('orig') : version == 'b' ? offer.total_times_clicked('alt') : offer.total_times_clicked
+
+        ctr_result = offer.ctr(shown, clicked)
+        ctr_str_result = offer.ctr_string(shown, ctr_result)
 
         render 'offers/ab_analytics', locals: { ctr_result: ctr_result, ctr_str_result: ctr_str_result }
       end

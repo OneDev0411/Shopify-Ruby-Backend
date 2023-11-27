@@ -504,17 +504,7 @@ class Offer < ApplicationRecord
     daily_stats.sum(q)
   end
 
-  def ctr(version='all')
-    if version == 'a'
-      shown = total_times_shown('orig')
-      clicked = total_times_clicked('orig')
-    elsif version == 'b'
-      shown = total_times_shown('alt')
-      clicked = total_times_clicked('alt')
-    else
-      shown = total_times_shown
-      clicked = total_times_clicked
-    end
+  def ctr(shown, clicked)
     if shown == 0
       0.0
     else
@@ -522,18 +512,11 @@ class Offer < ApplicationRecord
     end
   end
 
-  def ctr_string(version='all')
-    if version == 'a'
-      shown = total_times_shown('orig')
-    elsif version == 'b'
-      shown = total_times_shown('alt')
-    else
-      shown = total_times_shown
-    end
+  def ctr_string(shown, ctr_result)
     if shown == 0
       "N/A"
     else
-      ctr(version).round(2).to_s + " %"
+      ctr_result.round(2).to_s + " %"
     end
   end
 
@@ -547,7 +530,11 @@ class Offer < ApplicationRecord
     b = alt_expected - total_times_clicked("alt")
     chi_squared = (a * a / orig_expected) + (b * b / alt_expected)
     if chi_squared > 3.84 # 95%
-      ctr('a') > ctr('b') ? 'a' : 'b'
+      shownOrig = total_times_shown('orig')
+      clickedOrig = total_times_clicked('orig')
+      shownAlt = total_times_shown('alt')
+      clickedAlt = total_times_clicked('alt')
+      ctr(shownOrig, clickedOrig) > ctr(shownAlt, clickedAlt) ? 'a' : 'b'
     else
       nil
     end
