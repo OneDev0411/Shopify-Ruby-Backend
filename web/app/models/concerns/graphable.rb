@@ -117,18 +117,17 @@ module Graphable
       'all' => { interval: 6.months, start_date: self.orders.present? ? self.orders.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
     }
 
-    i = 0
     start_date = period_hash[period][:start_date]
     last = period_hash[period][:last]
     interval = period_hash[period][:interval]
 
+    offer_events = OfferEvent.sales_within_given_range(start_date, last, self.id).to_a
+
+    i = 0
     total = 0
     while (start_date <= last) do
-      if (start_date + interval > last)
-        end_date = last
-      else
-        end_date = start_date + interval
-      end
+      end_date = start_date + interval > last ? last : start_date + interval
+
       label_hash = {
         'daily' => ->(start_date, end_date) { "#{start_date.hour} - #{end_date.hour}" },
         'weekly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
@@ -138,16 +137,18 @@ module Graphable
         'yearly' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
         'all' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" }
       }
-      results[i]
+
       results[i] = {
         key: label_hash[period].call(start_date, end_date),
         value: 0
       }
-      offer_events = OfferEvent.sales_within_given_range(start_date, end_date, self.id)
+
       quantities = []
       prices = []
 
-      offer_events.each do |offer_event|
+      offer_events_in_range = offer_events.select { |oe| oe.created_at >= start_date && oe.created_at < end_date }
+
+      offer_events_in_range.each do |offer_event|
         next if start_date == end_date
 
         item_variants = offer_event.payload["item_variants"]
@@ -158,10 +159,10 @@ module Graphable
 
       sum = prices.zip(quantities).sum { |price, quantity| price * quantity }
       results[i][:value] = sum
-      total += sum 
+      total += sum
 
-      start_date = start_date + interval
-      i+=1;
+      start_date += interval
+      i += 1
     end
 
     { results: results, sales_total: total}
