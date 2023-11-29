@@ -134,21 +134,13 @@ class Offer < ApplicationRecord
     elsif offerable_type =='collection'
       offerable_shopify_title || collection.try(:title) || '(Collection Deleted From Store)'
     elsif offerable_type == 'multi'
-      if @my_offerable_product_details.empty?
-        ''
-      else
-        @my_offerable_product_details.first[:title]
-      end
+      @my_offerable_product_details&.first[:title] || ''
     end
   end
 
   def offerable_price
     if offerable_type == 'multi'
-      if @my_offerable_product_details.present?
-        @my_offerable_product_details.first[:price]
-      else
-        0.0
-      end
+      @my_offerable_product_details&.first[:price] || 0.0
     elsif offerable_type == 'collection'
       if collection.nil? || collection.products.empty?
         0.0
@@ -172,11 +164,7 @@ class Offer < ApplicationRecord
 
   def offerable_compare_at_price
     if offerable_type == 'multi'
-      if @my_offerable_product_details.present?
-        @my_offerable_product_details.first[:compare_at_price]
-      else
-        0.0
-      end
+      @my_offerable_product_details&.first[:compare_at_price] || 0.0
     elsif offerable_type == 'collection'
       if collection.nil? || collection.products.empty?
         0.0
@@ -516,7 +504,7 @@ class Offer < ApplicationRecord
     if shown == 0
       "N/A"
     else
-      ctr_result.round(2).to_s + " %"
+      "#{ctr_result.round(2)} %"
     end
   end
 
