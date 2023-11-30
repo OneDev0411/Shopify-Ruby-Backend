@@ -532,6 +532,8 @@ class Shop < ApplicationRecord
       end
     end
     res
+  rescue StandardError => e
+    ErrorNotifier.call(e)
   end
 
   # Public. This deletes the shops JS tag, if they are using a shopify-injected tag.  Be careful
