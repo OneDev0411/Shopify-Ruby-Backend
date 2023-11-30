@@ -3,6 +3,8 @@
 class AuthenticatedController < ApplicationController
   include ShopifyApp::EnsureHasSession
 
+  # check if the current shop is admin or not
+  # if it is not admin, redirected to the root path and return false
   protected
   def require_admin
     shop = Shop.find_by(shopify_domain: current_shopify_domain)

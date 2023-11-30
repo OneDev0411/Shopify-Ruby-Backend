@@ -25,11 +25,9 @@ class ApplicationController < ActionController::Base
   end
 
   def find_shop
-    logger.info("Current shopify domain: #{current_shopify_domain}")
-    redirect_to login_path and return  unless defined?(current_shopify_domain)
+    redirect_to login_path and return unless defined?(current_shopify_domain)
 
     @icushop = Shop.find_or_create_shop(current_shopify_domain)
-    logger.info("Current shopify sessoin: #{@current_shopify_session}")
     @icushop.check_shopify_token(@current_shopify_session&.access_token)
 
     # check to see if current token is valid, otherwise need a new login
@@ -38,14 +36,10 @@ class ApplicationController < ActionController::Base
       return
     end
 
-    if @icushop.admin?
-      @admin = true
-      # This is for the Admin section, to see other shops UI
-      if params[:shop_id].present? && !admin_subscription_methods.include?(params[:action])
-        @icushop = Shop.find_by(id: params[:shop_id])
-      end
-    else
-      @admin = false
+    # This is for the Admin section, to see other shops UI
+    @admin = @icushop.admin?
+    if @admin && params[:shop_id].present? && !admin_subscription_methods.include?(params[:action])
+      @icushop = Shop.find_by(id: params[:shop_id])
     end
     true
   end
