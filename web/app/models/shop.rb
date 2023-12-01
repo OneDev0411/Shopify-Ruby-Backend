@@ -525,8 +525,10 @@ class Shop < ApplicationRecord
       cdn_url = 'https://gateway.stackpath.com/cdn/v1/stacks/' \
                 "#{ENV['STACKPATH_STACK_ID']}/purge/#{res['id']}"
       progress_query = HTTParty.get(cdn_url, headers: query_headers)
-      while progress_query['progress'] < 1
+      cycle = 0;
+      while (progress_query['progress'].nil? && cycle < 5) || progress_query['progress'] < 1
         Rails.logger.info "Checking progress: #{progress_query['progress']}"
+        cycle += 1
         progress_query = HTTParty.get("https://gateway.stackpath.com/cdn/v1/stacks/#{ENV['STACKPATH_STACK_ID']}/purge/#{res['id']}", headers: query_headers)
         sleep(1)
       end
