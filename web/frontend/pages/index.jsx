@@ -43,6 +43,7 @@ export default function HomePage() {
       theme: icu_shop.shopify_theme_name,
       currency: icu_shop.currency
     });
+    window.Intercom('show');
   }
   
   useEffect(() => {
