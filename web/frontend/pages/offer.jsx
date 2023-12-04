@@ -63,7 +63,7 @@ export default function Offers() {
             <div className="space-10"></div>
           </Page>
         </div>
-        <GenericFooter text='Need more help? ' linkUrl='#' linkText='Watch the help video' />
+        {/* <GenericFooter text='Need more help? ' linkUrl='#' linkText='Watch the help video' /> */}
       </>
     );
   }

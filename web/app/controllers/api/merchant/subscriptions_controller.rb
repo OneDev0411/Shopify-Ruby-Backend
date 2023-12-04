@@ -38,7 +38,9 @@ module Api
           @subscription.remove_recurring_charge
         end
         @subscription.shop_id = @icushop.id
-        unless @plan.flex_plan?
+        if @plan.flex_plan?
+          @subscription.plan_id ||= Plan.find_by(internal_name: 'trial_plan').id
+        else
           @subscription.plan_id = @plan.id
           @subscription.update_subscription(@plan)
           if @subscription.plan.free_plan?

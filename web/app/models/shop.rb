@@ -525,13 +525,17 @@ class Shop < ApplicationRecord
       cdn_url = 'https://gateway.stackpath.com/cdn/v1/stacks/' \
                 "#{ENV['STACKPATH_STACK_ID']}/purge/#{res['id']}"
       progress_query = HTTParty.get(cdn_url, headers: query_headers)
-      while progress_query['progress'] < 1
+      cycle = 0;
+      while (progress_query['progress'].nil? && cycle < 5) || progress_query['progress'] < 1
         Rails.logger.info "Checking progress: #{progress_query['progress']}"
+        cycle += 1
         progress_query = HTTParty.get("https://gateway.stackpath.com/cdn/v1/stacks/#{ENV['STACKPATH_STACK_ID']}/purge/#{res['id']}", headers: query_headers)
         sleep(1)
       end
     end
     res
+  rescue StandardError => e
+    ErrorNotifier.call(e)
   end
 
   # Public. This deletes the shops JS tag, if they are using a shopify-injected tag.  Be careful
@@ -1082,14 +1086,14 @@ class Shop < ApplicationRecord
 
   def offer_data_with_stats
     data = []
-    offers.includes(:daily_stats, :offer_events).each do |offer|
+    offers.each do |offer|
       data << {
         id: offer.id,
         title: offer.title,
         status: offer.active,
-        clicks: offer.daily_stats.map(&:times_clicked).sum,
-        views: offer.daily_stats.map(&:times_loaded).sum,
-        revenue: offer.offer_events&.where(action: 'sale')&.pluck(:amount).sum,
+        clicks: offer.total_clicks,
+        views: offer.total_views,
+        revenue: offer.total_revenue,
         created_at: offer.created_at.to_datetime,
       }
     end
