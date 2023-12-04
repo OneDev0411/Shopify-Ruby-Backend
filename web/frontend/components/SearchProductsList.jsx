@@ -4,6 +4,7 @@ import {useState, useCallback} from 'react';
 export function SearchProductsList(props) {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedVariants, setSelectedVariants] = useState({})
+  const exclude_variant_selectors = ['cart_at_least', 'cart_at_most', 'cart_exactly', 'cart_does_not_contain'];
 
   function handleSelectedVariant(selectedOptions, id) {
     setSelectedVariants(selectedVariants => {
@@ -35,7 +36,7 @@ export function SearchProductsList(props) {
 
   function renderItem(item) {
     const {id, title, image, variants} = item
-    if(!variants){
+    if(!variants || exclude_variant_selectors.includes(props.rule?.rule_selector)){
       return (
         <ResourceItem
           id={id}
@@ -51,7 +52,7 @@ export function SearchProductsList(props) {
         </ResourceItem>
       );
     }
-    if(variants.length <= 1)
+    if(variants.length <= 1 || exclude_variant_selectors.includes(props.rule?.rule_selector))
     {
       return (
         <ResourceItem
@@ -83,7 +84,7 @@ export function SearchProductsList(props) {
           image={image}
           accessibilityLabel={`View details for ${title}`}
           persistActions
-          onClick={() => selectedProduct(currentValue)}
+          onClick={() => selectedProduct(item)}
         >
           <p variant="bodyMd" fontWeight="bold" as="h3">
             <strong>{title}</strong>

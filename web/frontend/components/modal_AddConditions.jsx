@@ -128,7 +128,7 @@ export function ModalAddConditions(props) {
             </LegacyStack.Item>
             {productData ? (
               <LegacyStack.Item>
-                <SearchProductsList item_type={item} shop={shopAndHost.shop} updateQuery={updateQuery} productData={productData} resourceListLoading={resourceListLoading} setResourceListLoading={setResourceListLoading} updateSelectedProduct={updateSelectedProduct} />
+                <SearchProductsList item_type={item} shop={shopAndHost.shop} updateQuery={updateQuery} productData={productData} resourceListLoading={resourceListLoading} setResourceListLoading={setResourceListLoading} updateSelectedProduct={updateSelectedProduct} rule={props.rule}/>
               </LegacyStack.Item>
             ) : null
             }
