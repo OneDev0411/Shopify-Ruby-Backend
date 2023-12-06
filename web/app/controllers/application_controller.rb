@@ -41,7 +41,6 @@ class ApplicationController < ActionController::Base
     if @admin && params[:shop_id].present? && !admin_subscription_methods.include?(params[:action])
       @icushop = Shop.find_by(id: params[:shop_id])
     end
-    true
   end
 
   # Public. Be sure this shop has a valid and active subscription.
