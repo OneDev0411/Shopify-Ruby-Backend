@@ -170,7 +170,7 @@ export function SecondTab(props) {
 
     useEffect(() => {
         if(storedThemeNames?.length != 0 && shopifyThemeName != null && !storedThemeNames?.includes(shopifyThemeName)) {
-            updateNestedAttributeOfOffer(true, "advanced_placement_setting", "advanced_placement_setting_enabled");
+            props.updateNestedAttributeOfOffer(true, "advanced_placement_setting", "advanced_placement_setting_enabled");
         }
     }, [storedThemeNames, shopifyThemeName])
 
