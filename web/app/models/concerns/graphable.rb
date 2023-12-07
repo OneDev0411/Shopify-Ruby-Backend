@@ -279,9 +279,9 @@ module Graphable
     }
 
     i = 0
-    start_date = period_hash[period][:start_date]
-    last = period_hash[period][:last]
-    interval = period_hash[period][:interval]
+    start_date = period_hash[period]&.[](:start_date)
+    last = period_hash[period]&.[](:last)
+    interval = period_hash[period]&.[](:interval)
 
     total = 0
     while (start_date <= last) do
@@ -300,7 +300,7 @@ module Graphable
         'all' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" }
       }
       results[i] = {
-        key: label_hash[period].call(start_date, end_date),
+        key: label_hash[period]&.call(start_date, end_date),
         value: 0
       }
       sum = 0
