@@ -282,7 +282,7 @@ export function FirstTab(props) {
                         console.log("# Error AutopilotDetails > ", JSON.stringify(error));
                     })
             }
-        } else {
+        } else if (autopilotButtonText === "Launch Autopilot") {
             setIsLoading(true);
             fetch(`/api/merchant/enable_autopilot`, {
                 method: 'POST',
