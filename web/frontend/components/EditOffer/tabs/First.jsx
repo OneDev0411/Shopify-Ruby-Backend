@@ -162,7 +162,6 @@ export function FirstTab(props) {
     //Called when the save button of popup modal is clicked
     function updateProducts() {
         var product_title_str = "Would you like to add a {{ product_title }}?";
-
         if (selectedProducts.length == 0) {
             props.updateOffer("included_variants", {});
             setProductData("");
@@ -178,30 +177,43 @@ export function FirstTab(props) {
         props.updateOffer("offerable_product_shopify_ids", []);
         props.updateInitialVariants(props.offer.included_variants);
         var responseCount = 0;
-        for (var i = 0; i < selectedProducts.length; i++) {
-            fetch(`/api/merchant/products/multi/${selectedProducts[i]}?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-                .then((response) => {
-                    return response.json()
-                })
-                .then((data) => {
-                    data.available_json_variants = data.available_json_variants.filter((o) => props.offer.included_variants[data.id].includes(o.id))
-                    props.updateProductsOfOffer(data);
-                    if (responseCount == 0 && selectedProducts.length <= 1) {
-                        props.updateCheckKeysValidity("text", props.offer.text_a.replace("{{ product_title }}", data.title));
-                        props.updateCheckKeysValidity('cta', props.offer.cta_a);
-                    }
-                    responseCount++;
-                })
-                .catch((error) => {
-                    console.log("# Error updateProducts > ", JSON.stringify(error));
-                })
+        const promises = selectedProducts.map((productId) =>
+        fetch(`/api/merchant/products/multi/${productId}?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        })
+        .then((response) => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        handleModal();
+        return response.json();
+        })
+        .catch((error) => {
+        console.log("# Error updateProducts > ", error.message);
+        throw error;
+        })
+    );
+
+    Promise.all(promises)
+        .then((responses) => {
+            // 'responses' will contain the data in the same order as the requests
+            for (var i = 0; i < responses.length; i++) {
+                var data = responses[i]
+                data.available_json_variants = data.available_json_variants.filter((o) => props.offer.included_variants[data.id].includes(o.id))
+                        props.updateProductsOfOffer(data);
+                        if (responseCount == 0 && selectedProducts.length <= 1) {
+                            props.updateCheckKeysValidity("text", props.offer.text_a.replace("{{ product_title }}", data.title));
+                            props.updateCheckKeysValidity('cta', props.offer.cta_a);
+                        }
+                        responseCount++;
+            }
+            handleModal();
+        })
+        .catch((error) => {
+        console.error('Error:', error);
+        });
     }
 
     //For autopilot section
@@ -609,7 +621,7 @@ export function FirstTab(props) {
                         activator={activator}
                         open={productModal}
                         onClose={handleModalCloseEvent}
-                        title="Select products from your store"
+                        title="Select products from your store1"
                         primaryAction={{
                             content: 'Save',
                             onAction: updateProducts,
