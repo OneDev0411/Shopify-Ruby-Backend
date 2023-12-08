@@ -211,7 +211,7 @@ export function FirstTab(props) {
                 handleModal();
             })
             .catch((error) => {
-                console.error('Error:', error);
+                console.log("# Error updateProducts > ", JSON.stringify(error));
             });
     }
 
