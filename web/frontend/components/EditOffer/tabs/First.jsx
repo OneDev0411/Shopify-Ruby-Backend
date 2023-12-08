@@ -620,7 +620,7 @@ export function FirstTab(props) {
                         activator={activator}
                         open={productModal}
                         onClose={handleModalCloseEvent}
-                        title="Select products from your store1"
+                        title="Select products from your store"
                         primaryAction={{
                             content: 'Save',
                             onAction: updateProducts,
