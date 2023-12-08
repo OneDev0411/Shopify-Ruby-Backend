@@ -178,42 +178,41 @@ export function FirstTab(props) {
         props.updateInitialVariants(props.offer.included_variants);
         var responseCount = 0;
         const promises = selectedProducts.map((productId) =>
-        fetch(`/api/merchant/products/multi/${productId}?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        })
-        .then((response) => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-        })
-        .catch((error) => {
-        console.log("# Error updateProducts > ", error.message);
-        throw error;
-        })
-    );
-
-    Promise.all(promises)
-        .then((responses) => {
-            // 'responses' will contain the data in the same order as the requests
-            for (var i = 0; i < responses.length; i++) {
-                var data = responses[i]
-                data.available_json_variants = data.available_json_variants.filter((o) => props.offer.included_variants[data.id].includes(o.id))
-                        props.updateProductsOfOffer(data);
-                        if (responseCount == 0 && selectedProducts.length <= 1) {
-                            props.updateCheckKeysValidity("text", props.offer.text_a.replace("{{ product_title }}", data.title));
-                            props.updateCheckKeysValidity('cta', props.offer.cta_a);
-                        }
-                        responseCount++;
-            }
-            handleModal();
-        })
-        .catch((error) => {
-        console.error('Error:', error);
-        });
+            fetch(`/api/merchant/products/multi/${productId}?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+            return response.json();
+            })
+            .catch((error) => {
+                console.log("# Error updateProducts > ", error.message);
+                throw error;
+            })
+        );
+        Promise.all(promises)
+            .then((responses) => {
+                // 'responses' will contain the data in the same order as the requests
+                for (var i = 0; i < responses.length; i++) {
+                    var data = responses[i]
+                    data.available_json_variants = data.available_json_variants.filter((o) => props.offer.included_variants[data.id].includes(o.id))
+                    props.updateProductsOfOffer(data);
+                    if (responseCount == 0 && selectedProducts.length <= 1) {
+                        props.updateCheckKeysValidity("text", props.offer.text_a.replace("{{ product_title }}", data.title));
+                        props.updateCheckKeysValidity('cta', props.offer.cta_a);
+                    }
+                    responseCount++;
+                }
+                handleModal();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }
 
     //For autopilot section
