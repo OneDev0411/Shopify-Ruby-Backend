@@ -188,7 +188,7 @@ export function FirstTab(props) {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-            return response.json();
+                return response.json();
             })
             .catch((error) => {
                 console.log("# Error updateProducts > ", error.message);
