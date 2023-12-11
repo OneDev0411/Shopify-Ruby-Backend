@@ -224,3 +224,7 @@
 .widget-visibility { 
     overflow: hidden;
 }
+
+.skeleton-margin{
+    margin: var(--p-space-3);
+}
