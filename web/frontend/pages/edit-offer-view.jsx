@@ -17,7 +17,6 @@ import { OfferPreview } from "../components/OfferPreview";
 import { useAuthenticatedFetch } from "../hooks";
 import AbAnalytics from "../components/abAnalytics";
 import "../components/stylesheets/mainstyle.css";
-import EditOfferViewSkeleton from "../skeletons/EditOfferViewSkeleton";
 
 const EditOfferView = () => {
   const shopAndHost = useSelector((state) => state.shopAndHost);
@@ -128,11 +127,11 @@ const EditOfferView = () => {
             updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
           }
           updateCheckKeysValidity('cta', data.cta_a);
-          setIsLoading(false);
         })
         .catch((error) => {
             console.log("Error > ", error);
         })
+      setIsLoading(false);
   }
   },[offer.publish_status]);
 
@@ -146,7 +145,15 @@ const EditOfferView = () => {
     <AppProvider i18n={[]}>
       <div className="page-space">
         {isLoading ? (
-          <EditOfferViewSkeleton />
+          <div style={{
+              overflow: 'hidden',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '100vh',
+          }}>
+            <Spinner size="large" color="teal"/>
+          </div>
         ) : (
           <>
             <Page
