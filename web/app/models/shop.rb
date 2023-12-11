@@ -1095,6 +1095,7 @@ class Shop < ApplicationRecord
         views: offer.total_views,
         revenue: offer.total_revenue,
         created_at: offer.created_at.to_datetime,
+        offerable_type: offer.offerable_type,
       }
     end
     return data
