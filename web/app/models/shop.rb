@@ -1161,15 +1161,31 @@ class Shop < ApplicationRecord
     start_date = period_hash_to_offers[period][:start_date]
     end_date = period_hash_to_offers[period][:end_date]
 
+    # First before join to the offers table, get daily_stats and offer_events
+    # data which their created_at is between start_date and end_date
+    daily_stats_subquery = DailyStat
+      .select('offer_id, SUM(times_clicked) as total_clicks, SUM(times_loaded) as total_views')
+      .where(created_at: start_date..end_date)
+      .group(:offer_id)
+
+    offer_events_subquery = OfferEvent
+      .select('offer_id, SUM(amount) as total_revenue')
+      .where(created_at: start_date..end_date)
+      .where(action: 'sale')
+      .group(:offer_id)
+
+    # Reorder the offers data due to the default query of offer model
+    # If the data isn't reordered, the query result is wrong due to two order queries
+    # one is the default order by position_order and another one is a order by total_revenue
     offers
-    .where(created_at: start_date..end_date)
-    .joins('LEFT OUTER JOIN daily_stats ON daily_stats.offer_id = offers.id')
-    .joins('LEFT OUTER JOIN offer_events ON offer_events.offer_id = offers.id AND offer_events.action = \'sale\'')
+    .reorder('')
+    .joins("LEFT OUTER JOIN (#{daily_stats_subquery.to_sql}) ds ON ds.offer_id = offers.id")
+    .joins("LEFT OUTER JOIN (#{offer_events_subquery.to_sql}) oe ON oe.offer_id = offers.id")
     .select('offers.id, offers.shop_id, offers.title, offers.active, offers.created_at,
-             SUM(daily_stats.times_clicked) AS total_clicks,
-             SUM(daily_stats.times_loaded) AS total_views,
-             SUM(offer_events.amount) AS total_revenue')
-    .group('offers.id')
+            COALESCE(ds.total_clicks, 0) AS total_clicks,
+            COALESCE(ds.total_views, 0) AS total_views,
+            COALESCE(oe.total_revenue, 0) as total_revenue')
+    .group('offers.id, ds.total_clicks, ds.total_views, oe.total_revenue')
     .order('total_revenue DESC')
     .limit(3)
     .each do |offer|

@@ -305,8 +305,13 @@ module Graphable
       }
       sum = 0
 
-      offers.includes(:daily_stats).where(created_at: start_date..end_date).each do |offer|
-        sum = offer.daily_stats.sum(:times_clicked)
+      offers
+      .joins('LEFT OUTER JOIN daily_stats ON daily_stats.offer_id = offers.id')
+      .where('daily_stats.created_at' => start_date..end_date)
+      .group('offers.id')
+      .select('SUM(daily_stats.times_clicked) as total_clicks')
+      .each do |offer|
+        sum = offer.total_clicks
       end
 
       results[i][:value] = sum
