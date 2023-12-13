@@ -335,7 +335,7 @@ export function AbTestingData(props) {
                 {salesData ? (<h3 className="report-money"><strong>${salesTotal}</strong></h3>) : null}
                 <div className="space-4"></div>
                 <p>SALES OVER TIME</p><br />
-                {loading ? "Loading..." : salesData ? (<StackedAreaChart
+                {loading ? <SkeletonBodyText lines={10} /> : salesData ? (<StackedAreaChart
                     isAnimated={true}
                     comparisonMetric={{
                         accessibilityLabel: 'trending up 6%',
@@ -405,7 +405,7 @@ export function ClickThroughtRateData(props) {
                 <div className="space-4"></div>
                 <p>Clicks through rate over time</p><br />
                 <div className="space-5"></div>
-                {loading ? "Loading..." : clicksData ? (<StackedAreaChart
+                {loading ? <SkeletonBodyText lines={10} /> : clicksData ? (<StackedAreaChart
                     comparisonMetric={{
                         accessibilityLabel: 'trending up 6%',
                         metric: '6%',
