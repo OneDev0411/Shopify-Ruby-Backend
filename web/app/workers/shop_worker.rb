@@ -183,9 +183,17 @@ module ShopWorker
     def perform(shopify_domain, shopify_id)
       shop = Shop.find_by(shopify_domain: shopify_domain)
       return if shop.blank?
-      product = Product.find_by(shop_id: shop.id, shopify_id: payload['id'])
+      product = Product.find_by(shop_id: shop.id, shopify_id: shopify_id)
       if product.present?
         product.published_status = "deleted"
+
+        shop.offers.each do | offer |
+          if offer.offerable_product_shopify_ids.include?(shopify_id)
+            offer.offerable_product_shopify_ids.delete(shopify_id)
+            offer.save
+          end
+        end
+
         product.save
       end
     end
