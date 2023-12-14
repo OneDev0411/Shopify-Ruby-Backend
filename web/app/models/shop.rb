@@ -1138,7 +1138,7 @@ class Shop < ApplicationRecord
   def offer_data_with_stats
     data = []
     offers
-      .select('offers.id, offers.shop_id, offers.title, offers.active, offers.total_clicks, offers.total_views, offers.total_revenue, offers.created_at')
+      .select('offers.id, offers.shop_id, offers.title, offers.active, offers.total_clicks, offers.total_views, offers.total_revenue, offers.created_at, offers.offerable_type')
       .group('offers.id')
       .each do |offer|
         data << {
@@ -1149,6 +1149,7 @@ class Shop < ApplicationRecord
           views: offer.total_views,
           revenue: offer.total_revenue,
           created_at: offer.created_at.to_datetime,
+          offerable_type: offer.offerable_type,
         }
     end
     return data
