@@ -239,8 +239,7 @@ export function TopPerformingOffersData(props) {
                 return response.json();
             })
             .then((data) => {
-                let sortData = data.offers.sort((a, b) => b.revenue - a.revenue);
-                setOffersData(sortData.slice(0, 3));
+                setOffersData(data.offers);
             })
             .catch((error) => {
                 console.log("error", error);

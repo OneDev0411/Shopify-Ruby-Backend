@@ -1181,7 +1181,7 @@ class Shop < ApplicationRecord
     .reorder('')
     .joins("LEFT OUTER JOIN (#{daily_stats_subquery.to_sql}) ds ON ds.offer_id = offers.id")
     .joins("LEFT OUTER JOIN (#{offer_events_subquery.to_sql}) oe ON oe.offer_id = offers.id")
-    .select('offers.id, offers.shop_id, offers.title, offers.active, offers.created_at,
+    .select('offers.id, offers.shop_id, offers.title, offers.active, offers.created_at, offers.offerable_type,
             COALESCE(ds.total_clicks, 0) AS total_clicks,
             COALESCE(ds.total_views, 0) AS total_views,
             COALESCE(oe.total_revenue, 0) as total_revenue')
