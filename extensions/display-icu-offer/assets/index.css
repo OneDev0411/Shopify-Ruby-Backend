@@ -1044,19 +1044,11 @@
   -webkit-background-clip: border-box;
 }
 
-/*#nudge-offer-list .product-title-wrapper {*/
-/*  margin: 10px 0;*/
-/*}*/
-
-/*#nudge-offer-list .variants {*/
-/*  margin-top: 15px;*/
-/*}*/
-
 #nudge-offer-list input[type="submit"] {
   margin-left: 10px;
 }
 
-#nudge-offer-list .custom-field {
+#nudge-offer-list .custom-field, #nudge-offer-list .variants-wrapper {
   margin-right: 10px;
 }
 

@@ -73,7 +73,7 @@
 
         let mySiema, prev, next;
 
-        if (document.querySelector(".offer-collection") && document.querySelector('.product-wrapper')) {
+        if (offer.multi_layout === 'carousel' && document.querySelector(".offer-collection") && document.querySelector('.product-wrapper')) {
             if (mySiema) {
                 mySiema.destroy(true);
             }
@@ -270,8 +270,8 @@
 
     const createProductInfoElements = (parentEl) => {
         if (offer.multi_layout === 'compact') {
-            parentEl.appendChild(createPriceEl());
             parentEl.appendChild(createProductTitle());
+            parentEl.appendChild(createPriceEl());
         } else {
             const detailsContainer = document.createElement('div');
             detailsContainer.className = 'details';
@@ -343,7 +343,7 @@
 
         ctaContainer.appendChild(createVariantsWrapper());
 
-        if (offer.show_variant_price && hide_variants_wrapper) {
+        if (offer.show_variant_price && product.available_json_variants.length <= 1) {
             ctaContainer.appendChild(createSingleVariant());
         }
 
@@ -361,7 +361,7 @@
     const createCustomFields = (fieldName, placeholder, id) => {
 
         const customFieldInput = document.createElement('input');
-        customFieldInput.className = `custom-field ${!offer.hide_variants_wrapper ? 'inline' : '' }`;
+        customFieldInput.className = `custom-field ${product.available_json_variants.length > 1 ? 'inline' : '' }`;
         customFieldInput.type = 'text';
         customFieldInput.name= `properties[${fieldName}]`;
         customFieldInput.id = id;
@@ -376,7 +376,7 @@
 
         variantsWrapper.className = 'variants-wrapper';
 
-        if (!offer.hide_variants_wrapper) {
+        if (product.available_json_variants.length <= 1) {
             variantsWrapper.style.display = 'none';
         }
 
@@ -848,7 +848,7 @@
         let altComparePrice;
         let compareAtPrice;
 
-        let option = e.childNodes.find( child => child.value === e.target.value);
+        let option = Array.from(e.target.childNodes).find( child => child.value === e.target.value);
 
         if (option) {
             imgUrl = option.getAttribute('data-image-url');
