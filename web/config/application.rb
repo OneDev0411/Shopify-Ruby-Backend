@@ -48,6 +48,8 @@ module ShopifyAppTemplateRuby
       })
     end
 
+    config.host_authorization = { exclude: ->(request) { request.path =~ /proxy/ } }
+
     config.hosts.clear
   end
 end

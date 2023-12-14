@@ -1129,7 +1129,7 @@ class Shop < ApplicationRecord
       subscription.update_subscription(plan)
       subscription.save
     end
-    if plan.free_plan?
+    if !plan.nil? and plan.free_plan?
       self.unpublish_extra_offers if self.offers.present?
     end
     # subscription.update_attribute(:free_plan_after_trial, false)
@@ -1147,6 +1147,18 @@ class Shop < ApplicationRecord
         revenue: offer.total_revenue,
         created_at: offer.created_at.to_datetime,
         offerable_type: offer.offerable_type,
+      }
+    end
+    return data
+  end
+
+  def active_offers
+    data = []
+    offers.each do |offer|
+      offer.active && data << {
+        id: offer.id,
+        title: offer.title,
+        status: offer.active
       }
     end
     return data

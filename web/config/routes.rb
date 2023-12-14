@@ -59,7 +59,7 @@ Rails.application.routes.draw do
   post 'custom_webhooks/request_customer', to: 'custom_webhooks#request_customer'
   post 'custom_webhooks/redact_customer', to: 'custom_webhooks#redact_customer'
 
-
+  get 'proxy/get_offers', to: 'proxy#get_offers'
 
   # Any other routes will just render the react app
   match '*path' => 'home#index', via: [:get, :post]
