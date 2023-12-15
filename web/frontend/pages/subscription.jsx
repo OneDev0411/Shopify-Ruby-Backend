@@ -124,17 +124,24 @@ export default function Subscription() {
                                 Live onboarding<br/>
                                 Success manager support<br/>
                                 Remove "Power by In Cart Upsell" water mark on offer box
-                                </p>                                
+                                </p>
+                                <div className="space-4"></div>
                                 <p>
-                                    Shopify Basic<br/>
-                                    <b>$19.99/month</b><br/>
-                                    Shopify Standard<br/>
-                                    <b>$29.99/month</b><br/>
-                                    Shopify Advanced<br/>
-                                    <b>$59.99/month</b><br/>
-                                    Shopify Plus<br/>
-                                    <b>$99.99/month</b>
-                                </p>                   
+                                  <b>Shopify Basic</b><br/>
+                                     $19.99/month<br/>
+                                  <div className="space-1"></div>
+
+                                  <b>Shopify Standard</b><br/>
+                                     $29.99/month<br/>
+                                  <div className="space-1"></div>
+
+                                  <b>Shopify Advanced</b><br/>
+                                     $59.99/month<br/>
+                                  <div className="space-1"></div>
+                                  
+                                  <b>Shopify Plus</b><br/>
+                                     $99.99/month
+                                </p>
                             </LegacyStack.Item>
                             <LegacyStack.Item>
                                 <Image
