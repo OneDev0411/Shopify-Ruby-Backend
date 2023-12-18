@@ -283,6 +283,23 @@ module Graphable
     last = period_hash[period]&.[](:last)
     interval = period_hash[period]&.[](:interval)
 
+    # This query calculates total clicks of all offers which exist in a shop and was updated from the previous one
+    # The previous query calculated total clicks of daily_stats for each filtered offer after filtering offers data
+    # with its associated daily_stats data by start_date and end_date but this query didn't get the correct offers data
+    # due to filter the offers. For instance an offer was created yesterday and selected "Today" in the time range
+    # dropdown the result of the previous query is nothing so the query was updated to get all offers data which exist
+    # in the shop and join its associated daily_stats data which its created_at is in the time range.
+    # The reason a LEFT OUTER JOIN is used instead of an INNER JOIN is because we want to include all offers,
+    # even those that may not have corresponding entries in the 'daily_stats' table within the specified date range.
+
+    # Get all offers data which created_at is between start_date and last outside the while loop to avoid repeated
+    # execution of the query in loop, and calculate total_clicks inside the loop again.
+    all_offers = offers
+      .joins('LEFT OUTER JOIN daily_stats ON daily_stats.offer_id = offers.id')
+      .where('daily_stats.created_at' => start_date..last)
+      .group('offers.id, daily_stats.created_at')
+      .select('offers.id, daily_stats.created_at, SUM(daily_stats.times_clicked) as total_clicks')
+
     total = 0
     while (start_date <= last) do
       if (start_date + interval > last)
@@ -305,21 +322,11 @@ module Graphable
       }
       sum = 0
 
-      # This query calculates total clicks of all offers which exist in a shop and was updated from the previous one
-      # The previous query calculated total clicks of daily_stats for each filtered offer after filtering offers data
-      # with its associated daily_stats data by start_date and end_date but this query didn't get the correct offers data
-      # due to filter the offers. For instance an offer was created yesterday and selected "Today" in the time range
-      # dropdown the result of the previous query is nothing so the query was updated to get all offers data which exist
-      # in the shop and join its associated daily_stats data which its created_at is in the time range.
-      # The reason a LEFT OUTER JOIN is used instead of an INNER JOIN is because we want to include all offers,
-      # even those that may not have corresponding entries in the 'daily_stats' table within the specified date range.
-      offers
-      .joins('LEFT OUTER JOIN daily_stats ON daily_stats.offer_id = offers.id')
-      .where('daily_stats.created_at' => start_date..end_date)
-      .group('offers.id')
-      .select('SUM(daily_stats.times_clicked) as total_clicks')
-      .each do |offer|
-        sum = offer.total_clicks
+      # Calculated total_clicks from all offers data
+      all_offers.each do |offer|
+        if offer.created_at >= start_date && offer.created_at <= end_date
+          sum += offer.total_clicks
+        end
       end
 
       results[i][:value] = sum
