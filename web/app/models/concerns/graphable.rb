@@ -228,6 +228,9 @@ module Graphable
       start_date = period_hash[period][:start_date]
       last = period_hash[period][:last]
       interval = period_hash[period][:interval]
+
+      all_orders = orders.where('created_at >= ? and created_at < ?', start_date, last)
+
       i = 0;
       total = 0
       while (start_date <= last) do
@@ -253,7 +256,7 @@ module Graphable
           value: 0
         }
 
-        stats = orders.where('created_at >= ? and created_at < ?', start_date, end_date).count
+        stats = all_orders.select{ |order| order.created_at >= start_date && order.created_at < end_date }.count
 
         results[i][:value] = stats
         total += stats
