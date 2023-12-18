@@ -229,6 +229,8 @@ module Graphable
       last = period_hash[period][:last]
       interval = period_hash[period][:interval]
 
+      # Get all orders data which created_at is between start_date and last outside the while loop to avoid repeated
+      # execution of the query in loop, and calculate the count inside the loop again.
       all_orders = orders.where('created_at >= ? and created_at < ?', start_date, last)
 
       i = 0;
@@ -256,6 +258,7 @@ module Graphable
           value: 0
         }
 
+        # Get the count of orders data which created_at is in the time range
         stats = all_orders.select{ |order| order.created_at >= start_date && order.created_at < end_date }.count
 
         results[i][:value] = stats
