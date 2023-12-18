@@ -481,6 +481,10 @@ class Offer < ApplicationRecord
     end
   end
 
+  def created_in_between(start_date, end_date)
+    created_at >= start_date && created_at <= end_date
+  end
+
   ##### Methods for describing statistics about the offer #######
   def total_times_shown(variant=nil)
     q = ['times', variant, 'loaded'].compact.join('_').to_sym

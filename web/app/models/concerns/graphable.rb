@@ -324,9 +324,7 @@ module Graphable
 
       # Calculated total_clicks from all offers data
       all_offers.each do |offer|
-        if offer.created_at >= start_date && offer.created_at <= end_date
-          sum += offer.total_clicks
-        end
+        sum += offer.total_clicks if offer.created_in_between(start_date, end_date)
       end
 
       results[i][:value] = sum
