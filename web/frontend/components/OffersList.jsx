@@ -12,6 +12,7 @@ import {
   Select,
   LegacyCard, LegacyStack, Image, VerticalStack, Text, ButtonGroup, MediaCard, VideoThumbnail, Layout,
   Spinner,
+  Modal,
 } from '@shopify/polaris';
 
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -42,6 +43,11 @@ export function OffersList(props) {
   const fetch = useAuthenticatedFetch(shopAndHost.host);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [modalActive, setModalActive] = useState(false);
+
+  const toggleModal = useCallback(() => {
+    setModalActive(!modalActive)
+  }, [modalActive]);
 
   const sendOfferList =
     props.getOfferListData &&
@@ -126,13 +132,29 @@ export function OffersList(props) {
     }
     setSortValue(value), []});
 
-  const promotedBulkActions = [
+  const promotedBulkActions = ((selectedResources.length == 1 && paginatedData.find(obj => obj['id'] === selectedResources[0])?.offerable_type == 'auto')) ? 
+  [
+    {
+      content: 'Publish',
+      onAction: () => activateSelectedOffer(),
+    },
+  ] : [
     {
       content: 'Duplicate Offer',
-      onAction: () => createDuplicateOffer(),
+      onAction: () => { createDuplicateOffer();},
     },
   ];
-  const bulkActions = [
+  const bulkActions = ((selectedResources.length == 1 && paginatedData.find(obj => obj['id'] === selectedResources[0])?.offerable_type == 'auto')) ?
+  [
+    {
+      content: 'Unpublish',
+      onAction: () => deactivateSelectedOffer(),
+    },
+    {
+      content: 'Delete',
+      onAction: () => deleteSelectedOffer(),
+    },
+  ] : [
     {
       content: 'Publish',
       onAction: () => activateSelectedOffer(),
@@ -205,22 +227,29 @@ export function OffersList(props) {
 
   function createDuplicateOffer() {
     selectedResources.forEach(function (resource) {
-      let url = `/api/merchant/offers/${resource}/duplicate`;
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ offer_id: resource, shop: shopAndHost.shop })
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          setFilteredData(data.offers);
-          setOffersData(data.offers);
-          selectedResources.shift();
+      if(paginatedData.find(obj => obj['id'] === resource)?.offerable_type != 'auto')
+      {
+        let url = `/api/merchant/offers/${resource}/duplicate`;
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ offer_id: resource, shop: shopAndHost.shop })
         })
+          .then((response) => response.json())
+          .then((data) => {
+            setFilteredData(data.offers);
+            setOffersData(data.offers);
+            selectedResources.shift();
+          })
         .catch((error) => {
         })
+      }
+      else {
+        setModalActive(paginatedData.find(obj => obj['id'] === resource)?.offerable_type == 'auto');
+        selectedResources.shift();
+      }
     });
   }
 
@@ -369,6 +398,19 @@ export function OffersList(props) {
                 >
                   {rowMarkup}
                 </IndexTable>
+                <Modal
+                  open={modalActive}
+                  onClose={toggleModal}
+                  title="Alert Message"
+                  primaryAction={{
+                    content: 'OK',
+                    onAction: toggleModal,
+                  }}
+                  >
+                  <Modal.Section>
+                      <p>Autopilot Offer cannot be duplicated.</p>
+                  </Modal.Section>
+                  </Modal>
                 <div className="space-4"></div>
                 <div className="offer-table-footer">
                   <Pagination
