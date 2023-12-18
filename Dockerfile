@@ -1,4 +1,4 @@
-FROM ruby:3.1-alpine
+FROM ruby:3.1-alpine3.18
 
 RUN apk update && apk add nodejs npm git build-base sqlite-dev postgresql-dev postgresql-client gcompat bash openssl-dev
 
