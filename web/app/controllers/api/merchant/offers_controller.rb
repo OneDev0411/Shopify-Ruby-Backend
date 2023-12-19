@@ -2,7 +2,7 @@
 module Api
   module Merchant
     class OffersController < ApiMerchantBaseController
-      before_action :find_shop, only: [:offer_settings, :update_from_builder, :offers_list, :offers_list_by_period, :activate, :deactivate, :duplicate, :destroy, :ab_analytics]
+      before_action :find_shop, only: [:offer_settings, :update_from_builder, :offers_list, :offer_stats, :offers_list_by_period, :activate, :deactivate, :duplicate, :destroy, :ab_analytics]
       before_action :set_offer, only: [:load_offer_details, :shopify_ids_from_rule]
       before_action :ensure_plan, only: [:offer_settings, :update_from_builder, :offers_list, :activate, :deactivate, :duplicate, :destroy, :ab_analytics]
 
@@ -16,6 +16,18 @@ module Api
       # POST /api/merchant/offers_list
       def offers_list
         render json: { shopify_domain: @icushop.shopify_domain, offers: @icushop.offer_data_with_stats }
+      end
+
+      # POST /api/merchant/offer_stats
+      def offer_stats
+        offer = @icushop.offer_data_with_stats.find(id: params['offer_id'])
+
+        if !offer.nil?
+          render json: { shopify_domain: @icushop.shopify_domain, offer: offer.first }
+        else
+          render status: :not_found
+        end
+
       end
 
       # POST /api/merchant/offers_list_by_period

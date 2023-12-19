@@ -37,10 +37,27 @@ const Summary = (props) => {
         });
     };
 
-    useEffect(() => {
-      console.log(props.offer)
+    const getOfferStats = () => {
+        fetch(`/api/merchant/offer_stats`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ shop: shopAndHost.shop, offer_id: props.offerID }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setOfferStats(data.offer);
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.log("error", error);
+            });
+    };
 
+    useEffect(() => {
       setIsLoading(true);
+      getOfferStats();
       getShopOffersStats('daily');
     }, [shopAndHost.shop]);
 

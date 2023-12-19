@@ -202,7 +202,7 @@ const EditOfferView = () => {
                   <Grid.Cell columnSpan={{xs: 6, sm: 6, md: 6, lg: 4, xl: 4}}>
                     <VerticalStack gap="5">
                       <Details offer={offer} offerableProducts={initialOfferableProductDetails}/>
-                      <Summary offer={offer}/>
+                      <Summary offerID={offerID}/>
                       <AbAnalytics offerId={offerID}/>
                     </VerticalStack>
                   </Grid.Cell>

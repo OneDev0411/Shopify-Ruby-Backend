@@ -42,6 +42,7 @@ Rails.application.routes.draw do
       get 'enable_autopilot_status', to: 'shops#enable_autopilot_status'
 
       post 'offers_list', to: 'offers#offers_list'
+      post 'offer_stats', to: 'offers#offer_stats'
       post 'offers_list_by_period', to: 'offers#offers_list_by_period'
       post 'offer_activate', to: 'offers#activate'
       post 'offer_deactivate', to: 'offers#deactivate'
