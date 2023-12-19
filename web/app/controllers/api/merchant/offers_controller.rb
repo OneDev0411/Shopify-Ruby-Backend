@@ -20,10 +20,21 @@ module Api
 
       # POST /api/merchant/offer_stats
       def offer_stats
-        offer = @icushop.offer_data_with_stats.find(id: params['offer_id'])
+        offer = @icushop.offers.find_by(id: params['offer_id'])
 
         if !offer.nil?
-          render json: { shopify_domain: @icushop.shopify_domain, offer: offer.first }
+
+          data = {
+            id: offer.id,
+            title: offer.title,
+            status: offer.active,
+            clicks: offer.total_clicks,
+            views: offer.total_views,
+            revenue: offer.total_revenue,
+            created_at: offer.created_at.to_datetime,
+            offerable_type: offer.offerable_type
+          }
+          render json: { shopify_domain: @icushop.shopify_domain, offer: data }
         else
           render status: :not_found
         end
