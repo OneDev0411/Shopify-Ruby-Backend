@@ -259,7 +259,7 @@ module Graphable
         }
 
         # Get the count of orders data which created_at is in the time range
-        stats = all_orders.select{ |order| order.created_at >= start_date && order.created_at < end_date }.count
+        stats = all_orders.select{ |order| order.created_at >= start_date && order.created_at < end_date }.size
 
         results[i][:value] = stats
         total += stats
