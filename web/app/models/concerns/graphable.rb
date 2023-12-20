@@ -107,15 +107,7 @@ module Graphable
   def sales_stats(period)
     results = []
 
-    period_hash = {
-      'daily' => { interval: 6.hours, start_date: DateTime.now.beginning_of_day, last: DateTime.now.end_of_day },
-      'weekly' => { interval: 2.days, start_date: Date.today - 7.days, last: (Date.today - 1.day) },
-      'monthly' => { interval: 1.week, start_date: (Date.today.beginning_of_month - 1.month), last: (Date.today-1.months).end_of_month },
-      '3-months' => { interval: 1.month, start_date: (Date.today.beginning_of_month - 2.months), last: Date.today.end_of_month },
-      '6-months' => { interval: 2.months, start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
-      'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
-      'all' => { interval: 6.months, start_date: self.orders.present? ? self.orders.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
-    }
+    period_hash = construct_period_hash
 
     start_date = period_hash[period][:start_date]
     last = period_hash[period][:last]
@@ -177,15 +169,7 @@ module Graphable
       times_checkedout: 0
     }
 
-    period_hash = {
-      'daily' => { interval: 6.hours, start_date: DateTime.now.beginning_of_day, last: DateTime.now.end_of_day },
-      'weekly' => { interval: 2.days, start_date: Date.today - 7.days, last: (Date.today - 1.day) },
-      'monthly' => { interval: 1.week, start_date: (Date.today.beginning_of_month - 1.month), last: (Date.today-1.months).end_of_month },
-      '3-months' => { interval: 1.month, start_date: (Date.today.beginning_of_month - 2.months), last: Date.today.end_of_month },
-      '6-months' => { interval: 2.months, start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
-      'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
-      'all' => { interval: 6.months, start_date: self.daily_stats.present? ? self.daily_stats.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
-    }
+    period_hash = construct_period_hash
 
 
     start_date = period_hash[period][:start_date]
@@ -214,25 +198,17 @@ module Graphable
   def orders_stats(period)
     results = []
 
-    period_hash = {
-      'daily' => { interval: 6.hours, start_date: DateTime.now.beginning_of_day, last: DateTime.now.end_of_day },
-      'weekly' => { interval: 2.days, start_date: Date.today - 7.days, last: (Date.today - 1.day) },
-      'monthly' => { interval: 1.week, start_date: (Date.today.beginning_of_month - 1.month), last: (Date.today-1.months).end_of_month },
-      '3-months' => { interval: 1.month, start_date: (Date.today.beginning_of_month - 2.months), last: Date.today.end_of_month },
-      '6-months' => { interval: 2.months, start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
-      'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
-      'all' => { interval: 6.months, start_date: self.orders.present? ? self.orders.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
-    }
+    period_hash = construct_period_hash
 
-    if orders.present?
-      start_date = period_hash[period][:start_date]
-      last = period_hash[period][:last]
-      interval = period_hash[period][:interval]
+    start_date = period_hash[period][:start_date]
+    last = period_hash[period][:last]
+    interval = period_hash[period][:interval]
 
-      # Get all orders data which created_at is between start_date and last outside the while loop to avoid repeated
-      # execution of the query in loop, and calculate the count inside the loop again.
-      all_orders = orders.where('created_at >= ? and created_at < ?', start_date, last)
+    # Get all orders data which created_at is between start_date and last
+    # i.e. the Bigger DataSet of the entire reporting range.
+    all_orders = orders.where('created_at >= ? and created_at < ?', start_date, last)
 
+    if all_orders.present?
       i = 0;
       total = 0
       while (start_date <= last) do
@@ -258,8 +234,9 @@ module Graphable
           value: 0
         }
 
-        # Get the count of orders data which created_at is in the time range
-        stats = all_orders.select{ |order| order.created_at >= start_date && order.created_at < end_date }.size
+        # Get the count of orders which fall between reporting interval's time range
+        # i.e. a subset of all orders separated by time intervals
+        stats = all_orders.where('created_at >= ? and created_at < ?', start_date, end_date).count
 
         results[i][:value] = stats
         total += stats
@@ -274,15 +251,7 @@ module Graphable
   def clicks_stats(period)
     results = []
 
-    period_hash = {
-      'daily' => { interval: 6.hours, start_date: DateTime.now.beginning_of_day, last: DateTime.now.end_of_day },
-      'weekly' => { interval: 2.days, start_date: Date.today - 7.days, last: (Date.today - 1.day) },
-      'monthly' => { interval: 1.week, start_date: (Date.today.beginning_of_month - 1.month), last: (Date.today-1.months).end_of_month },
-      '3-months' => { interval: 1.month, start_date: (Date.today.beginning_of_month - 2.months), last: Date.today.end_of_month },
-      '6-months' => { interval: 2.months, start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
-      'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
-      'all' => { interval: 6.months, start_date: self.offers.present? ? self.offers.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
-    }
+    period_hash = construct_period_hash
 
     i = 0
     start_date = period_hash[period]&.[](:start_date)
@@ -411,5 +380,17 @@ module Graphable
   def report_dates
     @report_dates ||= (created_at.in_time_zone(iana_timezone).to_date)..
                       (Time.now.in_time_zone(iana_timezone).to_date)
+  end
+
+  def construct_period_hash
+    {
+      'daily' => { interval: 6.hours, start_date: DateTime.now.beginning_of_day, last: DateTime.now.end_of_day },
+      'weekly' => { interval: 2.days, start_date: Date.today - 7.days, last: (Date.today - 1.day) },
+      'monthly' => { interval: 1.week, start_date: (Date.today.beginning_of_month - 1.month), last: (Date.today-1.months).end_of_month },
+      '3-months' => { interval: 1.month, start_date: (Date.today.beginning_of_month - 2.months), last: Date.today.end_of_month },
+      '6-months' => { interval: 2.months, start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
+      'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
+      'all' => { interval: 6.months, start_date: self.orders.present? ? self.orders.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
+    }
   end
 end
