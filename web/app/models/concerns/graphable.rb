@@ -120,15 +120,7 @@ module Graphable
     while (start_date <= last) do
       end_date = start_date + interval > last ? last : start_date + interval
 
-      label_hash = {
-        'daily' => ->(start_date, end_date) { "#{start_date.hour} - #{end_date.hour}" },
-        'weekly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
-        'monthly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
-        '3-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
-        '6-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
-        'yearly' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
-        'all' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" }
-      }
+      label_hash = construct_lable_hash(start_date, end_date)
 
       results[i] = {
         key: label_hash[period].call(start_date, end_date),
@@ -219,15 +211,8 @@ module Graphable
           end_date = start_date + interval
         end
 
-        label_hash = {
-          'daily' => ->(start_date, end_date) { "#{start_date.hour} - #{end_date.hour}" },
-          'weekly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
-          'monthly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
-          '3-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
-          '6-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
-          'yearly' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
-          'all' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" }
-        }
+        label_hash = construct_lable_hash(start_date, end_date)
+
         results[i]
         results[i] = {
           key: label_hash[period].call(start_date, end_date),
@@ -282,15 +267,7 @@ module Graphable
       else
         end_date = start_date + interval
       end
-      label_hash = {
-        'daily' => ->(start_date, end_date) { "#{start_date.hour} - #{end_date.hour}" },
-        'weekly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
-        'monthly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
-        '3-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
-        '6-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
-        'yearly' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
-        'all' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" }
-      }
+      label_hash = construct_lable_hash(start_date, end_date)
       results[i] = {
         key: label_hash[period]&.call(start_date, end_date),
         value: 0
@@ -391,6 +368,18 @@ module Graphable
       '6-months' => { interval: 2.months, start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
       'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
       'all' => { interval: 6.months, start_date: self.orders.present? ? self.orders.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
+    }
+  end
+
+  def construct_lable_hash(start_date, end_date)
+    {
+      'daily' => ->(start_date, end_date) { "#{start_date.hour} - #{end_date.hour}" },
+      'weekly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
+      'monthly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
+      '3-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+      '6-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+      'yearly' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
+      'all' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" }
     }
   end
 end
