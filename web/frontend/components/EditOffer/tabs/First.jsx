@@ -70,6 +70,7 @@ export function FirstTab(props) {
     const handleDiscountCodeChange = useCallback((value) => props.updateOffer("discount_code", value), []);
     const handleCustomTextChange = useCallback((newChecked) => props.updateOffer("show_custom_field", newChecked), []);
     const handleShowNoThanksChange = useCallback((newChecked) => props.updateOffer("show_nothanks", !newChecked), []);
+    const handleRedirectedToProductChange = useCallback((newChecked) => props.updateOffer("redirect_to_product", newChecked), []);
 
     //modal controls
     const [productModal, setProductModal] = useState(false);
@@ -605,6 +606,13 @@ export function FirstTab(props) {
                                       onChange={handleShowNoThanksChange}
                                       label="Customer can't dismiss offer"
                             />
+                            {props.shop.has_redirect_to_product == true && (
+                                <Checkbox id={"redirectToProduct"}
+                                      checked={props.offer.redirect_to_product}
+                                      onChange={handleRedirectedToProductChange}
+                                      label="Offer button sends shopper to product page instead of adding to the cart (not recommended)"
+                                />
+                            )}
                         </LegacyStack>
                     </LegacyCard>
                     <div className="space-10"/>
