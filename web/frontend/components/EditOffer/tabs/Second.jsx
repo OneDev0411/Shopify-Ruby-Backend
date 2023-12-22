@@ -60,6 +60,8 @@ export function SecondTab(props) {
     const [templateImagesURL, setTemplateImagesURL] = useState({});
     const [storedThemeNames, setStoredThemeName] = useState([]);
 
+    const [isLegacy, setIsLegacy] = useState(false);
+
     useEffect(() => {
         fetch(`/api/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
             method: 'GET',
@@ -716,29 +718,36 @@ export function SecondTab(props) {
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                             {/*Select requires a styled dropdown*/}
-                            <CustomSelect options={options} onChange={handleSelectChange} value={selected}
-                                          callbackfn={(elem) =>
-                                              <Text as="h2" variant="bodyMd">
-                                                  {elem.label}
-                                              </Text>}/>
+                            {!isLegacy ? <CustomSelect options={options} onChange={handleSelectChange} value={selected}
+                                           callbackfn={(elem) =>
+                                               <Text as="h2" variant="bodyMd">
+                                                   {elem.label}
+                                               </Text>}/> :
+                                <Select
+                                    options={options}
+                                    onChange={handleSelectChange}
+                                    value={selected}
+                                />
+                            }
                         </Grid.Cell>
-                        <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
+                        {/*To be removed */}
+                        {isLegacy && <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                             <Checkbox
                                 label="Enable Advanced Setting"
                                 checked={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                                 onChange={handleEnableAdvancedSetting}
                             />
-                        </Grid.Cell>
+                        </Grid.Cell>}
                     </Grid>
-                    {(props.offer.id == null || props.offer.id != props.autopilotCheck?.autopilot_offer_id) && (
-                        <>
-                            <div style={{marginBottom: '20px', marginTop: '16px'}}>
-                                <Button onClick={handleSelectProductsModal} ref={modalProd}>Select Product</Button>
-                            </div>
+                    {((props.offer.id == null || props.offer.id != props.autopilotCheck?.autopilot_offer_id) && isLegacy) && (
+                    <>
+                        <div style={{marginBottom: '20px', marginTop: '16px'}}>
+                            <Button onClick={handleSelectProductsModal} ref={modalProd}>Select Product</Button>
+                        </div>
 
-                            <Button onClick={handleSelectCollectionsModal} ref={modalColl}>Select Collection</Button>
-                        </>
-                    )}
+                        <Button onClick={handleSelectCollectionsModal} ref={modalColl}>Select Collection</Button>
+                    </>
+                )}
                     <Modal
                         open={productModal}
                         onClose={handleProductsModal}
@@ -776,7 +785,7 @@ export function SecondTab(props) {
                         </Modal.Section>
                     </Modal>
                 </LegacyStack>
-                {
+                { isLegacy &&
                     (multipleDefaultSettings ? (
                         (props.offer.in_product_page && props.offer.in_cart_page) ? (
                             <>
@@ -1039,7 +1048,7 @@ export function SecondTab(props) {
                                 )}
                             </>
                         )
-                    ) : (
+                        ) : (
                         <>
                             <hr className="legacy-card-hr legacy-card-hr-t20-b15"/>
                             <div style={{paddingBottom: '12px'}}>
