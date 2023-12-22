@@ -201,7 +201,7 @@ module ShopWorker
 
   class RecordOrderJob
     include Sidekiq::Worker
-    sidekiq_options queue: 'low'
+    sidekiq_options queue: 'orders'
 
     def perform(shopify_url, order_data)
       shop = Shop.find_by(shopify_domain: shopify_url)
