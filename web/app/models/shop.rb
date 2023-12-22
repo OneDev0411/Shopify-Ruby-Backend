@@ -608,7 +608,8 @@ class Shop < ApplicationRecord
       # This needs to go in a delayed job
       # Order.where(shop_id: self.id).delete_all
       update_columns(uninstalled_at: Time.now.utc, myshopify_domain: shopify_domain,
-                     shopify_token: nil, shopify_domain: "#{shopify_domain}_OLD", access_scopes: 'uninstalled')
+                     shopify_token: nil, shopify_domain: "#{shopify_domain}_OLD", access_scopes: 'uninstalled',
+                     is_shop_active: false)
 
       $customerio.track(id, 'uninstalled')
       $customerio.identify(id: id, email: email, active: false, shopify_plan: shopify_plan_name, app_plan_name: self.plan&.name, created_at: created_at.to_i, updated_at: Time.now.to_i, status: "uninstalled")
