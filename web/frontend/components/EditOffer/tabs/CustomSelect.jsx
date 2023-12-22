@@ -1,11 +1,21 @@
 import {Card, LegacyCard, Select, Text} from "@shopify/polaris";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 export function CustomSelect(props) {
     const [options, setOptions] = useState(false)
+    const [selected, setSelected] = useState(props.value)
+
+    useEffect(() => {
+        props.onChange(selected);
+    }, [selected]);
     const toggleOptions = () => {
         setOptions(prevState => !prevState)
         console.log("toggling")
+    }
+
+    const updateSelect = (selection) => {
+        toggleOptions()
+        setSelected(selection)
     }
 
     // Click not registering
@@ -15,13 +25,13 @@ export function CustomSelect(props) {
             <Select
                 options={props.options}
                 onChange={props.onChange}
-                value={props.value}
+                value={selected}
             />
         </div>
         {options && (<div className={"options-card"}>
             <LegacyCard className={"custom-select-card"}>
                 <ul>
-                    {props.options.map(elem => <li onClick={() => toggleOptions()}>
+                    {props.options.map(elem => <li onClick={() => updateSelect(elem.value)}>
                             <Text as="h2" variant="bodyMd">
                                 {elem.label}
                             </Text>
