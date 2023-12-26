@@ -47,15 +47,91 @@ export function CreateOfferCard() {
     fetchCurrentShop();
   }, [shopAndHost]);
 
+  const moreHelpInfo = <div>
+    <div style={{marginBottom: '20px'}}>
+      <Text variant="headingMd" as="span" fontWeight="medium" >
+        Need help creating an offer?&nbsp;
+      </Text>
+      <Text variant="headingMd" as="span" fontWeight="regular" >
+        Our support team can help walk you through it.
+      </Text>
+    </div>
+    <div>
+      <Text variant="headingSm" as="p" fontWeight="regular" >
+        Chat support is open 5am to 10pm EST.
+      </Text>
+      <Text variant="headingSm" as="p" fontWeight="regular" >
+        Or you can send us an email any time and we’ll get back to you within 48 hours.
+      </Text>
+    </div>
+  </div>;
+
+  const homepageInfo =
+    <div style={{marginBottom: '20px'}} className={"homepage-info"}>
+      <Text variant="headingSm" as="p" fontWeight="regular" >
+        <ol>
+         <li>Go to theme settings</li>
+          <li>Click on Product page</li>
+          <li>Click Add Section</li>
+          <li>Search for ICU - Product Page app block</li>
+          <li>Drag into your preferred placement</li>
+          <li>Click on Cart page</li>
+          <li>Click Add Section</li>
+          <li>Search for ICU - Cart Page app block</li>
+          <li>Drag into preferred placement</li>
+          <li>Click save</li>
+          <li>Return to ICU, you're done!</li>
+        </ol>
+      </Text>
+    </div>;
+
   // Though not necessary, this should serve as an example of how to use the Context API
   return (
     <ShopContext.Provider value={{ shopData, setShopData }}>
       <div style={{marginBottom: '47px'}}>
+        <AlphaCard>
+          <VerticalStack inlineAlign="center">
+            <div className="leadin-card">
+              <div style={{marginBottom: '11px'}} className="center-content">
+                <Text variant="headingLg" as="h2" fontWeight="regular">
+                  Add ICU to your stores theme
+                </Text>
+              </div>
+              <div style={{marginBottom: '35px'}} className="center-content">
+                <Text variant="headingSm" as="p" fontWeight="regular" color="subdued">
+                  Start by creating your first offer and publishing it to your store
+                </Text>
+              </div>
+              <div style={{marginBottom: '35px'}} className={"video-intro-section"}>
+                <HelpSection info={homepageInfo} handleOpen={handleOpen} shopData={shopData} disablePrimary />
+                <VideoModal active={active} handleClose={handleClose} />
+              </div>
+              <div className="center-btn" style={{marginBottom: '42px'}}>
+                <ButtonGroup>
+                  <Button primary onClick={handleCreateOffer}>
+                    {/*TODO: swap with Go to theme editor*/}
+                    Create offer
+                  </Button>
+                  <Button
+                      url="https://help.incartupsell.com/en/collections/6780837-help-articles-for-new-ui"
+                      target="_blank"
+                  >
+                    View Help Docs
+                  </Button>
+                </ButtonGroup>
+              </div>
+            </div>
+          </VerticalStack>
+        </AlphaCard>
+      </div>
+
+      <div style={{marginBottom: '47px'}}>
         <OfferCard  handleCreateOffer={handleCreateOffer} isOffers={isOffers} />
       </div>
+
       {!isOffers && (
         <>
-          <HelpSection handleOpen={handleOpen} shopData={shopData} />
+          <HelpSection info={moreHelpInfo} handleOpen={handleOpen} shopData={shopData} />
           <VideoModal active={active} handleClose={handleClose} />
         </>
       )}
@@ -108,7 +184,7 @@ function OfferCard({ handleCreateOffer, isOffers }) {
   );
 }
 
-function HelpSection({ handleOpen }) {
+function HelpSection({ handleOpen, info, disablePrimary }) {
   const { shopData } = useContext(ShopContext);
 
   const showIntercomWidget = () => {
@@ -131,40 +207,29 @@ function HelpSection({ handleOpen }) {
     window.Intercom('show');
   };
 
+  let VideoComp = <VideoThumbnail
+      onClick={handleOpen}
+      videoLength={80}
+      thumbnailUrl="https://burst.shopifycdn.com/photos/business-woman-smiling-in-office.jpg"
+  />
+
   return (
-    <MediaCard
-      title={
-        <div>
-          <div style={{marginBottom: '20px'}}>
-            <Text variant="headingMd" as="span" fontWeight="medium" >
-              Need help creating an offer?&nbsp;
-            </Text>
-            <Text variant="headingMd" as="span" fontWeight="regular" >
-              Our support team can help walk you through it.
-            </Text>
-          </div>
-          <div>
-            <Text variant="headingSm" as="p" fontWeight="regular" >
-              Chat support is open 5am to 10pm EST.
-            </Text>
-            <Text variant="headingSm" as="p" fontWeight="regular" >
-              Or you can send us an email any time and we’ll get back to you within 48 hours.
-            </Text>
-          </div>
-        </div>
-      }
-      primaryAction={{
-        content: "Learn more",
-        onAction: showIntercomWidget,
-      }}
+    disablePrimary ? <MediaCard
+      title={info}
       description={""}
-      popoverActions={[{ content: "Dismiss", onAction: () => {} }]}
     >
-      <VideoThumbnail
-        onClick={handleOpen}
-        videoLength={80}
-        thumbnailUrl="https://burst.shopifycdn.com/photos/business-woman-smiling-in-office.jpg"
-      />
+      {VideoComp}
+    </MediaCard> :
+        <MediaCard
+        title={info}
+        primaryAction={{
+          content: "Learn more",
+          onAction: showIntercomWidget,
+        }}
+        description={""}
+        popoverActions={[{ content: "Dismiss", onAction: () => {} }]}
+    >
+      {VideoComp}
     </MediaCard>
   );
 }
