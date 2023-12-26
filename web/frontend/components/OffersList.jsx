@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 import { useSelector } from "react-redux";
 import {CreateOfferCard} from "./CreateOfferCard.jsx";
+import OffersListSkeleton from '../skeletons/OfferListSkeleton.jsx';
 
 export function OffersList(props) {
   const resourceName = {
@@ -334,17 +335,7 @@ export function OffersList(props) {
   return (
     <div className="narrow-width-layout">
       {isLoading ? (
-        <div
-          style={{
-            overflow: "hidden",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "100vh",
-          }}
-        >
-          <Spinner size="large" color="teal" />
-        </div>
+        <OffersListSkeleton sectionsCount={4}/>
       ) : (
         <>
           {offersData.length === 0 ? (

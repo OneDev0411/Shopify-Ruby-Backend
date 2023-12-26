@@ -11,6 +11,7 @@ import {useAuthenticatedFetch} from "../hooks";
 import {FirstTab, FourthTab, SecondTab, ThirdTab} from "../components";
 import {OfferPreview} from "../components/OfferPreview";
 import "../components/stylesheets/mainstyle.css";
+import EditOfferSkeleton from '../skeletons/EditOfferSkeleton';
 
 export default function EditPage() {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -739,15 +740,9 @@ export default function EditPage() {
     };
 
     return (
-        <div className="edit-offer" style={{
-            overflow: 'hidden',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: '100vh',
-        }}>
+        <div className="edit-offer">
             {isLoading ? (
-                <Spinner size="large" color="teal"/>
+                <EditOfferSkeleton />
             ) : (
                 <Page
                     backAction={{content: 'Offers', url: '/offer'}}

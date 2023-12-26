@@ -2,7 +2,7 @@ import { forwardRef, useState, useEffect, useRef } from "react";
 import { 
 	Text,
 	LegacyCard,
-	Grid
+	Grid, TextContainer ,SkeletonBodyText
 } from '@shopify/polaris';
 import TemplateComponent from 'react-mustache-template-component';
 import themeCss from '../assets/theme.css';
@@ -190,9 +190,11 @@ export function OfferPreview(props) {
 					<Stack offer={props.offer} checkKeysValidity={props.checkKeysValidity}/>
 				) : props.offer.multi_layout == "carousel" ? (
 					carouselLoading ? (
-						<div style={{ marginTop: props.offer.css_options?.main?.marginTop, marginLeft: '40%' }}>
-							<Spinner></Spinner>
-						</div>
+						<LegacyCard sectioned>
+							<TextContainer>
+								<SkeletonBodyText lines={6} />
+							</TextContainer>
+						</LegacyCard>
 					) : (
 						<Carousel offer={props.offer} checkKeysValidity={props.checkKeysValidity} updateCheckKeysValidity={props.updateCheckKeysValidity}/>
 					)

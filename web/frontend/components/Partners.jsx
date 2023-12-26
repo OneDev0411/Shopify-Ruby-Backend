@@ -7,12 +7,14 @@ import { useSelector } from 'react-redux';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useAuthenticatedFetch } from "../hooks";
+import PartnersSkeleton from '../skeletons/PartnersSkeleton';
 
 export function Partners(){
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [partners, setPartners] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const previousVal = null;
     const nextVal = null;
     let slider;
@@ -63,6 +65,7 @@ export function Partners(){
     }
 
     const getAllPartners = useCallback(async ()=>{
+      setIsLoading(true);
       fetch(`/api/merchant/partners?shop=${shopAndHost.shop}`, {
         method: 'GET',
            headers: {
@@ -72,6 +75,7 @@ export function Partners(){
        .then( (response) => { return response.json(); })
        .then( (data) => {
         setPartners(data.partners);
+        setIsLoading(false);
        })
        .catch((error) => {
         console.log("error", error);
@@ -90,7 +94,11 @@ export function Partners(){
       <LegacyCard sectioned title="Recommended Apps" id={"LegacyCardYpadding"}>
         <p>Check out our partners below.</p>
         <div className="space-4"></div>
-        <Grid >
+        {isLoading ? (
+          <PartnersSkeleton sectionsCount={3} />
+        ) : (
+          <>
+          <Grid >
             <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 12, lg: 12, xl: 12}}>
                 <Slider ref={c => (slider = c)} {...settings}>
                   {partners && partners.map((partner, index) => (
@@ -142,6 +150,8 @@ export function Partners(){
                 </Slider>
             </Grid.Cell>
         </Grid>
+          </>
+        )}
         <div className="space-4"></div>
         <Pagination
             hasPrevious
