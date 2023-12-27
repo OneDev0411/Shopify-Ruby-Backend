@@ -1,12 +1,3 @@
-<head>
-  {% # theme-check-disable AssetSizeJavaScript, ParserBlockingJavaScript, RemoteAsset %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" defer></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/siema@1.5.1/dist/siema.min.js"></script>
-    <script type="module">
-      import { Helpers } from './helpers.js';
-    </script>
-  {% # theme-check-enable AssetSizeJavaScript, ParserBlockingJavaScript, RemoteAsset %}
-</head>
 <div id="nudge-offer-list">
 
 </div>
@@ -18,7 +9,7 @@
     "stylesheet": "index.css",
     "javascript": "index.js",
     "enabled_on": {
-      "templates": ["product", "cart"]
+      "templates": ["product", "cart", "collection"]
     }
   }
 {% endschema %}

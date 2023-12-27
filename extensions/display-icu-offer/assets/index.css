@@ -26,9 +26,6 @@
   right: 0;
   top: 45%;
 }
-.nudge-offer .product-title-wrapper {
-  margin-bottom: 5px;
-}
 .nudge-offer .octane-plugin__checkbox {
   display: none !important;
 }
@@ -337,7 +334,6 @@
   margin: 0 auto;
 }
 .nudge-offer.multi.stack .offer-collection .product-wrapper .details {
-  padding: 5px 0px;
   display: table-cell;
   vertical-align: middle;
 }
@@ -960,6 +956,7 @@
 .nudge-offer input.bttn, .nudge-offer button.bttn, nudge-offer.multi.flex input.bttn, .nudge-offer.multi.flex button.bttn{
   border-radius: 2px;
   margin: 0px 0px 0px 0px;
+  height: 32px;
 }
 .nudge-offer .offer-text, .nudge-offer .product-title{ }
 .nudge-offer.custom{
@@ -1042,6 +1039,8 @@
 
 .nudge-offer.carousel {
   -webkit-background-clip: border-box;
+  padding-left: 30px;
+  padding-right: 30px;
 }
 
 #nudge-offer-list input[type="submit"] {
@@ -1054,5 +1053,35 @@
 
 #nudge-offer-list .inline ~ .bttn {
   margin-bottom: 0;
+}
+
+#nudge-offer-list .carousel .offer-collection {
+  display: -webkit-box;
+  overflow-x: hidden;
+  max-width: 380px;
+  position: relative;
+}
+
+#nudge-offer-list .fade {
+  animation-name: fade;
+  animation-duration: 1.5s;
+  transition: all 200ms ease-out 0s;
+  margin-left: 0;
+  max-width: 100%;
+}
+
+@keyframes fade {
+  from {opacity: .4}
+  to {opacity: 1}
+}
+
+#nudge-offer-list .slide-left {
+  transform: translate3d(120%, 0px, 0px);
+}
+
+
+#nudge-offer-list .slide-right {
+  transition: all 200ms ease-out 0s;
+  transform: translate3d(-120%, 0px, 0px);
 }
 /*# sourceMappingURL=themes.css.map */
