@@ -97,9 +97,8 @@ export function ConversionRate(props) {
     const [converted, setConverted] = useState(0);
     const [totalDisplayed, setTotalDisplayed] = useState(0);
 
-    function getOffersStats(period) {
-        let redirect = Redirect.create(app);
-        fetch(`/api/merchant/shop_offers_stats`, {
+    function getOffersStats(endpointUrl, period, callback) {
+        fetch(endpointUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -108,21 +107,43 @@ export function ConversionRate(props) {
         })
             .then((response) => { return response.json(); })
             .then((data) => {
-                if (data.redirect_to) {
-                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
-                } else {
-                setAddedToCart(data.offers_stats.times_clicked);
-                setTotalDisplayed(data.offers_stats.times_loaded);
-                setReachedCheckout(data.offers_stats.times_checkedout);
-                setConverted(data.orders_through_offers_count);
-            }})
+                callback(data)
+            })
             .catch((error) => {
                 console.log("error", error);
             })
     }
 
+    function getOffersStatsTimesLoaded(period) {
+        getOffersStats(
+            `/api/merchant/shop_offers_stats_times_loaded`, 
+            period, 
+            (data) => {
+                setTotalDisplayed(data.stat_times_loaded);
+                setConverted(data.orders_through_offers_count);
+            });
+    }
+
+    function getOffersStatsTimesClicked(period) {
+        getOffersStats(
+            `/api/merchant/shop_offers_stats_times_clicked`,
+            period,
+            (data) => { setAddedToCart(data.stat_times_clicked); }
+        )
+    }
+
+    function getOffersStatsTimesCheckedout(period) {
+        getOffersStats(
+            `/api/merchant/shop_offers_stats_times_checkedout`,
+            period,
+            (data) => { setReachedCheckout(data.stat_times_checkedout); }
+        )
+    }
+
     useEffect(() => {
-        getOffersStats(props.period);
+        getOffersStatsTimesLoaded(props.period);
+        getOffersStatsTimesClicked(props.period);
+        getOffersStatsTimesCheckedout(props.period);
     }, [props.period])
 
     return (

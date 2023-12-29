@@ -187,6 +187,46 @@ module Graphable
     results
   end
 
+  def offers_stats_click_revenue(period)
+    calculate_offer_stat(period, :click_revenue)
+  end
+
+  def offers_stats_times_loaded(period)
+    calculate_offer_stat(period, :times_loaded)
+  end
+
+  def offers_stats_times_clicked(period)
+    calculate_offer_stat(period, :times_clicked)
+  end
+
+  def offers_stats_times_checkedout(period)
+    calculate_offer_stat(period, :times_checkedout)
+  end
+
+  def calculate_offer_stat(period, stat_field)
+    total_stat = 0
+    period_hash = construct_period_hash
+
+    start_date = period_hash[period][:start_date]
+    last = period_hash[period][:last]
+    interval = period_hash[period][:interval]
+
+    if daily_stats.present?
+      while (start_date <= last) do
+        if (start_date + interval > last)
+          end_date = last
+        else
+          end_date = start_date + interval
+        end
+
+        total_stat += daily_stats.where('created_at >= ? and created_at < ?', start_date, end_date).sum(stat_field)
+
+        start_date = start_date + interval
+      end
+    end
+    total_stat
+  end
+
   def orders_stats(period)
     results = []
 

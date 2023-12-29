@@ -165,6 +165,54 @@ module Api
       end
     end
 
+    # Gets total click_revenue of offers stats data.
+    # POST  /api/merchant/shop_offers_stats_click_revenue
+    def shop_offers_stats_click_revenue
+      begin
+        @stat_click_revenue = @icushop.offers_stats_click_revenue(params[:period])
+        render "shops/shop_offers_stats_click_revenue"
+      rescue StandardError => e
+        Rails.logger.debug "Error Message: #{e.message}"
+        Rollbar.error("Error", e)
+      end
+    end
+
+    # Gets total times_loaded of offers stats data
+    # POST /api/merchant/shop_offers_stats_times_loaded
+    def shops_offers_stats_times_loaded
+      begin
+        @stat_times_loaded = @icushop.offers_stats_times_loaded(params[:period])
+        render "shops/shop_offers_stats_times_loaded"
+      rescue StandardError => e
+        Rails.logger.debug "Error Message: #{e.message}"
+        Rollbar.error("Error", e)
+      end
+    end
+
+    # Gets total times_clicked of offers stats data
+    # POST /api/merchant/shop_offers_stats_times_clicked
+    def shops_offers_stats_times_clicked
+      begin
+        @stat_times_clicked = @icushop.offers_stats_times_clicked(params[:period])
+        render "shops/shop_offers_stats_times_clicked"
+      rescue StandardError => e
+        Rails.logger.debug "Error Message: #{e.message}"
+        Rollbar.error("Error", e)
+      end
+    end
+
+    # Gets total times_checkedout of offers stats data
+    # POST /api/merchant/shop_offers_stats_times_checkedout
+    def shops_offers_stats_times_checkedout
+      begin
+        @stat_times_checkedout = @icushop.offers_stats_times_checkedout(params[:period])
+        render "shops/shop_offers_stats_times_checkedout"
+      rescue StandardError => e
+        Rails.logger.debug "Error Message: #{e.message}"
+        Rollbar.error("Error", e)
+      end
+    end
+
     # Gets all clicks stats. POST   /api/merchant/shops_clicks_stats
     def shop_clicks_stats
       begin

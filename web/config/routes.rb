@@ -48,7 +48,13 @@ Rails.application.routes.draw do
       post 'offer_deactivate', to: 'offers#deactivate'
       post 'shop_sale_stats', to: 'shops#shop_sale_stats'
       post 'shop_orders_stats', to: 'shops#shop_orders_stats'
+
       post 'shop_offers_stats', to: 'shops#shop_offers_stats'
+      post 'shop_offers_stats_click_revenue', to: 'shops#shop_offers_stats_click_revenue'
+      post 'shop_offers_stats_times_loaded', to: 'shops#shops_offers_stats_times_loaded'
+      post 'shop_offers_stats_times_clicked', to: 'shops#shops_offers_stats_times_clicked'
+      post 'shop_offers_stats_times_checkedout', to: 'shops#shops_offers_stats_times_checkedout'
+
       post 'shop_clicks_stats', to: 'shops#shop_clicks_stats'
       post '/offers/:id/duplicate', to: 'offers#duplicate'
       delete '/offers/:id', to: 'offers#destroy'
