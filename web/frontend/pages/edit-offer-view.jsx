@@ -4,7 +4,6 @@ import {
   Badge,
   Grid,
   VerticalStack,
-  Spinner,
 } from "@shopify/polaris";
 import "@shopify/polaris/build/esm/styles.css";
 import { useNavigate } from "react-router-dom";

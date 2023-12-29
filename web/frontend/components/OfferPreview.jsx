@@ -1,17 +1,11 @@
-import { forwardRef, useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { 
-	Text,
-	LegacyCard,
-	Grid, TextContainer ,SkeletonBodyText
+	LegacyCard, TextContainer ,SkeletonBodyText
 } from '@shopify/polaris';
-import TemplateComponent from 'react-mustache-template-component';
-import themeCss from '../assets/theme.css';
 import Compact from './layouts/template_single_compact';
 import Stack from './layouts/template_multi_stack';
 import Carousel from './layouts/template_multi_carousel';
 import Flex from './layouts/template_multi_flex';
-import Siema from 'siema'
-import { Spinner } from '@shopify/polaris';
 import {useAuthenticatedFetch} from "../hooks/index.js";
 import {useSelector} from "react-redux";
 

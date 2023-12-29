@@ -1,5 +1,5 @@
 import {ResourceList, ResourceItem, OptionList} from '@shopify/polaris';
-import {useState, useCallback} from 'react';
+import {useState} from 'react';
 
 export function SearchProductsList(props) {
   const [selectedItems, setSelectedItems] = useState([]);

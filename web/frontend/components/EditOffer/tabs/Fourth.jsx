@@ -13,7 +13,6 @@ import React from "react";
 // Advanced Tab
 export function FourthTab(props) {
 
-    const [checked, setChecked] = useState(false);
     const handleChange = useCallback((newChecked) => props.updateOffer("save_as_default_setting", newChecked), []);
     const handleProductDomSelector = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "advanced_placement_setting",  "custom_product_page_dom_selector"), []);
     const handleProductDomAction = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_product_page_dom_action"), []);

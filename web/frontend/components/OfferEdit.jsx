@@ -1,13 +1,11 @@
 import { useState, useCallback } from "react";
 import { LegacyCard,Tabs} from "@shopify/polaris";
 
-import { Toast } from "@shopify/app-bridge-react";
-import { useAppQuery, useAuthenticatedFetch } from "../hooks";
+import { useAppQuery } from "../hooks";
 
 export function OfferEdit() {
 
   const shopAndHost = useSelector(state => state.shopAndHost);
-  const fetch = useAuthenticatedFetch(shopAndHost.host);
   const [isLoading, setIsLoading]   = useState(true);
   const [selected, setSelected] = useState(0);
 

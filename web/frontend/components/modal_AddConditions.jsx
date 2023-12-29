@@ -1,9 +1,9 @@
-import { Select, TextField, LegacyStack, ResourceList, ResourceItem, OptionList } from '@shopify/polaris';
-import { useState, useCallback, useEffect } from 'react';
+import { Select, TextField, LegacyStack } from '@shopify/polaris';
+import { useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { SearchProductsList } from './SearchProductsList';
 import { countriesList } from "../components/countries.js";
-import { useAppQuery, useAuthenticatedFetch } from "../hooks";
+import { useAuthenticatedFetch } from "../hooks";
 
 export function ModalAddConditions(props) {
   const shopAndHost = useSelector(state => state.shopAndHost);
@@ -13,7 +13,6 @@ export function ModalAddConditions(props) {
   const [productData, setProductData] = useState("");
   const [item, setItem] = useState("product");
   const [resourceListLoading, setResourceListLoading] = useState(false);
-  const [errorText, setErrorText] = useState(null);
 
   const item_options = [
     { label: "Product", value: "product" },

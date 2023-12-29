@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Card, AppProvider, Text, Image, Grid, Link, Spinner } from '@shopify/polaris';
+import { Card, AppProvider, Text, Image, Grid, Link } from '@shopify/polaris';
 import "../components/stylesheets/editOfferStyle.css";
 import { useAuthenticatedFetch } from '../hooks';
 

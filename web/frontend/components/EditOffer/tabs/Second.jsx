@@ -36,8 +36,6 @@ export function SecondTab(props) {
     const [selectedItems, setSelectedItems] = useState([]);
     const [defaultSetting, setDefaultSetting] = useState(false);
     const [useTemplate, setUseTemplate] = useState(false);
-    const [defaultSettingSecond, setDefaultSettingSecond] = useState(false);
-    const [useTemplateSecond, setUseTemplateSecond] = useState(false);
     const [multipleDefaultSettings, setMultipleDefaultSettings] = useState(false);
     
     const [insertedImage1, setInsertedImage1] = useState(null);

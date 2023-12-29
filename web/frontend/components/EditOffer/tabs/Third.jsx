@@ -11,7 +11,6 @@ import {
     Text,
     Stack} from "@shopify/polaris";
 import { useState, useCallback, useRef, useEffect } from "react";
-import { SketchPicker } from 'react-color';
 import React from "react";
 import CollapsibleColorPicker from "../../CollapsibleColorPicker";
 import tinycolor from "tinycolor2";
@@ -31,7 +30,6 @@ export function ThirdTab(props) {
     const handleLayout = useCallback((value) => {
         props.updateOffer("multi_layout", value);
     }, []);
-    const handleSelectChange = useCallback((value) => setSelected(value), []);
 
     // Space above the offer
     const handleAboveSpace = useCallback((newValue) => {
@@ -171,17 +169,6 @@ export function ThirdTab(props) {
         { label: 'Verdana', value: 'Verdana' },
     ];
 
-    //Font weight
-    // const handleFontWeight = useCallback((newValue) => {
-    //     props.updateShop(`${newValue}px`, "css_options", "text", "fontWeightInPixel");
-    //     if (parseInt(newValue) > 400 && props.shop.css_options.text.fontWeight != "bold") {
-    //         props.updateShop("bold", "css_options", "text", "fontWeight");
-    //     }
-    //     else if (parseInt(newValue) <= 400 && props.shop.css_options.text.fontWeight != "Normal" && props.shop.css_options.text.fontWeight != "inherit") {
-    //         props.updateShop("Normal", "css_options", "text", "fontWeight");
-    //     }
-    // }, []);
-
     //Font sizes
     const handleFontSize = useCallback((newValue) => props.updateNestedAttributeOfOffer(`${newValue}px`, "css_options", "text", "fontSize"), []);
 
@@ -212,22 +199,10 @@ export function ThirdTab(props) {
         { label: 'Verdana', value: 'Verdana' },
     ];
 
-    //Button weight
-    // const handleBtnWeight = useCallback((newValue) => {
-    //     props.updateShop(`${newValue}px`, "css_options", "button", "fontWeightInPixel");
-    //     if (parseInt(newValue) > 400 && props.shop.css_options.button.fontWeight != "bold") {
-    //         props.updateShop("bold", "css_options", "button", "fontWeight");
-    //     }
-    //     else if (parseInt(newValue) <= 400 && props.shop.css_options.button.fontWeight != "Normal" && props.shop.css_options.button.fontWeight != "inherit") {
-    //         props.updateShop("Normal", "css_options", "button", "fontWeight");
-    //     }
-    // }, []);
-
     //Button size
     const handleBtnSize = useCallback((newValue) => props.updateNestedAttributeOfOffer(`${newValue}px`, "css_options", "button", "fontSize"), []);
 
     // Btn radius
-    const [rangeValue, setRangeValue] = useState(20);
     const handleRangeSliderChange = useCallback((newValue) => props.updateNestedAttributeOfOffer(parseInt(newValue), "css_options", "button", "borderRadius"), []);
 
     const handleBtnBorderWidth =useCallback((newValue) => {
@@ -534,16 +509,6 @@ export function ThirdTab(props) {
                             value={props.offer.css_options?.text?.fontFamily}
                         />
                     </Grid.Cell>
-                    {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                            <TextField
-                                label="Weight"
-                                type="number"
-                                suffix="px"
-                                autoComplete="off"
-                                onChange={handleFontWeight}
-                                value={parseInt(props.shop.css_options.text.fontWeightInPixel)}
-                            />
-                        </Grid.Cell>*/}
 
                     <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                         <TextField
@@ -569,16 +534,6 @@ export function ThirdTab(props) {
                             value={props.offer.css_options?.button?.fontFamily}
                         />
                     </Grid.Cell>
-                    {/*<Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                            <TextField
-                                label="Weight"
-                                type="number"
-                                suffix="px"
-                                autoComplete="off"
-                                onChange={handleBtnWeight}
-                                value={parseInt(props.offer.css_options?.button.fontWeightInPixel)}
-                            />
-                        </Grid.Cell>*/}
                         <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                             <TextField
                                 label="Size"
