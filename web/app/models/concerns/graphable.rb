@@ -152,57 +152,27 @@ module Graphable
     { results: results, sales_total: total}
   end
 
-
-  def offers_stats(period)
-    results = {
-      click_revenue: 0,
-      times_loaded: 0,
-      times_clicked: 0,
-      times_checkedout: 0
-    }
-
-    period_hash = construct_period_hash
-
-
-    start_date = period_hash[period][:start_date]
-    last = period_hash[period][:last]
-    interval = period_hash[period][:interval]
-
-    total = 0
-    if daily_stats.present?
-      while (start_date <= last) do
-        if (start_date + interval > last)
-          end_date = last
-        else
-          end_date = start_date + interval
-        end
-
-        [:click_revenue, :times_loaded, :times_clicked, :times_checkedout].map do |field|
-          total = daily_stats.where('created_at >= ? and created_at < ?', start_date, end_date).sum(field)
-          results[field] += total
-        end
-        start_date = start_date + interval
-      end
-    end
-    results
-  end
-
+  # Get stats data for click_revenue
   def offers_stats_click_revenue(period)
     calculate_offer_stat(period, :click_revenue)
   end
 
+  # Get stats data for times_loaded
   def offers_stats_times_loaded(period)
     calculate_offer_stat(period, :times_loaded)
   end
 
+  # Get stats data for times_clicked
   def offers_stats_times_clicked(period)
     calculate_offer_stat(period, :times_clicked)
   end
 
+  # Get stats data for times_checkedout
   def offers_stats_times_checkedout(period)
     calculate_offer_stat(period, :times_checkedout)
   end
 
+  # Calculate stat data for each kind of stat
   def calculate_offer_stat(period, stat_field)
     total_stat = 0
     period_hash = construct_period_hash

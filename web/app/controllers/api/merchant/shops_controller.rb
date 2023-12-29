@@ -154,17 +154,6 @@ module Api
       end
     end
 
-    # Gets all Shops. POST  /api/merchant/shops_last_stats
-    def shop_offers_stats
-      begin
-        @offers_stats = @icushop.offers_stats(params[:period])
-        render "shops/shop_offers_stats"
-      rescue StandardError => e
-        Rails.logger.debug "Error Message: #{e.message}"
-        Rollbar.error("Error", e)
-      end
-    end
-
     # Gets total click_revenue of offers stats data.
     # POST  /api/merchant/shop_offers_stats_click_revenue
     def shop_offers_stats_click_revenue

@@ -1,2 +1,0 @@
-json.offers_stats @offers_stats
-json.orders_through_offers_count @icushop.orders_through_offers
