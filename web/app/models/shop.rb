@@ -558,6 +558,26 @@ class Shop < ApplicationRecord
   def publish_async
     j = Sidekiq::Client.push('class' => 'ShopWorker::ForcePurgeCacheJob', 'args' => [id], 'queue' => 'shop', 'at' => Time.now.to_i)
     update_column(:publish_job, j)
+
+    if ENV["PUBLISH_SCRIPT_VIA_API"].downcase == 'true'
+      query_headers = {
+        'Content-Type' => 'application/json',
+        'accept' => 'application/json',
+        'Authorization' => "Bearer #{ENV['ICU_INTER_SERVICES_AUTH_TOKEN']}"
+      }
+      options = {
+        headers: query_headers,
+        body: {}.to_json
+      }
+      legacy_base = ENV['DOMAIN_URL']
+      legacy_api = "/internal/shops/#{id}/force_purge_cache"
+      url = legacy_base + legacy_api
+      begin
+        res = HTTParty.post(url, options)
+      rescue => e
+        ErrorNotifier.call(e)
+      end
+    end
   end
 
   # Public: Upload JS file to stackpath.

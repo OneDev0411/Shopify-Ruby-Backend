@@ -25,6 +25,7 @@ class Offer < ApplicationRecord
 
   validate :offer_text_must_be_valid
   validate :offerable_must_be_present
+  delegate :shopify_theme_name, to: :shop, prefix: true
 
   default_scope { order(position_order: :desc) }
 
