@@ -503,14 +503,6 @@ class Offer < ApplicationRecord
     daily_stats.sum(q)
   end
 
-  def total_revenue
-    daily_stats.sum(:click_revenue)
-  end
-
-  def total_sale_value
-    offer_events.where(action: 'sale').sum(:amount)
-  end
-
   def ctr(version='all')
     if version == 'a'
       shown = total_times_shown('orig')
