@@ -747,6 +747,29 @@ module Shopifable
     app_block_supported.length > 0
   end
 
+  def check_app_embed_enabled
+    activate_session
+    shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
+
+    assets = ShopifyAPI::Asset.all(theme_id: shopify_theme.id)
+
+    assets&.each do | asset |
+
+      if asset.key == 'templates/product.json' || asset.key == 'templates/collection.json' || asset.key == 'templates/cart.json'
+        asset_value = ShopifyAPI::Asset.all(asset: { key: asset.key }, theme_id: shopify_theme.id).compact.first
+
+        unless asset_value.nil?
+          if asset_value.value.include?("6c30493e-0cfb-4f06-aa36-cd34ba398a0a")
+            # if asset_value.include?("blocks/app_block/#{ENV.fetch(SHOPIFY_ICU_EXTENSION_APP_ID)}")
+            return true
+          end
+        end
+      end
+    end
+
+    false
+  end
+
   private
 
   # Private. defines the webhooks used in the store.

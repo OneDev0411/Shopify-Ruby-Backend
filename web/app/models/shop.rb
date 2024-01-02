@@ -836,6 +836,7 @@ class Shop < ApplicationRecord
       default_template_settings: default_template_settings,
       has_redirect_to_product: has_redirect_to_product?,
       has_pro_features: has_pro_features?
+      theme_version: theme_version || ''
     }
 
     admin ? std_settings.merge(admin_settings) : std_settings
@@ -1201,6 +1202,14 @@ class Shop < ApplicationRecord
       }
     end
     return data
+  end
+
+  def publish_or_purge
+    if self.theme_version != '2.0'
+      self.publish_async
+    else
+      self.force_purge_cache
+    end
   end
 
   private

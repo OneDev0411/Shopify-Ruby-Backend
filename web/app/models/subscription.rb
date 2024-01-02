@@ -327,11 +327,7 @@ class Subscription < ApplicationRecord
       end
     end
 
-    if shop.theme_version != '2.0'
-      shop.publish_async if needed
-    else
-      shop.force_purge_cache
-    end
+    shop.publish_or_purge
 
   end
 

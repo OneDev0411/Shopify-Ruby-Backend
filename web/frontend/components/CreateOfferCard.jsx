@@ -13,10 +13,12 @@ import {
 import {homeImage} from "../assets/index.js";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
+import {Link} from "react-router-dom";
+
 
 const ShopContext = createContext(null);
 
-export function CreateOfferCard() {
+export function CreateOfferCard({shopify_domain}) {
   const navigateTo = useNavigate();
   const location = useLocation();
   const shopAndHost = useSelector((state) => state.shopAndHost);
@@ -108,9 +110,11 @@ export function CreateOfferCard() {
               </div>
               <div className="center-btn" style={{marginBottom: '42px'}}>
                 <ButtonGroup>
-                  <Button primary onClick={handleCreateOffer}>
-                    {/*TODO: swap with Go to theme editor*/}
-                    Create offer
+                  <Button primary
+                    url={`https://${shopify_domain}/admin/themes/current/editor?template=product&addAppBlockId=${'6c30493e-0cfb-4f06-aa36-cd34ba398a0a'}/app_block&target=mainSection`}
+                    target="_blank"
+                  >
+                    Go to theme editor
                   </Button>
                   <Button
                       url="https://help.incartupsell.com/en/collections/6780837-help-articles-for-new-ui"
@@ -120,6 +124,10 @@ export function CreateOfferCard() {
                   </Button>
                 </ButtonGroup>
               </div>
+              <p style={{textAlign: "center"}}>If you want to add offers to your ajax cart, <Link
+                to={`https://${shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${'6c30493e-0cfb-4f06-aa36-cd34ba398a0a'}/app_block_embed`}
+                target="_blank">Click here
+              </Link> to enable the app</p>
             </div>
           </VerticalStack>
         </AlphaCard>

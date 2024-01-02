@@ -28,6 +28,7 @@ export default function EditPage() {
         isPending: "Launch Autopilot",
     });
     const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState({});
+    const [isAppEmbedded, setIsAppEmbedded] = useState(false);
 
     const [offer, setOffer] = useState({
         offerId: undefined,
@@ -178,6 +179,8 @@ export default function EditPage() {
                     }
                     setShop(data.shop_settings);
 
+                    setIsAppEmbedded(data.app_embed_enabled)
+
                     let newOffer = {...offer};
 
                     newOffer.advanced_placement_setting ={
@@ -248,6 +251,8 @@ export default function EditPage() {
                         }
                     }
                     setShop(data.shop_settings);
+                    setIsAppEmbedded(data.app_embed_enabled)
+
                     setUpdatePreviousAppOffer(!updatePreviousAppOffer);
 
                     setIsLoading(false);
@@ -674,7 +679,7 @@ export default function EditPage() {
                                                    updateOffer={updateOffer} updateShop={updateShop}
                                                    autopilotCheck={autopilotCheck} handleTabChange={changeTab}
                                                    updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}
-                                                   enableOrDisablePublish={enableOrDisablePublish}
+                                                   enableOrDisablePublish={enableOrDisablePublish} isAppEmbedded={isAppEmbedded}
                                         />
                                         : ""}
                                     {selected == 2 ?

@@ -31,6 +31,8 @@ module Api
       #POST /api/merchant/shop_settings
       def shop_settings
         @shop_settings = @icushop.shop_settings(@admin)
+        @app_embed_enabled = @icushop.check_app_embed_enabled
+
         render "shops/shop_settings"
       end
 
@@ -82,12 +84,7 @@ module Api
         end
         if @icushop.save
 
-          if @icushop.theme_version != '2.0'
-            @icushop.publish_async
-          else
-            @icushop.force_purge_cache
-          end
-
+          @icushop.publish_or_purge
           @message = "Shop settings saved!"
         else
           @message = @icushop.errors.full_messages.first

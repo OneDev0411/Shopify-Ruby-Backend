@@ -36,11 +36,7 @@ class OffersController < AuthenticatedController
     if offer.save
       $customerio.track(@icushop.id, 'offer created')
 
-      if @icushop.theme_version != '2.0'
-        @icushop.publish_async
-      else
-        @icushop.force_purge_cache
-      end
+      @icushop.publish_or_purge
 
       render json: { message: 'success', offer_id: offer.id, offer: offer.library_json }
     else
@@ -94,11 +90,7 @@ class OffersController < AuthenticatedController
 
     if offer.update(my_params)
 
-      if @icushop.theme_version != '2.0'
-        @icushop.publish_async
-      else
-        @icushop.force_purge_cache
-      end
+      @icushop.publish_or_purge
 
       render json: { offer: offer.library_json }, status: :ok
     else
@@ -121,12 +113,7 @@ class OffersController < AuthenticatedController
     old_offer_ids = @icushop.old_offers || []
     old_offer_ids << params[:id]
     @icushop.update_attribute(:old_offers, old_offer_ids.uniq)
-
-    if @icushop.theme_version != '2.0'
-      @icushop.publish_async
-    else
-      @icushop.force_purge_cache
-    end
+    @icushop.publish_or_purge
 
     render json: { message: "Offer Deleted", offers: @icushop.offer_data_with_stats}
   end

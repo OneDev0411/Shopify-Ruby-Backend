@@ -24,15 +24,6 @@ import { SelectCollectionsModal } from "../../SelectCollectionsModal";
 import { condition_options } from "../../../shared/constants/ConditionOptions";
 import { getLabelFromValue } from "../../../shared/helpers/commonHelpers";
 import {Link} from 'react-router-dom';
-import * as PropTypes from "prop-types";
-import {CustomSelect} from "./CustomSelect.jsx";
-
-CustomSelect.propTypes = {
-    options: PropTypes.any,
-    onChange: PropTypes.func,
-    value: PropTypes.string,
-    callbackfn: PropTypes.func
-};
 
 export function SecondTab(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -60,7 +51,7 @@ export function SecondTab(props) {
     const [templateImagesURL, setTemplateImagesURL] = useState({});
     const [storedThemeNames, setStoredThemeName] = useState([]);
 
-    const [isLegacy, setIsLegacy] = useState(false);
+    const [isLegacy, setIsLegacy] = useState(props.shop.theme_version === 'Vintage');
 
     useEffect(() => {
         fetch(`/api/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
@@ -106,7 +97,8 @@ export function SecondTab(props) {
             setSelected("cartpageproductpage");
         }
         else if (props.offer.in_ajax_cart && props.offer.in_cart_page) {
-            setSelected("ajaxcartpage");
+            if (isLegacy) setSelected("ajaxcartpage");
+            else setSelected("cartpage");
         }
         else if (props.offer.in_cart_page) {
             setSelected("cartpage");
@@ -181,7 +173,12 @@ export function SecondTab(props) {
 
     useEffect(() => {
         if(storedThemeNames?.length != 0 && shopifyThemeName != null && !storedThemeNames?.includes(shopifyThemeName)) {
-            props.updateNestedAttributeOfOffer(true, "advanced_placement_setting", "advanced_placement_setting_enabled");
+            if (isLegacy) {
+                props.updateNestedAttributeOfOffer(true, "advanced_placement_setting", "advanced_placement_setting_enabled");
+            }
+            else {
+                props.updateNestedAttributeOfOffer(false, "advanced_placement_setting", "advanced_placement_setting_enabled");
+            }
         }
     }, [storedThemeNames, shopifyThemeName])
 
@@ -250,6 +247,13 @@ export function SecondTab(props) {
         { label: 'Product and cart page', value: 'cartpageproductpage' },
         { label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax' },
         { label: 'AJAX and cart page', value: 'ajaxcartpage' }
+    ]
+
+    const newThemeOptions = [
+        { label: 'Cart page', value: 'cartpage' },
+        { label: 'Product page', value: 'productpage' },
+        { label: 'Product and cart page', value: 'cartpageproductpage' },
+        { label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax' },
     ]
 
     const handleDefaultSettingChange = useCallback((value, selectedPage) => {
@@ -710,6 +714,20 @@ export function SecondTab(props) {
                     </Banner>
                 </div>
             )}
+
+            {(selected === "ajax" && !props.isAppEmbedded) && (
+              <div style={{marginBottom: "10px"}} className="polaris-banner-container">
+                  <Banner title="You are using Shopify's Theme Editor" onDismiss={() => {
+                      setOpenBanner(!openBanner)
+                  }} tone='warning'>
+                      <p>Please use the theme editor to place the offer in the Ajax Cart</p><br/>
+                      <p><Link
+                        to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?context=apps&template=${props.offer.in_product_page ? 'product' : 'cart' }&activateAppId=${'6c30493e-0cfb-4f06-aa36-cd34ba398a0a'}/app_block_embed`}
+                        target="_blank">Click here</Link> to go to the theme editor</p>
+                  </Banner>
+              </div>
+            )}
+
             <LegacyCard title="Choose placement" sectioned>
                 <p style={{color: '#6D7175', marginTop: '-20px', marginBottom: '23px'}}>Where would you like your offer
                     to appear?</p>
@@ -718,11 +736,13 @@ export function SecondTab(props) {
                     <Grid>
                         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 6, xl: 6}}>
                             {/*Select requires a styled dropdown*/}
-                            {!isLegacy ? <CustomSelect options={options} onChange={handleSelectChange} value={selected}
-                                           callbackfn={(elem) =>
-                                               <Text as="h2" variant="bodyMd">
-                                                   {elem.label}
-                                               </Text>}/> :
+                            {!isLegacy ?
+                                  <Select
+                                    options={newThemeOptions}
+                                    onChange={handleSelectChange}
+                                    value={selected}
+                                  />
+                              :
                                 <Select
                                     options={options}
                                     onChange={handleSelectChange}

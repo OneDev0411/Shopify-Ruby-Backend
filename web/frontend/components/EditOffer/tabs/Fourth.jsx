@@ -5,10 +5,11 @@ import {
     Button,
     TextField,
     Checkbox,
-    Select, Text
+    Select, Text, Banner
 } from "@shopify/polaris";
-import { useState, useCallback } from "react";
+import {useState, useCallback, useEffect} from "react";
 import React from "react";
+import {Link} from "react-router-dom";
 
 // Advanced Tab
 export function FourthTab(props) {
@@ -21,6 +22,8 @@ export function FourthTab(props) {
     const handleAjaxDomSelector = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_ajax_dom_selector"), []);
     const handleAjaxDomAction = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_ajax_dom_action"), []);
     const handleOfferCss = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "custom_css"), []);
+    
+    const [isLegacy, setIsLegacy] = useState(props.shop.theme_version === 'Vintage');
 
     const options = [
         {label: 'prepend()', value: 'prepend'},
@@ -29,8 +32,44 @@ export function FourthTab(props) {
         {label: 'before()', value: 'before'}
     ];
 
+    useEffect(() => {
+        if (!isLegacy) {
+            props.updateNestedAttributeOfOffer(false, "advanced_placement_setting", "advanced_placement_setting_enabled");
+        }
+    }, [])
+
     return (
         <>
+            { !isLegacy && !props.offer.in_ajax_cart &&
+              (
+                <div style={{marginBottom: "10px"}} className="polaris-banner-container">
+                    <Banner title="You are using Shopify's Theme Editor" onDismiss={() => {
+                        setOpenBanner(!openBanner)
+                    }} tone='warning'>
+                        <p>Please use the theme editor to place the offers where you would like it.</p><br/>
+                        <p><Link
+                          to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?template=${props.offer.in_product_page ? 'product' : 'cart' }&addAppBlockId=${'6c30493e-0cfb-4f06-aa36-cd34ba398a0a'}/app_block&target=${props.offer.in_product_page ? 'mainSection' : 'newAppsSection'}`}
+                          target="_blank">Click here</Link> to go to the theme editor</p>
+                    </Banner>
+                </div>
+              )
+            }
+
+            { !isLegacy && props.offer.in_ajax_cart &&
+              (
+                <div style={{marginBottom: "10px"}} className="polaris-banner-container">
+                    <Banner title="You are using Shopify's Theme Editor" onDismiss={() => {
+                        setOpenBanner(!openBanner)
+                    }} tone='warning'>
+                        <p>Please use the theme editor to place the offer in the Ajax Cart</p><br/>
+                        <p><Link
+                          to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?context=apps&template=${props.offer.in_product_page ? 'product' : 'cart' }&activateAppId=${'6c30493e-0cfb-4f06-aa36-cd34ba398a0a'}/app_block_embed`}
+                          target="_blank">Click here</Link> to go to the theme editor</p>
+                    </Banner>
+                </div>
+              )
+            }
+
             {/* <LegacyCard sectioned title="Offer placement - advanced settings" actions={[{ content: 'View help doc' }]}> */}
             <LegacyCard sectioned title="Offer placement - advanced settings">
                 {(!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled) && (

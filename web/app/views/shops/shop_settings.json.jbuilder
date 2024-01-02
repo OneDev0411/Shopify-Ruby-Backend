@@ -1,1 +1,2 @@
 json.shop_settings @shop_settings
+json.app_embed_enabled @app_embed_enabled

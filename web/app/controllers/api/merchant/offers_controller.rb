@@ -90,11 +90,7 @@ module Api
 
           if offer.update({ published_at: Time.now.utc, deactivated_at: nil, active: true })
 
-            if @icushop.theme_version != '2.0'
-              @icushop.publish_async
-            else
-              @icushop.force_purge_cache
-            end
+            @icushop.publish_or_purge
 
             render json: { message: 'Offer published', status: 'Active' }, status: :ok
           else
@@ -112,11 +108,7 @@ module Api
           offer = @icushop.offers.find(offer_params['offer_id'])
           if offer.update({ published_at: nil, active: false })
 
-            if @icushop.theme_version != '2.0'
-              @icushop.publish_async
-            else
-              @icushop.force_purge_cache
-            end
+            @icushop.publish_or_purge
 
             render json: { message: 'Offer Saved As Draft',  status: 'Draft' }, status: :ok
           else
@@ -160,11 +152,7 @@ module Api
 
         if offer.update(my_params)
 
-          if @icushop.theme_version != '2.0'
-            @icushop.publish_async
-          else
-            @icushop.force_purge_cache
-          end
+          @icushop.publish_or_purge
 
           render json: { offer: offer.library_json }, status: :ok
         else
@@ -188,11 +176,7 @@ module Api
         old_offer_ids << params[:id]
         @icushop.update_attribute(:old_offers, old_offer_ids.uniq)
 
-        if @icushop.theme_version != '2.0'
-          @icushop.publish_async
-        else
-          @icushop.force_purge_cache
-        end
+        @icushop.publish_or_purge
 
         render json: { message: "Offer Deleted", offers: @icushop.offer_data_with_stats}
       end
