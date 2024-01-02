@@ -48,7 +48,7 @@ export function FourthTab(props) {
                     }} tone='warning'>
                         <p>Please use the theme editor to place the offers where you would like it.</p><br/>
                         <p><Link
-                          to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?template=${props.offer.in_product_page ? 'product' : 'cart' }&addAppBlockId=${'6c30493e-0cfb-4f06-aa36-cd34ba398a0a'}/app_block&target=${props.offer.in_product_page ? 'mainSection' : 'newAppsSection'}`}
+                          to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?template=${props.offer.in_product_page ? 'product' : 'cart' }&addAppBlockId=${process.env.SHOPIFY_ICU_EXTENSION_APP_ID}/app_block&target=${props.offer.in_product_page ? 'mainSection' : 'newAppsSection'}`}
                           target="_blank">Click here</Link> to go to the theme editor</p>
                     </Banner>
                 </div>
@@ -63,7 +63,7 @@ export function FourthTab(props) {
                     }} tone='warning'>
                         <p>Please use the theme editor to place the offer in the Ajax Cart</p><br/>
                         <p><Link
-                          to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?context=apps&template=${props.offer.in_product_page ? 'product' : 'cart' }&activateAppId=${'6c30493e-0cfb-4f06-aa36-cd34ba398a0a'}/app_block_embed`}
+                          to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?context=apps&template=${props.offer.in_product_page ? 'product' : 'cart' }&activateAppId=${process.env.SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
                           target="_blank">Click here</Link> to go to the theme editor</p>
                     </Banner>
                 </div>

@@ -47,6 +47,7 @@ export default defineConfig({
   plugins: [react()],
   define: {
     "process.env.SHOPIFY_API_KEY": JSON.stringify(process.env.SHOPIFY_API_KEY),
+    "process.env.SHOPIFY_ICU_EXTENSION_APP_ID": JSON.stringify(process.env.SHOPIFY_ICU_EXTENSION_APP_ID)
   },
   resolve: {
     preserveSymlinks: true,

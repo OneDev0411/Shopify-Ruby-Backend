@@ -759,8 +759,7 @@ module Shopifable
         asset_value = ShopifyAPI::Asset.all(asset: { key: asset.key }, theme_id: shopify_theme.id).compact.first
 
         unless asset_value.nil?
-          if asset_value.value.include?("6c30493e-0cfb-4f06-aa36-cd34ba398a0a")
-            # if asset_value.include?("blocks/app_block/#{ENV.fetch(SHOPIFY_ICU_EXTENSION_APP_ID)}")
+          if asset_value.value.include?("#{ENV.fetch(SHOPIFY_ICU_EXTENSION_APP_ID)}")
             return true
           end
         end
