@@ -98,7 +98,7 @@ module Shopifable
 
   def fetch_active_shopify_theme
     activate_session
-    shopify_theme = ShopifyAPI::Theme.all.map{|t| t if t.role == 'main'}.compact.first
+    shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
     if shopify_theme.nil?
       raise 'Could not find active Shopify Theme via API'
     else
@@ -130,7 +130,7 @@ module Shopifable
   # Public. Like the above, sets up app using presets, if presets are available
   def fetch_colors_for_active_theme
     activate_session
-    shopify_theme = ShopifyAPI::Theme.all.map{|t| t if t.role == 'main'}.compact.first
+    shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
     if shopify_theme.nil?
       return {result: false, message: 'Could not find active Shopify Theme' }
     else
@@ -341,7 +341,7 @@ module Shopifable
     a.each do |v|
       b[v] += 1
     end
-    self.top_sellers = b.sort_by{|k,v| v }.reverse[0 .. 49].map{|i| i[0].to_i }
+    self.top_sellers = b.sort_by{ |k,v| v }.reverse[0 .. 49].map{ |i| i[0].to_i }
     self.top_sellers_updated_at = Time.now.utc
     save
   end
@@ -350,7 +350,7 @@ module Shopifable
     regenerate_top_sellers
     batch_fetch_shopify_products(top_sellers) # update data on each product
     use_weighted_autopilot = has_weighted_autopilot?
-    products.where(shopify_id: top_sellers).map{|p| p.set_most_popular_companions(use_weighted_autopilot) }
+    products.where(shopify_id: top_sellers).map{ |p| p.set_most_popular_companions(use_weighted_autopilot) }
   end
 
   def enable_autopilot_status
@@ -395,9 +395,9 @@ module Shopifable
     batch_fetch_shopify_products(product_ids)
     puts "fetching #{product_ids.count} products companions"
     if opts[:since]
-      products.where(shopify_id: product_ids).where('most_popular_companions_updated_at is null OR most_popular_companions_updated_at < ?', opts[:since]).map{|p| p.set_most_popular_companions(use_weighted_autopilot) }
+      products.where(shopify_id: product_ids).where('most_popular_companions_updated_at is null OR most_popular_companions_updated_at < ?', opts[:since]).map{ |p| p.set_most_popular_companions(use_weighted_autopilot) }
     else
-      products.where(shopify_id: product_ids).map{|p| p.set_most_popular_companions(use_weighted_autopilot) }
+      products.where(shopify_id: product_ids).map{ |p| p.set_most_popular_companions(use_weighted_autopilot) }
     end
     self.companions_status = 'complete'
     self.companions_status_updated_at = Time.now.utc
@@ -444,7 +444,7 @@ module Shopifable
       fetch_data_on_companions
       # This sets the offerable_product_shopify_ids field for AUTOPILOT
       offer = offers.where(offerable_type: 'auto').first
-      offer.offerable_product_shopify_ids = (autopilot_companions.map{|c| [c[0], c[1].map(&:first)] }.flatten + autopilot_bestsellers).uniq
+      offer.offerable_product_shopify_ids = (autopilot_companions.map{ |c| [c[0], c[1].map(&:first)] }.flatten + autopilot_bestsellers).uniq
 
       offer.save
     end
@@ -555,7 +555,7 @@ module Shopifable
       remote_products = HTTParty.get(url, headers: headers).parsed_response['products']
       puts "  #{remote_products.length} products found"
       next unless remote_products.present?
-      all_products_found += remote_products.map{|p| p['id']}
+      all_products_found += remote_products.map{ |p| p['id'] }
       remote_products.each do |s_product|
         l_product = Product.find_or_create_by(shop_id: id, shopify_id: s_product['id'])
         l_product.apply_new_data(s_product)
@@ -691,7 +691,7 @@ module Shopifable
   #Called to get name of the theme for the current shop
   def active_theme_for_dafault_template
     activate_session
-    shopify_theme = ShopifyAPI::Theme.all.map{|t| t if t.role == 'main'}.compact.first
+    shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
     if shopify_theme.nil?
       return {result: false, message: 'Could not find active Shopify Theme via API' }
     else
@@ -701,6 +701,50 @@ module Shopifable
       end
     end
     return {result: true, message: shopify_theme_name }
+  end
+
+  def update_theme_version
+    activate_session
+    shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
+
+    assets = ShopifyAPI::Asset.all(theme_id: shopify_theme.id)
+    app_block_supported = []
+
+    assets&.each do | asset |
+
+      if asset.key == 'templates/product.json' || asset.key == 'templates/collection.json' || asset.key == 'templates/cart.json'
+        asset_value = ShopifyAPI::Asset.all(asset: { key: asset.key }, theme_id: shopify_theme.id).compact.first
+
+        unless asset_value.nil?
+          asset_value = JSON.parse(asset_value.value)
+          main = asset_value['sections'].select { |id, section| id == 'main' || section['type'].starts_with?('main-') }
+
+          main&.each do | asset_with_main_section |
+            asset_value = ShopifyAPI::Asset.all(asset: { key: "sections/#{asset_with_main_section.second['type']}.liquid" }, theme_id: shopify_theme.id).compact.first
+
+            unless asset_value.nil?
+              schema_match = /\{\%\s+schema\s+\%\}([\s\S]*?)\{\%\s+endschema\s+\%\}/m.match(asset_value.value)
+
+              unless schema_match.nil?
+                schema_match = schema_match[0]
+                schema_match.slice! "{% schema %}"
+                schema_match.slice! "{% endschema %}"
+
+                schema = JSON.parse(schema_match)
+
+                unless schema.nil? || schema["blocks"].nil?
+                  puts "chica"
+                  accepted_blocks = schema["blocks"].select { | block | block['type'] == '@app' }
+                  app_block_supported.push(accepted_blocks)
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    app_block_supported.length > 0
   end
 
   private

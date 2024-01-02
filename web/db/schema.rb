@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_11_22_032257) do
+ActiveRecord::Schema[7.0].define(version: 2024_01_02_083515) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -669,6 +669,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_22_032257) do
     t.boolean "activated", default: true
     t.integer "orders_through_offers", default: 0, null: false
     t.jsonb "default_template_settings"
+    t.string "theme_version"
     t.index ["created_at"], name: "index_shops_on_created_at"
     t.index ["uninstalled_at"], name: "index_shops_on_uninstalled_at"
   end

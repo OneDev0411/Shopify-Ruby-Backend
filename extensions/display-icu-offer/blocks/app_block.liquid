@@ -1,10 +1,15 @@
-<div id="nudge-offer-list">
+{% if request.design_mode or request.visual_preview_mode  %}
+  <div class="icu-notice">
+    Only one block is needed per page. If your offers are not showing up, check to ensure your placement settings is set to this current page and your offer is published.
+  </div>
+{% endif %}
 
+<div id="nudge-offer-list">
 </div>
 
 {% schema %}
   {
-    "name": "Theme App Block",
+    "name": "Product/Cart Page Offers",
     "target": "section",
     "stylesheet": "index.css",
     "javascript": "index.js",
@@ -13,3 +18,4 @@
     }
   }
 {% endschema %}
+

@@ -9,9 +9,16 @@ module Api
       # Get /api/merchant/current_shop
       def current_shop
         @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shop]) if @icushop.present?
+        new_theme = @icushop.update_theme_version
+
+        if new_theme
+          @icushop.update(theme_version: '2.0')
+        else
+          @icushop.update(theme_version: 'Vintage')
+        end
+
         render "shops/current_shop"
       end
-
 
       def shop_info
         if @icushop.present?
@@ -74,7 +81,12 @@ module Api
           @icushop.default_template_settings = opts['default_template_settings'].to_h
         end
         if @icushop.save
-          @icushop.publish_async  # trigger update
+
+          if @icushop.theme_version != '2.0'
+            @icushop.publish_async
+          else
+            @icushop.force_purge_cache
+          end
 
           @message = "Shop settings saved!"
         else
@@ -117,6 +129,8 @@ module Api
           }
         end
       end
+
+
 
        # Gets shop sale stats. POST  /api/merchant/shops_sale_stats
       def shop_sale_stats
@@ -218,7 +232,6 @@ module Api
         { 'css_options' => { 'main' => opts, 'button' => opts, 'text' => opts,
                              'image' => opts, 'custom' => opts } }
       end
-
     end
   end
 end

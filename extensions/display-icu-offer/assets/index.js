@@ -22,9 +22,12 @@
         return /\/cart\/?$/.test(window.location.pathname);
     };
 
-
     const isProductPage = () => {
         return window.location.pathname.includes("/products/");
+    };
+
+    const isCollectionsPage = () => {
+        return window.location.pathname.includes("/collections/");
     };
 
     const checkoutButton = document.querySelector('.cart__checkout-button') || document.querySelector('[name="checkout"]');
@@ -82,10 +85,6 @@
         }
     };
 
-    const isCollectionsPage = () => {
-        return window.location.pathname.includes("/collections/");
-    };
-
     const pageSatisfiesOfferConditions = async () => {
         return (!isOfferDismissed() &&
           !(offer.stop_showing_after_accepted && isOfferAlreadyAccepted() && await doesCartContainOffer()) &&
@@ -93,8 +92,6 @@
     }
 
     const pageSatisfiesRule = async (rule) => {
-        await fetchCart();
-
         const ruleSelector = rule.rule_selector;
         const itemType = rule.item_type;
         const itemShopifyID = rule.item_shopify_id;
@@ -110,8 +107,6 @@
     };
 
     const cartSatisfiesRule = async (rule) => {
-        await fetchCart();
-
         const ruleSelector = rule.rule_selector;
         const itemType = rule.item_type;
         const itemShopifyID = rule.item_shopify_id;
@@ -338,7 +333,7 @@
 
     const getCurrentCartItems = () => {
         return fetch(
-          `${window.Shopify.routes.root}cart.js`)
+          `${window.Shopify.routes.root}cart.js?icu=1`)
           .then(resp => resp.json())
           .then(cartData => {
               itemsInCart = cartData.items.map( item => {
@@ -365,7 +360,6 @@
     }
 
     const doesCartContainOffer = async () => {
-        await fetchCart();
 
         let cartProductIDs = itemsInCart.map(cartItem => cartItem.productID);
 
@@ -419,9 +413,9 @@
     };
 
     const setGeoOffers = () => {
-        const localyStoredCountry = localStorage.getItem('country');
+        const locallyStoredCountry = localStorage.getItem('country');
 
-        if (localyStoredCountry) {
+        if (locallyStoredCountry) {
             fetch('https://spcdn.incartupsell.com/country')
               .then(response => {
                   return response.json();
@@ -434,7 +428,7 @@
                   console.error('Error:', error);
               });
         } else {
-            customerCountryCode = localyStoredCountry
+            customerCountryCode = locallyStoredCountry
         }
     }
 
@@ -470,7 +464,7 @@
 
         if (Object.keys(updates).length > 0) {
             fetch(
-              `${window.Shopify.routes.root}cart/update.js`, {
+              `${window.Shopify.routes.root}cart/update.js?icu=1`, {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json'
@@ -491,11 +485,6 @@
     };
 
     const createOffer = async () => {
-
-        if (offer.offerable_type === 'auto') { // offer is autopilot
-            updateOfferWithAutopilotData();
-        }
-
         const nudgeContainer = createContainer();
 
         if (offer.show_nothanks) {
@@ -504,11 +493,6 @@
 
         let offer_title = createTitle();
         if (offer_title) nudgeContainer.appendChild(offer_title);
-
-        if (offerSettings.has_shopify_multicurrency) {
-            offer.active_currency = currencyIsSet() ? Shopify.currency.active : "USD";
-            offer.offerable_product_details = setProductsCurrency();
-        }
 
         nudgeContainer.appendChild( createVariantsContainerWithChildren() );
 
@@ -524,50 +508,35 @@
         if (offer.show_powered_by) {
             nudgeContainer.appendChild(createPoweredBy());
         }
+    }
+    const createAjaxOffer = async () => {
+        const ajaxNudgeContainer = createContainer(true);
 
-        // only on the cart page
-        if (isCartPage() && offer.must_accept && (!(await doesCartContainOffer() ) || !isOfferAlreadyAccepted())) {
-            disableCta();
+        if (offer.show_nothanks) {
+            ajaxNudgeContainer.appendChild(createDismissOffer());
         }
 
-        trackEvent('show', offer.id);
+        let offer_title = createTitle();
+        if (offer_title) ajaxNudgeContainer.appendChild(offer_title);
+
+        ajaxNudgeContainer.appendChild( createVariantsContainerWithChildren(true) );
+
+        const cartForms = document.querySelectorAll('[action="/cart"]:not([id*="product-actions"]):not(main [action="/cart"])');
+
+        cartForms.forEach( form => {
+            form.after(ajaxNudgeContainer);
+        })
+
+        if (offer.multi_layout === 'carousel') {
+            createCarouselArrows(nudgeContainer);
+            showSlides(1);
+        }
+
+        if (offer.show_powered_by) {
+            ajaxNudgeContainer.appendChild(createPoweredBy());
+        }
     }
 
-    const getOffers = () => {
-        fetch(`/apps/proxy/all_offers`)
-          .then( response => response.json())
-          .then(async (data) => {
-              if (data.length !== 0) {
-                  offers = data.offers;
-
-                  let offersToRemoveFromCart = [];
-
-                  for (let off of data.offers) {
-                      if (await checkCartRules(off)) {
-
-                          setGlobalVariables(off, data.shopify_domain, data.offer_settings);
-
-                          if (offerSettings.has_geo_offers) {
-                              setGeoOffers();
-                          }
-
-                          if (await checkPageRules()) {
-                              await createOffer();
-                              in_collection_page = false;
-                          }
-                      } else if (off.remove_if_no_longer_valid) {
-                          offersToRemoveFromCart.push(off);
-                      }
-
-                  }
-
-                  removeInvalidOffers(offersToRemoveFromCart);
-              }
-          })
-          .catch(error => console.log(error))
-    }
-
-    getOffers();
 
     const checkOffersWhenPageUpdates = async () => {
         await fetchCart();
@@ -583,37 +552,127 @@
                 }
             } else {
                 let offerOnPage = document.getElementById( `nudge-offer-${off.id}`);
+                let ajaxOfferOnPage = document.getElementById( `nudge-ajax-nudge-offer-${off.id}`);
+
                 offer = off;
 
-                if (await checkPageRules() && !offerOnPage) {
-                    await createOffer();
+                if (await checkPageRules()) {
+                    if (!offerOnPage) {
+                        await createOffer();
+                    }
+
+                    if (off.in_ajax_cart && !ajaxOfferOnPage) {
+                        await createAjaxOffer();
+                    }
+
                     in_collection_page = false;
+
+
                 }
             }
         }
 
         removeInvalidOffers(offersToRemoveFromCart);
-    };
+  };
 
-    const createEventListener = (elements) => {
-        elements.forEach(elem => {
-            elem.addEventListener('click', async() => {
-                setTimeout( async () => {
-                    await checkOffersWhenPageUpdates();
-                }, 4000)
-            } )
-        })
+    const listenForCartRequests = () => {
+        (function(open) {
+            XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
+                this.addEventListener("readystatechange", function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        let parser = document.createElement('a');
+                        parser.href = this.responseURL || this._url;
+                        let path = parser.pathname;
+                        if (path[0] !== "/") { path = "/" + path; }
+                        if (path.includes('/cart') && parser.search.indexOf("icu") === -1 ) {
+                            isAnAjaxCall = true;
+                            checkOffersWhenPageUpdates();
+                        }
+                    }
+                }, false);
+                open.call(this, method, url, async, user, pass);
+            };
+        })(XMLHttpRequest.prototype.open);
+
+        (function (ns, fetch) {
+            if (typeof fetch !== 'function') return;
+            ns.fetch = function () {
+                let out   = fetch.apply(this, arguments);
+                let _args = arguments;
+                out.then(function(_response) {
+                    let parser = document.createElement('a');
+                    parser.href = _args[0];
+                    let path = parser.pathname;
+                    if (path[0] !== "/") { path = "/" + path; }
+                    if (path.includes('/cart') && parser.search.indexOf("icu") === -1 ) {
+                        isAnAjaxCall = true;
+                        checkOffersWhenPageUpdates();
+                    }
+                });
+                return out;
+            };
+        }(window, window.fetch));  // Immediately-invoked Function Expression
     }
 
-    if (isCartPage() || isProductPage()) {
-        const inputs = document.querySelectorAll('input');
-        const links = document.querySelectorAll('a.button');
-        const buttons = document.querySelectorAll('button');
+    const getOffers = () => {
+        fetch(`/apps/proxy/all_offers`)
+          .then( response => response.json())
+          .then(async (data) => {
+              if (data.length !== 0) {
+                  offers = data.offers;
 
-        createEventListener(inputs);
-        createEventListener(links);
-        createEventListener(buttons);
+                  let offersToRemoveFromCart = [];
+                  await fetchCart();
+
+                  for (let off of data.offers) {
+                      if (await checkCartRules(off)) {
+
+                          setGlobalVariables(off, data.shopify_domain, data.offer_settings);
+
+                          if (offerSettings.has_geo_offers) {
+                              setGeoOffers();
+                          }
+
+                          if (await checkPageRules()) {
+
+                              if (off.offerable_type === 'auto') { // offer is autopilot
+                                  updateOfferWithAutopilotData();
+                              }
+
+                              if (offerSettings.has_shopify_multicurrency) {
+                                  offer.active_currency = currencyIsSet() ? Shopify.currency.active : "USD";
+                                  offer.offerable_product_details = setProductsCurrency();
+                              }
+
+                              await createOffer();
+
+                              if (off.in_ajax_cart) {
+                                  await createAjaxOffer();
+                              }
+
+                              // only on the cart page
+                              if (isCartPage() && off.must_accept && (!(await doesCartContainOffer() ) || !isOfferAlreadyAccepted())) {
+                                  disableCta();
+                              }
+
+                              trackEvent('show', offer.id);
+                              in_collection_page = false;
+                          }
+                      } else if (off.remove_if_no_longer_valid) {
+                          offersToRemoveFromCart.push(off);
+                      }
+
+                  }
+
+                  removeInvalidOffers(offersToRemoveFromCart);
+              }
+          })
+          .catch(error => console.log(error))
     }
+
+    listenForCartRequests();
+    getOffers();
+
 
     const setProductsCurrency = () => {
         let productDetails = offer.offerable_product_details;
@@ -776,10 +835,10 @@
         }
     };
 
-    const createContainer = () => {
+    const createContainer = (addAjax) => {
         const nudgeContainer = document.createElement('div');
         nudgeContainer.className = `nudge-offer ${offer.theme} ${offer.show_product_image ? 'with-image' : ''} multi ${offer.multi_layout} ${offer.extra_css_classes || ''}`;
-        nudgeContainer.id = `nudge-offer-${offer.id}`;
+        nudgeContainer.id = `${addAjax ? 'nudge-ajax-' : '' }nudge-offer-${offer.id}`;
 
         createContainerCSS(nudgeContainer);
 
@@ -884,7 +943,7 @@
         offerTitle.style.color = textCss.color;
     }
 
-    const createVariantsContainerWithChildren = () => {
+    const createVariantsContainerWithChildren = (addAjax) => {
         const variantsContainer = document.createElement('div');
 
         if (offer.multi_layout === 'compact') {
@@ -895,13 +954,13 @@
 
         offer.offerable_product_details.map( prod => {
             product = prod;
-            createNudgeWrapperWithChildren(variantsContainer);
+            createNudgeWrapperWithChildren(variantsContainer, addAjax);
         });
 
         return variantsContainer;
     }
 
-    const createNudgeWrapperWithChildren = (variantsContainer) => {
+    const createNudgeWrapperWithChildren = (variantsContainer, addAjax) => {
 
         let parentWrapper;
 
@@ -920,21 +979,21 @@
         }
 
         if (offer.show_product_image) {
-            parentWrapper.appendChild(createProductImage());
+            parentWrapper.appendChild(createProductImage(addAjax));
         }
 
         if (offer.link_to_product) {
-            parentWrapper.appendChild(createProductLinkWithChildren());
+            parentWrapper.appendChild(createProductLinkWithChildren(addAjax));
         } else {
-            createProductInfoElements(parentWrapper);
+            createProductInfoElements(parentWrapper, addAjax);
         }
 
-        parentWrapper.appendChild(createAddToCart());
+        parentWrapper.appendChild(createAddToCart(addAjax));
 
         variantsContainer.appendChild(parentWrapper);
     }
 
-    const createProductImage = () => {
+    const createProductImage = (addAjax) => {
         let parentWrapper;
 
         if (offer.multi_layout === 'compact') {
@@ -955,7 +1014,7 @@
 
         const imageEl = document.createElement('img');
 
-        imageEl.id = `product-image-${product.id}`
+        imageEl.id = `${addAjax ? 'ajax-' : ''}product-image-${product.id}`
         imageEl.src = `https://${product.medium_image_url}`;
         imageEl.className = 'product-image medium';
 
@@ -964,26 +1023,26 @@
         return parentWrapper;
     }
 
-    const createProductLinkWithChildren = () => {
+    const createProductLinkWithChildren = (addAjax) => {
         const productLinkEl = document.createElement('a');
         productLinkEl.style.cursor = 'pointer';
         productLinkEl.href = `/products/${product.url}`;
 
-        createProductInfoElements(productLinkEl);
+        createProductInfoElements(productLinkEl, addAjax);
 
         return productLinkEl;
     }
 
-    const createProductInfoElements = (parentEl) => {
+    const createProductInfoElements = (parentEl, addAjax) => {
         if (offer.multi_layout === 'compact') {
             parentEl.appendChild(createProductTitle());
-            parentEl.appendChild(createPriceEl());
+            parentEl.appendChild(createPriceEl(addAjax));
         } else {
             const detailsContainer = document.createElement('div');
             detailsContainer.className = 'details';
 
             detailsContainer.appendChild(createProductTitle());
-            detailsContainer.appendChild(createPriceEl());
+            detailsContainer.appendChild(createPriceEl(addAjax));
             parentEl.appendChild(detailsContainer);
         }
     }
@@ -1002,13 +1061,13 @@
         return productTitleWrapper;
     }
 
-    const createPriceEl = () => {
+    const createPriceEl = (addAjax) => {
         const priceContainer = document.createElement('div');
 
         if (offer.show_product_price) {
             if (offer.show_compare_at_price && product.available_json_variants[0].price_is_minor_than_compare_at_price) {
                 const productPriceWrapper = document.createElement('span');
-                productPriceWrapper.id = `product-price-wrapper-compare-${product.id}`
+                productPriceWrapper.id = `${addAjax ? 'ajax-' : ''}product-price-wrapper-compare-${product.id}`
                 productPriceWrapper.className = 'product-price-wrapper compare-at-price money';
                 productPriceWrapper.innerHTML = product.available_json_variants[0].compare_at_price;
 
@@ -1016,7 +1075,7 @@
             }
 
             const productPrice = document.createElement('span');
-            productPrice.id = `product-price-wrapper-${product.id}`
+            productPrice.id = `${addAjax ? 'ajax-' : ''}product-price-wrapper-${product.id}`
             productPrice.className = 'product-price-wrapper money';
             productPrice.innerHTML = product.available_json_variants[0].unparenthesized_price;
 
@@ -1026,13 +1085,13 @@
         return priceContainer;
     }
 
-    const createAddToCart = () => {
+    const createAddToCart = (addAjax) => {
         const ctaContainer = document.createElement('form');
 
         ctaContainer.action = offer.shop.path_to_cart;
 
         ctaContainer.method = 'post';
-        ctaContainer.id = `product-actions-${product.id}-offer-${offer.id}`;
+        ctaContainer.id = `${addAjax ? 'ajax-' : ''}product-actions-${product.id}-offer-${offer.id}`;
 
         if (offer.show_custom_field) {
             cFields.map( cField => {
@@ -1042,7 +1101,7 @@
             })
         }
 
-        ctaContainer.appendChild(createVariantsWrapper());
+        ctaContainer.appendChild(createVariantsWrapper(addAjax));
 
         if (offer.show_variant_price && product.available_json_variants.length <= 1) {
             ctaContainer.appendChild(createSingleVariant());
@@ -1071,7 +1130,7 @@
         return customFieldInput
     }
 
-    const createVariantsWrapper = () => {
+    const createVariantsWrapper = (addAjax) => {
 
         const variantsWrapper = document.createElement('span');
 
@@ -1083,8 +1142,8 @@
 
         const productSelect = document.createElement('select');
 
-        productSelect.id = `product-select-${product.id}`;
-        productSelect.onchange = ( e) => handleCollectionChange(e);
+        productSelect.id = `${addAjax ? 'ajax-' : ''}product-select-${product.id}`;
+        productSelect.onchange = ( e) => handleCollectionChange(e, addAjax);
 
         generateVariants(productSelect);
 
@@ -1132,6 +1191,7 @@
 
             quantityWrapper.className = 'quantity-wrapper';
             quantitySelect.id = "quantity-select";
+            quantitySelect.onchange = (e) => e.stopImmediatePropagation();
 
             [ ...Array(10) ].map( (e, i) => {
                 let option = document.createElement('option');
@@ -1314,7 +1374,7 @@
             trackEvent('click', currentOffer.id, selectedShopifyVariant)
 
             fetch(
-              `${window.Shopify.routes.root}cart/add.js`, {
+              `${window.Shopify.routes.root}cart/add.js?icu=1`, {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json'
@@ -1406,7 +1466,8 @@
     }
 
 
-    const handleCollectionChange = (e) => {
+    const handleCollectionChange = (e, addAjax) => {
+        e.stopImmediatePropagation();
         const has_shopify_multicurrency = offerSettings.has_shopify_multicurrency;
 
         let imgUrl;
@@ -1437,17 +1498,17 @@
             }
 
             if (imgUrl && imgUrl !== '') {
-                const productImage = document.querySelector(`#product-image-${currentProductID}`);
+                const productImage = document.querySelector(`#${addAjax ? 'ajax-' : '' }product-image-${currentProductID}`);
                 productImage.src = `https://${imgUrl}`;
             }
 
             if (variantPrice && variantPrice !== '') {
-                const productPrice = document.querySelector(`#product-price-wrapper-${currentProductID}`);
+                const productPrice = document.querySelector(`#${addAjax ? 'ajax-' : '' }product-price-wrapper-${currentProductID}`);
                 productPrice.innerHTML = variantPrice;
             }
 
             if (compareAtPrice && compareAtPrice !== '') {
-                const comparePrice = document.querySelector(`#product-price-wrapper-compare-${currentProductID}`);
+                const comparePrice = document.querySelector(`#${addAjax ? 'ajax-' : '' }product-price-wrapper-compare-${currentProductID}`);
                 comparePrice.innerHTML = compareAtPrice;
             }
 
@@ -1497,26 +1558,19 @@
             slideIndex = nextSlideIndex;
 
             if (nextSlideIndex < oldSlideIndex) {
-                slides[oldSlideIndex-1].style.transform = 'translate3d(-195%, 0px, 0px)';
 
                 if (nextSlideIndex < 1) {
                     slideIndex = slides.length;
-                    slides[slideIndex-1].style.transform = `translate3d(-${100 * (slideIndex-1)}%, 0px, 0px)`;
+                    slides[0].style.marginLeft = `-${100 * (slideIndex - 1)}%`;
                 } else {
-                    slides[slideIndex-1].style.transform = "translate3d(0%, 0px, 0px)";
+                    slides[0].style.marginLeft = `-${100 * (nextSlideIndex - 1)}%`;
                 }
-
             } else if (nextSlideIndex > oldSlideIndex) {
-                for (let sIndex = 0; sIndex < oldSlideIndex; sIndex++) {
-                    slides[0].style.marginLeft = `-${100 * (sIndex + 1)}%`;
-                }
-
                 if (nextSlideIndex > slides.length) {
                     slideIndex = 1;
-
-                    for (let sIndex = 0; sIndex < slides.length; sIndex++) {
-                        slides[sIndex].style.marginLeft = `0`;
-                    }
+                    slides[0].style.marginLeft = 0;
+                } else {
+                    slides[0].style.marginLeft = `-${100 * (oldSlideIndex)}%`;
                 }
             }
         }
