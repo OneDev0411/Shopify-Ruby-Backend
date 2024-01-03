@@ -111,7 +111,7 @@ export function CreateOfferCard({shopify_domain}) {
               <div className="center-btn" style={{marginBottom: '42px'}}>
                 <ButtonGroup>
                   <Button primary
-                    url={`https://${shopify_domain}/admin/themes/current/editor?template=product&addAppBlockId=${process.env.SHOPIFY_ICU_EXTENSION_APP_ID}/app_block&target=mainSection`}
+                    url={`https://${shopify_domain}/admin/themes/current/editor?template=product&addAppBlockId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block&target=mainSection`}
                     target="_blank"
                   >
                     Go to theme editor
@@ -125,7 +125,7 @@ export function CreateOfferCard({shopify_domain}) {
                 </ButtonGroup>
               </div>
               <p style={{textAlign: "center"}}>If you want to add offers to your ajax cart, <Link
-                to={`https://${shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${process.env.SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
+                to={`https://${shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
                 target="_blank">Click here
               </Link> to enable the app</p>
             </div>
