@@ -733,7 +733,6 @@ module Shopifable
                 schema = JSON.parse(schema_match)
 
                 unless schema.nil? || schema["blocks"].nil?
-                  puts "chica"
                   accepted_blocks = schema["blocks"].select { | block | block['type'] == '@app' }
                   app_block_supported.push(accepted_blocks)
                 end
@@ -759,7 +758,7 @@ module Shopifable
         asset_value = ShopifyAPI::Asset.all(asset: { key: asset.key }, theme_id: shopify_theme.id).compact.first
 
         unless asset_value.nil?
-          if asset_value.value.include?("#{ENV.fetch(SHOPIFY_ICU_EXTENSION_APP_ID)}")
+          if asset_value.value.include?("#{ENV["SHOPIFY_ICU_EXTENSION_APP_ID"]}")
             return true
           end
         end
