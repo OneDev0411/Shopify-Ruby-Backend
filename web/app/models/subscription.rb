@@ -15,8 +15,6 @@ class Subscription < ApplicationRecord
 
   has_many :usage_charges
   after_save :async_update_offers_if_needed
-  after_create :track_customerio_event
-  before_update :track_plan_change, if: ->{ self.plan_id_changed? }
   before_save :mixpanel_track_plan_update
 
 
@@ -332,20 +330,6 @@ class Subscription < ApplicationRecord
       time_period
     else
       default_time_period
-    end
-  end
-
-  def track_customerio_event
-    # $customerio.track(shop.id, 'installed')
-    # $customerio.identify(id: shop.id, email: shop.email, active: shop.active?, shopify_plan: shop.shopify_plan_name, app_plan_name: shop.plan&.name, created_at: shop.created_at.to_i, updated_at: shop.updated_at.to_i, status: "installed")
-  end
-
-  def track_plan_change
-    previous_plan = Plan.find plan_id_was
-    new_plan = Plan.find plan_id
-    if previous_plan.name == "Free"
-      # $customerio.track(shop.id, 'plan_changed')
-      # $customerio.identify(id: shop.id, email: shop.email, active: shop.active?, shopify_plan: shop.shopify_plan_name, app_plan_name: new_plan&.name, created_at: shop.created_at.to_i, updated_at: shop.updated_at.to_i, status: "installed")
     end
   end
 
