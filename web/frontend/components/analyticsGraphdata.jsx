@@ -115,13 +115,17 @@ export function ConversionRate(props) {
     }
 
     function getOffersStatsTimesLoaded(period) {
+        let redirect = Redirect.create(app);
         getOffersStats(
             `/api/merchant/shop_offers_stats_times_loaded`, 
             period, 
             (data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                } else {
                 setTotalDisplayed(data.stat_times_loaded);
                 setConverted(data.orders_through_offers_count);
-            });
+            }});
     }
 
     function getOffersStatsTimesClicked(period) {
@@ -244,11 +248,13 @@ export function OrderOverTimeData(props) {
 }
 
 export function TopPerformingOffersData(props) {
+    const app = useAppBridge();
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [offersData, setOffersData] = useState([]);
 
     function getOffersData(period) {
+        let redirect = Redirect.create(app);
         fetch(`/api/merchant/offers_list_by_period`, {
             method: 'POST',
             headers: {
@@ -260,8 +266,11 @@ export function TopPerformingOffersData(props) {
                 return response.json();
             })
             .then((data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                } else {
                 setOffersData(data.offers);
-            })
+            }})
             .catch((error) => {
                 console.log("error", error);
             })
@@ -308,6 +317,7 @@ export function TopPerformingOffersData(props) {
 }
 
 export function AbTestingData(props) {
+    const app = useAppBridge();
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [salesTotal, setSalesTotal] = useState(0);
@@ -315,6 +325,7 @@ export function AbTestingData(props) {
     const [loading, setLoading] = useState(false);
 
     function getSalesData(period) {
+        let redirect = Redirect.create(app);
         if(loading) return;
         setLoading(true)
 
@@ -327,9 +338,12 @@ export function AbTestingData(props) {
         })
             .then((response) => { return response.json(); })
             .then((data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                } else {
                 setSalesTotal(data.sales_stats.sales_total)
                 setSalesData(data.sales_stats.results);
-            })
+            }})
             .catch((error) => {
                 console.log("error", error);
             }).finally(() => {
@@ -379,6 +393,7 @@ export function AbTestingData(props) {
 }
 
 export function ClickThroughtRateData(props) {
+    const app = useAppBridge();
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [clicksTotal, setClicksTotal] = useState(0);
@@ -386,6 +401,7 @@ export function ClickThroughtRateData(props) {
     const [loading, setLoading] = useState(false); 
 
     function getClicksData(period) {
+        let redirect = Redirect.create(app);
         if(loading) return;
         setLoading(true)
         fetch(`/api/merchant/shop_clicks_stats`, {
@@ -397,9 +413,12 @@ export function ClickThroughtRateData(props) {
         })
             .then((response) => { return response.json(); })
             .then((data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                } else {
                 setClicksTotal(data.clicks_stats.clicks_total)
                 setClicksData(data.clicks_stats.results)
-            })
+            }})
             .catch((error) => {
                 console.log("error", error);
             }).finally(() => {
