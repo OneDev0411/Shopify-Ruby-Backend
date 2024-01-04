@@ -15,7 +15,6 @@ import {
   Modal,
 } from '@shopify/polaris';
 
-import { TitleBar } from "@shopify/app-bridge-react";
 import { useState, useCallback, useEffect } from 'react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -23,8 +22,11 @@ import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 import { useSelector } from "react-redux";
 import {CreateOfferCard} from "./CreateOfferCard.jsx";
 import OffersListSkeleton from '../skeletons/OfferListSkeleton.jsx';
+import {Redirect} from '@shopify/app-bridge/actions';
+import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 
 export function OffersList(props) {
+  const app = useAppBridge();
   const resourceName = {
     singular: 'offer',
     plural: 'offers',
@@ -55,6 +57,7 @@ export function OffersList(props) {
     useCallback((newValue) => props.getOfferListData(newValue), []);
 
   useEffect(() => {
+    let redirect = Redirect.create(app);
     fetch('/api/merchant/offers_list', {
       method: 'POST',
       mode: 'cors',
@@ -69,6 +72,9 @@ export function OffersList(props) {
     })
       .then((response) => response.json())
       .then((data) => {
+        if (data.redirect_to) {
+          redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+      } else {
         console.log('API Data >>> ', data);
         // localStorage.setItem('icushopify_domain', data.shopify_domain);
         setOffersData(data.offers);
@@ -77,7 +83,7 @@ export function OffersList(props) {
         if(sendOfferList){
           data.offers.length > 0 ? sendOfferList(true) : sendOfferList(false);
         }
-      }).catch((error) => {
+      }}).catch((error) => {
         console.log('Fetch error >> ', error);
       });
   }, []);

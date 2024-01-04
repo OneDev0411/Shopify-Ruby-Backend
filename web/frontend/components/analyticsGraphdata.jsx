@@ -4,14 +4,18 @@ import { PolarisVizProvider, StackedAreaChart } from '@shopify/polaris-viz';
 import { useAuthenticatedFetch } from "../hooks";
 import { useSelector } from 'react-redux';
 import '@shopify/polaris-viz/build/esm/styles.css';
+import {Redirect} from '@shopify/app-bridge/actions';
+import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 
 export function TotalSalesData(props) {
+    const app = useAppBridge();
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [salesTotal, setSalesTotal] = useState(0);
     const [salesData, setSalesData] = useState(0);
     const [loading, setLoading] = useState(false); 
     function getSalesData(period) {
+        let redirect = Redirect.create(app);
         if(loading) return;
         setLoading(true)
         fetch(`/api/merchant/shop_sale_stats`, {
@@ -23,9 +27,12 @@ export function TotalSalesData(props) {
         })
             .then((response) => { return response.json(); })
             .then((data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                } else {
                 setSalesTotal(data.sales_stats.sales_total)
                 setSalesData(data.sales_stats.results);
-            })
+                }})
             .catch((error) => {
                 console.log("error", error);
             }).finally(() => {

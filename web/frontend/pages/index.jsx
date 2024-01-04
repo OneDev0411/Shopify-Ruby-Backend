@@ -11,8 +11,11 @@ import { ConversionRate, CustomTitleBar, OffersList, OrderOverTimeData, TotalSal
 import { iculogo } from "../assets";
 import "../components/stylesheets/mainstyle.css";
 import HomePageSkeleton from "../skeletons/HomePageSkeleton";
+import {Redirect} from '@shopify/app-bridge/actions';
+import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 
 export default function HomePage() {
+  const app = useAppBridge();
   const shopAndHost = useSelector(state => state.shopAndHost);
   const fetch = useAuthenticatedFetch(shopAndHost.host);
 
@@ -49,6 +52,7 @@ export default function HomePage() {
   }
   
   useEffect(() => {
+    let redirect = Redirect.create(app);
     setIsLoading(true);
     fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
       method: 'GET',
@@ -58,6 +62,9 @@ export default function HomePage() {
     })
       .then( (response) => { return response.json(); })
       .then( (data) => {
+        if (data.redirect_to) {
+          redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+      } else {
         setHasOffers(data.has_offers);
         setCurrentShop(data.shop);
         setPlanName(data.plan);
@@ -66,7 +73,7 @@ export default function HomePage() {
         // notify intercom as soon as app is loaded and shop info is fetched
         notifyIntercom(data.shop);
         setIsLoading(false);
-      })
+      }})
       .catch((error) => {
         console.log("error", error);
       })
