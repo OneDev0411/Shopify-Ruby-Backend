@@ -16,6 +16,7 @@ import CollapsibleColorPicker from "../../CollapsibleColorPicker";
 import tinycolor from "tinycolor2";
 import "../../../components/stylesheets/colorPickerStyles.css";
 import ColorSwatchSelector from "../../ColorSwatchSelector";
+import { FontOptions } from "../../../shared/constants/OfferFontOptions";
 
 export function ThirdTab(props) {
 
@@ -145,29 +146,6 @@ export function ThirdTab(props) {
     //Font options
     // const [fontSelect, setFontSelect] = useState("Dummy font 1");
     const handleFontSelect = useCallback((value) => props.updateNestedAttributeOfOffer(value, "css_options", "text", "fontFamily"), []);
-    const fontOptions = [
-        { label: 'None', value: 'None' },
-        { label: 'Arial', value: 'Arial' },
-        { label: 'Caveat', value: 'Caveat' },
-        { label: 'Comfortaa', value: 'Comfortaa' },
-        { label: 'Comic Sans MS', value: 'Comic Sans MS' },
-        { label: 'Courier New', value: 'Courier New' },
-        { label: 'EB Garamond', value: 'EB Garamond' },
-        { label: 'Georgia', value: 'Georgia' },
-        { label: 'Impact', value: 'Impact' },
-        { label: 'Lexend', value: 'Lexend' },
-        { label: 'Lobster', value: 'Lobster' },
-        { label: 'Lora', value: 'Lora' },
-        { label: 'Merriweather', value: 'Merriweather' },
-        { label: 'Montserrat', value: 'Montserrat' },
-        { label: 'Oswald', value: 'Oswald' },
-        { label: 'Pacifico', value: 'Pacifico' },
-        { label: 'Playfair Display', value: 'Playfair Display' },
-        { label: 'Roboto', value: 'Roboto' },
-        { label: 'Spectral', value: 'Spectral' },
-        { label: 'Trebuchet MS', value: 'Trebuchet MS' },
-        { label: 'Verdana', value: 'Verdana' },
-    ];
 
     //Font sizes
     const handleFontSize = useCallback((newValue) => props.updateNestedAttributeOfOffer(`${newValue}px`, "css_options", "text", "fontSize"), []);
@@ -175,29 +153,6 @@ export function ThirdTab(props) {
 
     //Button options
     const handleBtnSelect = useCallback((value) => props.updateNestedAttributeOfOffer(value, "css_options", "button", "fontFamily"), []);
-    const btnOptions = [
-        { label: 'None', value: 'None' },
-        { label: 'Arial', value: 'Arial' },
-        { label: 'Caveat', value: 'Caveat' },
-        { label: 'Comfortaa', value: 'Comfortaa' },
-        { label: 'Comic Sans MS', value: 'Comic Sans MS' },
-        { label: 'Courier New', value: 'Courier New' },
-        { label: 'EB Garamond', value: 'EB Garamond' },
-        { label: 'Georgia', value: 'Georgia' },
-        { label: 'Impact', value: 'Impact' },
-        { label: 'Lexend', value: 'Lexend' },
-        { label: 'Lobster', value: 'Lobster' },
-        { label: 'Lora', value: 'Lora' },
-        { label: 'Merriweather', value: 'Merriweather' },
-        { label: 'Montserrat', value: 'Montserrat' },
-        { label: 'Oswald', value: 'Oswald' },
-        { label: 'Pacifico', value: 'Pacifico' },
-        { label: 'Playfair Display', value: 'Playfair Display' },
-        { label: 'Roboto', value: 'Roboto' },
-        { label: 'Spectral', value: 'Spectral' },
-        { label: 'Trebuchet MS', value: 'Trebuchet MS' },
-        { label: 'Verdana', value: 'Verdana' },
-    ];
 
     //Button size
     const handleBtnSize = useCallback((newValue) => props.updateNestedAttributeOfOffer(`${newValue}px`, "css_options", "button", "fontSize"), []);
@@ -504,7 +459,7 @@ export function ThirdTab(props) {
                     <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                         <Select
                             label="Font"
-                            options={fontOptions}
+                            options={FontOptions}
                             onChange={handleFontSelect}
                             value={props.offer.css_options?.text?.fontFamily}
                         />
@@ -529,7 +484,7 @@ export function ThirdTab(props) {
                     <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                         <Select
                             label="Font"
-                            options={btnOptions}
+                            options={FontOptions}
                             onChange={handleBtnSelect}
                             value={props.offer.css_options?.button?.fontFamily}
                         />

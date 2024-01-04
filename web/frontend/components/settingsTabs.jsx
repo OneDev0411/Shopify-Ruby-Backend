@@ -1,16 +1,9 @@
 import {Tabs, Card, TextField, Select, Checkbox} from '@shopify/polaris';
 import {useState, useCallback} from 'react';
 import React from "react";
+import { DOMActionOptions } from '../shared/constants/DOMActionOptions';
 
 export function SettingTabs(props){
- 
-   const options = [
-     {label: 'prepend()', value: 'prepend'},
-     {label: 'append()', value: 'append'},
-     {label: 'after()', value: 'after'},
-     {label: 'before()', value: 'before'},
-   ];
-  
     // Tabs
     const [selected, setSelected] = useState(0);
 
@@ -37,7 +30,7 @@ export function SettingTabs(props){
                 <Select
                     label="DOM action"
                     id="productDomAction"
-                    options={options}
+                    options={DOMActionOptions}
                     onChange={props.handleFormChange}
                     value={props.formData.productDomAction}
                 />
@@ -57,7 +50,7 @@ export function SettingTabs(props){
                 <Select
                     label="DOM action"
                     id="cartDomAction"
-                    options={options}
+                    options={DOMActionOptions}
                     onChange={props.handleFormChange}
                     value={props.formData.cartDomAction}
                 />
@@ -77,7 +70,7 @@ export function SettingTabs(props){
                 <Select
                     label="DOM action"
                     id="ajaxDomAction"
-                    options={options}
+                    options={DOMActionOptions}
                     onChange={props.handleFormChange}
                     value={props.formData.ajaxDomAction}
                 />

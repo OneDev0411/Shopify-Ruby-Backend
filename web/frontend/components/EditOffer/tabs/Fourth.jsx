@@ -10,6 +10,7 @@ import {
 import {useState, useCallback, useEffect} from "react";
 import React from "react";
 import {Link} from "react-router-dom";
+import { DOMActionOptions } from "../../../shared/constants/DOMActionOptions";
 
 // Advanced Tab
 export function FourthTab(props) {
@@ -24,13 +25,6 @@ export function FourthTab(props) {
     const handleOfferCss = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "custom_css"), []);
     
     const [isLegacy, setIsLegacy] = useState(props.shop.theme_version === 'Vintage');
-
-    const options = [
-        {label: 'prepend()', value: 'prepend'},
-        {label: 'append()', value: 'append'},
-        {label: 'after()', value: 'after'},
-        {label: 'before()', value: 'before'}
-    ];
 
     useEffect(() => {
         if (!isLegacy) {
@@ -93,7 +87,7 @@ export function FourthTab(props) {
                     <Select
                         label="DOM action"
                         id="productDomAction"
-                        options={options}
+                        options={DOMActionOptions}
                         onChange={handleProductDomAction}
                         value={props.offer?.advanced_placement_setting?.custom_product_page_dom_action}
                         disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
@@ -115,7 +109,7 @@ export function FourthTab(props) {
                     <Select
                         label="DOM action"
                         id="productDomAction"
-                        options={options}
+                        options={DOMActionOptions}
                         onChange={handleCartDomAction}
                         value={props.offer?.advanced_placement_setting?.custom_cart_page_dom_action}
                         disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
@@ -139,7 +133,7 @@ export function FourthTab(props) {
                     <Select
                         label="DOM action"
                         id="productDomAction"
-                        options={options}
+                        options={DOMActionOptions}
                         onChange={handleAjaxDomAction}
                         value={props.offer?.advanced_placement_setting?.custom_ajax_dom_action}
                         disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
