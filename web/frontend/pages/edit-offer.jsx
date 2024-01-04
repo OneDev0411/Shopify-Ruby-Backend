@@ -221,48 +221,49 @@ export default function EditPage() {
                     }
                     setOffer({...data});
                     setInitialOfferableProductDetails(data.offerable_product_details);
-                    setIsLoading(false);
+
+                    fetch(`/api/merchant/shop_settings`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({shop_attr: {admin: null}, shop: shopAndHost.shop}),
+                    })
+                      .then((response) => {
+                          return response.json()
+                      })
+                      .then((data) => {
+                          if (data.redirect_to) {
+                              redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                          } else {
+                              if (Object.keys(data.shop_settings.css_options.main).length == 0) {
+                                  data.shop_settings.css_options.main.color = "#2B3D51";
+                                  data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
+                                  data.shop_settings.css_options.button.color = "#FFFFFF";
+                                  data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
+                                  data.shop_settings.css_options.widows = '100%';
+                              }
+                          }
+                          setShop(data.shop_settings);
+                          setIsAppEmbedded(data.app_embed_enabled)
+
+                          setUpdatePreviousAppOffer(!updatePreviousAppOffer);
+
+                          setIsLoading(false);
+                      })
+                      .catch((error) => {
+                          setIsLoading(false);
+                          console.log("Error > ", error);
+                      })
                 })
                 .catch((error) => {
+                    setIsLoading(false);
                     console.log("Error > ", error);
                 })
 
             setIsLoading(true);
-            fetch(`/api/merchant/shop_settings`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({shop_attr: {admin: null}, shop: shopAndHost.shop}),
-            })
-                .then((response) => {
-                    return response.json()
-                })
-                .then((data) => {
-                    if (data.redirect_to) {
-                        redirect.dispatch(Redirect.Action.APP, data.redirect_to);
-                    } else {
-                        if (Object.keys(data.shop_settings.css_options.main).length == 0) {
-                            data.shop_settings.css_options.main.color = "#2B3D51";
-                            data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
-                            data.shop_settings.css_options.button.color = "#FFFFFF";
-                            data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
-                            data.shop_settings.css_options.widows = '100%';
-                        }
-                    }
-                    setShop(data.shop_settings);
-                    setIsAppEmbedded(data.app_embed_enabled)
-
-                    setUpdatePreviousAppOffer(!updatePreviousAppOffer);
-
-                    setIsLoading(false);
-                })
-                .catch((error) => {
-                    console.log("Error > ", error);
-                })
         }
     },[]);
-
 
 
     //Called whenever the checkKeysValidity changes in any child component
@@ -695,7 +696,7 @@ export default function EditPage() {
                                         <FourthTab offer={offer} shop={shop} updateOffer={updateOffer}
                                                    updateShop={updateShop}
                                                    saveDraft={saveDraft} publishOffer={publishOffer}
-                                                   enablePublish={enablePublish}
+                                                   enablePublish={enablePublish}  isAppEmbedded={isAppEmbedded}
                                                    updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>
                                         : ""}
                                 </Tabs>

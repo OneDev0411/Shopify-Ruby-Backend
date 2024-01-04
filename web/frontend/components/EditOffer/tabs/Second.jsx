@@ -701,7 +701,7 @@ export function SecondTab(props) {
 
     return (
         <div id="polaris-placement-cards">
-            {(!storedThemeNames?.includes(shopifyThemeName) && openBanner) && (
+            {(!storedThemeNames?.includes(shopifyThemeName) && openBanner && isLegacy) && (
                 <div style={{marginBottom: "10px"}} className="polaris-banner-container">
                     <Banner title="Unsupported Theme Detected" onDismiss={() => {
                         setOpenBanner(!openBanner)
@@ -715,12 +715,10 @@ export function SecondTab(props) {
                 </div>
             )}
 
-            {(selected === "ajax" && !props.isAppEmbedded) && (
+            {(selected === "ajax" && !props.isAppEmbedded && !isLegacy ) && (
               <div style={{marginBottom: "10px"}} className="polaris-banner-container">
-                  <Banner title="You are using Shopify's Theme Editor" onDismiss={() => {
-                      setOpenBanner(!openBanner)
-                  }} tone='warning'>
-                      <p>Please use the theme editor to place the offer in the Ajax Cart</p><br/>
+                  <Banner title="You are using Shopify's Theme Editor" tone='warning'>
+                      <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
                       <p><Link
                         to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?context=apps&template=${props.offer.in_product_page ? 'product' : 'cart' }&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
                         target="_blank">Click here</Link> to go to the theme editor</p>

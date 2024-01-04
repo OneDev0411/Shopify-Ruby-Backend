@@ -558,7 +558,13 @@
 
                 if (await checkPageRules()) {
                     if (!offerOnPage) {
-                        await createOffer();
+                        if (
+                          (offer.in_product_page && isProductPage()) ||
+                          (offer.in_cart_page && isCartPage()) ||
+                          (offer.in_collection_page && isCartPage())
+                        ) {
+                            await createOffer();
+                        }
                     }
 
                     if (off.in_ajax_cart && !ajaxOfferOnPage) {
@@ -644,7 +650,13 @@
                                   offer.offerable_product_details = setProductsCurrency();
                               }
 
-                              await createOffer();
+                              if (
+                                (offer.in_product_page && isProductPage()) ||
+                                (offer.in_cart_page && isCartPage()) ||
+                                (offer.in_collection_page && isCartPage())
+                              ) {
+                                  await createOffer();
+                              }
 
                               if (off.in_ajax_cart) {
                                   await createAjaxOffer();

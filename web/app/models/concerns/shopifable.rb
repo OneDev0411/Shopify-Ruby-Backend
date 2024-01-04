@@ -748,20 +748,19 @@ module Shopifable
 
   def check_app_embed_enabled
     activate_session
+
     shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
 
-    assets = ShopifyAPI::Asset.all(theme_id: shopify_theme.id)
+    asset = ShopifyAPI::Asset.all(asset: { key: 'config/settings_data.json' }, theme_id: shopify_theme.id).compact.first
 
-    assets&.each do | asset |
+    unless asset.nil?
+      asset = JSON.parse(asset.value)
+      blocks = asset['current']['blocks']
 
-      if asset.key == 'templates/product.json' || asset.key == 'templates/collection.json' || asset.key == 'templates/cart.json'
-        asset_value = ShopifyAPI::Asset.all(asset: { key: asset.key }, theme_id: shopify_theme.id).compact.first
+      block_found = blocks.find { |block| block.second["type"].include?("app_block_embed/#{ENV["SHOPIFY_ICU_EXTENSION_APP_ID"]}") }
 
-        unless asset_value.nil?
-          if asset_value.value.include?("#{ENV["SHOPIFY_ICU_EXTENSION_APP_ID"]}")
-            return true
-          end
-        end
+      unless block_found.nil?
+        return !block_found.second['disabled']
       end
     end
 

@@ -18,7 +18,7 @@ import {Link} from "react-router-dom";
 
 const ShopContext = createContext(null);
 
-export function CreateOfferCard({shopify_domain}) {
+export function CreateOfferCard({shopify_domain, hasOffers = false}) {
   const navigateTo = useNavigate();
   const location = useLocation();
   const shopAndHost = useSelector((state) => state.shopAndHost);
@@ -68,81 +68,39 @@ export function CreateOfferCard({shopify_domain}) {
     </div>
   </div>;
 
-  const homepageInfo =
-    <div style={{marginBottom: '20px'}} className={"homepage-info"}>
-      <Text variant="headingSm" as="p" fontWeight="regular" >
-        <ol>
-         <li>Go to theme settings</li>
-          <li>Click on Product page</li>
-          <li>Click Add Section</li>
-          <li>Search for ICU - Product Page app block</li>
-          <li>Drag into your preferred placement</li>
-          <li>Click on Cart page</li>
-          <li>Click Add Section</li>
-          <li>Search for ICU - Cart Page app block</li>
-          <li>Drag into preferred placement</li>
-          <li>Click save</li>
-          <li>Return to ICU, you're done!</li>
-        </ol>
-      </Text>
-    </div>;
+  const getHelpDismissed = () => {
+    return localStorage.getItem('help_dismissed');
+  }
 
   // Though not necessary, this should serve as an example of how to use the Context API
   return (
     <ShopContext.Provider value={{ shopData, setShopData }}>
-      <div style={{marginBottom: '47px'}}>
-        <AlphaCard>
-          <VerticalStack inlineAlign="center">
-            <div className="leadin-card">
-              <div style={{marginBottom: '11px'}} className="center-content">
-                <Text variant="headingLg" as="h2" fontWeight="regular">
-                  Add ICU to your stores theme
-                </Text>
-              </div>
-              <div style={{marginBottom: '35px'}} className="center-content">
-                <Text variant="headingSm" as="p" fontWeight="regular" color="subdued">
-                  Start by creating your first offer and publishing it to your store
-                </Text>
-              </div>
-              <div style={{marginBottom: '35px'}} className={"video-intro-section"}>
-                <HelpSection info={homepageInfo} handleOpen={handleOpen} shopData={shopData} disablePrimary />
-                <VideoModal active={active} handleClose={handleClose} />
-              </div>
-              <div className="center-btn" style={{marginBottom: '42px'}}>
-                <ButtonGroup>
-                  <Button primary
-                    url={`https://${shopify_domain}/admin/themes/current/editor?template=product&addAppBlockId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block&target=mainSection`}
-                    target="_blank"
-                  >
-                    Go to theme editor
-                  </Button>
-                  <Button
-                      url="https://help.incartupsell.com/en/collections/6780837-help-articles-for-new-ui"
-                      target="_blank"
-                  >
-                    View Help Docs
-                  </Button>
-                </ButtonGroup>
-              </div>
-              <p style={{textAlign: "center"}}>If you want to add offers to your ajax cart, <Link
-                to={`https://${shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
-                target="_blank">Click here
-              </Link> to enable the app</p>
-            </div>
-          </VerticalStack>
-        </AlphaCard>
-      </div>
-
-      <div style={{marginBottom: '47px'}}>
-        <OfferCard  handleCreateOffer={handleCreateOffer} isOffers={isOffers} />
-      </div>
-
-      {!isOffers && (
-        <>
-          <HelpSection info={moreHelpInfo} handleOpen={handleOpen} shopData={shopData} />
-          <VideoModal active={active} handleClose={handleClose} />
-        </>
+      {!isOffers && !getHelpDismissed() && (
+        <div style={{marginBottom: '47px'}}>
+          <ThemeAppCard
+            handleOpen={handleOpen}
+            shopData={shopData}
+            active={active}
+            handleClose={handleClose}
+            shopify_domain={shopify_domain}
+          />
+        </div>
       )}
+
+      { !hasOffers &&
+        <>
+          <div style={{marginBottom: '47px'}}>
+            <OfferCard handleCreateOffer={handleCreateOffer} isOffers={isOffers} />
+          </div>
+
+          {!isOffers && (
+            <>
+              <HelpSection info={moreHelpInfo} handleOpen={handleOpen} shopData={shopData} />
+              <VideoModal active={active} handleClose={handleClose} />
+            </>
+          )}
+        </>
+      }
     </ShopContext.Provider>
   );
 }
@@ -258,6 +216,76 @@ function VideoModal({ active, handleClose }) {
       </Modal.Section>
     </Modal>
   );
+}
+
+function ThemeAppCard({ handleOpen, handleClose, shopData, active, shopify_domain}) {
+  const homepageInfo =
+    <div style={{marginBottom: '20px'}} className={"homepage-info"}>
+      <Text variant="headingSm" as="p" fontWeight="regular" >
+        <ol>
+          <li>Go to theme settings</li>
+          <li>Click on Product page</li>
+          <li>Click Add Section</li>
+          <li>Search for ICU - Product Page app block</li>
+          <li>Drag into your preferred placement</li>
+          <li>Click on Cart page</li>
+          <li>Click Add Section</li>
+          <li>Search for ICU - Cart Page app block</li>
+          <li>Drag into preferred placement</li>
+          <li>Click save</li>
+          <li>Return to ICU, you're done!</li>
+        </ol>
+      </Text>
+    </div>;
+
+  const storeHelpDismissed = () => {
+    localStorage.setItem('help_dismissed', true);
+    window.reload();
+  }
+
+  return (
+    <AlphaCard>
+      <VerticalStack inlineAlign="center">
+        <div className="leadin-card">
+          <div style={{marginBottom: '11px'}} className="center-content">
+            <Text variant="headingLg" as="h2" fontWeight="regular">
+              Add ICU to your stores theme
+            </Text>
+          </div>
+          <div style={{marginBottom: '35px'}} className="center-content">
+            <Text variant="headingSm" as="p" fontWeight="regular" color="subdued">
+              Start by creating your first offer and publishing it to your store
+            </Text>
+          </div>
+          <div style={{marginBottom: '35px'}} className={"video-intro-section"}>
+            <HelpSection info={homepageInfo} handleOpen={handleOpen} shopData={shopData} disablePrimary />
+            <VideoModal active={active} handleClose={handleClose} />
+          </div>
+          <div className="center-btn" style={{marginBottom: '42px'}}>
+            <ButtonGroup>
+              <Button primary
+                      url={`https://${shopify_domain}/admin/themes/current/editor?template=product&addAppBlockId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block&target=mainSection`}
+                      target="_blank"
+                      onClick={storeHelpDismissed}
+              >
+                Go to theme editor
+              </Button>
+              <Button
+                url="https://help.incartupsell.com/en/collections/6780837-help-articles-for-new-ui"
+                target="_blank"
+              >
+                View Help Docs
+              </Button>
+            </ButtonGroup>
+          </div>
+          <p style={{textAlign: "center"}}>If you want to add offers to your ajax cart, <Link
+            to={`https://${shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
+            target="_blank">Click here
+          </Link> to enable the app</p>
+        </div>
+      </VerticalStack>
+    </AlphaCard>
+  )
 }
 
 // This service function should be placed in a separate file

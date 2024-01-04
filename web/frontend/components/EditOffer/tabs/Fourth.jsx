@@ -25,6 +25,7 @@ export function FourthTab(props) {
     const handleOfferCss = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "custom_css"), []);
     
     const [isLegacy, setIsLegacy] = useState(props.shop.theme_version === 'Vintage');
+    const [openBanner, setOpenBanner] = useState(false);
 
     useEffect(() => {
         if (!isLegacy) {
@@ -37,9 +38,7 @@ export function FourthTab(props) {
             { !isLegacy && !props.offer.in_ajax_cart &&
               (
                 <div style={{marginBottom: "10px"}} className="polaris-banner-container">
-                    <Banner title="You are using Shopify's Theme Editor" onDismiss={() => {
-                        setOpenBanner(!openBanner)
-                    }} tone='warning'>
+                    <Banner title="You are using Shopify's Theme Editor"  tone='warning'>
                         <p>Please use the theme editor to place the offers where you would like it.</p><br/>
                         <p><Link
                           to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?template=${props.offer.in_product_page ? 'product' : 'cart' }&addAppBlockId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block&target=${props.offer.in_product_page ? 'mainSection' : 'newAppsSection'}`}
@@ -52,13 +51,17 @@ export function FourthTab(props) {
             { !isLegacy && props.offer.in_ajax_cart &&
               (
                 <div style={{marginBottom: "10px"}} className="polaris-banner-container">
-                    <Banner title="You are using Shopify's Theme Editor" onDismiss={() => {
-                        setOpenBanner(!openBanner)
-                    }} tone='warning'>
-                        <p>Please use the theme editor to place the offer in the Ajax Cart</p><br/>
-                        <p><Link
-                          to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?context=apps&template=${props.offer.in_product_page ? 'product' : 'cart' }&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
-                          target="_blank">Click here</Link> to go to the theme editor</p>
+                    <Banner title="You are using Shopify's Theme Editor" status={props.isAppEmbedded ? 'success' : 'warning'}>
+                        {!props.isAppEmbedded ?
+                            <>
+                                <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
+                                <p><Link
+                                to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?context=apps&template=${props.offer.in_product_page ? 'product' : 'cart' }&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
+                                target="_blank">Click here</Link> to go to theme editor</p>
+                            </>
+                        :
+                          <p>Advanced settings are no longer needed for Shopify's Theme Editor. You've already enabled the app, all you need to do is publish your offer and it will appear in your Ajax cart</p>
+                        }
                     </Banner>
                 </div>
               )
