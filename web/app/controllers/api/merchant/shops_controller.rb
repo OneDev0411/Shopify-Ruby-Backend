@@ -9,12 +9,15 @@ module Api
       # Get /api/merchant/current_shop
       def current_shop
         @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shop]) if @icushop.present?
-        new_theme = @icushop.update_theme_version
 
-        if new_theme
-          @icushop.update(theme_version: '2.0')
-        else
-          @icushop.update(theme_version: 'Vintage')
+        if @icushop.present? && @icushop.theme_version.nil?
+          new_theme = @icushop.update_theme_version
+
+          if new_theme
+            @icushop.update(theme_version: '2.0')
+          else
+            @icushop.update(theme_version: 'Vintage')
+          end
         end
 
         render "shops/current_shop"

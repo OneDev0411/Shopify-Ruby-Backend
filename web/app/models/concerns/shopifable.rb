@@ -757,10 +757,12 @@ module Shopifable
       asset = JSON.parse(asset.value)
       blocks = asset['current']['blocks']
 
-      block_found = blocks.find { |block| block.second["type"].include?("app_block_embed/#{ENV["SHOPIFY_ICU_EXTENSION_APP_ID"]}") }
+      unless blocks.nil?
+        block_found = blocks.find { |block| block.second["type"].include?("app_block_embed/#{ENV["SHOPIFY_ICU_EXTENSION_APP_ID"]}") }
 
-      unless block_found.nil?
-        return !block_found.second['disabled']
+        unless block_found.nil?
+          return !block_found.second['disabled']
+        end
       end
     end
 
