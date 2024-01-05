@@ -1,10 +1,13 @@
 import {ResourceList, ResourceItem, OptionList} from '@shopify/polaris';
 import {useState} from 'react';
+import {
+  ExcludeVariantSelectors,
+  ProductResourceName
+} from '../shared/constants/Others';
 
 export function SearchProductsList(props) {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedVariants, setSelectedVariants] = useState({})
-  const exclude_variant_selectors = ['cart_at_least', 'cart_at_most', 'cart_exactly', 'cart_does_not_contain'];
 
   function handleSelectedVariant(selectedOptions, id) {
     setSelectedVariants(selectedVariants => {
@@ -12,18 +15,13 @@ export function SearchProductsList(props) {
     })
     props.updateSelectedProduct(id, selectedOptions);
   }
-  
-  const resourceName = {
-    singular: 'product',
-    plural: 'products',
-  };
 
   const items = props.productData;
 
   return (
     <>
       <ResourceList
-        resourceName={resourceName}
+        resourceName={ProductResourceName}
         items={items}
         renderItem={renderItem}
         selectedItems={selectedItems}
@@ -36,7 +34,7 @@ export function SearchProductsList(props) {
 
   function renderItem(item) {
     const {id, title, image, variants} = item
-    if(!variants || exclude_variant_selectors.includes(props.rule?.rule_selector)){
+    if(!variants || ExcludeVariantSelectors.includes(props.rule?.rule_selector)){
       return (
         <ResourceItem
           id={id}
@@ -52,7 +50,7 @@ export function SearchProductsList(props) {
         </ResourceItem>
       );
     }
-    if(variants.length <= 1 || exclude_variant_selectors.includes(props.rule?.rule_selector))
+    if(variants.length <= 1 || ExcludeVariantSelectors.includes(props.rule?.rule_selector))
     {
       return (
         <ResourceItem

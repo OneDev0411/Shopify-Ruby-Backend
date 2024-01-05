@@ -17,16 +17,16 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthenticatedFetch } from "../hooks";
 import { useSelector } from "react-redux";
+import {
+  OffersListSortOptions,
+  OffersResourceName
+} from '../shared/constants/Others';
 import {CreateOfferCard} from "./CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 
-export function OffersList(props) {
+export function OffersList() {
   const app = useAppBridge();
-  const resourceName = {
-    singular: 'offer',
-    plural: 'offers',
-  };
   const [isLoading, setIsLoading] = useState(true);
   const [taggedWith, setTaggedWith] = useState('');
   const [queryValue, setQueryValue] = useState(null);
@@ -186,13 +186,6 @@ export function OffersList(props) {
         },
       ]
     : [];
-
-  const sortOptions = [
-    {label: 'Date Desc', value: 'date_des'},
-    {label: 'Date Asc', value: 'date_asc'},
-    {label: 'Clicks', value: 'clicks'},
-    {label: 'Revenue', value: 'revenue'},
-  ];
 
   const rowMarkup = paginatedData.map(
     ({ id, title, status, clicks, views, revenue }, index) => (
@@ -354,19 +347,19 @@ export function OffersList(props) {
                     <Select
                       labelInline
                       label="Sort"
-                      options={sortOptions}
+                      options={OffersListSortOptions}
                       value={sortValue}
                       onChange={handleSortChange}
                     />
                   </div>
                 </div>
                 <IndexTable
-                  sortOptions={sortOptions}
+                  sortOptions={OffersListSortOptions}
                   sortable={[false, false, true, true, true]}
               sortDirection={'descending'}
                   sortColumnIndex={4}
                   sort={{ handleSorting }}
-                  resourceName={resourceName}
+                  resourceName={OffersResourceName}
                   itemCount={paginatedData.length}
                   selectedItemsCount={
                 allResourcesSelected ? 'All' : selectedResources.length

@@ -24,6 +24,12 @@ import { SelectCollectionsModal } from "../../SelectCollectionsModal";
 import { condition_options } from "../../../shared/constants/ConditionOptions";
 import { getLabelFromValue } from "../../../shared/helpers/commonHelpers";
 import {Link} from 'react-router-dom';
+import {
+    OfferThemeOptions,
+    OfferNewThemeOptions,
+    QuantityArray,
+    OrderArray
+} from "../../../shared/constants/EditOfferOptions";
 
 export function SecondTab(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -33,8 +39,6 @@ export function SecondTab(props) {
     const [rule, setRule] = useState({ quantity: null, rule_selector: 'cart_at_least', item_type: 'product', item_shopify_id: null, item_name: null });
     const [quantityErrorText, setQuantityErrorText] = useState(null);
     const [itemErrorText, setItemErrorText] = useState(null);
-    const quantityArray = ['cart_at_least', 'cart_at_most', 'cart_exactly'];
-    const orderArray = ['total_at_least', 'total_at_most'];
     const [selectedItems, setSelectedItems] = useState([]);
     const [defaultSetting, setDefaultSetting] = useState(false);
     const [useTemplate, setUseTemplate] = useState(false);
@@ -183,7 +187,7 @@ export function SecondTab(props) {
     }, [storedThemeNames, shopifyThemeName])
 
     function upadteCondition() {
-        if (quantityArray.includes(rule.rule_selector)) {
+        if (QuantityArray.includes(rule.rule_selector)) {
             if (!rule.quantity) {
                 setQuantityErrorText("Required filed");
                 return;
@@ -193,7 +197,7 @@ export function SecondTab(props) {
                 return;
             }
         }
-        if (orderArray.includes(rule.rule_selector)) {
+        if (OrderArray.includes(rule.rule_selector)) {
             if (!rule.item_name) {
                 setItemErrorText("Required filed");
                 return;
@@ -240,21 +244,6 @@ export function SecondTab(props) {
         }
         setSelected(value);
     }, []);
-
-    const options = [
-        { label: 'Cart page', value: 'cartpage' },
-        { label: 'Product page', value: 'productpage' },
-        { label: 'Product and cart page', value: 'cartpageproductpage' },
-        { label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax' },
-        { label: 'AJAX and cart page', value: 'ajaxcartpage' }
-    ]
-
-    const newThemeOptions = [
-        { label: 'Cart page', value: 'cartpage' },
-        { label: 'Product page', value: 'productpage' },
-        { label: 'Product and cart page', value: 'cartpageproductpage' },
-        { label: 'AJAX cart (slider, pop up or dropdown)', value: 'ajax' },
-    ]
 
     const handleDefaultSettingChange = useCallback((value, selectedPage) => {
          if(value) {
@@ -736,13 +725,13 @@ export function SecondTab(props) {
                             {/*Select requires a styled dropdown*/}
                             {!isLegacy ?
                                   <Select
-                                    options={newThemeOptions}
+                                    options={OfferNewThemeOptions}
                                     onChange={handleSelectChange}
                                     value={selected}
                                   />
                               :
                                 <Select
-                                    options={options}
+                                    options={OfferThemeOptions}
                                     onChange={handleSelectChange}
                                     value={selected}
                                 />

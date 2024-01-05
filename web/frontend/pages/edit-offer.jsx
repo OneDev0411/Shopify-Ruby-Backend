@@ -11,6 +11,7 @@ import {useAuthenticatedFetch} from "../hooks";
 import {FirstTab, FourthTab, SecondTab, ThirdTab} from "../components";
 import {OfferPreview} from "../components/OfferPreview";
 import "../components/stylesheets/mainstyle.css";
+import { EditOfferTabs } from '../shared/constants/EditOfferOptions';
 
 export default function EditPage() {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -559,29 +560,6 @@ export default function EditPage() {
         save(false);
     }
 
-    const tabs = [
-        {
-            id: 'content',
-            content: "Content",
-            panelID: 'content',
-        },
-        {
-            id: 'placement',
-            content: 'Placement',
-            panelID: 'placement',
-        },
-        {
-            id: 'appearance',
-            content: 'Appearance',
-            panelID: 'appearance',
-        },
-        {
-            id: 'advanced',
-            content: 'Advanced',
-            panelID: 'advanced',
-        },
-    ];
-
     // Preview section tab data
     const [selectedPre, setSelectedPre] = useState(0);
     const handlePreTabChange = useCallback((selectedPreTabIndex) => {
@@ -654,7 +632,7 @@ export default function EditPage() {
                         <Layout.Section>
                             <div className="offer-tabs-no-padding">
                                 <Tabs
-                                    tabs={tabs}
+                                    tabs={EditOfferTabs}
                                     selected={selected}
                                     onSelect={setSelected}
                                     disclosureText="More views"

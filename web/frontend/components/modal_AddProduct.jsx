@@ -48,22 +48,6 @@ export function ModalAddProduct(props) {
     plural: 'products',
   };
 
-  const bulkActions = [
-    {
-      content: 'Add products',
-      onAction: () => console.log('Todo: implement bulk add tags'),
-    }
-  ];
-
-  const filters = [
-    {
-      key: 'taggedWith3',
-      label: 'Tagged withh',
-      filter: null,
-      shortcut: true,
-    },
-  ];
-
   const appliedFilters = !isEmpty(taggedWith)
     ? [
       {
@@ -83,7 +67,7 @@ export function ModalAddProduct(props) {
       onQueryClear={handleQueryValueRemove}
       onClearAll={handleClearAll}
     />
-  ); filters
+  );
 
   return (
     <div id="right-align-polaris">

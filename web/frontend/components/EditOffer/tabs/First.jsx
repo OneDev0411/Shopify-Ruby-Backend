@@ -21,6 +21,7 @@ import {
 import {InfoMinor} from '@shopify/polaris-icons';
 import {ModalAddProduct} from "./../../modal_AddProduct";
 import {useAuthenticatedFetch} from "../../../hooks";
+import { AutopilotQuantityOptions } from "../../../shared/constants/EditOfferOptions";
 
 export function FirstTab(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -221,13 +222,6 @@ export function FirstTab(props) {
     const [openAutopilotSection, setOpenAutopilotSection] = useState(false);
     const [autopilotButtonText, setAutopilotButtonText] = useState(props.autopilotCheck.isPending);
     const [autopilotQuantity, setAutopilotQuantity] = useState(props.offer?.autopilot_quantity);
-    const autopilotQuantityOptions = [
-        {label: '1 (recommended)', value: 1},
-        {label: '2', value: 2},
-        {label: '3', value: 3},
-        {label: '4', value: 4},
-        {label: '5', value: 5}
-    ];
 
     const navigateTo = useNavigate();
     const location = useLocation();
@@ -459,7 +453,7 @@ export function FirstTab(props) {
                                 <LegacyStack spacing="loose" vertical>
                                     <Select
                                         label="How many products would you like the customer to be able to choose from in the offer?"
-                                        options={autopilotQuantityOptions}
+                                        options={AutopilotQuantityOptions}
                                         onChange={handleAutoPilotQuantityChange}
                                         value={autopilotQuantity}
                                     />

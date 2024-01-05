@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import { Page ,Grid, Select } from '@shopify/polaris';
 import { AnalyticsMinor } from '@shopify/polaris-icons';
 import { GenericFooter } from '../components/GenericFooter';
+import { DateRangeOptions } from '../shared/constants/AnalyticsOptions';
 import "../components/stylesheets/mainstyle.css";
 import {
   TotalSalesData,
@@ -20,16 +21,6 @@ export default function AnalyticsOffers() {
     setPeriod(val)
   },[]);
 
-  const options = [
-    {label: 'Today', value: 'daily'},
-    {label: 'Last week', value: 'weekly'},
-    {label: 'Last Month', value: 'monthly'},
-    {label: 'This 3 Months', value: '3-months'},
-    {label: 'This 6 Months', value: '6-months'},
-    {label: 'This year', value: 'yearly'},
-    {label: 'All time', value: 'all'},
-  ];
-
   return (
     <Page> 
       <CustomTitleBar title='Analytics' icon={AnalyticsMinor} />  
@@ -38,7 +29,7 @@ export default function AnalyticsOffers() {
         <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
           <Select
             label="Date range"
-            options={options}
+            options={DateRangeOptions}
             onChange={setTimePeriod}
             value={period}
           />

@@ -16,17 +16,15 @@ import CollapsibleColorPicker from "../../CollapsibleColorPicker";
 import tinycolor from "tinycolor2";
 import "../../../components/stylesheets/colorPickerStyles.css";
 import ColorSwatchSelector from "../../ColorSwatchSelector";
-import { FontOptions } from "../../../shared/constants/OfferFontOptions";
+import {
+    OfferStyleOptions,
+    OfferBorderOptions,
+    OfferFontOptions
+} from "../../../shared/constants/EditOfferOptions";
 
 export function ThirdTab(props) {
 
     const [selected, setSelected] = useState(props.offer.css_options?.main?.borderStyle);
-    const options = [
-        { label: 'Compact', value: 'compact' },
-        { label: 'Stack', value: 'stack' },
-        { label: 'Carousel', value: 'carousel' },
-        { label: 'Flex', value: 'flex' },
-    ];
 
     const handleLayout = useCallback((value) => {
         props.updateOffer("multi_layout", value);
@@ -56,18 +54,6 @@ export function ThirdTab(props) {
         props.updateNestedAttributeOfOffer(newValue, "css_options", "main", "borderStyle");
         setSelected(newValue);
     }, []);
-    const BorderOptions = [
-        { label: 'No border', value: 'none' },
-        { label: 'Dotted lines', value: 'dotted' },
-        { label: 'Dashed line', value: 'dashed' },
-        { label: 'Solid line', value: 'solid' },
-        { label: 'Double line', value: 'double' },
-        { label: 'Groove line', value: 'groove' },
-        { label: 'Ridge line', value: 'ridge' },
-        { label: 'Inset line', value: 'inset' },
-        { label: 'Outset line', value: 'outset' },
-        { label: 'Hidden line', value: 'hidden' },
-    ];
 
     //Border width
     const handleBorderWidth = useCallback((newValue) => {
@@ -213,7 +199,7 @@ export function ThirdTab(props) {
                                 <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 3, lg: 4, xl: 4}}>
                                     <Select
                                         label="Layout"
-                                        options={options}
+                                        options={OfferStyleOptions}
                                         onChange={handleLayout}
                                         value={props.offer.multi_layout}
                                     />
@@ -249,7 +235,7 @@ export function ThirdTab(props) {
                     <Grid>
                         <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
                             <Select label="Border style"
-                                options={BorderOptions}
+                                options={OfferBorderOptions}
                                 onChange={handleBorderStyle}
                                 value={props.offer?.css_options?.main?.borderStyle}
                             />
@@ -459,7 +445,7 @@ export function ThirdTab(props) {
                     <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                         <Select
                             label="Font"
-                            options={FontOptions}
+                            options={OfferFontOptions}
                             onChange={handleFontSelect}
                             value={props.offer.css_options?.text?.fontFamily}
                         />
@@ -484,7 +470,7 @@ export function ThirdTab(props) {
                     <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                         <Select
                             label="Font"
-                            options={FontOptions}
+                            options={OfferFontOptions}
                             onChange={handleBtnSelect}
                             value={props.offer.css_options?.button?.fontFamily}
                         />
@@ -524,7 +510,7 @@ export function ThirdTab(props) {
                         </Grid.Cell>
                         <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 4, xl: 4 }}>
                             <Select label="Border style"
-                                options={BorderOptions}
+                                options={OfferBorderOptions}
                                 onChange={handleBtnBorderStyle}
                                 value={props.offer?.css_options?.button?.borderStyle}
                             />
