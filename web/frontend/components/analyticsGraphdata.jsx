@@ -80,6 +80,7 @@ export function TotalSalesData(props) {
 
 
 export function ConversionRate(props) {
+    const app = useAppBridge();
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [addedToCart, setAddedToCart] = useState(0);
@@ -88,6 +89,7 @@ export function ConversionRate(props) {
     const [totalDisplayed, setTotalDisplayed] = useState(0);
 
     function getOffersStats(period) {
+        let redirect = Redirect.create(app);
         fetch(`/api/merchant/shop_offers_stats`, {
             method: 'POST',
             headers: {
@@ -97,11 +99,14 @@ export function ConversionRate(props) {
         })
             .then((response) => { return response.json(); })
             .then((data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                } else {
                 setAddedToCart(data.offers_stats.times_clicked);
                 setTotalDisplayed(data.offers_stats.times_loaded);
                 setReachedCheckout(data.offers_stats.times_checkedout);
                 setConverted(data.orders_through_offers_count);
-            })
+            }})
             .catch((error) => {
                 console.log("error", error);
             })
@@ -135,6 +140,7 @@ export function ConversionRate(props) {
 
 
 export function OrderOverTimeData(props) {
+    const app = useAppBridge();
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [ordersTotal, setOrdersTotal] = useState(0);
@@ -142,6 +148,7 @@ export function OrderOverTimeData(props) {
     const [loading, setLoading] = useState(false); 
 
     function getOrdersData(period) {
+        let redirect = Redirect.create(app);
         if(loading) return;
         setLoading(true)
         fetch(`/api/merchant/shop_orders_stats`, {
@@ -153,9 +160,12 @@ export function OrderOverTimeData(props) {
         })
             .then((response) => { return response.json(); })
             .then((data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                } else {
                 setOrdersTotal(data.orders_stats.orders_total)
                 setOrdersData(data.orders_stats.results)
-            })
+            }})
             .catch((error) => {
                 console.log("error", error);
             }).finally(() => {
