@@ -10,7 +10,10 @@ module Api
       def current_shop
         @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shop]) if @icushop.present?
 
-        if @icushop.present? && @icushop.theme_version.nil?
+        #DO NOT DELETE, WEBHOOKS DO NOT WORK ON STAGING AND WE NEED THIS FOR PRODUCTION
+        #if @icushop.present? && @icushop.theme_version.nil?
+
+        if @icushop.present?
           new_theme = @icushop.update_theme_version
 
           if new_theme
