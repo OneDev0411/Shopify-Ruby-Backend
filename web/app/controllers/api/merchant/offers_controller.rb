@@ -4,7 +4,7 @@ module Api
     class OffersController < ApiMerchantBaseController
       before_action :find_shop, only: [:offer_settings, :update_from_builder, :offers_list, :activate, :deactivate, :duplicate, :destroy, :ab_analytics]
       before_action :set_offer, only: [:load_offer_details, :shopify_ids_from_rule]
-      before_action :ensure_plan
+      before_action :ensure_plan, only: [:offer_settings, :update_from_builder, :offers_list, :activate, :deactivate, :duplicate, :destroy, :ab_analytics]
 
       # GET /api/merchant/shop_offers
       def shop_offers
