@@ -888,10 +888,8 @@ module Shopifable
     intercom.install_event(self, 'install')
 
     if shop.present? && shop.id!=self.id
-      intercom_install_event(self, 'install')
       mixpanel.track_shop_event(self, 'App re-installed')
     else
-      intercom_install_event(self, 'install')
       mixpanel.add_user(self)
       mixpanel.track_shop_event(self, 'App installed')
     end
@@ -902,54 +900,6 @@ module Shopifable
     mixpanel = MixpanelEventsTracker.new
     intercom.uninstall_event(self)
     mixpanel.track_shop_event(self, 'App uninstalled')
-  end
-
-  def intercom_base_url
-    "https://api.intercom.io/events"
-  end
-
-  def intercom_headers
-    token = ENV['INTERCOM_API_KEY']
-    {
-      "Authorization" => "Bearer #{token}",
-      "Content-Type" => "application/json",
-      "Intercom-Version" => "2.10"
-    }
-  end
-
-  def intercom_base_event(shop)
-    {
-      event_name: "",
-      email: shop.email,
-      created_at: Time.now.utc,
-      metadata: {
-        shop_id: shop.id,
-        shopify_domain: shop.shopify_domain
-      }
-    }
-  end
-
-  def intercom_install_event(shop, event_title)
-    begin
-      body = intercom_base_event(shop)
-      body.event_name = "#{event_title}_date"
-      body = body.to_json
-      HTTParty.post(intercom_base_url, body: body, headers: intercom_headers)
-    rescue Exception => e
-      puts "--INTERCOM INSTALL DATE EXCEPTION---"
-    end
-  end
-
-  def intercom_uninstall_event(shop)
-    begin
-      body = intercom_base_event(shop)
-      body.created_at = shop.uninstalled_at
-      body.event_name = "uninstall_date"
-      body = body.to_json
-      HTTParty.post(intercom_base_url, body: body, headers: intercom_headers)
-    rescue Exception => e
-      puts "--INTERCOM UNINSTALL DATE EXCEPTION---"
-    end
   end
 
   ####  CLASS METHODS IN THE MIXIN #####
