@@ -888,7 +888,7 @@ module Shopifable
     intercom.install_event(self, 'install')
 
     if shop.present? && shop.id!=self.id
-      intercom_install_event(self, 're-install')
+      intercom_install_event(self, 'install')
       mixpanel.track_shop_event(self, 'App re-installed')
     else
       intercom_install_event(self, 'install')
