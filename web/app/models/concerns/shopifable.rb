@@ -678,6 +678,7 @@ module Shopifable
   #
   # Return AR object.
   def set_up_for_shopify
+    self.is_shop_active = true
     self.finder_token = SecureRandom.hex(10) if self.finder_token.blank?
     self.access_scopes = ShopifyApp.configuration.scope
     if uninstalled_at.present? && installed_at.present? && installed_at < uninstalled_at
@@ -857,6 +858,7 @@ module Shopifable
         # re-doing errands for old_shop after reinstall
         old_shop.async_setup
         old_shop.set_up_for_shopify
+        old_shop.save!
 
         # since we are all set connecting new installation to already existing shop
         # destroying garbage shop now
