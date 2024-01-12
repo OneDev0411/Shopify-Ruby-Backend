@@ -23,9 +23,6 @@ module Api
           end
         end
 
-        # Accounting for edge cases where is_shop_active column might be nil
-        @shop.update(is_shop_active: true) if !@shop.nil? && @shop.is_shop_active.nil?
-
         render "shops/current_shop"
       end
 
