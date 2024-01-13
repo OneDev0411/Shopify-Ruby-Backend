@@ -813,8 +813,13 @@ module Shopifable
   def track_installation
     return if ENV['ENV']!="PRODUCTION"
     # to check if the app is being re-installed
+    intercom = IntercomEventsTracker.new
     mixpanel = MixpanelEventsTracker.new
+
     shop = Shop.find_by(myshopify_domain: shopify_domain)
+
+    intercom.install_event(self, 'install')
+
     if shop.present? && shop.id!=self.id
       mixpanel.track_shop_event(self, 'App re-installed')
     else
@@ -824,7 +829,9 @@ module Shopifable
   end
 
   def track_uninstallation
+    intercom = IntercomEventsTracker.new
     mixpanel = MixpanelEventsTracker.new
+    intercom.uninstall_event(self)
     mixpanel.track_shop_event(self, 'App uninstalled')
   end
 
