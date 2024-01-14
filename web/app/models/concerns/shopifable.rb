@@ -852,7 +852,8 @@ module Shopifable
         Rollbar.info('Reinstall', { shop: current_shopify_domain, uninstall: old_shop.uninstalled_at,
                                     reinstall: Time.now.utc })
         # copying from new_shop to old_shop
-        old_shop.update_columns(JSON.parse(icushop.to_json).except('id', 'created_at', 'installed_at'))
+        old_shop.update_columns(JSON.parse(icushop.to_json).except('id', 'created_at'))
+        old_shop.installed_at = icushop.created_at
 
         # re-doing errands for old_shop after reinstall
         old_shop.async_setup
