@@ -57,6 +57,7 @@ export default defineConfig({
     hmr: hmrConfig,
     proxy: {
       "^/(\\?.*)?$": proxyOptions,
+      "^/js(/|(\\?.*)?$)": proxyOptions,
       "^/api(/|(\\?.*)?$)": proxyOptions,
     },
   },
