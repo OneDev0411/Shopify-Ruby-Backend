@@ -813,8 +813,13 @@ module Shopifable
   def track_installation
     return if ENV['ENV']!="PRODUCTION"
     # to check if the app is being re-installed
+    intercom = IntercomEventsTracker.new
     mixpanel = MixpanelEventsTracker.new
+
     shop = Shop.find_by(myshopify_domain: shopify_domain)
+
+    intercom.install_event(self, 'install')
+
     if shop.present? && shop.id!=self.id
       mixpanel.track_shop_event(self, 'App re-installed')
     else
@@ -824,7 +829,9 @@ module Shopifable
   end
 
   def track_uninstallation
+    intercom = IntercomEventsTracker.new
     mixpanel = MixpanelEventsTracker.new
+    intercom.uninstall_event(self)
     mixpanel.track_shop_event(self, 'App uninstalled')
   end
 
@@ -853,7 +860,8 @@ module Shopifable
         Rollbar.info('Reinstall', { shop: current_shopify_domain, uninstall: old_shop.uninstalled_at,
                                     reinstall: Time.now.utc })
         # copying from new_shop to old_shop
-        old_shop.update_columns(JSON.parse(icushop.to_json).except('id', 'created_at', 'installed_at'))
+        old_shop.update_columns(JSON.parse(icushop.to_json).except('id', 'created_at'))
+        old_shop.installed_at = icushop.created_at
 
         # re-doing errands for old_shop after reinstall
         old_shop.async_setup

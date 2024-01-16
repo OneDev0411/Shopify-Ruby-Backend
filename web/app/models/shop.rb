@@ -26,6 +26,7 @@ class Shop < ApplicationRecord
   include ShopWorker
   
   def shop_setup
+    self.update(is_shop_active: true)
     async_setup
     signup_for_referral_program
     select_plan('trial_plan')

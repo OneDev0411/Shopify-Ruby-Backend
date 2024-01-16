@@ -83,7 +83,10 @@ module Api
           Rollbar.error('Charge Confirmation Error', e)
           @success = false
         end
-        redirect_to "https://#{@icushop.shop_domain}", allow_other_host: true
+        
+        encrypted_shop_path = Base64.encode64(params[:shop]) if params[:shop]
+
+        redirect_to(ShopifyAPI::Auth.embedded_app_url(params[:host] || encrypted_shop_path), allow_other_host: true)
       end
 
       private
