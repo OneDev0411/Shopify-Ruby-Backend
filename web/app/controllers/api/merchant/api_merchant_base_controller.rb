@@ -4,7 +4,7 @@ module Api
   module Merchant
     class ApiMerchantBaseController < ActionController::API
       before_action :allow_cors
-  
+
       protected
       def allow_cors
         response.headers['Access-Control-Allow-Origin'] = '*'
@@ -23,17 +23,23 @@ module Api
       end
 
       def ensure_plan
-        return true if @admin || (@icushop.in_trial_period?) || (@icushop.plan.present? &&
-                                  @icushop.subscription.status == 'approved')
-    
-        @message = if @icushop&.plan.nil?
-                    'Please Choose A Plan'
-                  else
-                    'Your subscription is not active - please re-confirm your plan on this page.'
-                  end
-        render "shops/ensure_plan"
+        if (!@icushop.in_trial_period? && (@icushop.plan.present? && @icushop.plan.internal_name == 'trial_plan')) || @icushop&.plan.nil?
+          @icushop.plan = Plan.find_by(:internal_name => 'free_plan')
+          @icushop.subscription.update_attribute(:free_plan_after_trial, false)
+        end
+
+        if @icushop.plan.internal_name == 'free_plan'
+          offers = @icushop.offers.where(active: true)
+          offers.length > 0 && @icushop.unpublish_extra_offers
+        end
+
+        if @icushop.in_trial_period? && @icushop.plan.internal_name == 'trial_plan'
+          @icushop.subscription.update_attribute(:free_plan_after_trial, true)
+        end
+
+        return true if @admin || (@icushop.in_trial_period?) || (@icushop.plan.present? && @icushop.subscription.status == 'approved')
       end
-  
-    end # class ends
+
+    end
   end
 end
