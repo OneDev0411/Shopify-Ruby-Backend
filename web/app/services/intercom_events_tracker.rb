@@ -15,7 +15,7 @@ class IntercomEventsTracker
   def uninstall_event(shop)
     begin
       body = base_event(shop)
-      body["created_at"] = shop.uninstalled_at
+      body["created_at"] = shop.uninstalled_at.to_i
       body["event_name"] = "uninstall_date"
       body = body.to_json
       HTTParty.post(base_url, body: body, headers: headers)
@@ -44,7 +44,7 @@ class IntercomEventsTracker
     {
       event_name: "",
       email: shop.email,
-      created_at: Time.now.utc,
+      created_at: Time.now.utc.to_i,
       metadata: {
         shop_id: shop.id,
         shopify_domain: shop.shopify_domain
