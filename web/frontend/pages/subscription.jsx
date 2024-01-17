@@ -167,7 +167,7 @@ export default function Subscription() {
                   </LegacyCard>
                 </Layout.Section>
                 <Layout.Section secondary>
-                  <LegacyCard title="Free" sectioned primaryFooterAction={(planName==='free' && isSubscriptionActive(currentSubscription)) ? null : {content: 'Downgrade', onClick: () => handlePlanChange('free_plan'), id: 'btnf'}}>
+                  <LegacyCard title="Free" sectioned primaryFooterAction={(planName==='free' || planName === "trial" && isSubscriptionActive(currentSubscription)) ? null : {content: 'Downgrade', onClick: () => handlePlanChange('free_plan'), id: 'btnf'}}>
                     {(planName==='free' && isSubscriptionActive(currentSubscription)) ? (
                       <p><small>Current Plan</small></p>
                     ) : (
@@ -177,8 +177,6 @@ export default function Subscription() {
                     <p>
                       Limited offer<br/>
                       Geo targeting<br/>
-                      Autopilot (AI-generated offers feature)<br/>
-                      A/B testing<br/>
                       Advanced discount terms<br/>
                       "Power by In Cart Upsell" water mark on offer box
                       <br/><br/>

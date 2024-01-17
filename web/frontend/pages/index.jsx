@@ -110,22 +110,22 @@ export default function HomePage() {
                 </Banner>
               </Layout.Section>
             }
-            {hasOffers && (
               <Layout.Section>
                 <OffersList />
-                <Grid>
-                  <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-                    <TotalSalesData period='monthly' title={true} />
-                  </Grid.Cell>
-                  {/*  <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>*/}
-                  {/*    <ConversionRate period='monthly' title={true} />*/}
-                  {/*</Grid.Cell>*/}
-                  <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-                    <OrderOverTimeData period='monthly' title={true} />
-                  </Grid.Cell>
-                </Grid>
+                {hasOffers && (
+                  <Grid>
+                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
+                      <TotalSalesData period='monthly' title={true} />
+                    </Grid.Cell>
+                    {/*  <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>*/}
+                    {/*    <ConversionRate period='monthly' title={true} />*/}
+                    {/*</Grid.Cell>*/}
+                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
+                      <OrderOverTimeData period='monthly' title={true} />
+                    </Grid.Cell>
+                  </Grid>
+                )}
               </Layout.Section>
-            )}
           </Layout>
           <div className="space-10"></div>
         </>
