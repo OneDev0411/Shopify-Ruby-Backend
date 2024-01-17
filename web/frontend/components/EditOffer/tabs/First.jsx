@@ -380,7 +380,7 @@ export function FirstTab(props) {
                                 <p style={{color: '#6D7175'}}>What product would you like to have in the offer?</p>
                             )}
 
-                            {props.offer.id == null && !props.autopilotCheck?.autopilot_offer_id ? (
+                            {props.offer.id == null && !props.autopilotCheck?.autopilot_offer_id && props.shop.has_pro_features ? (
                                 <>
                                     <div style={{marginBottom: '20px'}}>
                                         <Button id={"btnLaunchAI"}
@@ -402,7 +402,7 @@ export function FirstTab(props) {
                                 </div>
                             )}
 
-                            {(props.offer.id == null && !props.autopilotCheck?.autopilot_offer_id) && (
+                            {(!props.shop.has_pro_features) && (
                                 <ButtonGroup>
                                     <>
                                         <div>
@@ -506,10 +506,10 @@ export function FirstTab(props) {
                                 id="basic-collapsible"
                                 transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                             >
-                                {!props.offerSettings.has_ab_testing ? (
+                                {!props.shop.has_pro_features ? (
                                     <div style={{maxWidth: '476px', marginTop: '10px'}}>
                                         <Text as="p" variant="headingSm" fontWeight="regular">
-                                            A/B testing is available on our Professional plan. Please <Link
+                                            A/B testing is available on our Paid plan. Please <Link
                                             to="/subscription">upgrade your subscription</Link> to enable it.
                                         </Text>
                                     </div>
