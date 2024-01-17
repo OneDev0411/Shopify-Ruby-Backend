@@ -823,7 +823,7 @@ class Shop < ApplicationRecord
       wizard_token: wizard_token,
       finder_token: finder_token,
       has_branding: subscription.try(:has_branding) || false,
-      has_ab_testing: subscription.try(:has_ab_testing) || false,
+      has_pro_features: has_pro_features?,
       css_options: css_options.present? ? css_options : { main: {}, button: {}, text: {} },
       custom_bg_color: custom_bg_color,
       custom_text_color: custom_text_color,
