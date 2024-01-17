@@ -1,4 +1,4 @@
-import {LegacyCard, Page, Layout, Image, LegacyStack, Banner} from "@shopify/polaris";
+import {LegacyCard, Page, Layout, Image, LegacyStack, Banner, Spinner} from "@shopify/polaris";
 import { useAppBridge } from '@shopify/app-bridge-react'
 import {Redirect, Toast} from '@shopify/app-bridge/actions';
 import {billingImg} from "../assets";
@@ -22,6 +22,7 @@ export default function Subscription() {
     const [activeOffersCount, setActiveOffersCount] = useState();
     const [unpublishedOfferIds, setUnpublishedOfferIds] = useState();
     const app = useAppBridge();
+    const [isLoading, setIsLoading] = useState(false);
 
     async function handlePlanChange (internal_name) {
         let redirect = Redirect.create(app);
@@ -80,114 +81,128 @@ export default function Subscription() {
   return (
     <Page>
         <CustomTitleBar title='Billing' icon={BillingStatementDollarMajor}/>
-        <div className="auto-height">
-            <Layout>
+        { isLoading ?  (
+          <div style={{
+            overflow: 'hidden',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '100vh',
+          }}>
+            <Spinner size="large" color="teal"/>
+          </div>
+        ) : (
+          <>
+            <div className="auto-height">
+              <Layout>
                 <Layout.Section>
-                    {(isSubscriptionActive(currentSubscription) && planName!=='free' && trialDays>0) ? (
-                        <Banner icon='none' status="info">
-                            <p>{ trialDays } days remaining for the trial period</p>
-                        </Banner>) : null
-                    }
-                    {!isSubscriptionActive(currentSubscription) ? (
-                        <Banner icon='none' status="info">
-                            <p>Your Subscription Is Not Active: please confirm it on this page</p>
-                        </Banner> ) : null
-                    }
-                    {(planName==='trial' && (unpublishedOfferIds?.lenght>0 || activeOffersCount)) ? (
-                        <Banner icon='none' status="info">
-                            <p>If you choose free plan after trial, offers will be unpublished</p>
-                        </Banner>) : null
-                    }
+                  {(isSubscriptionActive(currentSubscription) && planName!=='free' && trialDays>0) ? (
+                    <Banner icon='none' status="info">
+                      <p>{ trialDays } days remaining for the trial period</p>
+                    </Banner>) : null
+                  }
+                  {!isSubscriptionActive(currentSubscription) ? (
+                    <Banner icon='none' status="info">
+                      <p>Your Subscription Is Not Active: please confirm it on this page</p>
+                    </Banner> ) : null
+                  }
+                  {(planName==='trial' && (unpublishedOfferIds?.lenght>0 || activeOffersCount)) ? (
+                    <Banner icon='none' status="info">
+                      <p>If you choose free plan after trial, offers will be unpublished</p>
+                    </Banner>) : null
+                  }
                 </Layout.Section>
                 <Layout.Section>
-                    Choose a Plan
+                  Choose a Plan
                 </Layout.Section>
                 <Layout.Section>
-                    <LegacyCard title="Paid"
-                        primaryFooterAction={(planName==='flex' && isSubscriptionActive(currentSubscription)) ? null : {content: 'Upgrade', onClick: () => handlePlanChange('plan_based_billing')}}
-                        sectioned
-                    >
-                        <LegacyStack>
-                            <LegacyStack.Item>
-                                {(planName==='flex' && isSubscriptionActive(currentSubscription)) ? (
-                                    <p><small>Current Plan</small></p>
-                                ) : (
-                                    <p><small>Recommended</small></p>
-                                )}
-                                <div className="space-4"></div>
-                                <p>
-                                500 Offers<br/>
-                                Geo targeting<br/>
-                                Autopilot (AI-generated offers feature)<br/>
-                                A/B testing<br/>
-                                Advanced discount terms<br/>
-                                Live onboarding<br/>
-                                Success manager support<br/>
-                                Remove "Power by In Cart Upsell" water mark on offer box
-                                </p>
-                                <div className="space-4"></div>
-                                <p>
-                                  <b>Shopify Basic</b><br/>
-                                     $19.99/month<br/>
-                                  <div className="space-1"></div>
-
-                                  <b>Shopify Standard</b><br/>
-                                     $29.99/month<br/>
-                                  <div className="space-1"></div>
-
-                                  <b>Shopify Advanced</b><br/>
-                                     $59.99/month<br/>
-                                  <div className="space-1"></div>
-                                  
-                                  <b>Shopify Plus</b><br/>
-                                     $99.99/month
-                                </p>
-                            </LegacyStack.Item>
-                            <LegacyStack.Item>
-                                <Image
-                                    source={billingImg}
-                                    alt="upgrade subscription"
-                                    width={200}
-                                />
-                            </LegacyStack.Item>
-                        </LegacyStack>
-                    </LegacyCard>
-                </Layout.Section>
-                <Layout.Section secondary>
-                    <LegacyCard title="Free" sectioned primaryFooterAction={(planName==='free' && isSubscriptionActive(currentSubscription)) ? null : {content: 'Downgrade', onClick: () => handlePlanChange('free_plan'), id: 'btnf'}}>
-                        {(planName==='free' && isSubscriptionActive(currentSubscription)) ? (
-                             <p><small>Current Plan</small></p>
+                  <LegacyCard title="Paid"
+                              primaryFooterAction={(planName==='flex' && isSubscriptionActive(currentSubscription)) ? null : {content: 'Upgrade', onClick: () => handlePlanChange('plan_based_billing')}}
+                              sectioned
+                  >
+                    <LegacyStack>
+                      <LegacyStack.Item>
+                        {(planName==='flex' && isSubscriptionActive(currentSubscription)) ? (
+                          <p><small>Current Plan</small></p>
                         ) : (
-                            <p><small>Not Recommended</small></p>
-                        )}  
+                          <p><small>Recommended</small></p>
+                        )}
                         <div className="space-4"></div>
                         <p>
-                            Limited offer<br/>
-                            Geo targeting<br/>
-                            Autopilot (AI-generated offers feature)<br/>
-                            A/B testing<br/>
-                            Advanced discount terms<br/>
-                            "Power by In Cart Upsell" water mark on offer box
-                            <br/><br/>
-                        </p>                
-                    </LegacyCard>
+                          500 Offers<br/>
+                          Geo targeting<br/>
+                          Autopilot (AI-generated offers feature)<br/>
+                          A/B testing<br/>
+                          Advanced discount terms<br/>
+                          Live onboarding<br/>
+                          Success manager support<br/>
+                          Remove "Power by In Cart Upsell" water mark on offer box
+                        </p>
+                        <div className="space-4"></div>
+                        <p>
+                          <b>Shopify Basic</b><br/>
+                          $19.99/month<br/>
+                          <div className="space-1"></div>
+
+                          <b>Shopify Standard</b><br/>
+                          $29.99/month<br/>
+                          <div className="space-1"></div>
+
+                          <b>Shopify Advanced</b><br/>
+                          $59.99/month<br/>
+                          <div className="space-1"></div>
+
+                          <b>Shopify Plus</b><br/>
+                          $99.99/month
+                        </p>
+                      </LegacyStack.Item>
+                      <LegacyStack.Item>
+                        <Image
+                          source={billingImg}
+                          alt="upgrade subscription"
+                          width={200}
+                        />
+                      </LegacyStack.Item>
+                    </LegacyStack>
+                  </LegacyCard>
                 </Layout.Section>
-            </Layout>
-        </div>
-            
-        <div className="space-10"></div>
-        <Layout>
-            <Layout.Section>
+                <Layout.Section secondary>
+                  <LegacyCard title="Free" sectioned primaryFooterAction={(planName==='free' && isSubscriptionActive(currentSubscription)) ? null : {content: 'Downgrade', onClick: () => handlePlanChange('free_plan'), id: 'btnf'}}>
+                    {(planName==='free' && isSubscriptionActive(currentSubscription)) ? (
+                      <p><small>Current Plan</small></p>
+                    ) : (
+                      <p><small>Not Recommended</small></p>
+                    )}
+                    <div className="space-4"></div>
+                    <p>
+                      Limited offer<br/>
+                      Geo targeting<br/>
+                      Autopilot (AI-generated offers feature)<br/>
+                      A/B testing<br/>
+                      Advanced discount terms<br/>
+                      "Power by In Cart Upsell" water mark on offer box
+                      <br/><br/>
+                    </p>
+                  </LegacyCard>
+                </Layout.Section>
+              </Layout>
+            </div>
+
+            <div className="space-10"></div>
+            <Layout>
+              <Layout.Section>
                 <LegacyCard sectioned>
-                    <p>Need help, have some questions, or just want to say hi? We're available for a live chat 7 days a week from 5 AM EST - 9 PM EST.</p>
-                    <br/>
-                    <p>Not anything urgent? Fire us an email, we usually respond with 24 hours Monday to Friday</p>
+                  <p>Need help, have some questions, or just want to say hi? We're available for a live chat 7 days a week from 5 AM EST - 9 PM EST.</p>
+                  <br/>
+                  <p>Not anything urgent? Fire us an email, we usually respond with 24 hours Monday to Friday</p>
                 </LegacyCard>
-            </Layout.Section>
-        </Layout>
-        <div className="space-10"></div>
+              </Layout.Section>
+            </Layout>
+            <div className="space-10"></div>
             <Reviews/>
-        <div className="space-10"></div>
+            <div className="space-10"></div>
+          </>
+        )}
     </Page>
   );
 }

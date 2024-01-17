@@ -768,6 +768,11 @@ class Shop < ApplicationRecord
     my_products.map{|p| p if p.available_json_variants.present? }.compact.map(&:shopify_id)
   end
 
+  def has_pro_features?
+    plan_name = subscription.plan.internal_name
+    plan_name.present? && (plan_name == "trial_plan" || plan_name == "plan_based_billing")
+  end
+
   # Public. Gathers current shop data for the API response.
   #
   # admin - boolean.
@@ -807,8 +812,9 @@ class Shop < ApplicationRecord
       shop_id: id,
       default_template_settings: default_template_settings,
       has_redirect_to_product: has_redirect_to_product?,
-
+      has_pro_features: has_pro_features?
     }
+
     admin ? std_settings.merge(admin_settings) : std_settings
   end
 
@@ -839,7 +845,6 @@ class Shop < ApplicationRecord
       has_remove_offer: has_remove_offer,
       has_geo_offers: has_geo_offers,
       has_custom_rules: has_custom_rules,
-      has_ab_testing: subscription.try(:has_ab_testing) || false,
       has_custom_layout: custom_theme_template.present?,
       has_custom_theme: !has_default_colors?,
       has_redirect_to_product: has_redirect_to_product?,
