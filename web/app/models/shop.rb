@@ -166,11 +166,7 @@ class Shop < ApplicationRecord
   end
 
   def in_trial_period?
-    if subscription.try(:trial_ends_at).present?
-      subscription.trial_ends_at > Time.now.utc
-    else
-      (ENV["TRIAL_PERIOD"].to_i.days.ago < created_at)
-    end
+    self.subscription.days_remaining_in_trial.positive?
   end
 
   def next_bill_date

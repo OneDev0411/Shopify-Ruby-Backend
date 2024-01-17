@@ -273,15 +273,19 @@ class Subscription < ApplicationRecord
     end
   end
 
-  def in_trial_period?
-    days_remaining_in_trial.positive?
-  end
-
   def days_remaining_in_trial
-    seconds_remaining_in_trial = shop.created_at +  Subscription.get_time_period(ENV["TRIAL_PERIOD"].to_i, 30).days - Time.now
     if trial_ends_at.present?
       seconds_remaining_in_trial = trial_ends_at - Time.now
+    elsif ENV['TRIAL_PERIOD']
+      if extra_trial_days.present?
+        seconds_remaining_in_trial = shop.created_at +  (ENV["TRIAL_PERIOD"].to_i + extra_trial_days).days - Time.now
+      else
+        seconds_remaining_in_trial = shop.created_at +  Subscription.get_time_period(ENV["TRIAL_PERIOD"].to_i, 30).days - Time.now
+      end
+    elsif extra_trial_days.present?
+      seconds_remaining_in_trial = shop.created_at + (extra_trial_days + 30).days - Time.now
     end
+
     if seconds_remaining_in_trial.negative?
       0
     else
