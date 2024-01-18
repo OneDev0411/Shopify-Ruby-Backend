@@ -857,8 +857,8 @@ module Shopifable
 
       if old_shop.present? && icushop.id != old_shop.id
         # logging to Rollbar
-        Rollbar.info('Reinstall', { shop: current_shopify_domain, uninstall: old_shop.uninstalled_at,
-                                    reinstall: Time.now.utc })
+        # Rollbar.info('Reinstall', { shop: current_shopify_domain, uninstall: old_shop.uninstalled_at, reinstall: Time.now.utc })
+
         # copying from new_shop to old_shop
         old_shop.update_columns(JSON.parse(icushop.to_json).except('id', 'created_at'))
         old_shop.installed_at = icushop.created_at
