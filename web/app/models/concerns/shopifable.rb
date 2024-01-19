@@ -218,7 +218,6 @@ module Shopifable
   def activate_session
     begin
       raise "ShopifyToken Not Present for shop: ##{id}, #{shopify_domain}" if shopify_token.nil?
-
       session = ShopifyAPI::Auth::Session.new(shop: shopify_domain, access_token: shopify_token)
       ShopifyAPI::Context.activate_session(session)
       return session
