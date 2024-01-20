@@ -15,7 +15,10 @@ module ShopWorker
     include Sidekiq::Worker
     sidekiq_options queue: 'stats'
 
+    
     def perform(new_stat)
+      offer = Offer.find_by(new_event[:offerId])
+      return if !offer.shop.is_shop_active?
       OfferStat.create_offer_stat(new_stat)
     end
   end
@@ -25,6 +28,8 @@ module ShopWorker
     sidekiq_options queue: 'stats'
 
     def perform(new_event)
+      offer = Offer.find_by(new_event[:offerId])
+      return if !offer.shop.is_shop_active?
       OfferEvent.create_offer_event(new_event)
     end
   end
@@ -115,7 +120,7 @@ module ShopWorker
     include Sidekiq::Worker
     def perform(subscription_id)
       subscription = Subscription.find_by(id: subscription_id)
-      return if subscription.blank?
+      return if subscription.blank? || !subscription.shop.is_shop_active?
       subscription.update_offers_if_needed
     end
   end
@@ -133,7 +138,7 @@ module ShopWorker
     include Sidekiq::Worker
     def perform(id)
       product = Product.find_by(id: id)
-      return if product.blank?
+      return if product.blank? || !product.shop.is_shop_active?
       product.update_from_shopify_new
     end
   end
