@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 
 import { Banner, Grid, Layout, Page } from "@shopify/polaris";
 
@@ -105,11 +105,20 @@ export default function HomePage() {
             </Layout.Section>
             {isSubscriptionActive(currentShop?.subscription) && planName!=='free' && trialDays>0 &&
               <Layout.Section>
-                <Banner icon='none' status="info">
+                <Banner status="info">
                   <p>{ trialDays } days remaining for the trial period</p>
                 </Banner>
               </Layout.Section>
             }
+
+            {planName ==='free' && (
+              <Layout.Section>
+                <Banner status="info">
+                  <p>You are currently on the free plan and only one offer can be published at a time. <Link
+                    to="/subscription">Click here</Link> to see the features available or to upgrade your plan</p>
+                </Banner>
+              </Layout.Section>
+            )}
               <Layout.Section>
                 <OffersList />
                 {hasOffers && (
