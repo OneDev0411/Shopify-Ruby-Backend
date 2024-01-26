@@ -36,7 +36,7 @@ class OffersController < AuthenticatedController
     if offer.save
       $customerio.track(@icushop.id, 'offer created')
 
-      @icushop.publish_or_purge
+      @icushop.publish_or_delete_script_tag
 
       render json: { message: 'success', offer_id: offer.id, offer: offer.library_json }
     else
@@ -90,7 +90,7 @@ class OffersController < AuthenticatedController
 
     if offer.update(my_params)
 
-      @icushop.publish_or_purge
+      @icushop.publish_or_delete_script_tag
 
       render json: { offer: offer.library_json }, status: :ok
     else
@@ -113,7 +113,7 @@ class OffersController < AuthenticatedController
     old_offer_ids = @icushop.old_offers || []
     old_offer_ids << params[:id]
     @icushop.update_attribute(:old_offers, old_offer_ids.uniq)
-    @icushop.publish_or_purge
+    @icushop.publish_or_delete_script_tag
 
     render json: { message: "Offer Deleted", offers: @icushop.offer_data_with_stats}
   end

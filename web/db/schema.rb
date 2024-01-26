@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_01_02_083515) do
+ActiveRecord::Schema[7.0].define(version: 2024_01_25_192526) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -669,7 +669,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_02_083515) do
     t.boolean "activated", default: true
     t.integer "orders_through_offers", default: 0, null: false
     t.jsonb "default_template_settings"
-    t.string "theme_version"
+    t.boolean "is_shop_active"
     t.index ["created_at"], name: "index_shops_on_created_at"
     t.index ["uninstalled_at"], name: "index_shops_on_uninstalled_at"
   end
@@ -738,6 +738,19 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_02_083515) do
     t.index ["shop_id"], name: "index_tags_on_shop_id"
   end
 
+  create_table "theme_app_extensions", force: :cascade do |t|
+    t.bigint "shop_id"
+    t.boolean "product_block_added", default: false
+    t.boolean "cart_block_added", default: false
+    t.boolean "collection_block_added", default: false
+    t.boolean "theme_app_embed", default: false
+    t.boolean "theme_app_complete", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "theme_version"
+    t.index ["shop_id"], name: "index_theme_app_extensions_on_shop_id"
+  end
+
   create_table "theme_default_settings", force: :cascade do |t|
     t.string "theme_name"
     t.string "page_type"
@@ -796,4 +809,5 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_02_083515) do
   add_foreign_key "subscriptions", "plans"
   add_foreign_key "subscriptions", "shops"
   add_foreign_key "tags", "customers"
+  add_foreign_key "theme_app_extensions", "shops"
 end

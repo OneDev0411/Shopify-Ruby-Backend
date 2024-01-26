@@ -134,7 +134,11 @@ class ProxyController < ApplicationController
       uses_ajax_cart: @icushop.uses_ajax_cart,
       has_shopify_multicurrency: @icushop.enabled_presentment_currencies.present? && @icushop.enabled_presentment_currencies.length > 0,
       show_spinner: @icushop.show_spinner?,
-      uses_customer_tags: @icushop.uses_customer_tags? || false
+      uses_customer_tags: @icushop.uses_customer_tags? || false,
     }
+  end
+
+  def theme_app_completed
+    render json: { theme_app_completed: @icushop.theme_app_extension.theme_app_complete }
   end
 end

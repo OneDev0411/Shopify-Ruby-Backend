@@ -703,70 +703,86 @@ module Shopifable
     return {result: true, message: shopify_theme_name }
   end
 
-  def update_theme_version
+  def check_offers_placement
+    keys = []
+
+    unless offers.find(&:in_cart_page).nil?
+      keys.push('templates/cart.json')
+    end
+
+    unless offers.find(&:in_product_page).nil?
+      keys.push('templates/product.json')
+    end
+
+    unless offers.find { |off|
+      !(off.rules_json.find { |rule| rule['item_type'] == 'collection' }).nil?
+    }.nil?
+      keys.push('templates/collection.json')
+    end
+
+    unless offers.find(&:in_ajax_cart).nil?
+      keys.push('ajax')
+    end
+
+    keys
+  end
+
+  def update_theme_version(keys)
     activate_session
+
+    app_blocks_added = []
+    assets = []
+    skip_individual_blocks_check = false
+
     shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
 
-    assets = ShopifyAPI::Asset.all(theme_id: shopify_theme.id)
-    app_block_supported = []
+    if shopify_theme
+      assets = ShopifyAPI::Asset.all(theme_id: shopify_theme.id)
+    end
 
-    assets&.each do | asset |
+    unless keys.present?
+      keys = ['templates/product.json', 'templates/cart.json', 'templates/collection.json']
+      skip_individual_blocks_check = true
+    end
 
-      if asset.key == 'templates/product.json' || asset.key == 'templates/collection.json' || asset.key == 'templates/cart.json'
-        asset_value = ShopifyAPI::Asset.all(asset: { key: asset.key }, theme_id: shopify_theme.id).compact.first
-
-        unless asset_value.nil?
-          asset_value = JSON.parse(asset_value.value)
-          main = asset_value['sections'].select { |id, section| id == 'main' || section['type'].starts_with?('main-') }
-
-          main&.each do | asset_with_main_section |
-            asset_value = ShopifyAPI::Asset.all(asset: { key: "sections/#{asset_with_main_section.second['type']}.liquid" }, theme_id: shopify_theme.id).compact.first
-
-            unless asset_value.nil?
-              schema_match = /\{\%\s+schema\s+\%\}([\s\S]*?)\{\%\s+endschema\s+\%\}/m.match(asset_value.value)
-
-              unless schema_match.nil?
-                schema_match = schema_match[0]
-                schema_match.slice! "{% schema %}"
-                schema_match.slice! "{% endschema %}"
-
-                schema = JSON.parse(schema_match)
-
-                unless schema.nil? || schema["blocks"].nil?
-                  accepted_blocks = schema["blocks"].select { | block | block['type'] == '@app' }
-                  app_block_supported.push(accepted_blocks)
-                end
-              end
-            end
-          end
-        end
+    assets.each do |asset|
+      if keys.include?(asset.key)
+        app_blocks_added = search_asset_value(asset.key, shopify_theme.id, app_blocks_added, skip_individual_blocks_check)
       end
     end
 
-    app_block_supported.length > 0
+    update_false_theme_values(app_blocks_added)
   end
 
   def check_app_embed_enabled
     activate_session
+    asset = []
 
     shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
 
-    asset = ShopifyAPI::Asset.all(asset: { key: 'config/settings_data.json' }, theme_id: shopify_theme.id).compact.first
-
-    unless asset.nil?
-      asset = JSON.parse(asset.value)
-      blocks = asset['current']['blocks']
-
-      unless blocks.nil?
-        block_found = blocks.find { |block| block.second["type"].include?("app_block_embed/#{ENV["SHOPIFY_ICU_EXTENSION_APP_ID"]}") }
-
-        unless block_found.nil?
-          return !block_found.second['disabled']
-        end
-      end
+    unless shopify_theme.nil?
+      asset = ShopifyAPI::Asset.all(asset: { key: 'config/settings_data.json' }, theme_id: shopify_theme.id).compact.first
     end
 
-    false
+    return if asset.nil?
+
+    asset = JSON.parse(asset.value || '')
+    blocks = asset['current']['blocks']
+
+    return if blocks.nil?
+
+    block_found = nil
+
+    blocks.each do |_block_id, block|
+      if block['type'].include?("app_block_embed/#{ENV['SHOPIFY_ICU_EXTENSION_APP_ID']}")
+        block_found = block
+      end
+
+      if block_found.nil?
+        self.theme_app_extension.update(theme_app_embed: block_found['disabled'])
+        break
+      end
+    end
   end
 
   private
@@ -998,6 +1014,100 @@ module Shopifable
     def search_for(str)
       str.strip!
       where('name ilike ? OR shopify_domain ilike ? OR email ilike ? OR custom_domain ilike ? OR finder_token=? OR id=?', "%#{str}%", "%#{str}%", "%#{str}%", "%#{str}%", str, str.to_i)
+    end
+  end
+
+  def search_asset_value(asset_key, theme_id, app_blocks_added, skip_individual_blocks_check)
+    asset_value = ShopifyAPI::Asset.all(asset: { key: asset_key }, theme_id: theme_id).compact.first
+
+    unless asset_value.nil?
+      asset_value = JSON.parse(asset_value.value || '')
+
+      if asset_value.present?
+        main = asset_value['sections'].select { |id, section| id == 'main' || section['type'].starts_with?('main-') }
+
+        app_block_supported = check_app_blocks_support(main, theme_id)
+
+        if app_block_supported.length.positive? || asset_key == 'templates/collection.json'
+          self.theme_app_extension.update(theme_version: '2.0')
+
+          app_blocks_added = update_theme_app_extension(asset_value, asset_key, app_blocks_added) unless skip_individual_blocks_check
+        else
+          self.theme_app_extension.update(theme_version: 'Vintage')
+        end
+      end
+    end
+    app_blocks_added
+  end
+
+  def check_app_blocks_support(main, theme_id)
+    app_block_supported = []
+
+
+    main&.each do |_section_id, section|
+      section_asset = ShopifyAPI::Asset.all(
+        asset: { key: "sections/#{section['type']}.liquid" }, theme_id: theme_id
+      ).compact.first
+
+      unless section_asset.nil?
+        schema_match = /\{%\s+schema\s+%}([\s\S]*?)\{%\s+endschema\s+%}/m.match(section_asset.value)
+
+        unless schema_match.nil?
+          schema_match = schema_match[0]
+          schema_match.slice! '{% schema %}'
+          schema_match.slice! '{% endschema %}'
+
+          schema = JSON.parse(schema_match)
+
+          unless schema.nil? || schema['blocks'].nil?
+            accepted_blocks = schema['blocks'].select { |block| block['type'] == '@app' }
+            app_block_supported.push(accepted_blocks)
+            break
+          end
+        end
+      end
+    end
+    app_block_supported
+  end
+
+  def update_theme_app_extension(asset_value, asset_key, app_blocks_added)
+
+    asset_value['sections'].each do |_sections_id, sections|
+      sections.each do |section_id, section|
+
+        next unless section_id == 'blocks'
+
+        section.each do |_block_id, block|
+          next unless block['type']&.include?("app_block/#{ENV['SHOPIFY_ICU_EXTENSION_APP_ID']}")
+
+          if asset_key == 'templates/product.json'
+            self.theme_app_extension.update(product_block_added: true)
+          end
+          if asset_key == 'templates/cart.json'
+            self.theme_app_extension.update(cart_block_added: true)
+          end
+          if asset_key == 'templates/collection.json'
+            self.theme_app_extension.update(collection_block_added: true)
+          end
+          app_blocks_added.push(asset_key)
+          break
+        end
+      end
+    end
+    app_blocks_added
+  end
+
+  def update_false_theme_values(app_blocks_added)
+    unless app_blocks_added.include?('templates/product.json')
+      self.theme_app_extension.update(product_block_added: false)
+    end
+
+    unless app_blocks_added.include?('templates/cart.json')
+      self.theme_app_extension.update(cart_block_added: false)
+    end
+
+    unless app_blocks_added.include?('templates/collection.json')
+      self.theme_app_extension.update(collection_block_added: false)
     end
   end
 end

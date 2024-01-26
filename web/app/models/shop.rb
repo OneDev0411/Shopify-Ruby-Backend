@@ -7,6 +7,7 @@ class Shop < ApplicationRecord
   has_one :plan, through: :subscription
   has_one :customer
   has_one :customer_by_shopify_domain, primary_key: 'shopify_domain', class_name: 'Customer', foreign_key: 'shopify_domain'
+  has_one :theme_app_extension
   has_many :offers
   has_many :orders
   has_many :daily_stats, -> (shop) { where("created_at > \'#{ shop.stats_from || Time.parse('2000-01-01')}\'") }
@@ -605,7 +606,7 @@ class Shop < ApplicationRecord
   #
   # Returns Httparty::response object.
   def force_purge_cache
-    if script_tag_id.blank?
+    if script_tag_id.blank? && !theme_app_extension&.theme_app_complete
       puts "No script tag - creating"
       create_script_tag
     else
@@ -836,7 +837,7 @@ class Shop < ApplicationRecord
       default_template_settings: default_template_settings,
       has_redirect_to_product: has_redirect_to_product?,
       has_pro_features: has_pro_features?
-      theme_version: theme_version || ''
+      theme_version: theme_app_extension&.theme_version || ''
     }
 
     admin ? std_settings.merge(admin_settings) : std_settings
@@ -1204,11 +1205,11 @@ class Shop < ApplicationRecord
     return data
   end
 
-  def publish_or_purge
-    if self.theme_version != '2.0'
+  def publish_or_delete_script_tag
+    if !self.theme_app_extension.theme_app_complete
       self.publish_async
-    else
-      self.force_purge_cache
+    elsif !script_tag_id.nil?
+      self.disable_javascript
     end
   end
 

@@ -682,9 +682,14 @@
           .catch(error => console.log(error))
     }
 
-    listenForCartRequests();
-    getOffers();
-
+    fetch(`/apps/proxy/theme_app_completed`)
+      .then( response => response.json())
+      .then( (data) => {
+          if (data.theme_app_completed) {
+              listenForCartRequests();
+              getOffers();
+          }
+      })
 
     const setProductsCurrency = () => {
         let productDetails = offer.offerable_product_details;

@@ -10,19 +10,6 @@ module Api
       def current_shop
         @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shop]) if @icushop.present?
 
-        #DO NOT DELETE, WEBHOOKS DO NOT WORK ON STAGING AND WE NEED THIS FOR PRODUCTION
-        #if @icushop.present? && @icushop.theme_version.nil?
-
-        if @icushop.present?
-          new_theme = @icushop.update_theme_version
-
-          if new_theme
-            @icushop.update(theme_version: '2.0')
-          else
-            @icushop.update(theme_version: 'Vintage')
-          end
-        end
-
         render "shops/current_shop"
       end
 
@@ -37,7 +24,6 @@ module Api
       #POST /api/merchant/shop_settings
       def shop_settings
         @shop_settings = @icushop.shop_settings(@admin)
-        @app_embed_enabled = @icushop.check_app_embed_enabled
 
         render "shops/shop_settings"
       end
@@ -90,7 +76,7 @@ module Api
         end
         if @icushop.save
 
-          @icushop.publish_or_purge
+          @icushop.publish_or_delete_script_tag
           @message = "Shop settings saved!"
         else
           @message = @icushop.errors.full_messages.first

@@ -327,7 +327,7 @@ class Subscription < ApplicationRecord
       end
     end
 
-    shop.publish_or_purge
+    shop.publish_or_delete_script_tag
 
   end
 
