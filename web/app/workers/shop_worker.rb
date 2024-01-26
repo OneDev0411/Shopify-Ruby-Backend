@@ -17,9 +17,8 @@ module ShopWorker
 
     
     def perform(new_stat)
-      offer = Offer.find_by(new_event[:offerId])
-      is_active = offer.join(:shop).where(shops: {is_shop_active: true}).limit(1).present?
-      return unless is_active
+      offer = Offer.find_by(id: new_stat[:offer_id]).join(:shop).where(shops: {is_shop_active: true}).limit(1).present?
+      return if offer.blank?
       OfferStat.create_offer_stat(new_stat)
     end
   end
@@ -29,9 +28,8 @@ module ShopWorker
     sidekiq_options queue: 'stats'
 
     def perform(new_event)
-      offer = Offer.find_by(new_event[:offerId])
-      is_active = offer.join(:shop).where(shops: {is_shop_active: true}).limit(1).present?
-      return unless is_active
+      offer = Offer.find_by(id: new_event[:offerId]).join(:shop).where(shops: {is_shop_active: true}).limit(1).present?
+      return if offer.blank?
       OfferEvent.create_offer_event(new_event)
     end
   end
@@ -41,8 +39,8 @@ module ShopWorker
     sidekiq_options queue: 'sale_stats'
 
     def perform(order_data)
-      is_active = order.join(:shop).where(shops: {is_shop_active: true}).limit(1).present?
-      return unless is_active
+      shop = Shop.find_by(order_data[:shopify_id]).where(is_shop_active: true).limit(1)
+      return if shop.blank?
       OfferEvent.create_offer_sale_stat(order_data)
     end
   end
@@ -123,9 +121,8 @@ module ShopWorker
   class UpdateOffersIfNeededJob
     include Sidekiq::Worker
     def perform(subscription_id)
-      subscription = Subscription.find_by(id: subscription_id)
-      is_active = subscription.join(:shop).where(shops: {is_shop_active: true}).limit(1).present?
-      return if subscription.blank? || !is_active
+      subscription = Subscription.find_by(id: subscription_id).join(:shop).where(shops: {is_shop_active: true}).limit(1)
+      return if subscription.blank?
       subscription.update_offers_if_needed
     end
   end
@@ -142,9 +139,8 @@ module ShopWorker
   class UpdateProductJob
     include Sidekiq::Worker
     def perform(id)
-      product = Product.find_by(id: id)
-      is_active = product.join(:shop).where(shops: {is_shop_active: true}).limit(1).present?
-      return if product.blank? || !is_active
+      product = Product.find_by(id: id).join(:shop).where(shops: {is_shop_active: true}).limit(1).present?
+      return if product.blank?
       product.update_from_shopify_new
     end
   end
@@ -247,7 +243,7 @@ module ShopWorker
   class AddInitialChargeToSubscriptionJob
     include Sidekiq::Worker
     def perform(subscription_id)
-      sub = Subscription.find_by(id: subscription_id)
+      sub = Subscription.find_by(id: subscription_id).join(:shop).where(shops: {is_shop_active: true}).limit(1).present?
       return if sub.blank?
       return if sub.plan.try(:id) != 19
 
