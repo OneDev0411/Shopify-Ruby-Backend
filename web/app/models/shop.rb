@@ -19,6 +19,21 @@ class Shop < ApplicationRecord
   before_create :set_up_for_shopify
   after_create :shop_setup
 
+  # scope to make product specific keys for redis cache
+  scope :shopify_products_ids_with_prefix, -> (id) {
+    joins(:products).pluck(Arel.sql("CONCAT('shopify_product_', products.shopify_id)"))
+  }
+
+  # scope to make collection specific keys for redis cache
+  scope :shopify_collections_ids_with_prefix, -> (id) {
+    Collection.where(collections: { shop_id: id }).pluck(Arel.sql("CONCAT('shopify_collection_', shopify_id)"))
+  }
+
+  # scope to combine all keys to cache in redis
+  scope :shopify_products_and_collections_ids, -> (id) {
+    shopify_products_ids_with_prefix(id) + shopify_collections_ids_with_prefix(id)
+  }
+
   include Shopifable
   include Graphable
 
@@ -639,6 +654,7 @@ class Shop < ApplicationRecord
 
       # Finally, delete from FirstPromoter as we don't want to pay commission against this shop anymore
       delete_from_referral_program
+      remove_cache_keys_for_uninstalled_shop
     rescue StandardError => e
       delete_from_referral_program
       Rollbar.error('Error uninstalling the app >> ', e)
@@ -1188,5 +1204,15 @@ class Shop < ApplicationRecord
       has_custom_rules: has_custom_rules,
       has_redirect_to_product: has_redirect_to_product
     }
+  end
+
+  def remove_cache_keys_for_uninstalled_shop
+    $redis_cache.del(*self.class.shopify_products_and_collections_ids(id))
+  end
+
+  def store_cache_keys_on_reinstall
+    keys_to_cache = (self.class.shopify_products_and_collections_ids(id)).map { |key| 
+                                                                                [key, 1] }
+    $redis_cache.mset(*keys_to_cache)
   end
 end

@@ -887,6 +887,7 @@ module Shopifable
         end
 
         icushop = old_shop
+        icushop.store_cache_keys_on_reinstall
       end
 
       icushop
