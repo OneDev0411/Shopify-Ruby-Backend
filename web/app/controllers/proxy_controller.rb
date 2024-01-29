@@ -19,6 +19,10 @@ class ProxyController < ApplicationController
     render json: { shopify_domain: @shopify_domain, collection: collections }
   end
 
+  def theme_app_completed
+    render json: { theme_app_completed: @icushop.theme_app_extension.theme_app_complete }
+  end
+
   private
 
   def verify_signature
@@ -136,9 +140,5 @@ class ProxyController < ApplicationController
       show_spinner: @icushop.show_spinner?,
       uses_customer_tags: @icushop.uses_customer_tags? || false,
     }
-  end
-
-  def theme_app_completed
-    render json: { theme_app_completed: @icushop.theme_app_extension.theme_app_complete }
   end
 end

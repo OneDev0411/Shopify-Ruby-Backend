@@ -10,6 +10,11 @@ module Api
       def current_shop
         @shop = Shop.includes(:subscription).includes(:plan).find_by(shopify_domain: params[:shop]) if @icushop.present?
 
+        if @shop.theme_app_extension.nil?
+          @shop.theme_app_extension = ThemeAppExtension.new
+          @shop.theme_app_extension_check
+        end
+
         render "shops/current_shop"
       end
 

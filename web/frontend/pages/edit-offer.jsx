@@ -29,7 +29,7 @@ export default function EditPage() {
         isPending: "Launch Autopilot",
     });
     const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState({});
-    const [isAppEmbedded, setIsAppEmbedded] = useState(false);
+    const [themeAppExtension, setThemeAppExtension] = useState();
 
     const [offer, setOffer] = useState({
         offerId: undefined,
@@ -180,7 +180,7 @@ export default function EditPage() {
                     }
                     setShop(data.shop_settings);
 
-                    setIsAppEmbedded(data.app_embed_enabled)
+                    setThemeAppExtension(data.theme_app_extension)
 
                     let newOffer = {...offer};
 
@@ -246,7 +246,7 @@ export default function EditPage() {
                               }
                           }
                           setShop(data.shop_settings);
-                          setIsAppEmbedded(data.app_embed_enabled)
+                          setThemeAppExtension(data.theme_app_extension)
 
                           setUpdatePreviousAppOffer(!updatePreviousAppOffer);
 
@@ -658,7 +658,7 @@ export default function EditPage() {
                                                    updateOffer={updateOffer} updateShop={updateShop}
                                                    autopilotCheck={autopilotCheck} handleTabChange={changeTab}
                                                    updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}
-                                                   enableOrDisablePublish={enableOrDisablePublish} isAppEmbedded={isAppEmbedded}
+                                                   enableOrDisablePublish={enableOrDisablePublish} themeAppExtension={themeAppExtension}
                                         />
                                         : ""}
                                     {selected == 2 ?
@@ -674,7 +674,7 @@ export default function EditPage() {
                                         <FourthTab offer={offer} shop={shop} updateOffer={updateOffer}
                                                    updateShop={updateShop}
                                                    saveDraft={saveDraft} publishOffer={publishOffer}
-                                                   enablePublish={enablePublish}  isAppEmbedded={isAppEmbedded}
+                                                   enablePublish={enablePublish}  themeAppExtension={themeAppExtension}
                                                    updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>
                                         : ""}
                                 </Tabs>

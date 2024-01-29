@@ -9,6 +9,7 @@ import { isSubscriptionActive } from "../services/actions/subscription";
 import { CustomTitleBar, OffersList, OrderOverTimeData, TotalSalesData } from "../components";
 
 import "../components/stylesheets/mainstyle.css";
+import {ThemeAppCard} from "../components/CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 
@@ -21,9 +22,11 @@ export default function HomePage() {
   const [planName, setPlanName] = useState();
   const [trialDays, setTrialDays] = useState();
   const [hasOffers, setHasOffers] = useState();
+  const [themeAppExtension, setThemeAppExtension] = useState();
   const [isLoading, setIsLoading] = useState(false);
 
   const navigateTo = useNavigate();
+  const isOffers = location?.pathname.includes('offer');
 
   const handleOpenOfferPage = () => {
     navigateTo('/edit-offer', { state: { offerID: null } });
@@ -65,6 +68,7 @@ export default function HomePage() {
           redirect.dispatch(Redirect.Action.APP, data.redirect_to);
       } else {
         setHasOffers(data.has_offers);
+        setThemeAppExtension(data.theme_app_extension);
         setCurrentShop(data.shop);
         setPlanName(data.plan);
         setTrialDays(data.days_remaining_in_trial);
@@ -77,6 +81,10 @@ export default function HomePage() {
         console.log("error", error);
       })
   }, [setCurrentShop, setPlanName, setTrialDays])
+
+  const getHelpDismissed = () => {
+    return localStorage.getItem('help_dismissed');
+  }
 
   return (
     <Page>
@@ -118,6 +126,18 @@ export default function HomePage() {
                 </Banner>
               </Layout.Section>
             }
+
+            {!isOffers && !getHelpDismissed() && (
+              <Layout.Section>
+                <div style={{marginBottom: '47px'}}>
+                  <ThemeAppCard
+                      shopData={currentShop}
+                      themeAppExtension={themeAppExtension}
+                  />
+                </div>
+              </Layout.Section>
+
+            )}
 
             {planName ==='free' && (
               <Layout.Section>

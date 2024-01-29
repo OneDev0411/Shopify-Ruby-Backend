@@ -704,7 +704,7 @@ export function SecondTab(props) {
                 </div>
             )}
 
-            {(selected === "ajax" && !props.isAppEmbedded && !isLegacy ) && (
+            {(selected === "ajax" && !props.themeAppExtension?.theme_app_embed && !isLegacy ) && (
               <div style={{marginBottom: "10px"}} className="polaris-banner-container">
                   <Banner title="You are using Shopify's Theme Editor" tone='warning'>
                       <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>

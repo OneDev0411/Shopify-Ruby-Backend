@@ -702,6 +702,36 @@ module Shopifable
     return {result: true, message: shopify_theme_name }
   end
 
+  def theme_app_extension_check
+    keys = check_offers_placement
+    keys_without_ajax = keys.map(&:clone)
+    blocks_added = 0
+
+    check_app_embed_enabled
+    keys_without_ajax.pop if keys.include?('ajax')
+
+    update_theme_version
+
+    if keys_without_ajax.length.positive?
+      keys_without_ajax.each do |key|
+        next blocks_added unless (key == 'templates/product.json' && theme_app_extension.product_block_added) ||
+          (key == 'templates/cart.json' && theme_app_extension.cart_block_added) ||
+          (key == 'templates/collection.json' && theme_app_extension.collection_block_added)
+
+        blocks_added += 1
+      end
+    end
+
+    unless (!theme_app_extension&.theme_app_complete && ((blocks_added == keys_without_ajax.length) &&
+      ((keys.include?('ajax') && theme_app_embed) || keys.exclude?('ajax')))) && offers.present?
+      theme_app_extension.update(theme_app_complete: true)
+
+      unless script_tag_id.nil?
+        disable_javascript
+      end
+    end
+  end
+
   def check_offers_placement
     keys = []
 
@@ -726,12 +756,12 @@ module Shopifable
     keys
   end
 
-  def update_theme_version(keys)
+  def update_theme_version
     activate_session
 
     app_blocks_added = []
     assets = []
-    skip_individual_blocks_check = false
+    keys = %w[templates/product.json templates/cart.json templates/collection.json]
 
     shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
 
@@ -739,14 +769,9 @@ module Shopifable
       assets = ShopifyAPI::Asset.all(theme_id: shopify_theme.id)
     end
 
-    unless keys.present?
-      keys = ['templates/product.json', 'templates/cart.json', 'templates/collection.json']
-      skip_individual_blocks_check = true
-    end
-
     assets.each do |asset|
       if keys.include?(asset.key)
-        app_blocks_added = search_asset_value(asset.key, shopify_theme.id, app_blocks_added, skip_individual_blocks_check)
+        app_blocks_added = search_asset_value(asset.key, shopify_theme.id, app_blocks_added)
       end
     end
 
@@ -1016,7 +1041,7 @@ module Shopifable
     end
   end
 
-  def search_asset_value(asset_key, theme_id, app_blocks_added, skip_individual_blocks_check)
+  def search_asset_value(asset_key, theme_id, app_blocks_added)
     asset_value = ShopifyAPI::Asset.all(asset: { key: asset_key }, theme_id: theme_id).compact.first
 
     unless asset_value.nil?
@@ -1030,7 +1055,7 @@ module Shopifable
         if app_block_supported.length.positive? || asset_key == 'templates/collection.json'
           self.theme_app_extension.update(theme_version: '2.0')
 
-          app_blocks_added = update_theme_app_extension(asset_value, asset_key, app_blocks_added) unless skip_individual_blocks_check
+          app_blocks_added = update_theme_app_extension(asset_value, asset_key, app_blocks_added)
         else
           self.theme_app_extension.update(theme_version: 'Vintage')
         end

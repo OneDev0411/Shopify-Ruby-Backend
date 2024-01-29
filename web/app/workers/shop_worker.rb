@@ -328,33 +328,7 @@ module ShopWorker
         shop.theme_app_extension = ThemeAppExtension.new
       end
 
-      keys = shop.check_offers_placement
-      keys_without_ajax = keys.map(&:clone)
-      blocks_added = 0
-
-      shop.check_app_embed_enabled
-      keys_without_ajax.pop if keys.include?('ajax')
-
-      shop.update_theme_version(keys_without_ajax)
-
-      if keys_without_ajax.length.positive?
-        keys_without_ajax.each do |key|
-          next blocks_added unless (key == 'templates/product.json' && shop.theme_app_extension.product_block_added) ||
-            (key == 'templates/cart.json' && shop.theme_app_extension.cart_block_added) ||
-            (key == 'templates/collection.json' && shop.theme_app_extension.collection_block_added)
-
-          blocks_added += 1
-        end
-      end
-
-      unless (!shop.theme_app_extension&.theme_app_complete && ((blocks_added == keys_without_ajax.length) &&
-        ((keys.include?('ajax') && shop.theme_app_embed) || keys.exclude?('ajax')))) && shop.offers.present?
-        shop.theme_app_extension.update(theme_app_complete: true)
-
-        unless shop.script_tag_id.nil?
-          shop.disable_javascript
-        end
-      end
+      shop.theme_app_extension_check
     end
   end
 end

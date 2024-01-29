@@ -51,8 +51,8 @@ export function FourthTab(props) {
             { !isLegacy && props.offer.in_ajax_cart &&
               (
                 <div style={{marginBottom: "10px"}} className="polaris-banner-container">
-                    <Banner title="You are using Shopify's Theme Editor" status={props.isAppEmbedded ? 'success' : 'warning'}>
-                        {!props.isAppEmbedded ?
+                    <Banner title="You are using Shopify's Theme Editor" status={props.themeAppExtension?.theme_app_embed ? 'success' : 'warning'}>
+                        {!props.themeAppExtension?.theme_app_embed ?
                             <>
                                 <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
                                 <p><Link

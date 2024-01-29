@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_01_25_192526) do
+ActiveRecord::Schema[7.0].define(version: 2024_01_26_131237) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -527,6 +527,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_25_192526) do
     t.index ["shop_id"], name: "index_setups_on_shop_id"
   end
 
+  create_table "shop_actions", force: :cascade do |t|
+    t.bigint "shop_id"
+    t.integer "action_timestamp"
+    t.string "shopify_domain"
+    t.string "action"
+    t.string "source"
+    t.datetime "created_at", null: false
+    t.index ["shop_id"], name: "index_shop_actions_on_shop_id"
+  end
+
   create_table "shop_events", force: :cascade do |t|
     t.bigint "shop_id"
     t.string "title"
@@ -805,6 +815,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_25_192526) do
   add_foreign_key "products", "shops"
   add_foreign_key "rules", "offers"
   add_foreign_key "setups", "shops"
+  add_foreign_key "shop_actions", "shops"
   add_foreign_key "shop_events", "shops"
   add_foreign_key "subscriptions", "plans"
   add_foreign_key "subscriptions", "shops"
