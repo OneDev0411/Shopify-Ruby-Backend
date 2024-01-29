@@ -8,6 +8,8 @@ class Collection < ApplicationRecord
   belongs_to :shop
   has_many :collects
 
+  after_create :cache_collection_key
+
   def products
     if collects_json.present?
       Product.where(shopify_id: collects_json)
@@ -155,5 +157,9 @@ class Collection < ApplicationRecord
   def extract_ids(result_body)
     hash_body = JSON.parse(result_body)
     hash_body['products'].map{ |pp| pp['id'] }
+  end
+
+  def cache_collection_key
+    $redis_cache.set("shopify_collection_#{shopify_id}", 1)
   end
 end

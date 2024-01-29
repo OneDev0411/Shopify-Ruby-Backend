@@ -18,6 +18,8 @@ class Product < ApplicationRecord
 
   attr_accessor :hidden_json_variants
 
+  after_create :cache_product_key
+
   def price
     if read_attribute(:price).present?
       read_attribute(:price)
@@ -431,5 +433,9 @@ class Product < ApplicationRecord
       Rails.logger.debug "Caught compare_at_price exception #{e}!"
       false
     end
+  end
+
+  def cache_product_key
+    $redis_cache.set("shopify_product_#{shopify_id}", 1)
   end
 end
