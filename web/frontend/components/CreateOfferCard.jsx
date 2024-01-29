@@ -8,7 +8,7 @@ import {
   Modal,
   Text,
   VerticalStack,
-  VideoThumbnail, Tabs, LegacyCard,
+  VideoThumbnail, Tabs, LegacyCard, Layout,
 } from "@shopify/polaris";
 import {homeImage} from "../assets/index.js";
 import {useLocation, useNavigate} from "react-router-dom";
