@@ -128,15 +128,10 @@ export default function HomePage() {
             }
 
             {!isOffers && !getHelpDismissed() && (
-              <Layout.Section>
-                <div style={{marginBottom: '47px'}}>
-                  <ThemeAppCard
-                      shopData={currentShop}
-                      themeAppExtension={themeAppExtension}
-                  />
-                </div>
-              </Layout.Section>
-
+              <ThemeAppCard
+                shopData={currentShop}
+                themeAppExtension={themeAppExtension}
+              />
             )}
 
             {planName ==='free' && (

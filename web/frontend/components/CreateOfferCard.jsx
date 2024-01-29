@@ -208,8 +208,6 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
   const handleOpen = useCallback(() => setActive(true), []);
   const handleClose = useCallback(() => setActive(false), []);
 
-
-
   const contentInfo = (tab) => {
     return  <VerticalStack inlineAlign="center">
       <div className="leadin-card">
@@ -314,6 +312,7 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
       handle: 'collection'
     },
   ];
+  const availableTabs = tabs.filter( tab => tab.showTab);
 
   const storeHelpDismissed = () => {
     // if (hasOffers && hasCollectionOffers && hasCartOffers && hasProductPageOffers && )
@@ -322,15 +321,20 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
   }
 
   return (
-    <AlphaCard>
-      <div className="offer-tabs-no-padding">
-        <Tabs tabs={tabs.filter( (tab) => tab.showTab)} selected={selected} onSelect={handleTabChange}>
-          <LegacyCard.Section >
-            {contentInfo(tabs.filter( (tab) => tab.showTab)[selected])}
-          </LegacyCard.Section>
-        </Tabs>
+    (availableTabs.length > 0) &&
+    <Layout.Section>
+      <div style={{marginBottom: '47px'}}>
+        <AlphaCard>
+          <div className="offer-tabs-no-padding">
+            <Tabs tabs={availableTabs} selected={selected} onSelect={handleTabChange}>
+              <LegacyCard.Section>
+                {contentInfo(availableTabs[selected])}
+              </LegacyCard.Section>
+            </Tabs>
+          </div>
+        </AlphaCard>
       </div>
-    </AlphaCard>
+    </Layout.Section>
   )
 }
 
