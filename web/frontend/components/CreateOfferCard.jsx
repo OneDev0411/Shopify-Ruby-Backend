@@ -247,7 +247,6 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
               <Button primary
                       url={`https://${shopData?.shopify_domain}/admin/themes/current/editor?template=${tab.handle}&addAppBlockId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block&target=mainSection`}
                       target="_blank"
-                      onClick={storeHelpDismissed}
               >
                 Add to {tab.title}
               </Button>
@@ -255,7 +254,6 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
               <Button primary
                       url={`https://${shopData?.shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
                       target="_blank"
-                      onClick={storeHelpDismissed}
               >
                 Add to {tab.title}
               </Button>
@@ -314,19 +312,13 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
   ];
   const availableTabs = tabs.filter( tab => tab.showTab);
 
-  const storeHelpDismissed = () => {
-    // if (hasOffers && hasCollectionOffers && hasCartOffers && hasProductPageOffers && )
-    // localStorage.setItem('help_dismissed', true);
-    // window.reload();
-  }
-
   return (
     (availableTabs.length > 0) &&
     <Layout.Section>
       <div style={{marginBottom: '47px'}}>
         <AlphaCard>
           <div className="offer-tabs-no-padding">
-            <Tabs tabs={availableTabs} selected={selected} onSelect={handleTabChange}>
+            <Tabs tabs={availableTabs} selected={selected} onSelect={handleTabChange} fitted>
               <LegacyCard.Section>
                 {contentInfo(availableTabs[selected])}
               </LegacyCard.Section>

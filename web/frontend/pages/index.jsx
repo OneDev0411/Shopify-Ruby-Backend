@@ -26,7 +26,6 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigateTo = useNavigate();
-  const isOffers = location?.pathname.includes('offer');
 
   const handleOpenOfferPage = () => {
     navigateTo('/edit-offer', { state: { offerID: null } });
@@ -82,10 +81,6 @@ export default function HomePage() {
       })
   }, [setCurrentShop, setPlanName, setTrialDays])
 
-  const getHelpDismissed = () => {
-    return localStorage.getItem('help_dismissed');
-  }
-
   return (
     <Page>
       {isLoading ? (
@@ -127,12 +122,10 @@ export default function HomePage() {
               </Layout.Section>
             }
 
-            {!isOffers && !getHelpDismissed() && (
-              <ThemeAppCard
+            <ThemeAppCard
                 shopData={currentShop}
                 themeAppExtension={themeAppExtension}
-              />
-            )}
+            />
 
             {planName ==='free' && (
               <Layout.Section>
