@@ -1,7 +1,4 @@
 import {Layout, Card, Stack, Image, HorizontalGrid} from "@shopify/polaris";
-import { useAppBridge } from '@shopify/app-bridge-react'
-import { TitleBar } from "@shopify/app-bridge-react";
-import {stars} from "../assets";
 import "../components/stylesheets/reviewStyle.css";
 import React from 'react';
 
@@ -32,7 +29,7 @@ export function Reviews() {
               <br />
             </div>
             <Stack distribution="center">
-              <Image source={stars} distribution="center" />
+              <Image source="https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/5-star.png" distribution="center" />
             </Stack>
           </div>
         </Card>
@@ -51,7 +48,7 @@ export function Reviews() {
               <br />
             </div>
             <Stack distribution="center">
-              <Image source={stars} distribution="center" />
+              <Image source="https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/5-star.png" distribution="center" />
             </Stack>
           </div>
         </Card>
@@ -70,7 +67,7 @@ export function Reviews() {
               <br />
             </div>
             <Stack distribution="center">
-              <Image source={stars} distribution="center" />
+              <Image source="https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/5-star.png" distribution="center" />
             </Stack>
           </div>
         </Card>

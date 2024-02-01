@@ -6,13 +6,13 @@ import { Banner, Grid, Layout, Page } from "@shopify/polaris";
 
 import { useAuthenticatedFetch } from "../hooks";
 import { isSubscriptionActive } from "../services/actions/subscription";
-import { ConversionRate, CustomTitleBar, OffersList, OrderOverTimeData, TotalSalesData } from "../components";
+import { CustomTitleBar, OffersList, OrderOverTimeData, TotalSalesData } from "../components";
 
 import { iculogo } from "../assets";
 import "../components/stylesheets/mainstyle.css";
 import HomePageSkeleton from "../skeletons/HomePageSkeleton";
 import {Redirect} from '@shopify/app-bridge/actions';
-import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
+import {useAppBridge } from "@shopify/app-bridge-react";
 
 export default function HomePage() {
   const app = useAppBridge();
@@ -126,9 +126,6 @@ export default function HomePage() {
                     <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
                       <TotalSalesData period='monthly' title={true} />
                     </Grid.Cell>
-                    {/*  <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>*/}
-                    {/*    <ConversionRate period='monthly' title={true} />*/}
-                    {/*</Grid.Cell>*/}
                     <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
                       <OrderOverTimeData period='monthly' title={true} />
                     </Grid.Cell>
