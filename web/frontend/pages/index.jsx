@@ -26,6 +26,7 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigateTo = useNavigate();
+  const [isLegacy, setIsLegacy] = useState(true);
 
   const handleOpenOfferPage = () => {
     navigateTo('/edit-offer', { state: { offerID: null } });
@@ -71,6 +72,10 @@ export default function HomePage() {
         setCurrentShop(data.shop);
         setPlanName(data.plan);
         setTrialDays(data.days_remaining_in_trial);
+
+        if (data.theme_app_extension) {
+          setIsLegacy(data.theme_app_extension.theme_version === "Vintage");
+        }
 
         // notify intercom as soon as app is loaded and shop info is fetched
         notifyIntercom(data.shop);
@@ -122,10 +127,12 @@ export default function HomePage() {
               </Layout.Section>
             }
 
-            <ThemeAppCard
+            {!isLegacy && (
+              <ThemeAppCard
                 shopData={currentShop}
                 themeAppExtension={themeAppExtension}
-            />
+              />
+            )}
 
             {planName ==='free' && (
               <Layout.Section>

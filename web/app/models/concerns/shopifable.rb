@@ -816,7 +816,7 @@ module Shopifable
   # Returns Array.
   def shopify_webhook_topics
     %w[app/uninstalled orders/create shop/update products/create products/update
-       collections/create collections/update products/delete]
+       collections/create collections/update products/delete themes/publish themes/update]
   end
 
   # Private. Find changed pĺans events for the last month.
@@ -960,7 +960,7 @@ module Shopifable
     def find_or_create_shop(current_shopify_domain)
       icushop = Shop.find_by(shopify_domain: current_shopify_domain)
 
-      old_shop = Shop.find_by(myshopify_domain: current_shopify_domain)
+      old_shop = Shop.find_by(shopify_domain: current_shopify_domain)
 
       if old_shop.present? && icushop.id != old_shop.id
         # logging to Rollbar
@@ -994,6 +994,8 @@ module Shopifable
         end
 
         icushop = old_shop
+        Sidekiq::Client.push('class' => 'ShopWorker::EnsureInCartUpsellWebhooksJob', 'args' => [icushop.id], 'queue' => 'default', 'at' => Time.now.to_i)
+
         icushop.store_cache_keys_on_reinstall
       end
 

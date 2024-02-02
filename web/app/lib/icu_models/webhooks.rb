@@ -7,7 +7,7 @@ module IcuModels
 
     def shopify_webhook_topics
       %w[app/uninstalled orders/create shop/update products/create products/update
-         collections/create collections/update products/delete]
+         collections/create collections/update products/delete themes/publish themes/update]
     end
 
     def publish_event_bridge_webhooks(session)
