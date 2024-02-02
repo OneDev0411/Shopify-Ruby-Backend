@@ -135,7 +135,7 @@ export default function Settings() {
                     const toastNotice = Toast.create(app, toastOptions);
                     toastNotice.dispatch(Toast.Action.SHOW);
                 })
-                .catch((error) => {
+                .catch(() => {
                     const toastOptions = {
                         message: "Error saving shop settings",
                         duration: 3000,

@@ -1,15 +1,12 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, AppProvider, Link, Text, Badge } from '@shopify/polaris';
-import "../components/stylesheets/editOfferStyle.css";
 import { condition_options } from "../shared/constants/ConditionOptions";
 import { getLabelFromValue } from "../shared/helpers/commonHelpers";
-
+import "../components/stylesheets/editOfferStyle.css";
 
 const Details = (props) => {
-
   const navigateTo = useNavigate();
-
   const checkPlacement = useCallback(() => {
     if(props.offer.in_product_page && props.offer.in_cart_page) {
         return <span>Product and cart page</span>

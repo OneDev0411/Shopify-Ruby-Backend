@@ -27,11 +27,8 @@ const EditOfferView = () => {
   const [offerStatus, setOfferStatus] = useState('');
   const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState();
   const [checkKeysValidity, setCheckKeysValidity] = useState({});
-
   const [offer, setOffer] = useState({});
-
   const navigateTo = useNavigate();
-
   const handleEditOffer = (offer_id) => {
     navigateTo('/edit-offer', { state: { offerID: offer_id } });
   }
@@ -45,7 +42,7 @@ const EditOfferView = () => {
       body: JSON.stringify({ offer: { offer_id: offerID }, shop: shopAndHost.shop })
     })
     .then((response) => response.json())
-    .then((data) => {
+    .then(() => {
       offer.active = true;
       setOfferStatus('published');
     })
@@ -81,7 +78,7 @@ const EditOfferView = () => {
       body: JSON.stringify({ offer_id: offerID, shop: shopAndHost.shop })
     })
       .then((response) => response.json())
-      .then((data) => {
+      .then(() => {
         navigateTo('/offer')
       })
       .catch((error) => {
@@ -98,7 +95,7 @@ const EditOfferView = () => {
       body: JSON.stringify({ offer_id: offerID, shop: shopAndHost.shop })
     })
       .then((response) => response.json())
-      .then((data) => {
+      .then(() => {
         navigateTo('/offer');
       })
       .catch((error) => {
@@ -141,7 +138,6 @@ const EditOfferView = () => {
         return {...previousState, [updatedKey]: updatedValue};
     });
   }
-
   return (
     <AppProvider i18n={[]}>
       <div className="page-space">
@@ -205,9 +201,7 @@ const EditOfferView = () => {
                   </Grid.Cell>
                 </Grid>
               </div>
-
               <GenericFooter text='Learn more about ' linkUrl='#' linkText='offers'></GenericFooter>
-
             </Page>
           </>
         )}
@@ -215,6 +209,5 @@ const EditOfferView = () => {
     </AppProvider>
   );
   }
-
 
 export default EditOfferView

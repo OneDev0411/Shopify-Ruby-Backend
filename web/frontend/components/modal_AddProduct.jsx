@@ -6,7 +6,7 @@ import {
   OptionList,
   Text, Thumbnail
 } from '@shopify/polaris';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
 

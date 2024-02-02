@@ -1,6 +1,6 @@
-import {Link,Icon,Modal, MediaCard, VideoThumbnail, LegacyCard, Page, Layout, Image, LegacyStack, Grid, List} from "@shopify/polaris";
+import {Link,Icon,Modal, LegacyCard, Page, Layout, Image, LegacyStack, Grid, List} from "@shopify/polaris";
 import {helpImage} from "../assets";
-import {HintMajor,TroubleshootMajor} from '@shopify/polaris-icons';
+import {HintMajor} from '@shopify/polaris-icons';
 import {useRef, useState, useCallback} from 'react';
 import "../components/stylesheets/mainstyle.css";
 import { CustomTitleBar } from "../components";
@@ -10,17 +10,12 @@ import {
 
 export default function HelpPage() {
     const [active, setActive] = useState(false);
-    const handleOpen = useCallback(() => setActive(true), []);
     const handleClose = useCallback(() => {
         setActive(false);
       }, []);
 
     const videoModal = useRef(null);
     const activator = videoModal;
-
-    function OpenModal(){
-        {handleOpen};
-    }
 
     const helpLinks = [
         {
@@ -104,44 +99,6 @@ export default function HelpPage() {
                         </Grid.Cell>
                     </Grid>
                 </LegacyCard>
-                {/* Second section with video */}
-                {/* Ticket https://dev.azure.com/ltv-growth/In-Cart-Upsell/_workitems/edit/678 says to temporarily hide, so commenting the code and not removing */}
-                {/* <LegacyCard
-                    title={
-                        <LegacyStack>
-                            <Icon source={TroubleshootMajor} />
-                            <p variant="headingXs" as="h3">
-                               <strong>Setup videos</strong>
-                            </p>
-                        </LegacyStack>
-                    } sectioned
-                >
-                <Grid>
-                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 12, lg: 12, xl: 6}}>
-                        <div ref={activator}>
-                            <MediaCard
-                                title="Create Your First Upsell and Cross-Sell Offer"
-                                primaryAction={{
-                                    content: 'Learn more',
-                                    onAction: handleOpen,
-                                }}
-                                description={`A step by step guide on how to set up your first upsell and cross-sell offer in In Cart 
-                                Upsell, a Shopify app that helps you increase your average order value from the traffic you are 
-                                sending to your store.`}
-                                >
-                                <VideoThumbnail
-                                    onClick={handleOpen}
-                                    videoLength={318}
-                                    thumbnailUrl="https://i.ytimg.com/vi/NibJDu5YFdM/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLC4HMpCnoGPA-gWLRl8raAfbb4SeA"
-                                />
-                            </MediaCard>
-                        </div>
-                            
-                    </Grid.Cell>
-                </Grid>  
-                </LegacyCard> */}
-                
-
                 <Modal
                     activator={activator}
                     open={active}
@@ -160,9 +117,6 @@ export default function HelpPage() {
                     </iframe>
                     </Modal.Section>
                 </Modal>
-
-
-
             </Layout.Section>
         </Layout>
     </Page>

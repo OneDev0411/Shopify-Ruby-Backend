@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from '@shopify/app-bridge-react';
-import { confirmCharge } from "../services/actions/subscription";
 import { useSelector } from "react-redux";
 import { useAuthenticatedFetch } from "../hooks";
 
@@ -42,7 +41,6 @@ const ConfirmFromOutside = () => {
   useEffect(async () => {
     await renderConfirmCharge();
   }, []);
-
   return <div></div>;
 };
 

@@ -8,7 +8,6 @@ import { useAuthenticatedFetch } from "../hooks";
 import { isSubscriptionActive } from "../services/actions/subscription";
 import { CustomTitleBar, OffersList, OrderOverTimeData, TotalSalesData } from "../components";
 
-import { iculogo } from "../assets";
 import "../components/stylesheets/mainstyle.css";
 import HomePageSkeleton from "../skeletons/HomePageSkeleton";
 import {Redirect} from '@shopify/app-bridge/actions';
@@ -88,7 +87,7 @@ export default function HomePage() {
         <>
           <CustomTitleBar
             title="In Cart Upsell & Cross Sell"
-            image={iculogo}
+            image={"https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/ICU-Logo-Small.png"}
             buttonText={"Create offer"}
             handleButtonClick={handleOpenOfferPage}
           />

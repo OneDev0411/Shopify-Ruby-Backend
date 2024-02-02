@@ -1,6 +1,5 @@
 import { Layout, LegacyCard, SkeletonBodyText, Grid, Text } from '@shopify/polaris';
 
-
 const SummarySkeleton = ({labels, sectionsCount}) => {
     const sections = Array.from({ length: sectionsCount }).map((_, index) => (
           <Grid key={index}>
