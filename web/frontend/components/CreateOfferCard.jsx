@@ -13,8 +13,6 @@ import {
 import {homeImage} from "../assets/index.js";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
-import {Link} from "react-router-dom";
-
 
 const ShopContext = createContext(null);
 
