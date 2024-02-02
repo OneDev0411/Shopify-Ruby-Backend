@@ -222,9 +222,10 @@ module Shopifable
       session = ShopifyAPI::Auth::Session.new(shop: shopify_domain, access_token: shopify_token)
       ShopifyAPI::Context.activate_session(session)
       return session
-    rescue StandardError => e
+    rescue => e
       Rails.logger.debug "Error Message: #{e.message}"
       Rollbar.error("Error", e)
+      return false
     end
   end
 

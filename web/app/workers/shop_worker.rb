@@ -240,6 +240,14 @@ module ShopWorker
       return if sub.blank?
       return if sub.plan.try(:internal_name) != 'plan_based_billing'
 
+      ShopAction.create(
+        shop_id: sub.shop.id,
+        action_timestamp: Time.now.utc.to_i,
+        shopify_domain: sub.shop.shopify_domain,
+        action: 'add_initial_charge_to_subscription',
+        source: 'icu-redesign_add_initial_charge_to_subscription_job'
+      )
+
       if sub.usage_charges.empty?
         charge = sub.calculate_monthly_usage_charge
         res = sub.add_usage_charge_to_shopify_bill(charge[:amount], charge[:description])

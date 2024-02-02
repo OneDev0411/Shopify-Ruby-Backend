@@ -15,6 +15,7 @@ class Shop < ApplicationRecord
   has_many :pending_jobs, dependent: :destroy
   has_many :sync_results
   has_many :shop_events, dependent: :destroy
+  has_many :shop_action, dependent: :destroy
 
   before_create :set_up_for_shopify
   after_create :shop_setup
@@ -42,6 +43,14 @@ class Shop < ApplicationRecord
   
   def shop_setup
     self.update(is_shop_active: true)
+    ShopAction.create(
+      shop_id: self.id,
+      action_timestamp: self.installed_at.to_i,
+      shopify_domain: self.shopify_domain,
+      action: 'install',
+      source: 'icu-redesign_shop_setup'
+    )
+    $redis_cache.del("shopify_uninstalled_#{self.myshopify_domain}")
     async_setup
     signup_for_referral_program
     select_plan('trial_plan')
