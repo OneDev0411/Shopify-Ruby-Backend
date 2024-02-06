@@ -54,7 +54,7 @@ const EditOfferSkeleton = () => {
                 <Layout.Section secondary>
                     <Layout>
                         <Layout.Section>
-                            <SkeletonTabs />  
+                            <SkeletonTabs count={4} />  
                         </Layout.Section>
                         <Layout.Section>
                             <LegacyCard sectioned>
