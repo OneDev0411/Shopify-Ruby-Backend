@@ -224,3 +224,7 @@
 .widget-visibility { 
     overflow: hidden;
 }
+
+.video-intro-section > .Polaris-LegacyCard {
+    width: 40rem;
+}

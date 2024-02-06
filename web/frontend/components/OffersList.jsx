@@ -17,6 +17,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthenticatedFetch } from "../hooks";
 import { useSelector } from "react-redux";
 import {CreateOfferCard} from "./CreateOfferCard.jsx";
+import {Redirect} from '@shopify/app-bridge/actions';
+import { useAppBridge } from "@shopify/app-bridge-react";
 
 export function OffersList(props) {
   const app = useAppBridge();

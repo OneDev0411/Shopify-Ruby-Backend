@@ -9,6 +9,9 @@ import { isSubscriptionActive } from "../services/actions/subscription";
 import { CustomTitleBar, OffersList, OrderOverTimeData, TotalSalesData } from "../components";
 
 import "../components/stylesheets/mainstyle.css";
+import {ThemeAppCard} from "../components/CreateOfferCard.jsx";
+import {Redirect} from '@shopify/app-bridge/actions';
+import { useAppBridge } from "@shopify/app-bridge-react";
 
 export default function HomePage() {
   const app = useAppBridge();

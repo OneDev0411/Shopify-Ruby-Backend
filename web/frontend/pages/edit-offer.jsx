@@ -11,6 +11,7 @@ import {useAuthenticatedFetch} from "../hooks";
 import {FirstTab, FourthTab, SecondTab, ThirdTab} from "../components";
 import {OfferPreview} from "../components/OfferPreview";
 import "../components/stylesheets/mainstyle.css";
+import { EditOfferTabs } from '../shared/constants/EditOfferOptions';
 
 export default function EditPage() {
     const shopAndHost = useSelector(state => state.shopAndHost);
