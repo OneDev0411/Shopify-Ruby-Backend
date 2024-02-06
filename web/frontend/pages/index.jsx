@@ -9,9 +9,6 @@ import { isSubscriptionActive } from "../services/actions/subscription";
 import { CustomTitleBar, OffersList, OrderOverTimeData, TotalSalesData } from "../components";
 
 import "../components/stylesheets/mainstyle.css";
-import HomePageSkeleton from "../skeletons/HomePageSkeleton";
-import {Redirect} from '@shopify/app-bridge/actions';
-import {useAppBridge } from "@shopify/app-bridge-react";
 
 export default function HomePage() {
   const app = useAppBridge();
@@ -82,7 +79,17 @@ export default function HomePage() {
   return (
     <Page>
       {isLoading ? (
-        <HomePageSkeleton />
+        <div
+          style={{
+            overflow: "hidden",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+          }}
+        >
+          <Spinner size="large" color="teal" />
+        </div>
       ) : (
         <>
           <CustomTitleBar

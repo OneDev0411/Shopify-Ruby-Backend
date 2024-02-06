@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Card, AppProvider, Text, Image, Grid, Link, Spinner } from '@shopify/polaris';
 import "../components/stylesheets/editOfferStyle.css";
 import { useAuthenticatedFetch } from '../hooks';
-import SummarySkeleton from '../skeletons/SummarySkeleton';
-
 
 const Summary = (props) => {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -76,7 +74,15 @@ const Summary = (props) => {
         <AppProvider>
           <Card>
             {isLoading ? (
-              <SummarySkeleton labels={summaryLabels} sectionsCount={4} />
+              <div style={{
+                  overflow: 'hidden',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  minHeight: '20vh',
+              }}>
+                <Spinner size="large" color="teal"/>
+              </div>
               ) : (
               <>
                 <div className="comp-cont">
