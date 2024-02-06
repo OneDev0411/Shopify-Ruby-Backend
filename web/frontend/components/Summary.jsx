@@ -73,6 +73,10 @@ const Summary = (props) => {
       <>
         <AppProvider>
           <Card>
+            <div className="comp-cont">
+              <span className="text-decor">Conversion Summary</span>
+              <span><Link onClick={handleViewAnalytics} removeUnderline>View analytics</Link></span>
+            </div>
             {isLoading ? (
               <div style={{
                   overflow: 'hidden',
@@ -85,10 +89,6 @@ const Summary = (props) => {
               </div>
               ) : (
               <>
-                <div className="comp-cont">
-                  <span className="text-decor">Conversion Summary</span>
-                  <span><Link onClick={handleViewAnalytics} removeUnderline>View analytics</Link></span>
-                </div>
                 <Grid columns={{sm: 6}}>
                       <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 7, xl: 7}}>
                           <div className="card-space">
