@@ -1,5 +1,8 @@
-import { LegacyCard, SkeletonBodyText, VerticalStack } from '@shopify/polaris';
-import React, { useEffect, useState, useCallback } from 'react';
+import {
+    LegacyCard,
+    VerticalStack,
+} from '@shopify/polaris';
+import React, { useEffect, useState } from 'react';
 import { PolarisVizProvider, StackedAreaChart } from '@shopify/polaris-viz';
 import { useAuthenticatedFetch } from "../hooks";
 import { useSelector } from 'react-redux';
@@ -57,7 +60,7 @@ export function TotalSalesData(props) {
                 {salesData ? (<h3 className="report-money"><strong>${salesTotal}</strong></h3>) : null}
                 <div className="space-4"></div>
                 <p>SALES OVER TIME</p><br />
-                {loading ? <SkeletonBodyText lines={10} /> : salesData ? (<StackedAreaChart
+                {loading ? "Loading..." : salesData ? (<StackedAreaChart
                     isAnimated={true}
                     comparisonMetric={{
                         accessibilityLabel: 'trending up 6%',
@@ -191,7 +194,7 @@ export function OrderOverTimeData(props) {
                 <div className="space-4"></div>
                 <p>ORDERS OVER TIME</p><br />
                 <div className="space-5"></div>
-                {loading ? <SkeletonBodyText lines={10} /> : ordersData ? (<StackedAreaChart
+                {loading ? "Loading..." : ordersData ? (<StackedAreaChart
                     comparisonMetric={{
                         accessibilityLabel: 'trending up 6%',
                         metric: '6%',
