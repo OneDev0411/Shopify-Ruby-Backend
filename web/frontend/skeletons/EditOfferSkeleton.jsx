@@ -1,10 +1,9 @@
-import { Layout, LegacyCard, SkeletonBodyText, SkeletonTabs, SkeletonPage, TextContainer, SkeletonDisplayText, LegacyStack } from '@shopify/polaris';
-import Skeleton from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
+import { Layout, LegacyCard, SkeletonBodyText, SkeletonTabs, SkeletonPage, TextContainer } from '@shopify/polaris';
+
 
 const EditOfferSkeleton = () => {
 
-    const labels = ['Offer title', 'Offer text', 'Button text']
+    const titles = ['Offer Product', 'Text', 'Display Conditions']
 
     return (
         <SkeletonPage backAction primaryAction>
@@ -14,41 +13,15 @@ const EditOfferSkeleton = () => {
                         <Layout.Section>
                             <SkeletonTabs count={4} />
                         </Layout.Section>
-                        <Layout.Section>
-                            <LegacyCard title='Offer Product' sectioned>
-                                <TextContainer>
-                                    <SkeletonBodyText lines={1} />
-                                    <SkeletonDisplayText />
-                                    <LegacyStack vertical>
-                                        <p>Selected Products</p>
-                                        <SkeletonBodyText />
-                                    </LegacyStack>
-                                </TextContainer>
-                            </LegacyCard>
-                        </Layout.Section>
-                        <Layout.Section>
-                            <LegacyCard title='Text' sectioned>
-                                {labels.map((label, index) => (
-                                    <TextContainer key={index}>
-                                        <p>{label}</p>
-                                        <Skeleton borderRadius={4} height={32} baseColor='var(--p-color-bg-strong)' enableAnimation={false} />
-                                        <br/>
+                        {titles.map((title, index) => (
+                            <Layout.Section key={index}>
+                                <LegacyCard title={title} sectioned>
+                                    <TextContainer>
+                                        <SkeletonBodyText lines={6} />
                                     </TextContainer>
-                                ))}
-                                <SkeletonDisplayText />
-                            </LegacyCard>
-                        </Layout.Section>
-                        <Layout.Section>
-                            <LegacyCard title='Display Conditions' sectioned>
-                                <Skeleton count={8} className='skeleton-margin' height={13} width={250} baseColor='var(--p-color-bg-strong)' />
-                            </LegacyCard>
-                        </Layout.Section>
-                        <Layout.Section>
-                            <div className="space-4"/>
-                            <LegacyStack distribution='center'>
-                                <Skeleton borderRadius={4} height={35} width={130} baseColor='var(--p-color-bg-strong)' enableAnimation={false} />
-                            </LegacyStack>
-                        </Layout.Section>
+                                </LegacyCard>
+                            </Layout.Section>
+                        ))}
                     </Layout>
                 </Layout.Section>
                 <Layout.Section secondary>

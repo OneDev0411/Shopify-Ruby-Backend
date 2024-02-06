@@ -224,16 +224,3 @@
 .widget-visibility { 
     overflow: hidden;
 }
-
-.skeleton-margin{
-    margin: var(--p-space-3);
-}
-
-.skeleton-styles {
-    width: 200px;
-    height: 200px;
-    margin: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
