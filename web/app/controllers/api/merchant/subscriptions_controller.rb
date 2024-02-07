@@ -18,6 +18,11 @@ module Api
           return
         end
 
+        if @plan.internal_name == 'plan_based_billing' && @plan.id != 19
+          new_plan = Plan.find_by(id: 19)
+          @plan = new_plan if new_plan.present?
+        end
+
         if @plan.id == @subscription.plan_id && @subscription.status == 'approved'
           redirect_to root_path, notice: 'Your subscription was already updated!' and return
         end
@@ -59,14 +64,14 @@ module Api
         @icushop.activate_session
         begin
           ShopifyAPI::RecurringApplicationCharge.find(id: params[:charge_id]).activate
-          @plan = Plan.find_by(internal_name: 'plan_based_billing')
+          @plan = Plan.find_by(id: 19)
           @subscription.status = 'approved'
           @subscription.plan = @plan
           @subscription.update_subscription(@plan)
 
           if @subscription.save
             @success = true
-            if @subscription.plan.try(:internal_name) == 'plan_based_billing' && @subscription.bill_on.blank?
+            if @subscription.plan.try(:id) == 19 && @subscription.bill_on.blank?
               # Shop is switching from another plan, probably the free plan.
               if @icushop.in_trial_period?
                 @subscription.update_attribute(:bill_on, @subscription.days_remaining_in_trial.days.from_now)
