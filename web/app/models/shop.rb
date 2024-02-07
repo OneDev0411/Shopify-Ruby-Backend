@@ -638,7 +638,8 @@ class Shop < ApplicationRecord
       shopify_token.present? &&
       shopify_plan_name != 'cancelled' &&
       shopify_plan_name != 'frozen' &&
-      shopify_plan_name != 'dormant'
+      shopify_plan_name != 'dormant' &&
+      is_shop_active
   end
 
     # the customer has uninstalled the app
