@@ -238,7 +238,7 @@ module ShopWorker
     def perform(subscription_id)
       sub = Subscription.find_by(id: subscription_id)
       return if sub.blank?
-      return if sub.plan.try(:internal_name) != 'plan_based_billing'
+      return if sub.plan.try(:id) != 19
 
       ShopAction.create(
         shop_id: sub.shop.id,

@@ -158,7 +158,7 @@ class Subscription < ApplicationRecord
         return_url: confirm_subscription_url
       }
     }
-    if plan.internal_name == 'plan_based_billing'
+    if plan.id == 19
       opts[:recurring_application_charge][:capped_amount] = '99.99'
       opts[:recurring_application_charge][:terms] = 'Depending on your Shopify plan. Basic Shopify: $19.99/mo, ' \
                                                     'Shopify: $29.99/mo, Advanced Shopify: $59.99/mo, ' \
