@@ -17,6 +17,11 @@ module Api
           redirect_to edit_subscription_path, notice: 'Error: Plan Not Found'
           return
         end
+        
+        if @plan.internal_name == 'plan_based_billing' && @plan.id != 19
+          new_plan = Plan.find_by(id: 19)
+          @plan = new_plan if new_plan.present?
+        end
 
         if @plan.internal_name == 'plan_based_billing' && @plan.id != 19
           new_plan = Plan.find_by(id: 19)
