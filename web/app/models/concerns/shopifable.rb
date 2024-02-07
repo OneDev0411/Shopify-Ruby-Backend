@@ -760,6 +760,7 @@ module Shopifable
     activate_session
 
     app_blocks_added = []
+    app_blocks_supported = 0
     assets = []
     keys = %w[templates/product.json templates/cart.json templates/collection.json]
 
@@ -771,8 +772,16 @@ module Shopifable
 
     assets.each do |asset|
       if keys.include?(asset.key)
-        app_blocks_added = search_asset_value(asset.key, shopify_theme.id, app_blocks_added)
+        search_results = search_asset_value(asset.key, shopify_theme.id, app_blocks_added, app_blocks_supported)
+        app_blocks_supported = search_results[:app_blocks_supported] if search_results[:app_blocks_supported].present?
+        app_blocks_added = search_results[:app_blocks_added] if search_results[:app_blocks_added].present?
       end
+    end
+
+    if app_blocks_supported.positive?
+      self.theme_app_extension.update(theme_version: '2.0')
+    else
+      self.theme_app_extension.update(theme_version: 'Vintage')
     end
 
     update_false_theme_values(app_blocks_added)
@@ -1043,7 +1052,7 @@ module Shopifable
     end
   end
 
-  def search_asset_value(asset_key, theme_id, app_blocks_added)
+  def search_asset_value(asset_key, theme_id, app_blocks_added, app_blocks_supported)
     asset_value = ShopifyAPI::Asset.all(asset: { key: asset_key }, theme_id: theme_id).compact.first
 
     unless asset_value.nil?
@@ -1052,24 +1061,15 @@ module Shopifable
       if asset_value.present?
         main = asset_value['sections'].select { |id, section| id == 'main' || section['type'].starts_with?('main-') }
 
-        app_block_supported = check_app_blocks_support(main, theme_id)
+        app_blocks_supported = check_app_blocks_support(main, theme_id, app_blocks_supported)
 
-        if app_block_supported.length.positive? || asset_key == 'templates/collection.json'
-          self.theme_app_extension.update(theme_version: '2.0')
-
-          app_blocks_added = update_theme_app_extension(asset_value, asset_key, app_blocks_added)
-        else
-          self.theme_app_extension.update(theme_version: 'Vintage')
-        end
+        app_blocks_added = update_theme_app_extension(asset_value, asset_key, app_blocks_added)
       end
     end
-    app_blocks_added
+    { 'app_blocks_added': app_blocks_added, 'app_blocks_supported': app_blocks_supported}
   end
 
-  def check_app_blocks_support(main, theme_id)
-    app_block_supported = []
-
-
+  def check_app_blocks_support(main, theme_id, app_blocks_supported)
     main&.each do |_section_id, section|
       section_asset = ShopifyAPI::Asset.all(
         asset: { key: "sections/#{section['type']}.liquid" }, theme_id: theme_id
@@ -1087,13 +1087,15 @@ module Shopifable
 
           unless schema.nil? || schema['blocks'].nil?
             accepted_blocks = schema['blocks'].select { |block| block['type'] == '@app' }
-            app_block_supported.push(accepted_blocks)
-            break
+            if accepted_blocks.length.positive?
+              app_blocks_supported += 1
+              break
+            end
           end
         end
       end
     end
-    app_block_supported
+    app_blocks_supported
   end
 
   def update_theme_app_extension(asset_value, asset_key, app_blocks_added)

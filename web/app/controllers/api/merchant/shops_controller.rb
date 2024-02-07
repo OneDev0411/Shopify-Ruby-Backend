@@ -12,8 +12,9 @@ module Api
 
         if @shop.theme_app_extension.nil?
           @shop.theme_app_extension = ThemeAppExtension.new
-          @shop.theme_app_extension_check
         end
+        @shop.theme_app_extension_check
+
 
         render "shops/current_shop"
       end

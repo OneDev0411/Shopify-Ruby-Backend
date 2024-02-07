@@ -316,13 +316,11 @@
     }
 
     const fetchCart = () => {
-        if (offerSettings.uses_customer_tags) { // shops needs a height paid plan to activate this option.
-            return fetch('/apps/in-cart-upsell')
+        if (offerSettings.uses_customer_tags) {
+            return fetch('/apps/in-cart-upsell/customer_tags')
               .then(resp => resp.json())
               .then( data => {
-                  let begin = data.indexOf("<!--INCARTUPSELLSTART");
-                  let end   = data.indexOf("INCARTUPSELLEND-->", begin);
-                  customerTags = data.substring(begin + 21, end).split(",");
+                  customerTags = data
 
                   return getCurrentCartItems();
               });

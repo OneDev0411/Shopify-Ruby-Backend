@@ -23,6 +23,19 @@ class ProxyController < ApplicationController
     render json: { theme_app_completed: @icushop.theme_app_extension.theme_app_complete }
   end
 
+  def customer_tags
+    session = @icushop.activate_session
+
+    customer = ShopifyAPI::Customer.find(session: session, id: @customer_id,)
+    tags = ''
+
+    if customer.present?
+      tags = customer.tags.split(',').map(&:strip)
+    end
+
+    tags
+  end
+
   private
 
   def verify_signature
@@ -38,6 +51,7 @@ class ProxyController < ApplicationController
     query_hash = Rack::Utils.parse_query(query_string)
 
     @shopify_domain = query_hash["shop"]
+    @customer_id = query_hash["logged_in_customer_id"]
     @icushop = Shop.find_by(shopify_domain: @shopify_domain)
   end
 
