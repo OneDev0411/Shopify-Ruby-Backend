@@ -11,24 +11,14 @@ import {
     Image, Badge, Text,
     Banner
 } from "@shopify/polaris";
-import {
-    CancelMinor  } from '@shopify/polaris-icons';
-import {ModalAddConditions} from "./../../modal_AddConditions";
+import { CancelMinor  } from '@shopify/polaris-icons';
+import { ModalAddConditions } from "./../../modal_AddConditions";
 import { useState, useCallback, useRef, useEffect } from "react";
 import React from "react";
 import { useSelector } from 'react-redux';
 import { useAuthenticatedFetch } from "../../../hooks";
 import SelectProductsModal from "../../SelectProductsModal";
 import { SelectCollectionsModal } from "../../SelectCollectionsModal";
-import product_page_image_1 from "../../../assets/images/product_page_image_1.png";
-import product_page_image_2 from "../../../assets/images/product_page_image_2.png";
-import product_page_image_3 from "../../../assets/images/product_page_image_3.png";
-import cart_page_image_1 from "../../../assets/images/cart_page_image_1.png";
-import cart_page_image_2 from "../../../assets/images/cart_page_image_2.png";
-import cart_page_image_3 from "../../../assets/images/cart_page_image_3.png";
-import ajax_cart_image_1 from "../../../assets/images/ajax_cart_image_1.png";
-import ajax_cart_image_2 from "../../../assets/images/ajax_cart_image_2.png";
-import ajax_cart_image_3 from "../../../assets/images/ajax_cart_image_3.png";
 import { condition_options } from "../../../shared/constants/ConditionOptions";
 import { getLabelFromValue } from "../../../shared/helpers/commonHelpers";
 import {Link} from 'react-router-dom';
@@ -828,7 +818,6 @@ export function SecondTab(props) {
                                         <RadioButton
                                             label="Use default settings for Ajax Cart"
                                             checked={props.offer.placement_setting?.default_ajax_cart}
-                                            name="ajax-settings"
                                             onChange={(event) => handleDefaultSettingChange(event, 'ajax')}
                                             disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                                             name="ajax-cart-settings"
@@ -840,7 +829,6 @@ export function SecondTab(props) {
                                         <RadioButton
                                             label="Use Template for Ajax Cart"
                                             checked={!props.offer.placement_setting?.default_ajax_cart}
-                                            name="ajax-settings"
                                             onChange={(event) => handleUseTemplateChange(event, 'ajax')}
                                             disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                                             name="ajax-cart-settings"
@@ -883,7 +871,6 @@ export function SecondTab(props) {
                                         <RadioButton
                                             label="Use default settings for Cart Page"
                                             checked={props.offer.placement_setting?.default_cart_page}
-                                            name="cart-settings"
                                             onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
                                             disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                                             name="cart-page-settings"
@@ -895,7 +882,6 @@ export function SecondTab(props) {
                                         <RadioButton
                                             label="Use Template for Cart Page"
                                             checked={!props.offer.placement_setting?.default_cart_page}
-                                            name="cart-settings"
                                             onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
                                             disabled={props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                                             name="cart-page-settings"

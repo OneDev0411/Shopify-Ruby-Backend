@@ -4,8 +4,8 @@ import { PolarisVizProvider, StackedAreaChart } from '@shopify/polaris-viz';
 import { useAuthenticatedFetch } from "../hooks";
 import { useSelector } from 'react-redux';
 import '@shopify/polaris-viz/build/esm/styles.css';
-import {Redirect} from '@shopify/app-bridge/actions';
-import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
+import { Redirect } from '@shopify/app-bridge/actions';
+import { useAppBridge } from "@shopify/app-bridge-react";
 
 export function TotalSalesData(props) {
     const app = useAppBridge();

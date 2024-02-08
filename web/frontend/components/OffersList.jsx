@@ -4,39 +4,30 @@ import {
   IndexTable,
   Filters,
   useIndexResourceState,
-  Page,
   Badge,
-  Link,
-  FooterHelp,
   Pagination,
   Select,
-  LegacyCard, LegacyStack, Image, VerticalStack, Text, ButtonGroup, MediaCard, VideoThumbnail, Layout,
-  Spinner,
+  LegacyCard,
   Modal,
 } from '@shopify/polaris';
 
 import { useState, useCallback, useEffect } from 'react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppQuery, useAuthenticatedFetch } from "../hooks";
+import { useAuthenticatedFetch } from "../hooks";
 import { useSelector } from "react-redux";
 import {CreateOfferCard} from "./CreateOfferCard.jsx";
 import OffersListSkeleton from '../skeletons/OfferListSkeleton.jsx';
 import {Redirect} from '@shopify/app-bridge/actions';
-import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
+import { useAppBridge } from "@shopify/app-bridge-react";
 
-export function OffersList(props) {
+export function OffersList() {
   const app = useAppBridge();
   const resourceName = {
     singular: 'offer',
     plural: 'offers',
   };
-
-  const emptyToastProps = { content: null };
   const [isLoading, setIsLoading] = useState(true);
-  const [toastProps, setToastProps] = useState(emptyToastProps);
-  const info = { offer: { shop_domain: window.location.host } };
-
   const [taggedWith, setTaggedWith] = useState('');
   const [queryValue, setQueryValue] = useState(null);
   const [offersData, setOffersData] = useState([]);
@@ -107,7 +98,7 @@ export function OffersList(props) {
     (value) => setTaggedWith(value),
     [],
   );
-  const handleSorting = useCallback((headingIndex, direction) => {
+  const handleSorting = useCallback(() => {
     console.log('came in handle sorting');
   });
   const handleTaggedWithRemove = useCallback(() => setTaggedWith(null), []);
@@ -250,7 +241,7 @@ export function OffersList(props) {
             setOffersData(data.offers);
             selectedResources.shift();
           })
-        .catch((error) => {
+        .catch(() => {
         })
       }
       else {
@@ -315,7 +306,7 @@ export function OffersList(props) {
         body: JSON.stringify({ offer: { offer_id: resource }, shop: shopAndHost.shop })
       })
         .then((response) => response.json())
-        .then((data) => {
+        .then(() => {
           const dataDup = [...offersData];
           dataDup.find((o) => o.id == resource).status = false;
 
@@ -328,10 +319,6 @@ export function OffersList(props) {
   }
 
   const navigateTo = useNavigate();
-
-  const handleEditOffer = (offer_id) => {
-    navigateTo('/edit-offer', { state: { offerID: offer_id } });
-  }
 
   const handleViewOffer = (offer_id) => {
     localStorage.setItem('Offer-ID', offer_id);

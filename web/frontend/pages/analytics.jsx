@@ -1,14 +1,9 @@
-import {LegacyCard,Page,FooterHelp,Link,Grid,Popover, ActionList, Button,LegacyStack,Image, Select} from '@shopify/polaris';
-import { TitleBar } from "@shopify/app-bridge-react";
-import {CalendarMinor} from '@shopify/polaris-icons';
-import "../components/stylesheets/mainstyle.css";
-import {useState, useCallback} from 'react';
 import React from 'react';
-import { GenericFooter } from '../components/GenericFooter';
-import { TotalSalesData, ConversionRate, OrderOverTimeData, CustomTitleBar} from "../components";
-import {
-  AnalyticsMinor
-} from '@shopify/polaris-icons';
+import {useState, useCallback} from 'react';
+import { Page ,Grid, Select } from '@shopify/polaris';
+import {AnalyticsMinor} from '@shopify/polaris-icons';
+import { TotalSalesData, OrderOverTimeData, CustomTitleBar} from "../components";
+import "../components/stylesheets/mainstyle.css";
   
 export default function AnalyticsOffers() { 
     const [period, setPeriod] = useState('daily');

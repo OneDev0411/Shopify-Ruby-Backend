@@ -1,11 +1,11 @@
 import {Text, Icon, Link } from "@shopify/polaris";
 import {ExternalMinor } from '@shopify/polaris-icons';
-import {infoMinor} from "../assets/index.js";
+
 export function GenericFooter(props) {
   return (
     <div className="custom-footer">
       <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-        <img src={infoMinor} style={{marginRight: '8px'}} />
+        <img src={"https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/info_minor.svg"} style={{marginRight: '8px'}} />
         <Text as="p">
           {props.text}
           {props.linkText ? (

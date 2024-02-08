@@ -5,9 +5,8 @@ import {useNavigate} from 'react-router-dom';
 import {Layout, Page} from '@shopify/polaris';
 import {AddProductMajor} from '@shopify/polaris-icons';
 
-import {CustomTitleBar, GenericFooter, OffersList} from '../components';
+import {CustomTitleBar, OffersList} from '../components';
 import {useAuthenticatedFetch} from "../hooks";
-import {iculogo} from "../assets/index.js";
 
 export default function Offers() {
   const shopAndHost = useSelector(state => state.shopAndHost);
@@ -50,7 +49,7 @@ export default function Offers() {
             ): (
               <CustomTitleBar
                 title="In Cart Upsell & Cross Sell"
-                image={iculogo}
+                image={"https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/ICU-Logo-Small.png"}
               />
             )}
             <Layout>
@@ -63,7 +62,6 @@ export default function Offers() {
             <div className="space-10"></div>
           </Page>
         </div>
-        {/* <GenericFooter text='Need more help? ' linkUrl='#' linkText='Watch the help video' /> */}
       </>
     );
   }

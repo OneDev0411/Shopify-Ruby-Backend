@@ -1,6 +1,5 @@
 import {VerticalStack, LegacyCard, Image, Button, Grid, Pagination} from '@shopify/polaris';
 import {useState, useCallback, useEffect} from 'react';
-import {stars} from "../assets";
 import Slider from "react-slick";
 import React from "react";
 import { useSelector } from 'react-redux';
@@ -9,7 +8,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { useAuthenticatedFetch } from "../hooks";
 import PartnersSkeleton from '../skeletons/PartnersSkeleton';
 
-export function Partners(){
+export function Partners() {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [expandedIndex, setExpandedIndex] = useState(null);
@@ -138,7 +137,7 @@ export function Partners(){
                               width:'60%',
                               marginBottom:'15px',
                               }}
-                              source={stars}
+                              source="https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/5-star.png"
                             />
                             <Button url={partner.app_url} target="blank">View on Shopify App Store</Button>
                             </VerticalStack>

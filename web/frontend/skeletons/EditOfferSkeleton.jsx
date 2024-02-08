@@ -1,4 +1,4 @@
-import { Layout, LegacyCard, SkeletonBodyText, SkeletonTabs, SkeletonPage, TextContainer, SkeletonDisplayText, LegacyStack, Button } from '@shopify/polaris';
+import { Layout, LegacyCard, SkeletonBodyText, SkeletonTabs, SkeletonPage, TextContainer, SkeletonDisplayText, LegacyStack } from '@shopify/polaris';
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 

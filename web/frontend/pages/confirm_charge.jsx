@@ -1,8 +1,7 @@
 import {Page, Layout, Card, Stack, Image} from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
-import {Redirect, Toast} from '@shopify/app-bridge/actions';
+import { Redirect } from '@shopify/app-bridge/actions';
 import { useAppBridge } from '@shopify/app-bridge-react'
-import {woohoo} from "../assets";
 import "../components/stylesheets/mainstyle.css";
 import React from 'react';
 import { useSelector } from 'react-redux';
@@ -27,7 +26,7 @@ export default function ConfirmCharge() {
                 <Card>
                   <Stack distribution="center">
                     <Image 
-                        source={woohoo}
+                        source="https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/woohoo.png"
                     />
                     </Stack>
                     <Stack distribution="center">
