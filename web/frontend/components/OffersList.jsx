@@ -21,7 +21,7 @@ import OffersListSkeleton from '../skeletons/OfferListSkeleton.jsx';
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 
-export function OffersList() {
+export function OffersList(props) {
   const app = useAppBridge();
   const resourceName = {
     singular: 'offer',
