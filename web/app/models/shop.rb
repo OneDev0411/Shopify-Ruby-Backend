@@ -45,7 +45,7 @@ class Shop < ApplicationRecord
     self.update(is_shop_active: true)
     ShopAction.create(
       shop_id: self.id,
-      action_timestamp: self.installed_at.to_i,
+      action_timestamp: Time.now.utc.to_i,
       shopify_domain: self.shopify_domain,
       action: 'install',
       source: 'icu-redesign_shop_setup'
