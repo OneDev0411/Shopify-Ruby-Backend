@@ -726,7 +726,7 @@ module Shopifable
       ((keys.include?('ajax') && theme_app_embed) || keys.exclude?('ajax')))) && offers.present?
       theme_app_extension.update(theme_app_complete: true)
 
-      unless script_tag_id.nil?
+      unless script_tag_id.nil? && self.theme_app_extension.theme_version != '2.0'
         disable_javascript
       end
     end
