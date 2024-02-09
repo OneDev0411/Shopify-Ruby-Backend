@@ -97,11 +97,24 @@
         const itemShopifyID = rule.item_shopify_id;
         const itemName = rule.item_name;
 
+        if (ruleSelector.includes('customer')) {
+            await fetchCustomerTags();
+        }
+
         if (ruleSelector === "on_product_this_product_or_in_collection")           return await visibleOnProductOrColRule(itemType, itemShopifyID, true);
         if (ruleSelector === "on_product_not_this_product_or_not_in_collection")   return await visibleOnProductOrColRule(itemType, itemShopifyID, false);
 
         if (ruleSelector === "url_contains")                                       return visibleIfUrlRule(itemName, true);
         if (ruleSelector === "url_does_not_contain")                               return visibleIfUrlRule(itemName, false);
+
+        if (ruleSelector === "cookie_is_set")                                      return hasCookie(itemName);
+        if (ruleSelector === "cookie_is_not_set")                                  return !hasCookie(itemName);
+
+        if (ruleSelector === "customer_is_tagged")                                 return customerTags.includes(itemName);
+        if (ruleSelector === "customer_is_not_tagged")                             return !customerTags.includes(itemName);
+
+        if (ruleSelector === "in_location")                                        return customerCountryCode === itemName;
+        if (ruleSelector === "not_in_location")                                    return !customerCountryCode === itemName;
 
         return true;
     };
@@ -129,15 +142,6 @@
 
         if (ruleSelector === "total_at_least")                                     return cartTotalPrice >= parseFloat(ruleAmount);
         if (ruleSelector === "total_at_most")                                      return cartTotalPrice <= parseFloat(ruleAmount);
-
-        if (ruleSelector === "cookie_is_set")                                      return hasCookie(itemName);
-        if (ruleSelector === "cookie_is_not_set")                                  return !hasCookie(itemName);
-
-        if (ruleSelector === "customer_is_tagged")                                 return customerTags.includes(itemName);
-        if (ruleSelector === "customer_is_not_tagged")                             return !customerTags.includes(itemName);
-
-        if (ruleSelector === "in_location")                                        return customerCountryCode === itemName;
-        if (ruleSelector === "not_in_location")                                    return !customerCountryCode === itemName;
 
         if (ruleSelector === "cart_contains_recharge")                             return itemsInCart.some(item => item?.rechargeID === itemName);
         if (ruleSelector === "cart_does_not_contain_recharge")                     return !itemsInCart.some(item => item?.rechargeID === itemName);
@@ -315,9 +319,17 @@
         return false;
     }
 
+    const fetchCustomerTags = () => {
+        return fetch('/apps/proxy/customer_tags')
+          .then(resp => resp.json())
+          .then( data => {
+              customerTags = data
+          });
+    }
+
     const fetchCart = () => {
         if (offerSettings.uses_customer_tags) {
-            return fetch('/apps/in-cart-upsell/customer_tags')
+            return fetch('/apps/proxy/customer_tags')
               .then(resp => resp.json())
               .then( data => {
                   customerTags = data
@@ -493,6 +505,8 @@
         if (offer_title) nudgeContainer.appendChild(offer_title);
 
         nudgeContainer.appendChild( createVariantsContainerWithChildren() );
+
+        addCSSToPage();
 
         const nudgeParent = document.querySelector('#nudge-offer-list');
         if (nudgeParent) nudgeParent.appendChild(nudgeContainer);
@@ -1591,5 +1605,21 @@
         }
 
     }
+
+    const addCSSToPage = () => {
+        const head = document.head || document.getElementsByTagName('head')[0];
+
+        let style = document.createElement('style');
+        style.id = 'InCartUpsellCSS';
+        console.log(offer.custom_css)
+        style.appendChild(document.createTextNode(offer.custom_css));
+
+        head.appendChild(style);
+
+        const linkElement = document.createElement('link');
+        linkElement.rel = 'stylesheet';
+        linkElement.href = "https://fonts.googleapis.com/css2?family=Caveat&family=Comfortaa&family=EB+Garamond&family=Lexend&family=Lobster&family=Lora&family=Merriweather&family=Montserrat&family=Oswald&family=Pacifico&family=Playfair+Display&family=Roboto&family=Spectral&display=swap";
+        head.appendChild(linkElement);
+    };
 })();
 

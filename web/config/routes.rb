@@ -70,6 +70,7 @@ Rails.application.routes.draw do
   get 'proxy/all_offers', to: 'proxy#all_offers'
   get 'proxy/shop_collections', to: 'proxy#shop_collections'
   get 'proxy/theme_app_completed', to: 'proxy#theme_app_completed'
+  get 'proxy/customer_tags', to: 'proxy#customer_tags'
 
   # Any other routes will just render the react app
   match '*path' => 'home#index', via: [:get, :post]

@@ -13,8 +13,7 @@ module Api
         if @shop.theme_app_extension.nil?
           @shop.theme_app_extension = ThemeAppExtension.new
         end
-        @shop.theme_app_extension_check
-
+        Sidekiq::Client.push('class' => 'ShopWorker::ThemeUpdateJob', 'args' => [@shop.shopify_domain], 'queue' => 'themes', 'at' => Time.now.to_i + 3)
 
         render "shops/current_shop"
       end
