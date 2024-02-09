@@ -1206,7 +1206,7 @@ class Shop < ApplicationRecord
   end
 
   def publish_or_delete_script_tag
-    if !self.theme_app_extension.theme_app_complete
+    if !self.theme_app_extension.theme_app_complete || self.theme_app_extension.theme_version != '2.0'
       self.publish_async
     elsif !script_tag_id.nil?
       self.disable_javascript
