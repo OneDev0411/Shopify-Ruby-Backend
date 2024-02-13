@@ -836,7 +836,6 @@ class Shop < ApplicationRecord
       shop_id: id,
       default_template_settings: default_template_settings,
       has_redirect_to_product: has_redirect_to_product?,
-      has_pro_features: has_pro_features?
       theme_version: theme_app_extension&.theme_version || ''
     }
 
