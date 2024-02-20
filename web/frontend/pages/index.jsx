@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from 'react-redux';
 import {Link, useNavigate} from 'react-router-dom';
 
-import { Banner, Grid, Layout, Page } from "@shopify/polaris";
+import { Banner, Grid, Layout, Page, Spinner} from "@shopify/polaris";
 
 import { useAuthenticatedFetch } from "../hooks";
 import { isSubscriptionActive } from "../services/actions/subscription";
 import { CustomTitleBar, OffersList, OrderOverTimeData, TotalSalesData } from "../components";
 
 import "../components/stylesheets/mainstyle.css";
-import {ThemeAppCard} from "../components/CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 
