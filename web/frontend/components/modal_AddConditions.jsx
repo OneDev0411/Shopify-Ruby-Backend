@@ -69,7 +69,7 @@ export function ModalAddConditions(props) {
   }
 
   function countryOptions(){
-    var names = [{ value: '', label: 'Select a country' }]
+    const names = [{ value: '', label: 'Select a country' }]
     countriesList.map(([code, name]) => {
       names.push({ value: code, label: name })
     })
