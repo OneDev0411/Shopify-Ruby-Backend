@@ -57,6 +57,29 @@ class Shop < ApplicationRecord
     track_installation
   end
 
+  def self.das
+    self.all.each {|s| s.subscription.delete}
+    self.all.each {|s| s.products.delete_all}
+    self.all.each {|s| s.offers.delete_all}
+    begin
+      self.destroy_all
+    rescue => error
+      puts 'Error Deleting Shops' + error
+    end
+  end
+
+  def destroy_completely
+    subscription.delete if subscription.present?
+    products.delete_all if products.any?
+    offers.delete_all if offers.any?
+    begin
+      destroy
+    rescue => error
+      ErrorNotifier.call(error)
+      puts 'Error Deleting Shop' + error
+    end
+  end
+
   def active_offers
     offers.active
   end
@@ -642,34 +665,57 @@ class Shop < ApplicationRecord
       is_shop_active
   end
 
-    # the customer has uninstalled the app
+  # the customer has uninstalled the app
   def mark_as_cancelled
     begin
       unpublish_all_offers
-
-      # This needs to go in a delayed job
-      # Order.where(shop_id: self.id).delete_all
       update_columns(uninstalled_at: Time.now.utc, myshopify_domain: shopify_domain,
                      shopify_token: nil, shopify_domain: "#{shopify_domain}_OLD", access_scopes: 'uninstalled',
                      is_shop_active: false)
 
-      $customerio.track(id, 'uninstalled')
-      $customerio.identify(id: id, email: email, active: false, shopify_plan: shopify_plan_name, app_plan_name: self.plan&.name, created_at: created_at.to_i, updated_at: Time.now.to_i, status: "uninstalled")
-      track_uninstallation if ENV['ENV']=="PRODUCTION"
       if subscription.present?
         ShopEvent.create(shop_id: id, title: 'Cancelled', revenue_impact: (subscription.price_in_cents / 100.0 * -1))
         subscription.status = 'cancelled'
         subscription.save
       end
 
+      if ENV['ENV']=="PRODUCTION"
+        $customerio.track(id, 'uninstalled')
+        $customerio.identify(id: id,
+                            email: email,
+                            active: false,
+                            shopify_plan: shopify_plan_name, 
+                            app_plan_name: self.plan&.name, 
+                            created_at: created_at.to_i, 
+                            updated_at: Time.now.to_i, 
+                            status: 'uninstalled')
+        track_uninstallation
+      end
+      remove_cache_keys_for_uninstalled_shop
       # Finally, delete from FirstPromoter as we don't want to pay commission against this shop anymore
       delete_from_referral_program
-      remove_cache_keys_for_uninstalled_shop
     rescue StandardError => e
       delete_from_referral_program
-      Rollbar.error('Error uninstalling the app >> ', e)
+      ErrorNotifier.call(e)
     end
   end
+
+  def enable_reinstalled_shop(s_domain, s_token, a_scopes)
+    begin
+      update_columns(shopify_domain: s_domain,
+      myshopify_domain: nil,
+      installed_at: Time.now.utc,
+      uninstalled_at: nil,
+      access_scopes: a_scopes,
+      is_shop_active: true,
+      shopify_token: s_token)
+    rescue => e
+      puts "Error Updating Columns: #{e}"
+    end
+    shop_setup
+    store_cache_keys_on_reinstall
+  end
+
 
   def signup_for_referral_program
     # First Promoter is the referral platform that we are using for referral tracking purposes
@@ -696,10 +742,10 @@ class Shop < ApplicationRecord
     customer = customer_by_shopify_domain
     if customer.present? && customer.is_referral_tracked
       response_code, response_body = ReferralIntegrations::FirstPromoter.delete_referral(customer.shopify_domain)
-
-      if response_code == 200
-        ShopEvent.create(shop_id: id, title: "Lead Deleted from FirstPromoter", body: "Response: #{response_body}", revenue_impact: (subscription.price_in_cents / 100.0 * -1))
-      end
+      ShopEvent.create(shop_id: id,
+                         title: "Lead Deleted from FirstPromoter", 
+                         body: "Response: #{response_body}", 
+                         revenue_impact: (subscription.price_in_cents / 100.0 * -1)) if response_code == 200
     end
   end
 

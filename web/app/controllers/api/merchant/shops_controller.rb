@@ -88,14 +88,14 @@ module Api
           if res[:result] == true
             templatesOfCurrentTheme = ThemeSettingForTemplate.where(theme_name: res[:message])
             render json: {
-              themeExist: res[:result],
+              themeExist: res.dig(:result),
               shopify_theme_name: res[:message],
               templatesOfCurrentTheme: templatesOfCurrentTheme,
               theme_names_having_data: ThemeDefaultSetting.pluck(:theme_name).uniq
             }
           else
             render json: {
-              themeExist: res[:result],
+              themeExist: res.dig(:result),
               shopify_theme_name: res[:message]
             }
           end

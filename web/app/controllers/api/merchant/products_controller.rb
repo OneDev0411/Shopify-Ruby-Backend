@@ -7,8 +7,10 @@ module Api
       def element_search
         result = product_params['type'] == 'product' ? product_search : collection_search
         products = @icushop.products
-        result.each do |hashedValue|
-          hashedValue[:variants] = products.find_by(shopify_id: hashedValue[:id])&.variants_details_for_searchable_product
+        if result.present?
+          result.each do |hashedValue|
+            hashedValue[:variants] = products.find_by(shopify_id: hashedValue[:id])&.variants_details_for_searchable_product
+          end
         end
         render json: result
       end
