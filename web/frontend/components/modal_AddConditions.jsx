@@ -68,10 +68,10 @@ export function ModalAddConditions(props) {
     props.setRule(prev => ({ ...prev, item_type: item, item_shopify_id: shopify_id, item_name: title }))
   }
 
-  function countryNames(){
-    var names = ['Select a country']
+  function countryOptions(){
+    const names = [{ value: '', label: 'Select a country' }]
     countriesList.map(([code, name]) => {
-      names.push(name)
+      names.push({ value: code, label: name })
     })
     return names;
   }
@@ -152,7 +152,7 @@ export function ModalAddConditions(props) {
           <LegacyStack.Item>
             <Select
               label="Select a country"
-              options={countryNames()}
+              options={countryOptions()}
               id='item_name'
               onChange={handleChange}
               value={props.rule.item_name}
