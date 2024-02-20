@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Card, AppProvider, Text, Image, Grid, Link, Spinner } from '@shopify/polaris';
 import "../components/stylesheets/editOfferStyle.css";
 import { useAuthenticatedFetch } from '../hooks';
-import SummarySkeleton from '../skeletons/SummarySkeleton';
-
 
 const Summary = (props) => {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -15,8 +13,6 @@ const Summary = (props) => {
     const [converted, setConverted] = useState(0);
     const [totalDisplayed, setTotalDisplayed] = useState(0);
     const navigateTo = useNavigate();
-
-    const summaryLabels = ['Number of Views', 'Number of Clicks', 'Revenue', 'Conversion Rate']
 
     const handleViewAnalytics = () => {
       navigateTo('/analytics');
@@ -75,14 +71,22 @@ const Summary = (props) => {
       <>
         <AppProvider>
           <Card>
+            <div className="comp-cont">
+              <span className="text-decor">Conversion Summary</span>
+              <span><Link onClick={handleViewAnalytics} removeUnderline>View analytics</Link></span>
+            </div>
             {isLoading ? (
-              <SummarySkeleton labels={summaryLabels} sectionsCount={4} />
+              <div style={{
+                  overflow: 'hidden',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  minHeight: '20vh',
+              }}>
+                <Spinner size="large" color="teal"/>
+              </div>
               ) : (
               <>
-                <div className="comp-cont">
-                  <span className="text-decor">Conversion Summary</span>
-                  <span><Link onClick={handleViewAnalytics} removeUnderline>View analytics</Link></span>
-                </div>
                 <Grid columns={{sm: 6}}>
                       <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 7, xl: 7}}>
                           <div className="card-space">

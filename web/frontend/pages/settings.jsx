@@ -1,4 +1,4 @@
-import { LegacyCard, Grid, Button, Page, SkeletonBodyText } from "@shopify/polaris";
+import { LegacyCard, Grid, Button, Page } from "@shopify/polaris";
 import {
     SettingsMajor
 } from '@shopify/polaris-icons';
@@ -190,7 +190,7 @@ export default function Settings() {
                     <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }}>
                         <LegacyCard sectioned columnSpan={{ md: 6, lg: 6, xl: 6 }}>
                             {/* Tabs */}
-                            {currentShop ? <SettingTabs formData={formData} currentShop={currentShop} updateShop={updateShop} handleFormChange={handleFormChange} /> : <SkeletonBodyText lines={13} />}
+                            {currentShop ? <SettingTabs formData={formData} currentShop={currentShop} updateShop={updateShop} handleFormChange={handleFormChange} /> : 'Loading...'}
                         </LegacyCard>
                     </Grid.Cell>
                 </Grid>
