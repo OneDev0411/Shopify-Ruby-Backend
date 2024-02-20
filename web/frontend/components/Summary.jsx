@@ -14,8 +14,6 @@ const Summary = (props) => {
     const [totalDisplayed, setTotalDisplayed] = useState(0);
     const navigateTo = useNavigate();
 
-    const summaryLabels = ['Number of Views', 'Number of Clicks', 'Revenue', 'Conversion Rate']
-
     const handleViewAnalytics = () => {
       navigateTo('/analytics');
     }

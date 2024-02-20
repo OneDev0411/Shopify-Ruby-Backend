@@ -10,8 +10,6 @@ const AbAnalytics = (props) => {
     const [bAnalytics, setBAnalytics] = useState();
     const fetch = useAuthenticatedFetch(shopAndHost.host);
 
-    const optionLabels = ['Option A', 'Option B']
-
     const getAbAnalytics = useCallback((offerId, shop, version, setRequiredState) => {
         fetch(`/api/merchant/offers/load_ab_analytics`, {
             method: 'POST',
