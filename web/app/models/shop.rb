@@ -57,17 +57,6 @@ class Shop < ApplicationRecord
     track_installation
   end
 
-  def self.das
-    self.all.each {|s| s.subscription.delete}
-    self.all.each {|s| s.products.delete_all}
-    self.all.each {|s| s.offers.delete_all}
-    begin
-      self.destroy_all
-    rescue => error
-      puts 'Error Deleting Shops' + error
-    end
-  end
-
   # This method is intended to delete shops that are forcefully being created and controlled by 
   # shopify app gem on re-install, We enable the the old shop and deletes the new one. 
   # Never use this method on un-install app.
@@ -684,6 +673,7 @@ class Shop < ApplicationRecord
                          revenue_impact: (subscription.price_in_cents / 100.0 * -1))
         subscription.status = 'cancelled'
         subscription.save
+        puts 'Cancelling Subscription...'
       end
       track_uninstallation
       remove_cache_keys_for_uninstalled_shop
@@ -704,8 +694,13 @@ class Shop < ApplicationRecord
       access_scopes: a_scopes,
       is_shop_active: true,
       shopify_token: s_token)
+      
+      if subscription.present?
+        subscription.status = 'approved'
+        subscription.save
+      end
     rescue => e
-      puts "Error Updating Columns: #{e}"
+      ErrorNotifier.call(e)
     end
     shop_setup
     store_cache_keys_on_reinstall
