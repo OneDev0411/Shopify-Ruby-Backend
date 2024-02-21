@@ -839,13 +839,22 @@ module Shopifable
   ####  CLASS METHODS IN THE MIXIN #####
 
   class_methods do
-    def find_or_create_shop(current_shopify_domain)
+
+    # This method will return shop acc to the shopify domain, it is receving through params.
+    # Will return the shop if it finds through shopify_domain, otherwise if shop can be find through
+    # myshopify_domain, means that user is re-installing the old shop, so we will enable the old shop,
+    # and deletes the newly created shop.
+
+    # While enabling the old shop, we are using access scopes of new shop and updating the coloum because
+    # user can change them before re installing and can be caught through new shop that is created with that data.
+
+    def fetch_shop(current_shopify_domain)
       icushop = Shop.find_by(shopify_domain: current_shopify_domain)
       old_shop = Shop.find_by(myshopify_domain: current_shopify_domain)
-      if old_shop.present? && icushop.id != old_shop.id
+      if old_shop.present? && icushop&.id != old_shop.id
         old_shop.enable_reinstalled_shop(current_shopify_domain,
                                          icushop.shopify_token,
-                                         icushop.access_scopes )
+                                         icushop.access_scopes)
         icushop.destroy_completely
         return old_shop
       end

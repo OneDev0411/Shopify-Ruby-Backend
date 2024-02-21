@@ -68,6 +68,10 @@ class Shop < ApplicationRecord
     end
   end
 
+  # This method is intended to delete shops that are forcefully being created and controlled by 
+  # shopify app gem on re-install, We enable the the old shop and deletes the new one. 
+  # Never use this method on un-install app.
+
   def destroy_completely
     subscription.delete if subscription.present?
     products.delete_all if products.any?
@@ -76,7 +80,6 @@ class Shop < ApplicationRecord
       destroy
     rescue => error
       ErrorNotifier.call(error)
-      puts 'Error Deleting Shop' + error
     end
   end
 
@@ -482,6 +485,7 @@ class Shop < ApplicationRecord
     begin
       force_purge_cache
     rescue ActiveResource::UnauthorizedAccess => e
+      ErrorNotifier.call(e)
       return e.message
     end
   end
@@ -669,28 +673,19 @@ class Shop < ApplicationRecord
   def mark_as_cancelled
     begin
       unpublish_all_offers
+      # This needs to go in a delayed job
+      # Order.where(shop_id: self.id).delete_all
       update_columns(uninstalled_at: Time.now.utc, myshopify_domain: shopify_domain,
                      shopify_token: nil, shopify_domain: "#{shopify_domain}_OLD", access_scopes: 'uninstalled',
                      is_shop_active: false)
 
       if subscription.present?
-        ShopEvent.create(shop_id: id, title: 'Cancelled', revenue_impact: (subscription.price_in_cents / 100.0 * -1))
+        ShopEvent.create(shop_id: id, title: 'Cancelled', 
+                         revenue_impact: (subscription.price_in_cents / 100.0 * -1))
         subscription.status = 'cancelled'
         subscription.save
       end
-
-      if ENV['ENV']=="PRODUCTION"
-        $customerio.track(id, 'uninstalled')
-        $customerio.identify(id: id,
-                            email: email,
-                            active: false,
-                            shopify_plan: shopify_plan_name, 
-                            app_plan_name: self.plan&.name, 
-                            created_at: created_at.to_i, 
-                            updated_at: Time.now.to_i, 
-                            status: 'uninstalled')
-        track_uninstallation
-      end
+      track_uninstallation
       remove_cache_keys_for_uninstalled_shop
       # Finally, delete from FirstPromoter as we don't want to pay commission against this shop anymore
       delete_from_referral_program
@@ -742,10 +737,12 @@ class Shop < ApplicationRecord
     customer = customer_by_shopify_domain
     if customer.present? && customer.is_referral_tracked
       response_code, response_body = ReferralIntegrations::FirstPromoter.delete_referral(customer.shopify_domain)
-      ShopEvent.create(shop_id: id,
-                         title: "Lead Deleted from FirstPromoter", 
-                         body: "Response: #{response_body}", 
-                         revenue_impact: (subscription.price_in_cents / 100.0 * -1)) if response_code == 200
+      if response_code == 200
+        ShopEvent.create(shop_id: id,
+                          title: "Lead Deleted from FirstPromoter", 
+                          body: "Response: #{response_body}", 
+                          revenue_impact: (subscription.price_in_cents / 100.0 * -1))
+      end
     end
   end
 
