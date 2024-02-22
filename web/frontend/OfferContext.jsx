@@ -67,7 +67,6 @@ export default function OfferProvider({ children }) {
     setOffer({...updatedOffer});
   }
 
-  const test = "test from context"
   return (
     <OfferContext.Provider
       value={{offer, setOffer, updateOffer, updateProductsOfOffer, updateIncludedVariants, updateNestedAttributeOfOffer}}
