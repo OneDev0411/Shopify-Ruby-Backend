@@ -174,50 +174,6 @@ export default function EditPage() {
         });
     }
 
-
-    //Called whenever the shop changes in any child component
-    function updateNestedAttributeOfOffer(updatedValue, ...updatedKey) {
-        if(updatedKey.length == 1) {
-            setOffer(previousState => {
-                return { ...previousState, [updatedKey[0]]: updatedValue };
-            });
-        }
-        else if(updatedKey.length == 2) {
-            setOffer(previousState => ({
-                ...previousState,
-                [updatedKey[0]]: {
-                    ...previousState[updatedKey[0]],
-                    [updatedKey[1]]: updatedValue 
-                }
-            }));
-        }
-        else if(updatedKey.length == 3) {
-            setOffer(previousState => ({
-                ...previousState,
-                [updatedKey[0]]: {
-                    ...previousState[updatedKey[0]],
-                    [updatedKey[1]]: {
-                        ...previousState[updatedKey[0]][updatedKey[1]],
-                        [updatedKey[2]]: updatedValue
-                    }
-                }
-            }));
-        }
-    }
-
-    // Called to update the included variants in offer
-    function updateIncludedVariants(selectedItem, selectedVariants) {
-        const updatedOffer = {...offer};
-        if (Array.isArray(selectedItem)) {
-            for (var key in selectedVariants) {
-                updatedOffer.included_variants[key] = selectedVariants[key];
-            }
-        } else {
-            updatedOffer.included_variants[selectedItem] = selectedVariants;
-        }
-        setOffer({...updatedOffer});
-    }
-
     //Called whenever the shop changes in any child component
     function updateShop(updatedValue, ...updatedKey) {
         if (updatedKey.length == 1) {
