@@ -76,4 +76,4 @@ export default function OfferProvider({ children }) {
   );
 }
 
-export const OfferContext = createContext({});
+export const OfferContext = createContext(OFFER_DEFAULTS);
