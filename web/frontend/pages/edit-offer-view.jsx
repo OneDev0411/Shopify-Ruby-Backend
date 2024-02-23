@@ -8,7 +8,7 @@ import {
 } from "@shopify/polaris";
 import "@shopify/polaris/build/esm/styles.css";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import {useState, useEffect, useContext} from "react";
 import { useSelector } from "react-redux";
 import { GenericFooter } from "../components";
 import Summary from "../components/Summary";
@@ -17,8 +17,10 @@ import { OfferPreview } from "../components/OfferPreview";
 import { useAuthenticatedFetch } from "../hooks";
 import AbAnalytics from "../components/abAnalytics";
 import "../components/stylesheets/mainstyle.css";
+import {OfferContext} from "../OfferContext.jsx";
 
 const EditOfferView = () => {
+  const { offer, setOffer } = useContext(OfferContext);
   const shopAndHost = useSelector((state) => state.shopAndHost);
   const [isLoading, setIsLoading] = useState(false);
   const offerID = localStorage.getItem('Offer-ID');
@@ -26,7 +28,6 @@ const EditOfferView = () => {
   const [offerStatus, setOfferStatus] = useState('');
   const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState();
   const [checkKeysValidity, setCheckKeysValidity] = useState({});
-  const [offer, setOffer] = useState({});
   const navigateTo = useNavigate();
   const handleEditOffer = (offer_id) => {
     navigateTo('/edit-offer', { state: { offerID: offer_id } });
@@ -196,7 +197,7 @@ const EditOfferView = () => {
                 <Grid>
                   <Grid.Cell columnSpan={{xs: 6, sm: 6, md: 6, lg: 8, xl: 8}}>
                     <div className="widget-visibility">
-                      <OfferPreview offer={offer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity} previewMode/>
+                      <OfferPreview checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity} previewMode/>
                     </div>
                   </Grid.Cell>
                   <Grid.Cell columnSpan={{xs: 6, sm: 6, md: 6, lg: 4, xl: 4}}>
