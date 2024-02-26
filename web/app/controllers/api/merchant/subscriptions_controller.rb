@@ -14,7 +14,8 @@ module Api
       def update
         @plan = Plan.find_by(internal_name: subscription_params[:plan_internal_name])
         if @plan.blank?
-          redirect_to edit_subscription_path, notice: 'Error: Plan Not Found'
+          @message = 'Error: Plan Not Found'
+          render "subscriptions/update"
           return
         end
 
@@ -23,8 +24,10 @@ module Api
           @plan = new_plan if new_plan.present?
         end
 
-        if @plan.id == @subscription.plan_id && @subscription.status == 'approved'
-          redirect_to root_path, notice: 'Your subscription was already updated!' and return
+        if @plan.id == @subscription.plan_id && @subscription.status == 'approved' && !@subscription.subscription_not_paid
+          @message = 'Your subscription was already updated!'
+          render "subscriptions/update"
+          return
         end
 
         if @icushop.in_trial_period? && @plan.free_plan?

@@ -27,12 +27,13 @@ module Api
           @icushop.plan = Plan.find_by(:internal_name => 'free_plan')
           @icushop.subscription.update_attribute(:free_plan_after_trial, false)
           if @icushop.plan.internal_name == 'free_plan'
-            offers = @icushop.offers.where(active: true)
-            offers.length > 0 && @icushop.unpublish_extra_offers
+            @icushop.unpublish_extra_offers
           end
         end
 
-
+        if @icushop.subscription.status == 'pending_charge_approval'
+          @icushop.subscription.shopify_subscription_status
+        end
 
         if @icushop.in_trial_period? && @icushop.plan.internal_name == 'trial_plan'
           @icushop.subscription.update_attribute(:free_plan_after_trial, true)

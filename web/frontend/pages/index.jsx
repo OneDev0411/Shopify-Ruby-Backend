@@ -1,21 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Link, useNavigate} from 'react-router-dom';
 
 import { Banner, Grid, Layout, Page, Spinner} from "@shopify/polaris";
 
 import { useAuthenticatedFetch } from "../hooks";
 import { isSubscriptionActive } from "../services/actions/subscription";
+import { fetchShopData } from "../services/actions/shop";
+
 import { CustomTitleBar, OffersList, OrderOverTimeData, TotalSalesData } from "../components";
 
 import "../components/stylesheets/mainstyle.css";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 
+import ModalChoosePlan from "../components/modal_ChoosePlan.jsx";
+import { setIsSubscriptionUnpaid } from "../store/reducers/subscriptionPaidStatusSlice.js";
+
 export default function HomePage() {
   const app = useAppBridge();
   const shopAndHost = useSelector(state => state.shopAndHost);
+  const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
   const fetch = useAuthenticatedFetch(shopAndHost.host);
+  const reduxDispatch = useDispatch();
 
   const [currentShop, setCurrentShop] = useState(null);
   const [planName, setPlanName] = useState();
@@ -53,14 +60,8 @@ export default function HomePage() {
   useEffect(() => {
     let redirect = Redirect.create(app);
     setIsLoading(true);
-    fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then( (response) => { return response.json(); })
-      .then( (data) => {
+    fetchShopData(shopAndHost.shop)
+      .then((data) => {
         if (data.redirect_to) {
           redirect.dispatch(Redirect.Action.APP, data.redirect_to);
       } else {
@@ -68,6 +69,7 @@ export default function HomePage() {
         setCurrentShop(data.shop);
         setPlanName(data.plan);
         setTrialDays(data.days_remaining_in_trial);
+        reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
 
         // notify intercom as soon as app is loaded and shop info is fetched
         notifyIntercom(data.shop);
@@ -76,7 +78,7 @@ export default function HomePage() {
       .catch((error) => {
         console.log("error", error);
       })
-  }, [setCurrentShop, setPlanName, setTrialDays])
+  }, [setCurrentShop, setPlanName, setTrialDays, reduxDispatch])
 
   return (
     <Page>
@@ -94,6 +96,7 @@ export default function HomePage() {
         </div>
       ) : (
         <>
+          {isSubscriptionUnpaid && <ModalChoosePlan />}
           <CustomTitleBar
             title="In Cart Upsell & Cross Sell"
             image={"https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/ICU-Logo-Small.png"}

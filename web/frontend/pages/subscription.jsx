@@ -23,6 +23,7 @@ export default function Subscription() {
     const [unpublishedOfferIds, setUnpublishedOfferIds] = useState();
     const app = useAppBridge();
     const [isLoading, setIsLoading] = useState(false);
+    const [isSubscriptionUnpaid, setIsSubscriptionUnpaid] = useState(false);
 
     async function handlePlanChange (internal_name) {
         let redirect = Redirect.create(app);
@@ -68,6 +69,7 @@ export default function Subscription() {
                 setTrialDays(data.days_remaining_in_trial);
                 setActiveOffersCount(data.active_offers_count);
                 setUnpublishedOfferIds(data.unpublished_offer_ids)
+                setIsSubscriptionUnpaid(data.subscription_not_paid)
            })
            .catch((error) => {
             console.log("error", error);
@@ -117,7 +119,7 @@ export default function Subscription() {
                 </Layout.Section>
                 <Layout.Section>
                   <LegacyCard title="Paid"
-                              primaryFooterAction={(planName==='flex' && isSubscriptionActive(currentSubscription)) ? null : {content: 'Upgrade', onClick: () => handlePlanChange('plan_based_billing')}}
+                              primaryFooterAction={(planName==='flex' && isSubscriptionActive(currentSubscription)) && !isSubscriptionUnpaid ? null : {content: 'Upgrade', onClick: () => handlePlanChange('plan_based_billing')}}
                               sectioned
                   >
                     <LegacyStack>

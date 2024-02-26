@@ -13,6 +13,7 @@ import {
 import {homeImage} from "../assets/index.js";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
+import { fetchShopData } from "../services/actions/shop";
 
 const ShopContext = createContext(null);
 
@@ -37,8 +38,8 @@ export function CreateOfferCard() {
   useEffect(() => {
     const fetchCurrentShop = async () => {
       try {
-        const data = await fetchShopData(shopAndHost.shop);
-        setShopData(data);
+        const { shop, plan, days_remaining_in_trial } = await fetchShopData(shopAndHost.shop);
+        setShopData({ currentShop: shop, planName: plan, trialDays: days_remaining_in_trial });
       } catch (error) {
         console.log("error", error);
       }
@@ -185,30 +186,4 @@ function VideoModal({ active, handleClose }) {
       </Modal.Section>
     </Modal>
   );
-}
-
-// This service function should be placed in a separate file
-async function fetchShopData(shop) {
-  try {
-    const response = await fetch(`/api/merchant/current_shop?shop=${shop}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-
-    const data = await response.json();
-    return {
-      currentShop: data.shop,
-      planName: data.plan,
-      trialDays: data.days_remaining_in_trial,
-    };
-  } catch (error) {
-    console.error("Failed to fetch shop data:", error);
-    throw error;
-  }
 }

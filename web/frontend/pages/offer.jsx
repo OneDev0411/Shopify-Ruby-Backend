@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from 'react-router-dom';
 
 import {Layout, Page} from '@shopify/polaris';
@@ -8,23 +8,24 @@ import {AddProductMajor} from '@shopify/polaris-icons';
 import {CustomTitleBar, OffersList} from '../components';
 import {useAuthenticatedFetch} from "../hooks";
 
+import ModalChoosePlan from '../components/modal_ChoosePlan';
+import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatusSlice';
+import { fetchShopData } from "../services/actions/shop";
+
 export default function Offers() {
   const shopAndHost = useSelector(state => state.shopAndHost);
   const fetch = useAuthenticatedFetch(shopAndHost.host);
   const navigateTo = useNavigate();
+  const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
 
   const [hasOffers, setHasOffers] = useState();
+  const reduxDispatch = useDispatch();
 
   useEffect(() => {
-    fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then( (response) => { return response.json(); })
-      .then( (data) => {
+    fetchShopData(shopAndHost.shop)
+      .then((data) => {
         setHasOffers(data.has_offers);
+        reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
       })
       .catch((error) => {
         console.log("error", error);
@@ -37,6 +38,7 @@ export default function Offers() {
 
     return (
       <>
+        { isSubscriptionUnpaid && <ModalChoosePlan /> }
         <div className="min-height-container">
           <Page fullWidth>
             {hasOffers ? (

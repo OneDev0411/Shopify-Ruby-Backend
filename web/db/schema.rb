@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_04_135454) do
+ActiveRecord::Schema[7.0].define(version: 2024_02_01_181410) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -33,6 +33,20 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_04_135454) do
     t.index ["email"], name: "index_admins_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admins_on_reset_password_token", unique: true
     t.index ["unlock_token"], name: "index_admins_on_unlock_token", unique: true
+  end
+
+  create_table "advanced_placement_settings", force: :cascade do |t|
+    t.boolean "advanced_placement_setting_enabled"
+    t.string "custom_product_page_dom_selector"
+    t.string "custom_product_page_dom_action"
+    t.string "custom_cart_page_dom_selector"
+    t.string "custom_cart_page_dom_action"
+    t.string "custom_ajax_dom_selector"
+    t.string "custom_ajax_dom_action"
+    t.bigint "offer_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["offer_id"], name: "index_advanced_placement_settings_on_offer_id"
   end
 
   create_table "cases", force: :cascade do |t|
@@ -324,6 +338,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_04_135454) do
     t.boolean "in_ajax_cart", default: false
     t.boolean "in_product_page", default: false
     t.integer "position_order", default: 1
+    t.jsonb "css_options"
+    t.boolean "save_as_default_setting", default: false
+    t.text "custom_css"
+    t.bigint "total_clicks", default: 0, null: false
+    t.bigint "total_views", default: 0, null: false
+    t.bigint "total_revenue", default: 0, null: false
     t.index ["product_id"], name: "index_offers_on_product_id"
     t.index ["shop_id"], name: "index_offers_on_shop_id"
   end
@@ -373,6 +393,19 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_04_135454) do
     t.datetime "updated_at", precision: nil, null: false
     t.string "sidekiq_id"
     t.index ["shop_id"], name: "index_pending_jobs_on_shop_id"
+  end
+
+  create_table "placement_settings", force: :cascade do |t|
+    t.boolean "default_ajax_cart"
+    t.boolean "default_product_page"
+    t.boolean "default_cart_page"
+    t.integer "template_ajax_id"
+    t.integer "template_product_id"
+    t.integer "template_cart_id"
+    t.bigint "offer_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["offer_id"], name: "index_placement_settings_on_offer_id"
   end
 
   create_table "plans", force: :cascade do |t|
@@ -434,6 +467,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_04_135454) do
     t.datetime "most_popular_companions_updated_at", precision: nil
     t.integer "orders_count"
     t.integer "status", default: 1
+    t.bigint "original_shopify_id"
     t.index ["shop_id"], name: "index_products_on_shop_id"
     t.index ["shopify_id"], name: "index_products_on_shopify_id"
     t.index ["title"], name: "index_products_on_title"
@@ -491,6 +525,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_04_135454) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["shop_id"], name: "index_setups_on_shop_id"
+  end
+
+  create_table "shop_actions", force: :cascade do |t|
+    t.bigint "shop_id"
+    t.integer "action_timestamp"
+    t.string "shopify_domain"
+    t.string "action"
+    t.string "source"
+    t.datetime "created_at", null: false
+    t.index ["shop_id"], name: "index_shop_actions_on_shop_id"
   end
 
   create_table "shop_events", force: :cascade do |t|
@@ -634,6 +678,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_04_135454) do
     t.integer "unpublished_offer_ids", array: true
     t.boolean "activated", default: true
     t.integer "orders_through_offers", default: 0, null: false
+    t.jsonb "default_template_settings"
+    t.boolean "is_shop_active"
     t.index ["created_at"], name: "index_shops_on_created_at"
     t.index ["uninstalled_at"], name: "index_shops_on_uninstalled_at"
   end
@@ -702,6 +748,39 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_04_135454) do
     t.index ["shop_id"], name: "index_tags_on_shop_id"
   end
 
+  create_table "theme_app_extensions", force: :cascade do |t|
+    t.bigint "shop_id"
+    t.boolean "product_block_added", default: false
+    t.boolean "cart_block_added", default: false
+    t.boolean "collection_block_added", default: false
+    t.boolean "theme_app_embed", default: false
+    t.boolean "theme_app_complete", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "theme_version"
+    t.index ["shop_id"], name: "index_theme_app_extensions_on_shop_id"
+  end
+
+  create_table "theme_default_settings", force: :cascade do |t|
+    t.string "theme_name"
+    t.string "page_type"
+    t.string "selector"
+    t.string "action"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "theme_setting_for_templates", force: :cascade do |t|
+    t.string "theme_name"
+    t.string "page_type"
+    t.integer "position"
+    t.string "action"
+    t.string "selector"
+    t.string "image_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "themes", force: :cascade do |t|
     t.string "name"
     t.string "settings_asset_file"
@@ -722,11 +801,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_04_135454) do
     t.bigint "shopify_id"
   end
 
-  create_table "webhooks_passed_and_rejected_count", primary_key: "shopify_domain", id: :string, force: :cascade do |t|
-    t.bigint "passed_webhooks_count", default: 0, null: false
-    t.bigint "rejected_webhooks_count", default: 0, null: false
-  end
-
+  add_foreign_key "advanced_placement_settings", "offers"
   add_foreign_key "collections", "shops"
   add_foreign_key "customers", "shops"
   add_foreign_key "daily_stats", "offers"
@@ -736,11 +811,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_04_135454) do
   add_foreign_key "offers", "shops"
   add_foreign_key "orders", "shops"
   add_foreign_key "pending_jobs", "shops"
+  add_foreign_key "placement_settings", "offers"
   add_foreign_key "products", "shops"
   add_foreign_key "rules", "offers"
   add_foreign_key "setups", "shops"
+  add_foreign_key "shop_actions", "shops"
   add_foreign_key "shop_events", "shops"
   add_foreign_key "subscriptions", "plans"
   add_foreign_key "subscriptions", "shops"
   add_foreign_key "tags", "customers"
+  add_foreign_key "theme_app_extensions", "shops"
 end
