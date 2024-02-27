@@ -200,3 +200,6 @@ export const OFFER_DEFAULTS = {
     custom_ajax_dom_action: 'prepend',
   },
 }
+
+export const OFFER_DETAILS_URL = `/api/merchant/load_offer_details`
+export const OFFER_CREATE_URL = `/api/offers/create/`

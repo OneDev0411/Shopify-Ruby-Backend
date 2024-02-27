@@ -198,8 +198,6 @@ export function OfferPreview(props) {
 		}
 	}
 
-	console.log('offer',offer)
-
 	return(
 		<div>
 			{
