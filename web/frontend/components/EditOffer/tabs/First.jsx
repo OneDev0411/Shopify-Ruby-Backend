@@ -1,6 +1,7 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState, useContext} from "react";
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {useSelector} from 'react-redux';
+import { OfferContext } from "../../../OfferContext.jsx";
 
 import {
     Badge,
@@ -24,28 +25,29 @@ import {useAuthenticatedFetch} from "../../../hooks";
 import { AutopilotQuantityOptions } from "../../../shared/constants/EditOfferOptions";
 
 export function FirstTab(props) {
+    const { offer, updateOffer, updateProductsOfOffer, updateIncludedVariants } = useContext(OfferContext);
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [isLoading, setIsLoading] = useState(false);
 
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectedProducts, setSelectedProducts] = useState([]);
-    const handleTitleChange = useCallback((newValue) => props.updateOffer("title", newValue), []);
+    const handleTitleChange = useCallback((newValue) => updateOffer("title", newValue), []);
     const handleTextChange = useCallback((newValue) => {
-        props.updateOffer("text_a", newValue);
-        if (props.offer.offerable_product_details.length > 0) {
-            props.updateCheckKeysValidity("text", newValue.replace("{{ product_title }}", props.offer.offerable_product_details[0].title));
+        updateOffer("text_a", newValue);
+        if (offer.offerable_product_details.length > 0) {
+            props.updateCheckKeysValidity("text", newValue.replace("{{ product_title }}", offer.offerable_product_details[0].title));
         } else {
             props.updateCheckKeysValidity("text", newValue);
         }
-    }, [props.offer.offerable_product_details]);
+    }, [offer.offerable_product_details]);
 
-    const handleAltTextChange = useCallback((newValue) => props.updateOffer("text_b", newValue), []);
+    const handleAltTextChange = useCallback((newValue) => updateOffer("text_b", newValue), []);
     const handleBtnChange = useCallback((newValue) => {
-        props.updateOffer("cta_a", newValue);
+        updateOffer("cta_a", newValue);
         props.updateCheckKeysValidity('cta', newValue);
     }, []);
-    const handleAltBtnChange = useCallback((newValue) => props.updateOffer("cta_b", newValue), []);
+    const handleAltBtnChange = useCallback((newValue) => updateOffer("cta_b", newValue), []);
     //checkbox controls
     // const [removeImg, setRemoveImg] = useState(false);
     // const [removePriceCheck, setRemovePriceCheck] = useState(false);
@@ -55,23 +57,23 @@ export function FirstTab(props) {
     const [autoDiscount, setAutoDiscount] = useState(false);
     const [addCustomtext, setAddCustomtext] = useState(false);
 
-    const handleAbChange = useCallback((newChecked) => props.updateOffer("uses_ab_test", newChecked), []);
-    const handleImageChange = useCallback((newChecked) => props.updateOffer("show_product_image", !newChecked), []);
-    const handlePriceChange = useCallback((newChecked) => props.updateOffer("show_product_price", !newChecked), []);
-    const handleCompareChange = useCallback((newChecked) => props.updateOffer("show_compare_at_price", !newChecked), []);
-    const handleProductPageChange = useCallback((newChecked) => props.updateOffer("link_to_product", !newChecked), []);
-    const handleQtySelectorChange = useCallback((newChecked) => props.updateOffer("show_quantity_selector", !newChecked), []);
+    const handleAbChange = useCallback((newChecked) => updateOffer("uses_ab_test", newChecked), []);
+    const handleImageChange = useCallback((newChecked) => updateOffer("show_product_image", !newChecked), []);
+    const handlePriceChange = useCallback((newChecked) => updateOffer("show_product_price", !newChecked), []);
+    const handleCompareChange = useCallback((newChecked) => updateOffer("show_compare_at_price", !newChecked), []);
+    const handleProductPageChange = useCallback((newChecked) => updateOffer("link_to_product", !newChecked), []);
+    const handleQtySelectorChange = useCallback((newChecked) => updateOffer("show_quantity_selector", !newChecked), []);
     const handleDiscountChange = useCallback((newChecked) => {
         if (newChecked) {
-            props.updateOffer("discount_target_type", "code");
+            updateOffer("discount_target_type", "code");
         } else {
-            props.updateOffer("discount_target_type", "none");
+            updateOffer("discount_target_type", "none");
         }
     }, []);
-    const handleDiscountCodeChange = useCallback((value) => props.updateOffer("discount_code", value), []);
-    const handleCustomTextChange = useCallback((newChecked) => props.updateOffer("show_custom_field", newChecked), []);
-    const handleShowNoThanksChange = useCallback((newChecked) => props.updateOffer("show_nothanks", !newChecked), []);
-    const handleRedirectedToProductChange = useCallback((newChecked) => props.updateOffer("redirect_to_product", newChecked), []);
+    const handleDiscountCodeChange = useCallback((value) => updateOffer("discount_code", value), []);
+    const handleCustomTextChange = useCallback((newChecked) => updateOffer("show_custom_field", newChecked), []);
+    const handleShowNoThanksChange = useCallback((newChecked) => updateOffer("show_nothanks", !newChecked), []);
+    const handleRedirectedToProductChange = useCallback((newChecked) => updateOffer("redirect_to_product", newChecked), []);
 
     //modal controls
     const [productModal, setProductModal] = useState(false);
@@ -80,14 +82,14 @@ export function FirstTab(props) {
         setProductModal(!productModal);
     }, [productModal]);
     const handleModalCloseEvent = useCallback(() => {
-        props.updateOffer("included_variants", {...props.initialVariants});
+        updateOffer("included_variants", {...props.initialVariants});
         for (var i = 0; i < productData.length; i++) {
             if (!Object.keys(props.initialVariants).includes(productData[i].id.toString())) {
                 productData[i].variants = [];
             }
         }
         setProductModal(false);
-    }, [props.initialVariants, productData, props.offer.offerable_product_shopify_ids]);
+    }, [props.initialVariants, productData, offer.offerable_product_shopify_ids]);
     const modalRef = useRef(null);
     const activator = modalRef;
 
@@ -110,7 +112,7 @@ export function FirstTab(props) {
             })
             .then((data) => {
                 for (var i = 0; i < data.length; i++) {
-                    if (!Object.keys(props.offer.included_variants).includes(data[i].id.toString())) {
+                    if (!Object.keys(offer.included_variants).includes(data[i].id.toString())) {
                         data[i].variants = [];
                     }
                 }
@@ -129,7 +131,7 @@ export function FirstTab(props) {
         if (Array.isArray(selectedItem)) {
             setSelectedProducts(selectedItem);
         }
-        props.updateIncludedVariants(selectedItem, selectedVariants);
+        updateIncludedVariants(selectedItem, selectedVariants);
     }
 
     //Called when "select product manually button clicked"
@@ -147,13 +149,13 @@ export function FirstTab(props) {
             })
             .then((data) => {
                 for (var i = 0; i < data.length; i++) {
-                    if (!Object.keys(props.offer.included_variants).includes(data[i].id.toString())) {
+                    if (!Object.keys(offer.included_variants).includes(data[i].id.toString())) {
                         data[i].variants = [];
                     }
                 }
                 setProductData(data);
-                setSelectedItems(props.offer.offerable_product_shopify_ids);
-                setSelectedProducts(props.offer.offerable_product_shopify_ids)
+                setSelectedItems(offer.offerable_product_shopify_ids);
+                setSelectedProducts(offer.offerable_product_shopify_ids)
                 setResourceListLoading(false);
             })
             .catch((error) => {
@@ -165,19 +167,19 @@ export function FirstTab(props) {
     function updateProducts() {
         var product_title_str = "Would you like to add a {{ product_title }}?";
         if (selectedProducts.length == 0) {
-            props.updateOffer("included_variants", {});
+            updateOffer("included_variants", {});
             setProductData("");
             props.updateCheckKeysValidity("text", product_title_str);
         } else if (selectedProducts.length > 1) {
             props.updateCheckKeysValidity("text", "");
-            props.updateOffer("text_a", "");
+            updateOffer("text_a", "");
         } else if (selectedProducts.length <= 1) {
             props.updateCheckKeysValidity("text", product_title_str);
-            props.updateOffer("text_a", product_title_str);
+            updateOffer("text_a", product_title_str);
         }
-        props.updateOffer("offerable_product_details", []);
-        props.updateOffer("offerable_product_shopify_ids", []);
-        props.updateInitialVariants(props.offer.included_variants);
+        updateOffer("offerable_product_details", []);
+        updateOffer("offerable_product_shopify_ids", []);
+        props.updateInitialVariants(offer.included_variants);
         var responseCount = 0;
         const promises = selectedProducts.map((productId) =>
             fetch(`/api/merchant/products/multi/${productId}?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
@@ -202,11 +204,11 @@ export function FirstTab(props) {
                 // 'responses' will contain the data in the same order as the requests
                 for (var i = 0; i < responses.length; i++) {
                     var data = responses[i]
-                    data.available_json_variants = data.available_json_variants.filter((o) => props.offer.included_variants[data.id].includes(o.id))
-                    props.updateProductsOfOffer(data);
+                    data.available_json_variants = data.available_json_variants.filter((o) => offer.included_variants[data.id].includes(o.id))
+                    updateProductsOfOffer(data);
                     if (responseCount == 0 && selectedProducts.length <= 1) {
-                        props.updateCheckKeysValidity("text", props.offer.text_a.replace("{{ product_title }}", data.title));
-                        props.updateCheckKeysValidity('cta', props.offer.cta_a);
+                        props.updateCheckKeysValidity("text", offer.text_a.replace("{{ product_title }}", data.title));
+                        props.updateCheckKeysValidity('cta', offer.cta_a);
                     }
                     responseCount++;
                 }
@@ -221,7 +223,7 @@ export function FirstTab(props) {
 
     const [openAutopilotSection, setOpenAutopilotSection] = useState(false);
     const [autopilotButtonText, setAutopilotButtonText] = useState(props.autopilotCheck.isPending);
-    const [autopilotQuantity, setAutopilotQuantity] = useState(props.offer?.autopilot_quantity);
+    const [autopilotQuantity, setAutopilotQuantity] = useState(offer?.autopilot_quantity);
 
     const navigateTo = useNavigate();
     const location = useLocation();
@@ -253,16 +255,16 @@ export function FirstTab(props) {
     }, [])
 
     useEffect(() => {
-        if (props.offer.id != null && props.offer.id == props.autopilotCheck?.autopilot_offer_id && props.offer.autopilot_quantity != props.offer.offerable_product_details.length) {
+        if (offer.id != null && offer.id == props.autopilotCheck?.autopilot_offer_id && offer.autopilot_quantity != offer.offerable_product_details.length) {
             var tempArray = [];
-            for (var i = 0; i < props.offer?.autopilot_quantity; i++) {
-                if (props.offer.offerable_product_details.length > i) {
-                    tempArray[i] = props.offer.offerable_product_details[i];
+            for (var i = 0; i < offer?.autopilot_quantity; i++) {
+                if (offer.offerable_product_details.length > i) {
+                    tempArray[i] = offer.offerable_product_details[i];
                 }
             }
-            props.updateOffer("offerable_product_details", tempArray);
+            updateOffer("offerable_product_details", tempArray);
         }
-    }, [props.autopilotCheck?.autopilot_offer_id, props.offer.offerable_product_shopify_ids]);
+    }, [props.autopilotCheck?.autopilot_offer_id, offer.offerable_product_shopify_ids]);
 
     const handleAutoPilotQuantityChange = useCallback((value) => {
         var tempArray = [];
@@ -271,17 +273,17 @@ export function FirstTab(props) {
                 tempArray[i] = props.initialOfferableProductDetails[i];
             }
         }
-        props.updateOffer("offerable_product_details", tempArray);
+        updateOffer("offerable_product_details", tempArray);
         setAutopilotQuantity(parseInt(value));
-        props.updateOffer("autopilot_quantity", parseInt(value));
+        updateOffer("autopilot_quantity", parseInt(value));
     }, [props.initialOfferableProductDetails]);
 
     const handleAutopilotExcludedTags = useCallback((value) => {
-        props.updateOffer("excluded_tags", value);
+        updateOffer("excluded_tags", value);
     }, []);
 
     const handleLayoutRadioClicked = useCallback((value) => {
-        props.updateOffer("multi_layout", value);
+        updateOffer("multi_layout", value);
     }, []);
 
     // Called to enable the autopilot feature
@@ -366,9 +368,9 @@ export function FirstTab(props) {
 
     useEffect(() => {
         if (publishButtonFuntional) {
-            publishButtonFuntional(!(props.offer.offerable_product_details.length > 0 && props.offer.title !== '' && (props.offer.uses_ab_test ? (props.offer.text_b.length > 0 && props.offer.cta_b.length > 0) : true)))
+            publishButtonFuntional(!(offer.offerable_product_details.length > 0 && offer.title !== '' && (offer.uses_ab_test ? (offer.text_b.length > 0 && offer.cta_b.length > 0) : true)))
         }
-    }, [props.offer.offerable_product_details.length, props.offer.title, props.offer.uses_ab_test, props.offer.text_b, props.offer.cta_b]);
+    }, [offer.offerable_product_details.length, offer.title, offer.uses_ab_test, offer.text_b, offer.cta_b]);
 
 
     //Collapsible controls
@@ -392,11 +394,11 @@ export function FirstTab(props) {
                     {/* <LegacyCard title="Offer Product" actions={[{content: 'Learn about Autopilot'}]} sectioned> */}
                     <LegacyCard title="Offer Product" sectioned>
                         <LegacyStack spacing="loose" vertical>
-                            {(props.autopilotCheck?.autopilot_offer_id != props.offer.id || !props.autopilotCheck?.autopilot_offer_id) && (
+                            {(props.autopilotCheck?.autopilot_offer_id != offer.id || !props.autopilotCheck?.autopilot_offer_id) && (
                                 <p style={{color: '#6D7175'}}>What product would you like to have in the offer?</p>
                             )}
 
-                            {props.offer.id == null && !props.autopilotCheck?.autopilot_offer_id && props.shop.has_pro_features ? (
+                            {offer.id == null && !props.autopilotCheck?.autopilot_offer_id && props.shop.has_pro_features ? (
                                 <>
                                     <div style={{marginBottom: '20px'}}>
                                         <Button id={"btnLaunchAI"}
@@ -409,7 +411,7 @@ export function FirstTab(props) {
                                         getProducts();
                                     }} ref={modalRef}>Select product manually</Button>
                                 </>
-                            ) : (props.offer?.id != props.autopilotCheck?.autopilot_offer_id || !props.autopilotCheck?.autopilot_offer_id) && (
+                            ) : (offer?.id != props.autopilotCheck?.autopilot_offer_id || !props.autopilotCheck?.autopilot_offer_id) && (
                                 <div>
                                     <Button id={"btnSelectProduct"} onClick={() => {
                                         handleModal();
@@ -433,14 +435,14 @@ export function FirstTab(props) {
                                 </ButtonGroup>
                             )}
 
-                            {props.offer.offerable_product_details.length > 0 && (
+                            {offer.offerable_product_details.length > 0 && (
                                 <b>Selected Products:
                                     <br/>
                                     <div className="space-2" />
-                                    {props.offer.offerable_product_details.map((value, index) => (
+                                    {offer.offerable_product_details.map((value, index) => (
                                         <div style={{marginRight: '10px', display: "inline-block"}}>
                                             <Badge>
-                                                <p style={{color: 'blue'}}>{props.offer.offerable_product_details[index].title}</p>
+                                                <p style={{color: 'blue'}}>{offer.offerable_product_details[index].title}</p>
                                             </Badge>
                                         </div>
                                     ))}
@@ -448,7 +450,7 @@ export function FirstTab(props) {
                             )}
 
                         </LegacyStack>
-                        {(openAutopilotSection || (props.offer.id != null && props.autopilotCheck?.autopilot_offer_id == props.offer.id)) && (
+                        {(openAutopilotSection || (offer.id != null && props.autopilotCheck?.autopilot_offer_id == offer.id)) && (
                             <>
                                 <LegacyStack spacing="loose" vertical>
                                     <Select
@@ -461,12 +463,12 @@ export function FirstTab(props) {
                                 <LegacyStack vertical>
                                     <RadioButton
                                         label="Stack"
-                                        checked={props.offer.multi_layout === 'stack'}
+                                        checked={offer.multi_layout === 'stack'}
                                         onChange={() => handleLayoutRadioClicked('stack')}
                                     />
                                     <RadioButton
                                         label="Carousel"
-                                        checked={props.offer.multi_layout === 'carousel'}
+                                        checked={offer.multi_layout === 'carousel'}
                                         onChange={() => handleLayoutRadioClicked('carousel')}
                                     />
                                 </LegacyStack>
@@ -474,7 +476,7 @@ export function FirstTab(props) {
                                     <TextField
                                         label="Exclude products with a tag"
                                         helpText="Autopilot will not suggest any product with this tag."
-                                        value={props.offer?.excluded_tags}
+                                        value={offer?.excluded_tags}
                                         onChange={handleAutopilotExcludedTags}
                                     />
                                 </LegacyStack>
@@ -485,12 +487,12 @@ export function FirstTab(props) {
 
                     <LegacyCard title="Text" sectioned>
                         <LegacyStack spacing="loose" vertical>
-                            {(props.offer.id == null || props.offer.id != props.autopilotCheck?.autopilot_offer_id) && (
+                            {(offer.id == null || offer.id != props.autopilotCheck?.autopilot_offer_id) && (
                                 <>
                                     <TextField
                                         label="Offer title"
                                         placeholder='Offer #1'
-                                        value={props.offer.title}
+                                        value={offer.title}
                                         onChange={handleTitleChange}
                                         autoComplete="off"
                                         helpText="This title will only be visible to you so you can reference it internally"
@@ -501,24 +503,24 @@ export function FirstTab(props) {
                                 label="Offer text"
                                 placeholder='Take advantage of this limited offer'
                                 autoComplete="off"
-                                value={props.offer.text_a}
+                                value={offer.text_a}
                                 onChange={handleTextChange}
                             />
                             <TextField
                                 label="Button text"
                                 placeholder='Add to cart'
-                                value={props.offer.cta_a}
+                                value={offer.cta_a}
                                 onChange={handleBtnChange}
                                 autoComplete="off"
                             />
-                            {props.offer.uses_ab_test && <hr className="legacy-card-hr legacy-card-hr-t20-b15" />}
+                            {offer.uses_ab_test && <hr className="legacy-card-hr legacy-card-hr-t20-b15" />}
                             <Checkbox id={"abTesting"}
                                 label="Enable A/B testing"
-                                checked={props.offer.uses_ab_test}
+                                checked={offer.uses_ab_test}
                                 onChange={handleAbChange}
                             />
                             <Collapsible
-                                open={props.offer.uses_ab_test}
+                                open={offer.uses_ab_test}
                                 id="basic-collapsible"
                                 transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                             >
@@ -535,7 +537,7 @@ export function FirstTab(props) {
                                             label="Alternative offer text"
                                             placeholder='Take advantage of this limited offer'
                                             autoComplete="off"
-                                            value={props.offer.text_b}
+                                            value={offer.text_b}
                                             onChange={handleAltTextChange}
                                         />
 
@@ -545,13 +547,13 @@ export function FirstTab(props) {
                                             label="Alternative button text"
                                             placeholder='Add to cart'
                                             autoComplete="off"
-                                            value={props.offer.cta_b}
+                                            value={offer.cta_b}
                                             onChange={handleAltBtnChange}
                                         />
                                     </>
                                 )}
                                <Collapsible
-                                    open = {(props.offer.cta_b === '' && props.offer.text_b != '') || (props.offer.cta_b != '' && props.offer.text_b === '')}
+                                    open = {(offer.cta_b === '' && offer.text_b != '') || (offer.cta_b != '' && offer.text_b === '')}
                                     transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                                     expandOnPrint
                                 >
@@ -568,35 +570,35 @@ export function FirstTab(props) {
                     <LegacyCard title="Display options" sectioned>
                         <LegacyStack spacing="baseTight" vertical>
                             <Checkbox id={"removeImg"}
-                                      checked={!props.offer.show_product_image}
+                                      checked={!offer.show_product_image}
                                       onChange={handleImageChange}
                                       label="Remove product image"
                             />
                             <Checkbox id={"removePrice"}
-                                      checked={!props.offer.show_product_price}
+                                      checked={!offer.show_product_price}
                                       onChange={handlePriceChange}
                                       label="Remove price"
                             />
                             <Checkbox id={"removeComparePrice"}
-                                      checked={!props.offer.show_compare_at_price}
+                                      checked={!offer.show_compare_at_price}
                                       onChange={handleCompareChange}
                                       label="Remove compare at price"
                             />
                             <Checkbox id={"removeProductPage"}
-                                      checked={!props.offer.link_to_product}
+                                      checked={!offer.link_to_product}
                                       onChange={handleProductPageChange}
                                       label="Remove link to product page"
                             />
                             <Checkbox id={"autoDiscount"}
                                       label="Automatically apply discount code"
-                                      checked={props.offer.discount_target_type == "code"}
+                                      checked={offer.discount_target_type == "code"}
                                       onChange={handleDiscountChange}
                             />
-                            {props.offer.discount_target_type == "code" && (
+                            {offer.discount_target_type == "code" && (
                                 <div>
                                     <TextField
                                         label="Discount Code"
-                                        value={props.offer.discount_code}
+                                        value={offer.discount_code}
                                         onChange={handleDiscountCodeChange}
                                         autoComplete="off"
                                     />
@@ -608,23 +610,23 @@ export function FirstTab(props) {
                                 </div>
                             )}
                             <Checkbox id={"removeQtySelector"}
-                                      checked={!props.offer.show_quantity_selector}
+                                      checked={!offer.show_quantity_selector}
                                       onChange={handleQtySelectorChange}
                                       label="Remove quantity selector"
                             />
                             <Checkbox id={"addCustomtext"}
-                                      checked={props.offer.show_custom_field}
+                                      checked={offer.show_custom_field}
                                       onChange={handleCustomTextChange}
                                       label="Add custom textbox"
                             />
                             <Checkbox id={"showNoThanks"}
-                                      checked={!props.offer.show_nothanks}
+                                      checked={!offer.show_nothanks}
                                       onChange={handleShowNoThanksChange}
                                       label="Customer can't dismiss offer"
                             />
                             {props.shop.has_redirect_to_product == true && (
                                 <Checkbox id={"redirectToProduct"}
-                                      checked={props.offer.redirect_to_product}
+                                      checked={offer.redirect_to_product}
                                       onChange={handleRedirectedToProductChange}
                                       label="Offer button sends shopper to product page instead of adding to the cart (not recommended)"
                                 />
@@ -652,7 +654,7 @@ export function FirstTab(props) {
                         }}
                     >
                         <ModalAddProduct selectedItems={selectedItems} setSelectedItems={setSelectedItems}
-                                         offer={props.offer} updateQuery={updateQuery} shop_id={props.shop.shop_id}
+                                         offer={offer} updateQuery={updateQuery} shop_id={props.shop.shop_id}
                                          productData={productData} resourceListLoading={resourceListLoading}
                                          setResourceListLoading={setResourceListLoading}
                                          updateSelectedProduct={updateSelectedProduct}/>

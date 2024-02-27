@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {useSelector} from "react-redux";
 import {useLocation, useNavigate} from 'react-router-dom';
 
@@ -11,10 +11,11 @@ import {useAuthenticatedFetch} from "../hooks";
 import {FirstTab, FourthTab, SecondTab, ThirdTab} from "../components";
 import {OfferPreview} from "../components/OfferPreview";
 import "../components/stylesheets/mainstyle.css";
-import { EditOfferTabs } from '../shared/constants/EditOfferOptions';
+import {EditOfferTabs, OFFER_DEFAULTS} from '../shared/constants/EditOfferOptions';
 import OfferProvider, {OfferContext} from "../OfferContext.jsx";
 
 export default function EditPage() {
+    const { offer, setOffer, updateOffer, updateProductsOfOffer, updateIncludedVariants } = useContext(OfferContext);
     const shopAndHost = useSelector(state => state.shopAndHost);
     const app = useAppBridge();
     const navigateTo = useNavigate();
@@ -50,6 +51,8 @@ export default function EditPage() {
     const offerID = location?.state?.offerID;
     const fetch = useAuthenticatedFetch(shopAndHost.host);
 
+    let advanced_placement_setting = {}
+
     //Call on initial render
     useEffect(() => {
         let redirect = Redirect.create(app);
@@ -83,14 +86,13 @@ export default function EditPage() {
                     setThemeAppExtension(data.theme_app_extension)
 
                     let newOffer = {...offer};
-
                     newOffer.advanced_placement_setting ={
-                        custom_product_page_dom_selector: data.shop_settings.custom_product_page_dom_selector,
-                        custom_product_page_dom_action: data.shop_settings.custom_product_page_dom_action,
-                        custom_cart_page_dom_selector: data.shop_settings.custom_cart_page_dom_selector,
-                        custom_cart_page_dom_action: data.shop_settings.custom_cart_page_dom_action,
-                        custom_ajax_dom_selector: data.shop_settings.custom_ajax_dom_selector,
-                        custom_ajax_dom_action: data.shop_settings.custom_ajax_dom_action,
+                      custom_product_page_dom_selector: data.shop_settings.custom_product_page_dom_selector,
+                      custom_product_page_dom_action: data.shop_settings.custom_product_page_dom_action,
+                      custom_cart_page_dom_selector: data.shop_settings.custom_cart_page_dom_selector,
+                      custom_cart_page_dom_action: data.shop_settings.custom_cart_page_dom_action,
+                      custom_ajax_dom_selector: data.shop_settings.custom_ajax_dom_selector,
+                      custom_ajax_dom_action: data.shop_settings.custom_ajax_dom_action,
                     };
 
                     setOffer(newOffer);
@@ -447,7 +449,6 @@ export default function EditPage() {
     };
 
     return (
-      <OfferProvider>
         <div className="edit-offer" style={{
             overflow: 'hidden',
             display: 'flex',
@@ -479,9 +480,7 @@ export default function EditPage() {
                                     
                                     {selected == 0 ?
                                         // page was imported from components folder
-                                        <FirstTab offer={offer} shop={shop}
-                                                  updateOffer={updateOffer} updateIncludedVariants={updateIncludedVariants}
-                                                  updateProductsOfOffer={updateProductsOfOffer}
+                                        <FirstTab shop={shop}
                                                   updateCheckKeysValidity={updateCheckKeysValidity}
                                                   handleTabChange={changeTab} initialVariants={initialVariants}
                                                   updateInitialVariants={updateInitialVariants}
@@ -491,28 +490,23 @@ export default function EditPage() {
                                         : ""}
                                     {selected == 1 ?
                                         // page was imported from components folder
-                                        <SecondTab offer={offer} shop={shop} setOffer={setOffer}
-                                                   updateOffer={updateOffer} updateShop={updateShop}
+                                        <SecondTab shop={shop}
+                                                   updateShop={updateShop}
                                                    autopilotCheck={autopilotCheck} handleTabChange={changeTab}
-                                                   updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}
                                                    enableOrDisablePublish={enableOrDisablePublish} themeAppExtension={themeAppExtension}
                                         />
                                         : ""}
                                     {selected == 2 ?
                                         // page was imported from components folder
-                                        <ThirdTab offer={offer} shop={shop} updateOffer={updateOffer}
-                                                  updateShop={updateShop} saveDraft={saveDraft} publishOffer={publishOffer}
+                                        <ThirdTab updateShop={updateShop} saveDraft={saveDraft} publishOffer={publishOffer}
                                                   autopilotCheck={autopilotCheck} enablePublish={enablePublish}
-                                                  updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}
                                                   handleTabChange={changeTab}/>
                                         : ""}
                                     {selected == 3 ?
                                         // page was imported from components folder
-                                        <FourthTab offer={offer} shop={shop} updateOffer={updateOffer}
-                                                   updateShop={updateShop}
+                                        <FourthTab updateShop={updateShop}
                                                    saveDraft={saveDraft} publishOffer={publishOffer}
-                                                   enablePublish={enablePublish}  themeAppExtension={themeAppExtension}
-                                                   updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>
+                                                   enablePublish={enablePublish}  themeAppExtension={themeAppExtension}/>
                                         : ""}
                                 </Tabs>
                             </div>
@@ -528,17 +522,15 @@ export default function EditPage() {
                                 >
                                     <div style={{paddingTop: '40px', marginTop: '-40px'}}></div>
                                     {selectedPre == 0 ?
-                                        <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer}
+                                        <OfferPreview shop={shop}
                                                       checkKeysValidity={checkKeysValidity}
                                                       updateCheckKeysValidity={updateCheckKeysValidity}
-                                                      updatePreviousAppOffer={updatePreviousAppOffer}
-                                                      updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>
+                                                      updatePreviousAppOffer={updatePreviousAppOffer}/>
                                         :
-                                        <OfferPreview offer={offer} shop={shop} updateOffer={updateOffer}
+                                        <OfferPreview shop={shop}
                                                       checkKeysValidity={checkKeysValidity}
                                                       updateCheckKeysValidity={updateCheckKeysValidity}
-                                                      updatePreviousAppOffer={updatePreviousAppOffer}
-                                                      updateNestedAttributeOfOffer={updateNestedAttributeOfOffer}/>}
+                                                      updatePreviousAppOffer={updatePreviousAppOffer}/>}
                                 </Tabs>
                             </div>
                         </Layout.Section>
@@ -546,7 +538,6 @@ export default function EditPage() {
                 </Page>
             )}
         </div>
-      </OfferProvider>
     );
 }
 

@@ -7,6 +7,7 @@ import {
   QueryProvider,
   PolarisProvider,
 } from "./components";
+import OfferProvider from "./OfferContext.jsx";
 
 export default function App() {
   // Any .tsx or .jsx files in /pages will become a route
@@ -42,7 +43,9 @@ export default function App() {
                 },
               ]}
             />
+          <OfferProvider>
             <Routes pages={pages} />
+          </OfferProvider>
           </QueryProvider>
         </AppBridgeProvider>
       </BrowserRouter>
