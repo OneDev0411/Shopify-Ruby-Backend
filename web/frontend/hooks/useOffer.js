@@ -1,7 +1,7 @@
 import { useState } from "react";
-import {OFFER_CREATE_URL, OFFER_DETAILS_URL} from "../shared/constants/EditOfferOptions.js";
-import {useAuthenticatedFetch} from "./useAuthenticatedFetch.js";
-import {useSelector} from "react-redux";
+import { OFFER_CREATE_URL, OFFER_DETAILS_URL } from "../shared/constants/EditOfferOptions.js";
+import { useAuthenticatedFetch } from "./useAuthenticatedFetch.js";
+import { useSelector } from "react-redux";
 
 export const useOffer = () => {
   const [isPending, setIsPending] = useState(false);
@@ -40,7 +40,7 @@ export const useOffer = () => {
         responseData.offer.offerable_product_details[i].preview_mode = true;
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.log('Error:', error);
     }
 
     return responseData;
@@ -184,11 +184,11 @@ export const useOffer = () => {
       });
       responseData = await response.json();
     } catch (error) {
-      console.error('Error:', error);
+      console.log('Error:', error);
     }
 
     return responseData
   }
 
-  return {fetchOffer, saveOffer, createOffer, isPending}
+  return { fetchOffer, saveOffer, createOffer, isPending }
 };
