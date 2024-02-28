@@ -634,7 +634,7 @@ module Shopifable
       Rails.logger.info("Enqueuing to ShopWorker::CreateScriptTagJob for shop # #{self.id} : #{self.shopify_domain}")
       Sidekiq::Client.push('class' => 'ShopWorker::CreateScriptTagJob', 'args' => [self.id], 'queue' => 'default', 'at' => Time.now.to_i)
     end
-   
+
     update_column(soft_purge_only, opts[:soft_purge_only]) if opts[:soft_purge_only]
     tag_updated
   end
@@ -722,8 +722,10 @@ module Shopifable
       end
     end
 
-    unless (!theme_app_extension&.theme_app_complete && ((blocks_added == keys_without_ajax.length) &&
-      ((keys.include?('ajax') && theme_app_embed) || keys.exclude?('ajax')))) && offers.present?
+    all_blocks_enabled = ((blocks_added == keys_without_ajax.length) &&
+      ((keys.include?('ajax') && theme_app_extension&.theme_app_embed) || keys.exclude?('ajax')))
+
+    if !theme_app_extension&.theme_app_complete && ((all_blocks_enabled && offers.present?) || offers.blank?)
       theme_app_extension.update(theme_app_complete: true)
 
       unless script_tag_id.nil? && self.theme_app_extension.theme_version != '2.0'
@@ -804,15 +806,9 @@ module Shopifable
 
     return if blocks.nil?
 
-    block_found = nil
-
     blocks.each do |_block_id, block|
       if block['type'].include?("app_block_embed/#{ENV['SHOPIFY_ICU_EXTENSION_APP_ID']}")
-        block_found = block
-      end
-
-      if block_found.nil?
-        self.theme_app_extension.update(theme_app_embed: block_found['disabled'])
+        self.theme_app_extension.update(theme_app_embed: !block['disabled'])
         break
       end
     end

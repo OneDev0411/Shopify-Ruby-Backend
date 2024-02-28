@@ -453,7 +453,6 @@ export default function EditPage() {
             overflow: 'hidden',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center',
             minHeight: '100vh',
         }}>
             {isLoading ? (
@@ -504,7 +503,7 @@ export default function EditPage() {
                                         : ""}
                                     {selected == 3 ?
                                         // page was imported from components folder
-                                        <FourthTab updateShop={updateShop}
+                                        <FourthTab shop={shop} updateShop={updateShop}
                                                    saveDraft={saveDraft} publishOffer={publishOffer}
                                                    enablePublish={enablePublish}  themeAppExtension={themeAppExtension}/>
                                         : ""}

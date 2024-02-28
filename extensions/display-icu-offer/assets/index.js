@@ -253,7 +253,7 @@
 
     const getCollection = () => {
 
-        return fetch(`/apps/proxy/shop_collections`)
+        return fetch(`/apps/in-cart-upsell/shop_collections`)
           .then(response => response.json())
           .then(collectionData => {
               collections = collectionData.collection;
@@ -320,7 +320,7 @@
     }
 
     const fetchCustomerTags = () => {
-        return fetch('/apps/proxy/customer_tags')
+        return fetch('/apps/in-cart-upsell/customer_tags')
           .then(resp => resp.json())
           .then( data => {
               customerTags = data
@@ -329,7 +329,7 @@
 
     const fetchCart = () => {
         if (offerSettings.uses_customer_tags) {
-            return fetch('/apps/proxy/customer_tags')
+            return fetch('/apps/in-cart-upsell/customer_tags')
               .then(resp => resp.json())
               .then( data => {
                   customerTags = data
@@ -573,7 +573,7 @@
                         if (
                           (offer.in_product_page && isProductPage()) ||
                           (offer.in_cart_page && isCartPage()) ||
-                          (offer.in_collection_page && isCartPage())
+                          (in_collection_page && isCollectionsPage())
                         ) {
                             await createOffer();
                         }
@@ -633,7 +633,7 @@
     }
 
     const getOffers = () => {
-        fetch(`/apps/proxy/all_offers`)
+        fetch(`/apps/in-cart-upsell/all_offers`)
           .then( response => response.json())
           .then(async (data) => {
               if (data.length !== 0) {
@@ -665,7 +665,7 @@
                               if (
                                 (offer.in_product_page && isProductPage()) ||
                                 (offer.in_cart_page && isCartPage()) ||
-                                (offer.in_collection_page && isCartPage())
+                                (in_collection_page && isCollectionsPage())
                               ) {
                                   await createOffer();
                               }
@@ -694,7 +694,7 @@
           .catch(error => console.log(error))
     }
 
-    fetch(`/apps/proxy/theme_app_completed`)
+    fetch(`/apps/in-cart-upsell/theme_app_completed`)
       .then( response => response.json())
       .then( (data) => {
           if (data.theme_app_completed) {
