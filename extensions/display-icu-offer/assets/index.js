@@ -253,7 +253,7 @@
 
     const getCollection = () => {
 
-        return fetch(`/apps/in-cart-upsell//shop_collections`)
+        return fetch(`/apps/in-cart-upsell/shop_collections`)
           .then(response => response.json())
           .then(collectionData => {
               collections = collectionData.collection;
@@ -320,7 +320,7 @@
     }
 
     const fetchCustomerTags = () => {
-        return fetch('/apps/in-cart-upsell//customer_tags')
+        return fetch('/apps/in-cart-upsell/customer_tags')
           .then(resp => resp.json())
           .then( data => {
               customerTags = data
@@ -329,7 +329,7 @@
 
     const fetchCart = () => {
         if (offerSettings.uses_customer_tags) {
-            return fetch('/apps/in-cart-upsell//customer_tags')
+            return fetch('/apps/in-cart-upsell/customer_tags')
               .then(resp => resp.json())
               .then( data => {
                   customerTags = data
@@ -633,7 +633,7 @@
     }
 
     const getOffers = () => {
-        fetch(`/apps/in-cart-upsell//all_offers`)
+        fetch(`/apps/in-cart-upsell/all_offers`)
           .then( response => response.json())
           .then(async (data) => {
               if (data.length !== 0) {
@@ -694,7 +694,7 @@
           .catch(error => console.log(error))
     }
 
-    fetch(`/apps/in-cart-upsell//theme_app_completed`)
+    fetch(`/apps/in-cart-upsell/theme_app_completed`)
       .then( response => response.json())
       .then( (data) => {
           if (data.theme_app_completed) {
