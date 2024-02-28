@@ -13,7 +13,6 @@ Rails.application.routes.draw do
   get ShopifyApp.configuration.login_url, to: 'shopify_app/sessions#new', as: :login
 
   get '/confirm_from_outside', to: 'js#confirm_from_outside'
-  get '/js/offer', to: 'js#offer'
 
   post 'api/offers/create/:shop_id', to: 'offers#create_from_builder'
   patch 'api/offers/:id/update/:shop_id', to: 'offers#update_from_builder'
@@ -67,11 +66,14 @@ Rails.application.routes.draw do
   post 'custom_webhooks/request_customer', to: 'custom_webhooks#request_customer'
   post 'custom_webhooks/redact_customer', to: 'custom_webhooks#redact_customer'
 
-  get 'proxy/all_offers', to: 'proxy#all_offers'
-  get 'proxy/shop_collections', to: 'proxy#shop_collections'
-  get 'proxy/theme_app_completed', to: 'proxy#theme_app_completed'
-  get 'proxy/customer_tags', to: 'proxy#customer_tags'
+
+  get 'js/offer/all_offers', to: 'proxy#all_offers'
+  get 'js/offer/shop_collections', to: 'proxy#shop_collections'
+  get 'js/offer/theme_app_completed', to: 'proxy#theme_app_completed'
+  get 'js/offer/customer_tags', to: 'proxy#customer_tags'
+
+  get '/js/offer', to: 'js#offer'
 
   # Any other routes will just render the react app
-  match '*path' => 'home#index', via: [:get, :post]
+  match '*path' => 'splash#index', via: [:get, :post]
 end
