@@ -5,7 +5,7 @@ const homeImage =
   "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/plan-images/business-plan.svg";
 
 const billingImg =
-  "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/plan-images/plan-upgrade.png";
+  "https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/billing-ICU-Logo-Small.png";
 
 export { homeImage };
 export { billingImg };
