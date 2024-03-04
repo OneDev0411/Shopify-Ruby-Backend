@@ -1,26 +1,8 @@
-import {createContext, useEffect, useState} from 'react';
+import {createContext, useEffect, useRef, useState} from 'react';
 import {OFFER_DEFAULTS} from "./shared/constants/EditOfferOptions.js";
 
 export default function OfferProvider({ children }) {
-  const [offer, setOffer] = useState(OFFER_DEFAULTS);
-
-  useEffect(() => {
-    // let newOffer = {...offer};
-    // console.log("adv",advanced_placement_setting)
-    // newOffer.advanced_placement_setting ={
-    //   custom_product_page_dom_selector: advanced_placement_setting.custom_product_page_dom_selector,
-    //   custom_product_page_dom_action: advanced_placement_setting.custom_product_page_dom_action,
-    //   custom_cart_page_dom_selector: advanced_placement_setting.custom_cart_page_dom_selector,
-    //   custom_cart_page_dom_action: advanced_placement_setting.custom_cart_page_dom_action,
-    //   custom_ajax_dom_selector: advanced_placement_setting.custom_ajax_dom_selector,
-    //   custom_ajax_dom_action: advanced_placement_setting.custom_ajax_dom_action,
-    // };
-    //
-    // setOffer(newOffer);
-
-    // setOffer(updatedOffer);
-
-  }, []);
+  const [offer, setOffer] = useState({...OFFER_DEFAULTS});
 
   //Called whenever the offer changes in any child component
   function updateOffer(updatedKey, updatedValue) {
@@ -87,7 +69,7 @@ export default function OfferProvider({ children }) {
     setOffer({...updatedOffer});
   }
 
-  console.log("offer in context", offer)
+
 
   return (
     <OfferContext.Provider
