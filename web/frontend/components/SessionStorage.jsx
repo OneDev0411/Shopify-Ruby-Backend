@@ -13,7 +13,7 @@
         scope: Math.random().toString(36).slice(2),
         expires: new Date().toLocaleString()
       };
-      console.log("Storing/Updating Session:", SessionData);
+      console.log('Storing/Updating Session:', SessionData);
       const response =  await fetch(`/api/merchant/sessions/store_session`, {
         method: 'POST',
         headers: {
@@ -23,7 +23,7 @@
       });
       const data = await response.json();
       if (response.ok) {
-        console.log("Session stored/Updated SUCCESSFULLY");
+        console.log('Session stored/Updated SUCCESSFULLY');
         return true;
       }
       else {
@@ -37,11 +37,22 @@
   };
 
   // Function to load session
-  export const loadSession = async (sessionId, fetch) => {
+  export const loadSession = async (fetch) => {
     try {
-      const response = await fetch(`/api/merchant/session/load_session${sessionId}`);
-      const data = await response.json();
-      console.log(data);
+      const sessionId = "g78z2wu2h8h"
+      const response = await fetch(`/api/merchant/sessions/${sessionId}/load_session`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const sessionData = await response.json();
+      if (response.ok) {
+        console.log('Session Found:', sessionData);
+        return sessionData;
+      }
+      else {
+        console.log('Session Not Found');
+        return undefined;
+      }
     } catch (error) {
       console.error('Error loading session:', error);
     }
