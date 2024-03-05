@@ -4,7 +4,7 @@ module Api
       
       before_action :session_params, only: [:store_session]
       before_action :set_session, only: [:store_session]
-      before_action :find_by_session_id, only: [:load_session]
+      before_action :find_by_session_id, only: [:load_session, :delete_session]
 
       def store_session
         session = SessionService.new
@@ -17,6 +17,14 @@ module Api
           render json: @session, status: :ok
         else
           render json: { message: 'Session not found' }, status: :not_found
+        end
+      end
+
+      def delete_session
+        if @session.present? && @session.delete
+          render json: { message: 'Session deleted successfully' }, status: :ok
+        else
+          render json: { message: 'Session could not be deleted' }
         end
       end
 

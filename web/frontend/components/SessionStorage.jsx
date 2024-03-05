@@ -22,12 +22,11 @@
         body: JSON.stringify(SessionData),
       });
       const data = await response.json();
+      console.log(data.message)
       if (response.ok) {
-        console.log('Session stored/Updated SUCCESSFULLY');
         return true;
       }
       else {
-        console.log("Failed to store session:", data);
         return false;
       }
     } catch (error) {
@@ -39,6 +38,7 @@
   // Function to load session
   export const loadSession = async (fetch) => {
     try {
+      // Dummy Session ID
       const sessionId = "g78z2wu2h8h"
       const response = await fetch(`/api/merchant/sessions/${sessionId}/load_session`, {
         method: 'GET',
@@ -50,7 +50,7 @@
         return sessionData;
       }
       else {
-        console.log('Session Not Found');
+        console.log(sessionData.message);
         return undefined;
       }
     } catch (error) {
@@ -61,12 +61,21 @@
   // Function to delete session
   export const deleteSession = async (sessionId) => {
     try {
-      const response = await fetch(`/delete_session/${sessionId}`, {
+      debugger
+      // Dummy Session ID
+      const sessionId = "qa6ecdub5d"
+      const response = await fetch(`/api/merchant/sessions/${sessionId}/delete_session`, {
         method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
       });
       const data = await response.json();
-      console.log(data); // Handle response as needed
-    } catch (error) {
+      console.log(data.message)
+      if (response.ok) {
+        return true
+      }
+      else return false
+    } 
+    catch (error) {
       console.error('Error deleting session:', error);
     }
   };
