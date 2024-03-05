@@ -14,7 +14,9 @@ module Api
           @shop.theme_app_extension = ThemeAppExtension.new
         end
 
-        Sidekiq::Client.push('class' => 'ShopWorker::ThemeUpdateJob', 'args' => [@shop.shopify_domain], 'queue' => 'themes', 'at' => Time.now.to_i + 3)
+        if ENV['SUBSCRIPTION_TEST_MODE']&.downcase == 'true'
+          Sidekiq::Client.push('class' => 'ShopWorker::ThemeUpdateJob', 'args' => [@shop.shopify_domain], 'queue' => 'themes', 'at' => Time.now.to_i + 3)
+        end
 
         render "shops/current_shop"
       end
