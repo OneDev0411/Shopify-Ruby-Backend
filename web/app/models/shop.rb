@@ -606,7 +606,7 @@ class Shop < ApplicationRecord
   #
   # Returns Httparty::response object.
   def force_purge_cache
-    if script_tag_id.blank? && !theme_app_extension&.theme_app_complete
+    if script_tag_id.blank? && !theme_app_extension&.theme_app_complete && ENV['ENABLE_THEME_APP_EXTENSION']&.downcase != 'true'
       puts "No script tag - creating"
       create_script_tag
     else
@@ -1205,7 +1205,7 @@ class Shop < ApplicationRecord
   end
 
   def publish_or_delete_script_tag
-    if !self.theme_app_extension.theme_app_complete || self.theme_app_extension.theme_version != '2.0'
+    if (!self.theme_app_extension.theme_app_complete || self.theme_app_extension.theme_version != '2.0') && ENV['ENABLE_THEME_APP_EXTENSION']&.downcase != 'true'
       self.publish_async
     elsif !script_tag_id.nil?
       self.disable_javascript
