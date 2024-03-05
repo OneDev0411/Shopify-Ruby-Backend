@@ -21,6 +21,18 @@ Rails.application.routes.draw do
     # API V1
   namespace :api do
     namespace :merchant, defaults: { format: 'json' } do
+      #Session Storage Endpoints Routes
+      resources :sessions, only: [:create, :show, :destroy] do
+        collection do
+          post :store_session
+          delete :delete_sessions, action: :delete_multiple
+          get :find_by_shop
+        end
+        member do
+          get :load_session
+          delete :delete_session
+        end
+      end
       post 'offers/load_ab_analytics', to: 'offers#ab_analytics'
       post 'element_search', to: 'products#element_search'
       post 'load_offer_details', to: 'offers#load_offer_details'
@@ -61,6 +73,9 @@ Rails.application.routes.draw do
       get 'active_theme_for_dafault_template', to: 'shops#active_theme_for_dafault_template'
     end
   end
+
+  # config/routes.rb
+
 
   # Mandatory Shopify Webhooks (don't remove them even if not used)
   post 'custom_webhooks/redact_shop', to: 'custom_webhooks#redact_shop'
