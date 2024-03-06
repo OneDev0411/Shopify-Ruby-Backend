@@ -1,16 +1,17 @@
 import { createContext, useState } from 'react';
 import { OFFER_DEFAULTS } from "./shared/constants/EditOfferOptions.js";
 
+const SETTINGS_DEFAULTS = {
+  shop_id: undefined,
+  offer_css: '',
+  css_options: {
+    main: {},
+    text: {},
+    button: {},
+  }
+}
 export default function ShopSettingProvider({ children }) {
-  const [shopSettings, setShopSettings] = useState({...{
-      shop_id: undefined,
-      offer_css: '',
-      css_options: {
-        main: {},
-        text: {},
-        button: {},
-      }
-    }});
+  const [shopSettings, setShopSettings] = useState({...SETTINGS_DEFAULTS});
 
   //Called whenever the shop changes in any child component
   function updateShopSettingsAttributes(updatedValue, ...updatedKey) {
@@ -40,9 +41,13 @@ export default function ShopSettingProvider({ children }) {
     }
   }
 
+  function resetSettings () {
+    setShopSettings(SETTINGS_DEFAULTS);
+  }
+
   return (
     <ShopSettingContext.Provider
-      value={{shopSettings, setShopSettings, updateShopSettingsAttributes}}
+      value={{shopSettings, setShopSettings, updateShopSettingsAttributes, resetSettings}}
     >
       {children}
     </ShopSettingContext.Provider>

@@ -20,7 +20,7 @@ import {useShopSettings} from "../hooks/useShopSettings.js";
 
 export default function EditPage() {
     const { offer, setOffer } = useContext(OfferContext);
-    const { shopSettings, setShopSettings } = useContext(ShopSettingContext);
+    const { shopSettings, setShopSettings, resetSettings } = useContext(ShopSettingContext);
     const { fetchOffer, saveOffer, createOffer } = useOffer();
     const { fetchShopSettings, updateShopSettings } = useShopSettings();
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -121,6 +121,7 @@ export default function EditPage() {
         }
         return function cleanup() {
             setOffer(OFFER_DEFAULTS);
+            resetSettings();
         };
     },[]);
 

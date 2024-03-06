@@ -16,14 +16,13 @@ export const useShopSettings = () => {
     return response;
   };
 
-
   const updateShopSettings = async (shopAttr) => {
     const response = await authFetch('/api/merchant/update_shop_settings', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ shopAttr, shop: shopAndHost.shop, admin: shopAttr.admin, json: true }),
+      body: JSON.stringify({ shop_attr: shopAttr, shop: shopAndHost.shop, admin: shopAttr.admin, json: true }),
     })
     return response;
   };
