@@ -55,7 +55,7 @@ export default function Offers() {
             <Layout>
               <Layout.Section>
                 <div style={{marginTop: '54px'}}>
-                  <OffersList />
+                  <OffersList pageSize={20}/>
                 </div>
               </Layout.Section>
             </Layout>
