@@ -19,6 +19,8 @@ module Api
         else
           @icushop = Shop.find(params['shop_id'])
         end
+        
+        @icushop = Shop.fetch_shop(shop.shopify_domain)
       end
 
       def ensure_plan
