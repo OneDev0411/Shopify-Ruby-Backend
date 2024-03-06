@@ -74,9 +74,6 @@ Rails.application.routes.draw do
     end
   end
 
-  # config/routes.rb
-
-
   # Mandatory Shopify Webhooks (don't remove them even if not used)
   post 'custom_webhooks/redact_shop', to: 'custom_webhooks#redact_shop'
   post 'custom_webhooks/request_customer', to: 'custom_webhooks#request_customer'
