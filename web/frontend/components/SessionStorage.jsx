@@ -61,7 +61,6 @@
   // Function to delete session
   export const deleteSession = async (sessionId, fetch) => {
     try {
-      debugger
       // Dummy Session ID
       const sessionId = "qa6ecdub5d"
       const response = await fetch(`/api/merchant/sessions/${sessionId}/delete_session`, {
@@ -83,6 +82,7 @@
   // Function to delete multiple sessions
   export const deleteSessions = async (fetch) => {
     try {
+       // Dummy Session IDs
       const sessionIds = ["yifii7xscur", "5x0mxuz7cne"]
       const response = await fetch(`/api/merchant/sessions/delete_sessions`, {
         method: 'DELETE',
@@ -107,6 +107,7 @@
   // Function to find sessions by shop
   export const findSessionsByShop = async (fetch) => {
     try {
+       // Dummy Session Domain
       const ShopDomain = "wgubmjhav8k.shopify.comkj"
       const response = await fetch(`/api/merchant/sessions/find_by_shop?domain=${ShopDomain}`, {
         method: 'GET',
