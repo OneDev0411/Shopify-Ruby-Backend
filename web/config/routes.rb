@@ -26,7 +26,7 @@ Rails.application.routes.draw do
         collection do
           post :store_session
           delete :delete_sessions, action: :delete_multiple
-          get :find_by_shop
+          get :find_by_shop, action: :find_sessions_by_shop
         end
         member do
           get :load_session

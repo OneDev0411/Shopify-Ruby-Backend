@@ -59,7 +59,7 @@
   };
 
   // Function to delete session
-  export const deleteSession = async (sessionId) => {
+  export const deleteSession = async (sessionId, fetch) => {
     try {
       debugger
       // Dummy Session ID
@@ -81,9 +81,10 @@
   };
 
   // Function to delete multiple sessions
-  export const deleteSessions = async (sessionIds) => {
+  export const deleteSessions = async (fetch) => {
     try {
-      const response = await fetch('/delete_sessions', {
+      const sessionIds = ["yifii7xscur", "5x0mxuz7cne"]
+      const response = await fetch(`/api/merchant/sessions/delete_sessions`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -91,19 +92,37 @@
         body: JSON.stringify({ ids: sessionIds }),
       });
       const data = await response.json();
-      console.log(data); // Handle response as needed
+      console.log(data.message);
+      if (response.ok) {
+        return true;
+      }
+      else {
+        return false;
+      }
     } catch (error) {
-      console.error('Error deleting sessions:', error);
+      console.log('Error deleting sessions:', error);
     }
   };
 
   // Function to find sessions by shop
-  export const findSessionsByShop = async (shopName) => {
+  export const findSessionsByShop = async (fetch) => {
     try {
-      const response = await fetch(`/sessions/${shopName}`);
-      const data = await response.json();
-      console.log(data); // Handle response as needed
+      const ShopDomain = "wgubmjhav8k.shopify.comkj"
+      const response = await fetch(`/api/merchant/sessions/find_by_shop?domain=${ShopDomain}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      const sessionsData = await response.json();
+      console.log(sessionsData);
+      if (response.ok) {
+        return sessionsData;
+      }
+      else {
+        return [];
+      }
     } catch (error) {
-      console.error('Error finding sessions by shop:', error);
+      console.log('Error finding sessions by shop:', error);
     }
   };
