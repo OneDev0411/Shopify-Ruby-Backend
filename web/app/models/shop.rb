@@ -1135,7 +1135,7 @@ class Shop < ApplicationRecord
 
   #Unpublish all offers except first when merchant switches to free plan
   def unpublish_extra_offers
-    first_active_offer_id = self.unpublished_offer_ids? ? self.unpublished_offer_ids.last : self.offers.active.last&.id
+    first_active_offer_id = self.unpublished_offer_ids? ? self.unpublished_offer_ids.last : self.offers.active.first&.id
     if first_active_offer_id.present?
       @offers = self.offers.where.not(id: first_active_offer_id)
       @offers.update({ published_at: nil, active: false })

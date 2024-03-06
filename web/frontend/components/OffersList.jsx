@@ -25,7 +25,7 @@ import {CreateOfferCard} from "./CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 
-export function OffersList() {
+export function OffersList({ pageSize }) {
   const app = useAppBridge();
   const [isLoading, setIsLoading] = useState(true);
   const [taggedWith, setTaggedWith] = useState('');
@@ -73,7 +73,7 @@ export function OffersList() {
   }, []);
 
   // Pagination configuration
-  const itemsPerPage = 5;
+  const itemsPerPage = pageSize || 5;
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
