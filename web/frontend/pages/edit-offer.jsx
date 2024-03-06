@@ -166,6 +166,11 @@ export default function EditPage() {
 
             setIsLoading(true);
         }
+
+        return function cleanup() {
+            setOffer(OFFER_DEFAULTS);
+        };
+
     },[]);
 
 

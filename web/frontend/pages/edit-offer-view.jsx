@@ -18,6 +18,7 @@ import { useAuthenticatedFetch } from "../hooks";
 import AbAnalytics from "../components/abAnalytics";
 import "../components/stylesheets/mainstyle.css";
 import {OfferContext} from "../OfferContext.jsx";
+import {OFFER_DEFAULTS} from "../shared/constants/EditOfferOptions.js";
 
 const EditOfferView = () => {
   const { offer, setOffer } = useContext(OfferContext);
@@ -120,7 +121,6 @@ const EditOfferView = () => {
           setOffer({...data});
           setInitialOfferableProductDetails(data.offerable_product_details);
           setIsLoading(false);
-          offer.publish_status == 'published' ? setOfferStatus('published') : setOfferStatus('draft');
           if (data.offerable_product_details.length > 0) {
             updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
           }
@@ -131,7 +131,10 @@ const EditOfferView = () => {
         })
       setIsLoading(false);
   }
-  },[offer.publish_status]);
+    return function cleanup() {
+      setOffer(OFFER_DEFAULTS);
+    };
+  },[offerStatus]);
 
   function updateCheckKeysValidity(updatedKey, updatedValue) {
     setCheckKeysValidity(previousState => {
@@ -159,7 +162,7 @@ const EditOfferView = () => {
               }}}
               title={offer.title}
               titleMetadata={
-                offerStatus == "published" ? (
+                offer.publish_status == "published" ? (
                   <Badge status="success">Published</Badge>
                 ) : (
                   <Badge>Unpublished</Badge>
@@ -167,8 +170,8 @@ const EditOfferView = () => {
               }
               secondaryActions={[
                 {
-                  content: (offerStatus == 'draft') ? 'Publish' : 'Unpublish',
-                  onAction: () => offerStatus == 'draft' ? handleOfferActivation() : handleOfferDeactivation(),
+                  content: (offer.publish_status == 'draft') ? 'Publish' : 'Unpublish',
+                  onAction: () => offer.publish_status == 'draft' ? handleOfferActivation() : handleOfferDeactivation(),
                 },
                 {
                   content: 'Edit', 
