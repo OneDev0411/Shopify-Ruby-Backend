@@ -201,5 +201,5 @@ export const OFFER_DEFAULTS = {
   },
 }
 
-export const OFFER_DETAILS_URL = `/api/merchant/load_offer_details`
-export const OFFER_CREATE_URL = `/api/offers/create/`
+export const OFFER_DETAILS_URL = `/api/v2/merchant/load_offer_details`
+export const OFFER_CREATE_URL = `/api/v2/offers/create/`

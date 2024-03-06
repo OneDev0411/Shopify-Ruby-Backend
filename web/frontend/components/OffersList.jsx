@@ -45,7 +45,7 @@ export function OffersList({ pageSize }) {
 
   useEffect(() => {
     let redirect = Redirect.create(app);
-    fetch('/api/merchant/offers_list', {
+    fetch('/api/v2/merchant/offers_list', {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
@@ -213,7 +213,7 @@ export function OffersList({ pageSize }) {
     selectedResources.forEach(function (resource) {
       if(paginatedData.find(obj => obj['id'] === resource)?.offerable_type != 'auto')
       {
-        let url = `/api/merchant/offers/${resource}/duplicate`;
+        let url = `/api/v2/merchant/offers/${resource}/duplicate`;
         fetch(url, {
           method: 'POST',
           headers: {
@@ -239,7 +239,7 @@ export function OffersList({ pageSize }) {
 
   function deleteSelectedOffer() {
     selectedResources.forEach(function (resource) {
-      let url = `/api/merchant/offers/${resource}`;
+      let url = `/api/v2/merchant/offers/${resource}`;
       fetch(url, {
         method: 'DELETE',
         headers: {
@@ -260,7 +260,7 @@ export function OffersList({ pageSize }) {
 
   function activateSelectedOffer() {
     selectedResources.forEach(function (resource) {
-      let url = '/api/merchant/offer_activate';
+      let url = '/api/v2/merchant/offer_activate';
       fetch(url, {
         method: 'POST',
         headers: {
@@ -283,7 +283,7 @@ export function OffersList({ pageSize }) {
 
   function deactivateSelectedOffer() {
     selectedResources.forEach(function (resource) {
-      let url = '/api/merchant/offer_deactivate';
+      let url = '/api/v2/merchant/offer_deactivate';
       fetch(url, {
         method: 'POST',
         headers: {

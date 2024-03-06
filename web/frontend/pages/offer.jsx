@@ -16,7 +16,7 @@ export default function Offers() {
   const [hasOffers, setHasOffers] = useState();
 
   useEffect(() => {
-    fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
+    fetch(`/api/v2/merchant/current_shop?shop=${shopAndHost.shop}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

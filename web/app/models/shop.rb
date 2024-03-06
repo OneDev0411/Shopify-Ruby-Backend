@@ -597,7 +597,7 @@ class Shop < ApplicationRecord
     j = Sidekiq::Client.push('class' => 'ShopWorker::ForcePurgeCacheJob', 'args' => [id], 'queue' => 'shop', 'at' => Time.now.to_i)
     update_column(:publish_job, j)
 
-    if ENV["PUBLISH_SCRIPT_VIA_API"].downcase == 'true'
+    if ENV["PUBLISH_SCRIPT_VIA_API"]&.downcase == 'true'
       query_headers = {
         'Content-Type' => 'application/json',
         'accept' => 'application/json',

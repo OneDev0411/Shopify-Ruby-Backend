@@ -13,7 +13,7 @@ export function SelectCollectionsModal(props) {
 
   function updateQuery (childData) {
     setResourceListLoading(true);
-    fetch(`/api/merchant/element_search`, {
+    fetch(`/api/v2/merchant/element_search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,7 +40,7 @@ export function SelectCollectionsModal(props) {
 
   function getCollections() {
     setResourceListLoading(true);
-    fetch(`/api/merchant/element_search`, {
+    fetch(`/api/v2/merchant/element_search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

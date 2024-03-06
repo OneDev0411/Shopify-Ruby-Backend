@@ -100,7 +100,7 @@ export function FirstTab(props) {
     //Called from chiled modal_AddProduct.jsx when the text in searchbox changes
     function updateQuery(childData) {
         setResourceListLoading(true);
-        fetch(`/api/merchant/element_search`, {
+        fetch(`/api/v2/merchant/element_search`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -137,7 +137,7 @@ export function FirstTab(props) {
     //Called when "select product manually button clicked"
     function getProducts() {
         setResourceListLoading(true);
-        fetch(`/api/merchant/element_search`, {
+        fetch(`/api/v2/merchant/element_search`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -182,7 +182,7 @@ export function FirstTab(props) {
         props.updateInitialVariants(offer.included_variants);
         var responseCount = 0;
         const promises = selectedProducts.map((productId) =>
-            fetch(`/api/merchant/products/multi/${productId}?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
+            fetch(`/api/v2/merchant/products/multi/${productId}?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -229,7 +229,7 @@ export function FirstTab(props) {
     const location = useLocation();
 
     useEffect(() => {
-        fetch(`/api/merchant/autopilot_details?shop=${shopAndHost.shop}`, {
+        fetch(`/api/v2/merchant/autopilot_details?shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -290,7 +290,7 @@ export function FirstTab(props) {
     function enableAutopilot() {
         if (autopilotButtonText === "Configure Autopilot Settings") {
             if (!openAutopilotSection) {
-                fetch(`/api/merchant/autopilot_details?shop=${shopAndHost.shop}`, {
+                fetch(`/api/v2/merchant/autopilot_details?shop=${shopAndHost.shop}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -309,7 +309,7 @@ export function FirstTab(props) {
             }
         } else if (autopilotButtonText === "Launch Autopilot") {
             setIsLoading(true);
-            fetch(`/api/merchant/enable_autopilot`, {
+            fetch(`/api/v2/merchant/enable_autopilot`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -331,7 +331,7 @@ export function FirstTab(props) {
 
 
     function checkAutopilotStatus() {
-        fetch(`/api/merchant/enable_autopilot_status?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
+        fetch(`/api/v2/merchant/enable_autopilot_status?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

@@ -59,7 +59,7 @@ export default function EditPage() {
         if (location?.state?.offerID == null) {
             setIsLoading(true);
 
-            fetch(`/api/merchant/shop_settings`, {
+            fetch(`/api/v2/merchant/shop_settings`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ export default function EditPage() {
                 })
         } else {
             setIsLoading(true);
-            fetch(`/api/merchant/load_offer_details`, {
+            fetch(`/api/v2/merchant/load_offer_details`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ export default function EditPage() {
                     setOffer({...data});
                     setInitialOfferableProductDetails(data.offerable_product_details);
 
-                    fetch(`/api/merchant/shop_settings`, {
+                    fetch(`/api/v2/merchant/shop_settings`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -338,7 +338,7 @@ export default function EditPage() {
             let data = {
                 ...prev, uses_ajax_cart: shop_uses_ajax_cart
             }
-            fetch('/api/merchant/update_shop_settings', {
+            fetch('/api/v2/merchant/update_shop_settings', {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -356,7 +356,7 @@ export default function EditPage() {
         });
         if (location.state != null && location.state?.offerID == null) {
             try {
-                const response = await fetch(`/api/offers/create/${shop?.shop_id}`, {
+                const response = await fetch(`/api/v2/offers/create/${shop?.shop_id}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -372,7 +372,7 @@ export default function EditPage() {
             }
         } else {
             try {
-                const response = await fetch(`/api/offers/${offer.id}/update/${shop.shop_id}`, {
+                const response = await fetch(`/api/v2/offers/${offer.id}/update/${shop.shop_id}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json'
