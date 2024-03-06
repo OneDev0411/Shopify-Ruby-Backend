@@ -31,9 +31,11 @@ import {
     OrderArray
 } from "../../../shared/constants/EditOfferOptions";
 import {OfferContext} from "../../../OfferContext.jsx";
+import {ShopSettingContext} from "../../../ShopSettingContext.jsx";
 
 export function SecondTab(props) {
     const { offer, setOffer, updateOffer, updateNestedAttributeOfOffer } = useContext(OfferContext);
+    const { shopSettings } = useContext(ShopSettingContext);
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
 
@@ -57,7 +59,7 @@ export function SecondTab(props) {
     const [templateImagesURL, setTemplateImagesURL] = useState({});
     const [storedThemeNames, setStoredThemeName] = useState([]);
 
-    const [isLegacy, setIsLegacy] = useState(props.shop.theme_version === 'Vintage');
+    const [isLegacy, setIsLegacy] = useState(shopSettings.theme_version === 'Vintage');
 
     useEffect(() => {
         fetch(`/api/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
@@ -711,7 +713,7 @@ export function SecondTab(props) {
                   <Banner title="You are using Shopify's Theme Editor" tone='warning'>
                       <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
                       <p><Link
-                        to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?context=apps&template=${offer.in_product_page ? 'product' : 'cart' }&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
+                        to={`https://${shopSettings.shopify_domain}/admin/themes/current/editor?context=apps&template=${offer.in_product_page ? 'product' : 'cart' }&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
                         target="_blank">Click here</Link> to go to the theme editor</p>
                   </Banner>
               </div>
@@ -769,7 +771,7 @@ export function SecondTab(props) {
                         }}>
                         <Modal.Section>
                             <SelectProductsModal selectedItems={selectedItems} setSelectedItems={setSelectedItems}
-                                                 offer={offer} shop={props.shop}
+                                                 offer={offer} shop={shopSettings}
                                                  handleProductsModal={handleProductsModal}
                                                  selectedProducts={selectedProducts}
                                                  setSelectedProducts={setSelectedProducts}/>
@@ -787,7 +789,7 @@ export function SecondTab(props) {
                         }}>
                         <Modal.Section>
                             <SelectCollectionsModal selectedItems={selectedItems} setSelectedItems={setSelectedItems}
-                                                    offer={offer} shop={props.shop}
+                                                    offer={offer} shop={shopSettings}
                                                     handleCollectionsModal={handleCollectionsModal}
                                                     selectedCollections={selectedCollections}
                                                     setSelectedCollections={setSelectedCollections}/>
@@ -955,7 +957,7 @@ export function SecondTab(props) {
                                         />
                                     </Grid.Cell>
                                 </Grid>
-                                {props.shop.default_template_settings?.templateForAjaxCart && (
+                                {shopSettings.default_template_settings?.templateForAjaxCart && (
                                     <>
                                         <div className="space-4"/>
                                         <Image

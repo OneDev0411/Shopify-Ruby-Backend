@@ -23,9 +23,12 @@ import {InfoMinor} from '@shopify/polaris-icons';
 import {ModalAddProduct} from "./../../modal_AddProduct";
 import {useAuthenticatedFetch} from "../../../hooks";
 import { AutopilotQuantityOptions } from "../../../shared/constants/EditOfferOptions";
+import {ShopSettingContext} from "../../../ShopSettingContext.jsx";
+
 
 export function FirstTab(props) {
     const { offer, updateOffer, updateProductsOfOffer, updateIncludedVariants } = useContext(OfferContext);
+    const { shopSettings } = useContext(ShopSettingContext);
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [isLoading, setIsLoading] = useState(false);
@@ -182,7 +185,7 @@ export function FirstTab(props) {
         props.updateInitialVariants(offer.included_variants);
         var responseCount = 0;
         const promises = selectedProducts.map((productId) =>
-            fetch(`/api/merchant/products/multi/${productId}?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
+            fetch(`/api/merchant/products/multi/${productId}?shop_id=${shopSettings.shop_id}&shop=${shopAndHost.shop}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -314,7 +317,7 @@ export function FirstTab(props) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({shop_id: props.shop.shop_id, shop: shopAndHost.shop}),
+                body: JSON.stringify({shop_id: shopSettings.shop_id, shop: shopAndHost.shop}),
             })
                 .then((response) => {
                     return response.json()
@@ -331,7 +334,7 @@ export function FirstTab(props) {
 
 
     function checkAutopilotStatus() {
-        fetch(`/api/merchant/enable_autopilot_status?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
+        fetch(`/api/merchant/enable_autopilot_status?shop_id=${shopSettings.shop_id}&shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -398,7 +401,7 @@ export function FirstTab(props) {
                                 <p style={{color: '#6D7175'}}>What product would you like to have in the offer?</p>
                             )}
 
-                            {offer.id == null && !props.autopilotCheck?.autopilot_offer_id && props.shop.has_pro_features ? (
+                            {offer.id == null && !props.autopilotCheck?.autopilot_offer_id && shopSettings.has_pro_features ? (
                                 <>
                                     <div style={{marginBottom: '20px'}}>
                                         <Button id={"btnLaunchAI"}
@@ -420,7 +423,7 @@ export function FirstTab(props) {
                                 </div>
                             )}
 
-                            {(!props.shop.has_pro_features) && (
+                            {(!shopSettings.has_pro_features) && (
                                 <ButtonGroup>
                                     <>
                                         <div>
@@ -524,7 +527,7 @@ export function FirstTab(props) {
                                 id="basic-collapsible"
                                 transition={{ duration: '500ms', timingFunction: 'ease-in-out' }}
                             >
-                                {!props.shop.has_pro_features ? (
+                                {!shopSettings.has_pro_features ? (
                                     <div style={{maxWidth: '476px', marginTop: '10px'}}>
                                         <Text as="p" variant="headingSm" fontWeight="regular">
                                             A/B testing is available on our Paid plan. Please <Link
@@ -624,7 +627,7 @@ export function FirstTab(props) {
                                       onChange={handleShowNoThanksChange}
                                       label="Customer can't dismiss offer"
                             />
-                            {props.shop.has_redirect_to_product == true && (
+                            {shopSettings.has_redirect_to_product == true && (
                                 <Checkbox id={"redirectToProduct"}
                                       checked={offer.redirect_to_product}
                                       onChange={handleRedirectedToProductChange}
@@ -654,7 +657,7 @@ export function FirstTab(props) {
                         }}
                     >
                         <ModalAddProduct selectedItems={selectedItems} setSelectedItems={setSelectedItems}
-                                         offer={offer} updateQuery={updateQuery} shop_id={props.shop.shop_id}
+                                         offer={offer} updateQuery={updateQuery} shop_id={shopSettings.shop_id}
                                          productData={productData} resourceListLoading={resourceListLoading}
                                          setResourceListLoading={setResourceListLoading}
                                          updateSelectedProduct={updateSelectedProduct}/>

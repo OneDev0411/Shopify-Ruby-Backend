@@ -12,10 +12,12 @@ import React from "react";
 import {Link} from "react-router-dom";
 import { DOMActionOptions } from "../../../shared/constants/DOMActionOptions";
 import {OfferContext} from "../../../OfferContext.jsx";
+import {ShopSettingContext} from "../../../ShopSettingContext.jsx";
 
 // Advanced Tab
 export function FourthTab(props) {
     const { offer, updateOffer, updateNestedAttributeOfOffer } = useContext(OfferContext);
+    const { shopSettings } = useContext(ShopSettingContext);
     const handleChange = useCallback((newChecked) => updateOffer("save_as_default_setting", newChecked), []);
     const handleProductDomSelector = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting",  "custom_product_page_dom_selector"), []);
     const handleProductDomAction = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_product_page_dom_action"), []);
@@ -25,7 +27,7 @@ export function FourthTab(props) {
     const handleAjaxDomAction = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_ajax_dom_action"), []);
     const handleOfferCss = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "custom_css"), []);
     
-    const [isLegacy, setIsLegacy] = useState(props.shop.theme_version === 'Vintage');
+    const [isLegacy, setIsLegacy] = useState(shopSettings.theme_version === 'Vintage');
     const [openBanner, setOpenBanner] = useState(false);
 
     useEffect(() => {
@@ -42,7 +44,7 @@ export function FourthTab(props) {
                     <Banner title="You are using Shopify's Theme Editor"  tone='warning'>
                         <p>Please use the theme editor to place the offers where you would like it.</p><br/>
                         <p><Link
-                          to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?template=${offer.in_product_page ? 'product' : 'cart' }&addAppBlockId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block&target=${offer.in_product_page ? 'mainSection' : 'newAppsSection'}`}
+                          to={`https://${shopSettings.shopify_domain}/admin/themes/current/editor?template=${offer.in_product_page ? 'product' : 'cart' }&addAppBlockId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block&target=${offer.in_product_page ? 'mainSection' : 'newAppsSection'}`}
                           target="_blank">Click here</Link> to go to the theme editor</p>
                     </Banner>
                 </div>
@@ -57,7 +59,7 @@ export function FourthTab(props) {
                             <>
                                 <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
                                 <p><Link
-                                to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?context=apps&template=${offer.in_product_page ? 'product' : 'cart' }&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
+                                to={`https://${shopSettings.shopify_domain}/admin/themes/current/editor?context=apps&template=${offer.in_product_page ? 'product' : 'cart' }&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
                                 target="_blank">Click here</Link> to go to theme editor</p>
                             </>
                         :
