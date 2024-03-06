@@ -44,7 +44,7 @@ class OffersController < AuthenticatedController
     end
   end
 
-  # POST  api/offers/:id/update/:shop_id(.:format)
+  # POST  api/v2/offers/:id/update/:shop_id(.:format)
   # The CURRENT offer update method
   def update_from_builder
     offer = @icushop.offers.find_by(id: params[:id])

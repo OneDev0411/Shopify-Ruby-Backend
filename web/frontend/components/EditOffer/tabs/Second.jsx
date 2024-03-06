@@ -62,7 +62,7 @@ export function SecondTab(props) {
     );
 
     useEffect(() => {
-        fetch(`/api/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
+        fetch(`/api/v2/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -619,7 +619,7 @@ export function SecondTab(props) {
     }, []);
 
     function getSelectedItems(item_type) {
-        return fetch(`/api/merchant/offer/shopify_ids_from_rule`, {
+        return fetch(`/api/v2/merchant/offer/shopify_ids_from_rule`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

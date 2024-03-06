@@ -34,7 +34,7 @@ const EditOfferView = () => {
   }
 
   const handleOfferActivation = () => {
-    fetch(`/api/merchant/offer_activate`, {
+    fetch(`/api/v2/merchant/offer_activate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -52,7 +52,7 @@ const EditOfferView = () => {
   }
 
   const handleOfferDeactivation = () => {
-    fetch('/api/merchant/offer_deactivate', {
+    fetch('/api/v2/merchant/offer_deactivate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -70,7 +70,7 @@ const EditOfferView = () => {
   }
 
   const handleDuplicateOffer = () => {
-    fetch(`/api/merchant/offers/${offerID}/duplicate`, {
+    fetch(`/api/v2/merchant/offers/${offerID}/duplicate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -87,7 +87,7 @@ const EditOfferView = () => {
   }
 
   const handleDeleteOffer = () => {
-    fetch(`/api/merchant/offers/${offerID}`, {
+    fetch(`/api/v2/merchant/offers/${offerID}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -106,7 +106,7 @@ const EditOfferView = () => {
   useEffect(() => {
     if (offerID != null) {
       setIsLoading(true);
-      fetch(`/api/merchant/load_offer_details`, {
+      fetch(`/api/v2/merchant/load_offer_details`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

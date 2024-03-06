@@ -25,7 +25,7 @@ export function TotalSalesData(props) {
         let redirect = Redirect.create(app);
         if(loading) return;
         setLoading(true)
-        fetch(`/api/merchant/shop_sale_stats`, {
+        fetch(`/api/v2/merchant/shop_sale_stats`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ export function ConversionRate(props) {
     function getOffersStatsTimesLoaded(period) {
         let redirect = Redirect.create(app);
         getOffersStats(
-            `/api/merchant/shop_offers_stats_times_loaded`, 
+            `/api/v2/merchant/shop_offers_stats_times_loaded`, 
             period, 
             (data) => {
                 if (data.redirect_to) {
@@ -130,7 +130,7 @@ export function ConversionRate(props) {
 
     function getOffersStatsTimesClicked(period) {
         getOffersStats(
-            `/api/merchant/shop_offers_stats_times_clicked`,
+            `/api/v2/merchant/shop_offers_stats_times_clicked`,
             period,
             (data) => { setAddedToCart(data.stat_times_clicked); }
         )
@@ -138,7 +138,7 @@ export function ConversionRate(props) {
 
     function getOffersStatsTimesCheckedout(period) {
         getOffersStats(
-            `/api/merchant/shop_offers_stats_times_checkedout`,
+            `/api/v2/merchant/shop_offers_stats_times_checkedout`,
             period,
             (data) => { setReachedCheckout(data.stat_times_checkedout); }
         )
@@ -186,7 +186,7 @@ export function OrderOverTimeData(props) {
         let redirect = Redirect.create(app);
         if(loading) return;
         setLoading(true)
-        fetch(`/api/merchant/shop_orders_stats`, {
+        fetch(`/api/v2/merchant/shop_orders_stats`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -255,7 +255,7 @@ export function TopPerformingOffersData(props) {
 
     function getOffersData(period) {
         let redirect = Redirect.create(app);
-        fetch(`/api/merchant/offers_list_by_period`, {
+        fetch(`/api/v2/merchant/offers_list_by_period`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -329,7 +329,7 @@ export function AbTestingData(props) {
         if(loading) return;
         setLoading(true)
 
-        fetch(`/api/merchant/shop_sale_stats`, {
+        fetch(`/api/v2/merchant/shop_sale_stats`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -404,7 +404,7 @@ export function ClickThroughtRateData(props) {
         let redirect = Redirect.create(app);
         if(loading) return;
         setLoading(true)
-        fetch(`/api/merchant/shop_clicks_stats`, {
+        fetch(`/api/v2/merchant/shop_clicks_stats`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -12,7 +12,7 @@ const AbAnalytics = (props) => {
     const fetch = useAuthenticatedFetch(shopAndHost.host);
 
     const getAbAnalytics = useCallback((offerId, shop, version, setRequiredState) => {
-        fetch(`/api/merchant/offers/load_ab_analytics`, {
+        fetch(`/api/v2/merchant/offers/load_ab_analytics`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
