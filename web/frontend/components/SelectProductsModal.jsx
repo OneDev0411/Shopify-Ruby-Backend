@@ -13,7 +13,7 @@ export function SelectProductsModal(props) {
 
   function updateQuery(childData) {
     setResourceListLoading(true);
-    fetch(`/api/merchant/element_search`, {
+    fetch(`/api/v2/merchant/element_search`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export function SelectProductsModal(props) {
 
   async function getProducts() {
     setResourceListLoading(true);
-    fetch(`/api/merchant/element_search`, {
+    fetch(`/api/v2/merchant/element_search`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

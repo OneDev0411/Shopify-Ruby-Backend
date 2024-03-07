@@ -5,7 +5,6 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import {Icon, Layout, Page, Spinner, Tabs} from '@shopify/polaris';
 import {DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
 import {Redirect} from '@shopify/app-bridge/actions';
-
 import {useAuthenticatedFetch} from "../hooks";
 import {FirstTab, FourthTab, SecondTab, ThirdTab} from "../components";
 import {OfferPreview} from "../components/OfferPreview";
@@ -60,7 +59,7 @@ export default function EditPage() {
         let redirect = Redirect.create(app);
         if (location?.state?.offerID == null) {
             setIsLoading(true);
-            fetch(`/api/merchant/shop_settings`, {
+            fetch(`/api/v2/merchant/shop_settings`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -104,61 +103,61 @@ export default function EditPage() {
                 })
         } else {
             setIsLoading(true);
-                fetchOffer(offerID, shopAndHost.shop).then((response) => {
-                    if (response.status === 200) {
-                        return response.json()
-                    }
-                    navigateTo('/offer');
-                }).then((data) => {
-                    setInitialVariants({...data.included_variants});
-                    if (data.offerable_product_details.length > 0) {
-                        updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
-                    }
-                    updateCheckKeysValidity('cta', data.cta_a);
-                    for (var i = 0; i < data.offerable_product_details.length; i++) {
-                        data.offerable_product_details[i].preview_mode = true;
-                    }
-                    setOffer({...data});
-                    setInitialOfferableProductDetails(data.offerable_product_details);
+            fetchOffer(offerID, shopAndHost.shop).then((response) => {
+                if (response.status === 200) {
+                    return response.json()
+                }
+                navigateTo('/offer');
+            }).then((data) => {
+                setInitialVariants({...data.included_variants});
+                if (data.offerable_product_details.length > 0) {
+                    updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
+                }
+                updateCheckKeysValidity('cta', data.cta_a);
+                for (var i = 0; i < data.offerable_product_details.length; i++) {
+                    data.offerable_product_details[i].preview_mode = true;
+                }
+                setOffer({...data});
+                setInitialOfferableProductDetails(data.offerable_product_details);
 
-                    fetch(`/api/merchant/shop_settings`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({shop_attr: {admin: null}, shop: shopAndHost.shop}),
-                    })
-                      .then((response) => {
-                          return response.json()
-                      })
-                      .then((data) => {
-                          if (data.redirect_to) {
-                              redirect.dispatch(Redirect.Action.APP, data.redirect_to);
-                          } else {
-                              if (Object.keys(data.shop_settings.css_options.main).length == 0) {
-                                  data.shop_settings.css_options.main.color = "#2B3D51";
-                                  data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
-                                  data.shop_settings.css_options.button.color = "#FFFFFF";
-                                  data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
-                                  data.shop_settings.css_options.widows = '100%';
-                              }
+                fetch(`/api/v2/merchant/shop_settings`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({shop_attr: {admin: null}, shop: shopAndHost.shop}),
+                })
+                  .then((response) => {
+                      return response.json()
+                  })
+                  .then((data) => {
+                      if (data.redirect_to) {
+                          redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                      } else {
+                          if (Object.keys(data.shop_settings.css_options.main).length == 0) {
+                              data.shop_settings.css_options.main.color = "#2B3D51";
+                              data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
+                              data.shop_settings.css_options.button.color = "#FFFFFF";
+                              data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
+                              data.shop_settings.css_options.widows = '100%';
                           }
-                          setShop(data.shop_settings);
-                          setThemeAppExtension(data.theme_app_extension)
+                      }
+                      setShop(data.shop_settings);
+                      setThemeAppExtension(data.theme_app_extension)
 
-                          setUpdatePreviousAppOffer(!updatePreviousAppOffer);
+                      setUpdatePreviousAppOffer(!updatePreviousAppOffer);
 
-                          setIsLoading(false);
-                      })
-                      .catch((error) => {
-                          setIsLoading(false);
-                          console.log("Error > ", error);
-                      })
-                })
-                .catch((error) => {
-                    setIsLoading(false);
-                    console.log("Error > ", error);
-                })
+                      setIsLoading(false);
+                  })
+                  .catch((error) => {
+                      setIsLoading(false);
+                      console.log("Error > ", error);
+                  })
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                console.log("Error > ", error);
+            })
 
             setIsLoading(true);
         }
@@ -260,7 +259,7 @@ export default function EditPage() {
             let data = {
                 ...prev, uses_ajax_cart: shop_uses_ajax_cart
             }
-            fetch('/api/merchant/update_shop_settings', {
+            fetch('/api/v2/merchant/update_shop_settings', {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

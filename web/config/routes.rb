@@ -14,50 +14,52 @@ Rails.application.routes.draw do
 
   get '/confirm_from_outside', to: 'js#confirm_from_outside'
 
-  post 'api/offers/create/:shop_id', to: 'offers#create_from_builder'
-  patch 'api/offers/:id/update/:shop_id', to: 'offers#update_from_builder'
+  post 'api/v2/offers/create/:shop_id', to: 'offers#create_from_builder'
+  patch 'api/v2/offers/:id/update/:shop_id', to: 'offers#update_from_builder'
 
     # API V1
   namespace :api do
-    namespace :merchant, defaults: { format: 'json' } do
-      post 'offers/load_ab_analytics', to: 'offers#ab_analytics'
-      post 'element_search', to: 'products#element_search'
-      post 'load_offer_details', to: 'offers#load_offer_details'
-      post 'offer_settings', to: 'offers#offer_settings'
-      post 'shop_settings', to: 'shops#shop_settings'
-      get 'shop_offers', to: 'offers#shop_offers'
-      get '/products/shopify/:shopify_id' => 'products#shopify_details'
-      get '/products/multi/:shopify_id' => 'products#details_for_multi'
-      patch 'update_shop_settings', to: 'shops#update_shop_settings'
-      get 'current_shop', to: 'shops#current_shop'
-      get 'toggle_activation', to: 'shops#toggle_activation'
-      put 'subscription', to: 'subscriptions#update'
-      get 'current_subscription', to: 'subscriptions#current_subscription'
-      get 'subscription/confirm_charge', to: 'subscriptions#confirm_charge', as: :confirm_charge
-      get 'partners', to: 'partners#index'
-      get 'shop_info' => 'shops#shop_info'
-      get 'autopilot_details', to: 'shops#autopilot_details'
-      post 'enable_autopilot', to: 'shops#enable_autopilot'
-      get 'enable_autopilot_status', to: 'shops#enable_autopilot_status'
+    namespace :v2 do
+      namespace :merchant, defaults: { format: 'json' } do
+        post 'offers/load_ab_analytics', to: 'offers#ab_analytics'
+        post 'element_search', to: 'products#element_search'
+        post 'load_offer_details', to: 'offers#load_offer_details'
+        post 'offer_settings', to: 'offers#offer_settings'
+        post 'shop_settings', to: 'shops#shop_settings'
+        get 'shop_offers', to: 'offers#shop_offers'
+        get '/products/shopify/:shopify_id' => 'products#shopify_details'
+        get '/products/multi/:shopify_id' => 'products#details_for_multi'
+        patch 'update_shop_settings', to: 'shops#update_shop_settings'
+        get 'current_shop', to: 'shops#current_shop'
+        get 'toggle_activation', to: 'shops#toggle_activation'
+        put 'subscription', to: 'subscriptions#update'
+        get 'current_subscription', to: 'subscriptions#current_subscription'
+        get 'subscription/confirm_charge', to: 'subscriptions#confirm_charge', as: :confirm_charge
+        get 'partners', to: 'partners#index'
+        get 'shop_info' => 'shops#shop_info'
+        get 'autopilot_details', to: 'shops#autopilot_details'
+        post 'enable_autopilot', to: 'shops#enable_autopilot'
+        get 'enable_autopilot_status', to: 'shops#enable_autopilot_status'
 
-      post 'offers_list', to: 'offers#offers_list'
-      post 'offer_stats', to: 'offers#offer_stats'
-      post 'offers_list_by_period', to: 'offers#offers_list_by_period'
-      post 'offer_activate', to: 'offers#activate'
-      post 'offer_deactivate', to: 'offers#deactivate'
-      post 'shop_sale_stats', to: 'shops#shop_sale_stats'
-      post 'shop_orders_stats', to: 'shops#shop_orders_stats'
+        post 'offers_list', to: 'offers#offers_list'
+        post 'offer_stats', to: 'offers#offer_stats'
+        post 'offers_list_by_period', to: 'offers#offers_list_by_period'
+        post 'offer_activate', to: 'offers#activate'
+        post 'offer_deactivate', to: 'offers#deactivate'
+        post 'shop_sale_stats', to: 'shops#shop_sale_stats'
+        post 'shop_orders_stats', to: 'shops#shop_orders_stats'
 
-      post 'shop_offers_stats_click_revenue', to: 'shops#shop_offers_stats_click_revenue'
-      post 'shop_offers_stats_times_loaded', to: 'shops#shops_offers_stats_times_loaded'
-      post 'shop_offers_stats_times_clicked', to: 'shops#shops_offers_stats_times_clicked'
-      post 'shop_offers_stats_times_checkedout', to: 'shops#shops_offers_stats_times_checkedout'
+        post 'shop_offers_stats_click_revenue', to: 'shops#shop_offers_stats_click_revenue'
+        post 'shop_offers_stats_times_loaded', to: 'shops#shops_offers_stats_times_loaded'
+        post 'shop_offers_stats_times_clicked', to: 'shops#shops_offers_stats_times_clicked'
+        post 'shop_offers_stats_times_checkedout', to: 'shops#shops_offers_stats_times_checkedout'
 
-      post 'shop_clicks_stats', to: 'shops#shop_clicks_stats'
-      post '/offers/:id/duplicate', to: 'offers#duplicate'
-      delete '/offers/:id', to: 'offers#destroy'
-      post 'offer/shopify_ids_from_rule', to: 'offers#shopify_ids_from_rule'
-      get 'active_theme_for_dafault_template', to: 'shops#active_theme_for_dafault_template'
+        post 'shop_clicks_stats', to: 'shops#shop_clicks_stats'
+        post '/offers/:id/duplicate', to: 'offers#duplicate'
+        delete '/offers/:id', to: 'offers#destroy'
+        post 'offer/shopify_ids_from_rule', to: 'offers#shopify_ids_from_rule'
+        get 'active_theme_for_dafault_template', to: 'shops#active_theme_for_dafault_template'
+      end
     end
   end
 

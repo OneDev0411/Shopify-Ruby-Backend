@@ -25,7 +25,7 @@ import {CreateOfferCard} from "./CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 
-export function OffersList() {
+export function OffersList({ pageSize }) {
   const app = useAppBridge();
   const [isLoading, setIsLoading] = useState(true);
   const [taggedWith, setTaggedWith] = useState('');
@@ -45,7 +45,7 @@ export function OffersList() {
 
   useEffect(() => {
     let redirect = Redirect.create(app);
-    fetch('/api/merchant/offers_list', {
+    fetch('/api/v2/merchant/offers_list', {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
@@ -73,7 +73,7 @@ export function OffersList() {
   }, []);
 
   // Pagination configuration
-  const itemsPerPage = 5;
+  const itemsPerPage = pageSize || 5;
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -213,7 +213,7 @@ export function OffersList() {
     selectedResources.forEach(function (resource) {
       if(paginatedData.find(obj => obj['id'] === resource)?.offerable_type != 'auto')
       {
-        let url = `/api/merchant/offers/${resource}/duplicate`;
+        let url = `/api/v2/merchant/offers/${resource}/duplicate`;
         fetch(url, {
           method: 'POST',
           headers: {
@@ -239,7 +239,7 @@ export function OffersList() {
 
   function deleteSelectedOffer() {
     selectedResources.forEach(function (resource) {
-      let url = `/api/merchant/offers/${resource}`;
+      let url = `/api/v2/merchant/offers/${resource}`;
       fetch(url, {
         method: 'DELETE',
         headers: {
@@ -260,7 +260,7 @@ export function OffersList() {
 
   function activateSelectedOffer() {
     selectedResources.forEach(function (resource) {
-      let url = '/api/merchant/offer_activate';
+      let url = '/api/v2/merchant/offer_activate';
       fetch(url, {
         method: 'POST',
         headers: {
@@ -283,7 +283,7 @@ export function OffersList() {
 
   function deactivateSelectedOffer() {
     selectedResources.forEach(function (resource) {
-      let url = '/api/merchant/offer_deactivate';
+      let url = '/api/v2/merchant/offer_deactivate';
       fetch(url, {
         method: 'POST',
         headers: {

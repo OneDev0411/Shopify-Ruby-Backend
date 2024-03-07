@@ -204,7 +204,7 @@ export const OFFER_DEFAULTS = {
 export const OFFER_PUBLISH = "published"
 export const OFFER_DRAFT = "draft"
 
-export const OFFER_DETAILS_URL = `/api/merchant/load_offer_details`
-export const OFFER_CREATE_URL = `/api/offers/create/`;
-export const OFFER_ACTIVATE_URL = `/api/merchant/offer_activate`
-export const OFFER_DEACTIVATE_URL = `/api/merchant/offer_deactivate`
+export const OFFER_ACTIVATE_URL = `/api/v2/merchant/offer_activate`
+export const OFFER_DEACTIVATE_URL = `/api/v2/merchant/offer_deactivate`
+export const OFFER_DETAILS_URL = `/api/v2/merchant/load_offer_details`
+export const OFFER_CREATE_URL = `/api/v2/offers/create/`
