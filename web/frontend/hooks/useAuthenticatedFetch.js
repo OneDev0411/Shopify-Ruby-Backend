@@ -28,7 +28,7 @@ export function useAuthenticatedFetch(host) {
     headers.append('SourceApp', "icu-polaris");
     options.headers = headers;
     let response;
-    if(url.includes('https://web.incartupsell.com')) {
+    if(uri.includes('https://web.incartupsell.com')) {
       const trace = beginTrace(new URL(url).pathname);
       response = await fetchFunction(uriWithHost, options);
       endTrace(trace);

@@ -365,7 +365,7 @@ export default function EditPage() {
                                         : ""}
                                     {selected == 3 ?
                                         // page was imported from components folder
-                                        <FourthTab shopifysaveDraft={saveDraft} publishOffer={publishOffer}
+                                        <FourthTab saveDraft={saveDraft} publishOffer={publishOffer}
                                                    enablePublish={enablePublish} />
                                         : ""}
                                 </Tabs>
