@@ -23,12 +23,7 @@
       });
       const data = await response.json();
       console.log(data.message)
-      if (response.ok) {
-        return true;
-      }
-      else {
-        return false;
-      }
+      return response.ok
     } catch (error) {
       console.log('Error storing session:', error);
       return false;
@@ -69,10 +64,7 @@
       });
       const data = await response.json();
       console.log(data.message)
-      if (response.ok) {
-        return true
-      }
-      else return false
+      return response.ok
     } 
     catch (error) {
       console.error('Error deleting session:', error);
@@ -93,12 +85,7 @@
       });
       const data = await response.json();
       console.log(data.message);
-      if (response.ok) {
-        return true;
-      }
-      else {
-        return false;
-      }
+      return response.ok
     } catch (error) {
       console.log('Error deleting sessions:', error);
     }

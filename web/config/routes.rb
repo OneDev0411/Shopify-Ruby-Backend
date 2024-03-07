@@ -24,13 +24,13 @@ Rails.application.routes.draw do
       #Session Storage Endpoints Routes
       resources :sessions, only: [:create, :show, :destroy] do
         collection do
-          post :store_session
+          post :store_session, action: :create
           delete :delete_sessions, action: :delete_multiple
           get :find_by_shop, action: :find_sessions_by_shop
         end
         member do
-          get :load_session
-          delete :delete_session
+          get :load_session, action: show
+          delete :delete_session, action: :delete
         end
       end
       post 'offers/load_ab_analytics', to: 'offers#ab_analytics'

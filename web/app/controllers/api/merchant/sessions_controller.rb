@@ -1,13 +1,13 @@
 module Api
   module Merchant
     class SessionsController < ApiMerchantBaseController      
-      before_action :session_params, only: [:store_session]
-      before_action :set_session, only: [:store_session]
-      before_action :find_by_session_id, only: [:load_session, :delete_session]
+      before_action :session_params, only: [:create]
+      before_action :set_session, only: [:create]
+      before_action :find_by_session_id, only: [:show, :delete]
       before_action :find_by_session_ids, only: [:delete_multiple]
       before_action :find_by_shopify_domain, only: [:find_sessions_by_shop]
 
-      def store_session
+      def create
         session_service = SessionService.new
         if @session.present?
           session_service.update_session(@session_params, @session)
@@ -17,7 +17,7 @@ module Api
         render json: response[:message], status: response[:status]
       end
 
-      def load_session
+      def show
         if @session.present?
           render json: @session, message: 'Session Found', status: :ok
         else
@@ -25,7 +25,7 @@ module Api
         end
       end
 
-      def delete_session
+      def delete
         if @session.present? && @session.delete
           render json: { message: 'Session deleted successfully' }, status: :ok
         else
