@@ -1,5 +1,5 @@
 import {createContext, useEffect, useRef, useState} from 'react';
-import {OFFER_DEFAULTS} from "./shared/constants/EditOfferOptions.js";
+import {OFFER_DEFAULTS} from "../shared/constants/EditOfferOptions.js";
 
 export default function OfferProvider({ children }) {
   const [offer, setOffer] = useState({...OFFER_DEFAULTS});

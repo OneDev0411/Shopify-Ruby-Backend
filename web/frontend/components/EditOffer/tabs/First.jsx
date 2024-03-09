@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState, useContext} from "react";
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {useSelector} from 'react-redux';
-import { OfferContext } from "../../../OfferContext.jsx";
+import { OfferContext } from "../../../contexts/OfferContext.jsx";
 
 import {
     Badge,
@@ -23,12 +23,12 @@ import {InfoMinor} from '@shopify/polaris-icons';
 import {ModalAddProduct} from "./../../modal_AddProduct";
 import {useAuthenticatedFetch} from "../../../hooks";
 import { AutopilotQuantityOptions } from "../../../shared/constants/EditOfferOptions";
-import {ShopSettingContext} from "../../../ShopSettingContext.jsx";
+import {useShopState} from "../../../contexts/ShopContext.jsx";
 
 
 export function FirstTab(props) {
     const { offer, updateOffer, updateProductsOfOffer, updateIncludedVariants } = useContext(OfferContext);
-    const { shopSettings } = useContext(ShopSettingContext);
+    const { shopSettings } = useShopState();
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [isLoading, setIsLoading] = useState(false);

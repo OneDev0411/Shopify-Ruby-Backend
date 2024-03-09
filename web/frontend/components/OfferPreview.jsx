@@ -8,13 +8,13 @@ import Carousel from './layouts/template_multi_carousel';
 import Flex from './layouts/template_multi_flex';
 import {useAuthenticatedFetch} from "../hooks/index.js";
 import {useSelector} from "react-redux";
-import {OfferContext} from "../OfferContext.jsx";
-import {ShopSettingContext} from "../ShopSettingContext.jsx";
+import {OfferContext} from "../contexts/OfferContext.jsx";
+import {useShopState} from "../contexts/ShopContext.jsx";
 
 
 export function OfferPreview(props) {
 	const { offer, updateOffer, updateNestedAttributeOfOffer } = useContext(OfferContext);
-	const { shopSettings } = useContext(ShopSettingContext);
+	const { shopSettings } = useShopState();
 	const shopAndHost = useSelector(state => state.shopAndHost);
 
 	const [carouselLoading, setCarouselLoading] = useState(false);

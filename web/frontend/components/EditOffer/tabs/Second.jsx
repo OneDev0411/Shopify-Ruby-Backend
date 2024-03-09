@@ -30,12 +30,12 @@ import {
     QuantityArray,
     OrderArray
 } from "../../../shared/constants/EditOfferOptions";
-import {OfferContext} from "../../../OfferContext.jsx";
-import {ShopSettingContext} from "../../../ShopSettingContext.jsx";
+import {OfferContext} from "../../../contexts/OfferContext.jsx";
+import {useShopState} from "../../../contexts/ShopContext.jsx";
 
 export function SecondTab(props) {
     const { offer, setOffer, updateOffer, updateNestedAttributeOfOffer } = useContext(OfferContext);
-    const { shopSettings } = useContext(ShopSettingContext);
+    const { shopSettings } = useShopState();
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
 

@@ -11,13 +11,13 @@ import {useState, useCallback, useEffect, useContext} from "react";
 import React from "react";
 import {Link} from "react-router-dom";
 import { DOMActionOptions } from "../../../shared/constants/DOMActionOptions";
-import {OfferContext} from "../../../OfferContext.jsx";
-import {ShopSettingContext} from "../../../ShopSettingContext.jsx";
+import {OfferContext} from "../../../contexts/OfferContext.jsx";
+import {useShopState} from "../../../contexts/ShopContext.jsx";
 
 // Advanced Tab
 export function FourthTab(props) {
     const { offer, updateOffer, updateNestedAttributeOfOffer } = useContext(OfferContext);
-    const { shopSettings } = useContext(ShopSettingContext);
+    const { shopSettings } = useShopState();
     const handleChange = useCallback((newChecked) => updateOffer("save_as_default_setting", newChecked), []);
     const handleProductDomSelector = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting",  "custom_product_page_dom_selector"), []);
     const handleProductDomAction = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_product_page_dom_action"), []);

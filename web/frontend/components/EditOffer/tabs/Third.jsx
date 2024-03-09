@@ -21,7 +21,7 @@ import {
     OfferBorderOptions,
     OfferFontOptions
 } from "../../../shared/constants/EditOfferOptions";
-import {OfferContext} from "../../../OfferContext.jsx";
+import {OfferContext} from "../../../contexts/OfferContext.jsx";
 
 export function ThirdTab(props) {
     const {offer, updateOffer, updateNestedAttributeOfOffer} = useContext(OfferContext);

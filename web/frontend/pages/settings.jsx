@@ -8,14 +8,13 @@ import React, {useState, useEffect, useCallback, useContext} from "react";
 import { Redirect, Toast } from '@shopify/app-bridge/actions';
 import { Partners, SettingTabs, CustomTitleBar } from "../components";
 import { useAuthenticatedFetch, useShopSettings } from "../hooks";
-import { ShopSettingContext } from "../ShopSettingContext.jsx";
-import {OFFER_DEFAULTS} from "../shared/constants/EditOfferOptions.js";
+import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function Settings() {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const { fetchShopSettings, updateShopSettings } = useShopSettings();
-    const { shopSettings, setShopSettings, updateShopSettingsAttributes, resetSettings } = useContext(ShopSettingContext);
+    const { shopSettings, setShopSettings, updateShopSettingsAttributes, resetSettings } = useShopState();
     const [formData, setFormData] = useState({});
     const app = useAppBridge();
 

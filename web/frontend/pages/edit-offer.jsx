@@ -11,16 +11,16 @@ import {FirstTab, FourthTab, SecondTab, ThirdTab} from "../components";
 import {OfferPreview} from "../components/OfferPreview";
 import "../components/stylesheets/mainstyle.css";
 import {EditOfferTabs, OFFER_DEFAULTS} from '../shared/constants/EditOfferOptions';
-import {OfferContext} from "../OfferContext.jsx";
+import {OfferContext} from "../contexts/OfferContext.jsx";
 import {useOffer} from "../hooks/useOffer.js";
 import {useAppBridge} from '@shopify/app-bridge-react';
 import {Toast} from '@shopify/app-bridge/actions';
-import {ShopSettingContext} from "../ShopSettingContext.jsx";
 import {useShopSettings} from "../hooks/useShopSettings.js";
+import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function EditPage() {
     const { offer, setOffer } = useContext(OfferContext);
-    const { shopSettings, setShopSettings, resetSettings } = useContext(ShopSettingContext);
+    const { shopSettings, setShopSettings, resetSettings } = useShopState();
     const { fetchOffer, saveOffer, createOffer } = useOffer();
     const { fetchShopSettings, updateShopSettings } = useShopSettings();
     const shopAndHost = useSelector(state => state.shopAndHost);
