@@ -964,7 +964,8 @@ module Shopifable
     # user can change them before re installing and can be caught through new shop that is created with that data.
 
     def fetch_shop(current_shopify_domain)
-      Shop.find_by(shopify_domain: current_shopify_domain)
+      Shop.where(shopify_domain: current_shopify_domain).first
+    end
 
     def search_shops_by_criteria(search_type, search)
       shops_order = 'installed_at DESC NULLS LAST'
