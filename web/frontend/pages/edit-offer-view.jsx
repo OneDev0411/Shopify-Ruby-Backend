@@ -18,15 +18,22 @@ import { useAuthenticatedFetch } from "../hooks";
 import AbAnalytics from "../components/abAnalytics";
 import "../components/stylesheets/mainstyle.css";
 import {OfferContext} from "../OfferContext.jsx";
-import {OFFER_DEFAULTS} from "../shared/constants/EditOfferOptions.js";
+import {useOffer} from "../hooks/useOffer.js";
+import {
+  OFFER_ACTIVATE_URL,
+  OFFER_DEACTIVATE_URL,
+  OFFER_DEFAULTS,
+  OFFER_DRAFT,
+  OFFER_PUBLISH
+} from "../shared/constants/EditOfferOptions.js";
 
 const EditOfferView = () => {
-  const { offer, setOffer } = useContext(OfferContext);
+  const { offer, setOffer, updateOffer } = useContext(OfferContext);
+  const { fetchOffer } = useOffer();
   const shopAndHost = useSelector((state) => state.shopAndHost);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const offerID = localStorage.getItem('Offer-ID');
-  const fetch = useAuthenticatedFetch(shopAndHost.host);
-  const [offerStatus, setOfferStatus] = useState('');
+  const fetch = useAuthenticatedFetch(shopAndHost.host)
   const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState();
   const [checkKeysValidity, setCheckKeysValidity] = useState({});
   const navigateTo = useNavigate();
@@ -34,39 +41,24 @@ const EditOfferView = () => {
     navigateTo('/edit-offer', { state: { offerID: offer_id } });
   }
 
-  const handleOfferActivation = () => {
-    fetch(`/api/v2/merchant/offer_activate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ offer: { offer_id: offerID }, shop: shopAndHost.shop })
-    })
-    .then((response) => response.json())
-    .then(() => {
-      offer.active = true;
-      setOfferStatus('published');
-    })
-    .catch((error) => {
-      console.error('An error occurred while making the API call:', error);
-    })
-  }
+  const toggleOfferActivation = async (activate) => {
 
-  const handleOfferDeactivation = () => {
-    fetch('/api/v2/merchant/offer_deactivate', {
+    await fetch(activate ? OFFER_ACTIVATE_URL : OFFER_DEACTIVATE_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ offer: { offer_id: offerID }, shop: shopAndHost.shop })
-    })
-    .then((response) => response.json())
-    .then((data) => {
-      offer.active = false;
-      setOfferStatus('draft');
-    })
-    .catch((error) => {
-      console.error('An error occurred while making the API call:', error);
+    }).then((response) => {
+      if ([200,204].includes(response.status)) {
+        updateOffer("publish_status", activate ? OFFER_PUBLISH : OFFER_DRAFT)
+        updateOffer("active", activate)
+      } else {
+        // TODO: send out an error message here
+        console.log("there was an issue deactivating the offer")
+      }
+    }).catch((error) => {
+      console.log('Error:', error);
     })
   }
 
@@ -78,9 +70,10 @@ const EditOfferView = () => {
       },
       body: JSON.stringify({ offer_id: offerID, shop: shopAndHost.shop })
     })
-      .then((response) => response.json())
-      .then(() => {
-        navigateTo('/offer')
+      .then((response) => {
+        if ([200,204].includes(response.status)) {
+          navigateTo('/offer');
+        }
       })
       .catch((error) => {
         console.error('An error occurred while making the API call:', error);
@@ -95,9 +88,10 @@ const EditOfferView = () => {
       },
       body: JSON.stringify({ offer_id: offerID, shop: shopAndHost.shop })
     })
-      .then((response) => response.json())
-      .then(() => {
-        navigateTo('/offer');
+      .then((response) => {
+        if ([200,204].includes(response.status)) {
+          navigateTo('/offer');
+        }
       })
       .catch((error) => {
         console.error('An error occurred while making the API call:', error);
@@ -107,34 +101,29 @@ const EditOfferView = () => {
   useEffect(() => {
     if (offerID != null) {
       setIsLoading(true);
-      fetch(`/api/v2/merchant/load_offer_details`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({offer: {offer_id: offerID}, shop: shopAndHost.shop}),
-      })
-        .then((response) => {
-            return response.json()
-        })
-        .then((data) => {
+      fetchOffer(offerID, shopAndHost.shop).then((response) => {
+        if (response.status === 200) {
+          return response.json()
+        }
+        navigateTo('/offer');
+      }).then((data) => {
           setOffer({...data});
           setInitialOfferableProductDetails(data.offerable_product_details);
-          setIsLoading(false);
           if (data.offerable_product_details.length > 0) {
             updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
           }
           updateCheckKeysValidity('cta', data.cta_a);
+          setIsLoading(false);
         })
         .catch((error) => {
             console.log("Error > ", error);
-        })
-      setIsLoading(false);
-  }
+        });
+    }
+
     return function cleanup() {
       setOffer(OFFER_DEFAULTS);
     };
-  },[offerStatus]);
+  },[]);
 
   function updateCheckKeysValidity(updatedKey, updatedValue) {
     setCheckKeysValidity(previousState => {
@@ -162,7 +151,7 @@ const EditOfferView = () => {
               }}}
               title={offer.title}
               titleMetadata={
-                offer.publish_status == "published" ? (
+                offer.publish_status === "published" ? (
                   <Badge status="success">Published</Badge>
                 ) : (
                   <Badge>Unpublished</Badge>
@@ -170,8 +159,8 @@ const EditOfferView = () => {
               }
               secondaryActions={[
                 {
-                  content: (offer.publish_status == 'draft') ? 'Publish' : 'Unpublish',
-                  onAction: () => offer.publish_status == 'draft' ? handleOfferActivation() : handleOfferDeactivation(),
+                  content: (offer.publish_status === 'draft') ? 'Publish' : 'Unpublish',
+                  onAction: () => offer.publish_status === 'draft' ? toggleOfferActivation(true) : toggleOfferActivation(false),
                 },
                 {
                   content: 'Edit', 

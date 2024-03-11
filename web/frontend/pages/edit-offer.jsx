@@ -4,18 +4,20 @@ import {useLocation, useNavigate} from 'react-router-dom';
 
 import {Icon, Layout, Page, Spinner, Tabs} from '@shopify/polaris';
 import {DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
-import {useAppBridge} from "@shopify/app-bridge-react";
 import {Redirect} from '@shopify/app-bridge/actions';
-
 import {useAuthenticatedFetch} from "../hooks";
 import {FirstTab, FourthTab, SecondTab, ThirdTab} from "../components";
 import {OfferPreview} from "../components/OfferPreview";
 import "../components/stylesheets/mainstyle.css";
 import {EditOfferTabs, OFFER_DEFAULTS} from '../shared/constants/EditOfferOptions';
-import OfferProvider, {OfferContext} from "../OfferContext.jsx";
+import {OfferContext} from "../OfferContext.jsx";
+import {useOffer} from "../hooks/useOffer.js";
+import {useAppBridge} from '@shopify/app-bridge-react';
+import {Toast} from '@shopify/app-bridge/actions';
 
 export default function EditPage() {
-    const { offer, setOffer, updateOffer, updateProductsOfOffer, updateIncludedVariants } = useContext(OfferContext);
+    const { offer, setOffer } = useContext(OfferContext);
+    const { fetchOffer, saveOffer, createOffer } = useOffer();
     const shopAndHost = useSelector(state => state.shopAndHost);
     const app = useAppBridge();
     const navigateTo = useNavigate();
@@ -32,7 +34,6 @@ export default function EditPage() {
     });
     const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState({});
     const [themeAppExtension, setThemeAppExtension] = useState();
-
 
     const [shop, setShop] = useState({
         shop_id: undefined,
@@ -58,7 +59,6 @@ export default function EditPage() {
         let redirect = Redirect.create(app);
         if (location?.state?.offerID == null) {
             setIsLoading(true);
-
             fetch(`/api/v2/merchant/shop_settings`, {
                 method: 'POST',
                 headers: {
@@ -103,76 +103,68 @@ export default function EditPage() {
                 })
         } else {
             setIsLoading(true);
-            fetch(`/api/v2/merchant/load_offer_details`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({offer: {offer_id: offerID}, shop: shopAndHost.shop}),
-            })
-                .then((response) => {
+            fetchOffer(offerID, shopAndHost.shop).then((response) => {
+                if (response.status === 200) {
                     return response.json()
-                })
-                .then((data) => {
-                    setInitialVariants({...data.included_variants});
-                    if (data.offerable_product_details.length > 0) {
-                        updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
-                    }
-                    updateCheckKeysValidity('cta', data.cta_a);
-                    for (var i = 0; i < data.offerable_product_details.length; i++) {
-                        data.offerable_product_details[i].preview_mode = true;
-                    }
-                    setOffer({...data});
-                    setInitialOfferableProductDetails(data.offerable_product_details);
+                }
+                navigateTo('/offer');
+            }).then((data) => {
+                setInitialVariants({...data.included_variants});
+                if (data.offerable_product_details.length > 0) {
+                    updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
+                }
+                updateCheckKeysValidity('cta', data.cta_a);
+                for (var i = 0; i < data.offerable_product_details.length; i++) {
+                    data.offerable_product_details[i].preview_mode = true;
+                }
+                setOffer({...data});
+                setInitialOfferableProductDetails(data.offerable_product_details);
 
-                    fetch(`/api/v2/merchant/shop_settings`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({shop_attr: {admin: null}, shop: shopAndHost.shop}),
-                    })
-                      .then((response) => {
-                          return response.json()
-                      })
-                      .then((data) => {
-                          if (data.redirect_to) {
-                              redirect.dispatch(Redirect.Action.APP, data.redirect_to);
-                          } else {
-                              if (Object.keys(data.shop_settings.css_options.main).length == 0) {
-                                  data.shop_settings.css_options.main.color = "#2B3D51";
-                                  data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
-                                  data.shop_settings.css_options.button.color = "#FFFFFF";
-                                  data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
-                                  data.shop_settings.css_options.widows = '100%';
-                              }
+                fetch(`/api/v2/merchant/shop_settings`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({shop_attr: {admin: null}, shop: shopAndHost.shop}),
+                })
+                  .then((response) => {
+                      return response.json()
+                  })
+                  .then((data) => {
+                      if (data.redirect_to) {
+                          redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                      } else {
+                          if (Object.keys(data.shop_settings.css_options.main).length == 0) {
+                              data.shop_settings.css_options.main.color = "#2B3D51";
+                              data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
+                              data.shop_settings.css_options.button.color = "#FFFFFF";
+                              data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
+                              data.shop_settings.css_options.widows = '100%';
                           }
-                          setShop(data.shop_settings);
-                          setThemeAppExtension(data.theme_app_extension)
+                      }
+                      setShop(data.shop_settings);
+                      setThemeAppExtension(data.theme_app_extension)
 
-                          setUpdatePreviousAppOffer(!updatePreviousAppOffer);
+                      setUpdatePreviousAppOffer(!updatePreviousAppOffer);
 
-                          setIsLoading(false);
-                      })
-                      .catch((error) => {
-                          setIsLoading(false);
-                          console.log("Error > ", error);
-                      })
-                })
-                .catch((error) => {
-                    setIsLoading(false);
-                    console.log("Error > ", error);
-                })
+                      setIsLoading(false);
+                  })
+                  .catch((error) => {
+                      setIsLoading(false);
+                      console.log("Error > ", error);
+                  })
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                console.log("Error > ", error);
+            })
 
             setIsLoading(true);
         }
-
         return function cleanup() {
             setOffer(OFFER_DEFAULTS);
         };
-
     },[]);
-
 
     //Called whenever the checkKeysValidity changes in any child component
     function updateCheckKeysValidity(updatedKey, updatedValue) {
@@ -214,130 +206,54 @@ export default function EditPage() {
         setInitialVariants({...value});
     }
 
-    const save = async(status) =>  {
-        var placement_setting;
-        var save_as_default_setting;
-        var shop_uses_ajax_cart;
+    const save = async (status) =>  {
+        if (offer.title === "") {
+            console.log("offer", offer)
+
+            const toastNotice = Toast.create(app, {
+                message: 'Offer requires a title',
+                duration: 3000,
+                isError: true,
+            });
+
+            toastNotice.dispatch(Toast.Action.SHOW);
+            return
+        }
+
+        if (offer.offerable_product_details.length < 1) {
+            const toastOptions = {
+                message: 'Offer requires a title',
+                duration: 3000,
+                isError: true,
+            };
+            const toastNotice = Toast.create(app, {
+                message: 'Offer requires a valid item',
+                duration: 3000,
+                isError: true,
+            });
+
+            toastNotice.dispatch(Toast.Action.SHOW);
+            return
+        }
+
+        let shop_uses_ajax_cart;
+
         if(offer.in_product_page && offer.in_cart_page) {
             shop_uses_ajax_cart = offer.in_ajax_cart;
-            placement_setting = {
-                default_product_page: offer.placement_setting?.default_product_page,
-                default_cart_page: offer.placement_setting?.default_cart_page,
-                default_ajax_cart: true,
-                template_product_id: offer.placement_setting?.template_product_id,
-                template_cart_id: offer.placement_setting?.template_cart_id,
-                template_ajax_id: null,
-            }
         }
         else if (offer.in_ajax_cart && offer.in_cart_page) {
             shop_uses_ajax_cart = offer.in_ajax_cart;
-            placement_setting = {
-                default_product_page: true,
-                default_cart_page: offer.placement_setting?.default_cart_page,
-                default_ajax_cart: offer.placement_setting?.default_ajax_cart,
-                template_product_id: null,
-                template_cart_id: offer.placement_setting?.template_cart_id,
-                template_ajax_id: offer.placement_setting?.template_ajax_id,
-            }
         }
         else if (offer.in_cart_page) {
             shop_uses_ajax_cart = offer.in_ajax_cart;
-            placement_setting = {
-                default_product_page: true,
-                default_cart_page: offer.placement_setting?.default_cart_page,
-                default_ajax_cart: true,
-                template_product_id: null,
-                template_cart_id: offer.placement_setting?.template_cart_id,
-                template_ajax_id: null,
-            }
         }
         else if (offer.in_product_page) {
             shop_uses_ajax_cart = offer.in_ajax_cart;
-            placement_setting = {
-                default_product_page: offer.placement_setting?.default_product_page,
-                default_cart_page: true,
-                default_ajax_cart: true,
-                template_product_id: offer.placement_setting?.default_product_page,
-                template_cart_id: null,
-                template_ajax_id: null,
-            }
         }
         else if (offer.in_ajax_cart) {
             shop_uses_ajax_cart = offer.in_ajax_cart;
-            placement_setting = {
-                default_product_page: true,
-                default_cart_page: true,
-                default_ajax_cart: offer.placement_setting?.default_ajax_cart,
-                template_product_id: null,
-                template_cart_id: null,
-                template_ajax_id: offer.placement_setting?.template_ajax_id,
-            }
         }
-        if(offer.advanced_placement_setting?.advanced_placement_setting_enabled) {
-            save_as_default_setting = offer.save_as_default_setting;
-        }
-        else {
-            save_as_default_setting = false;
-        }
-        var ots = {
-            active: status,
-            checkout_after_accepted: offer.checkout_after_accepted,
-            custom_field_name: offer.custom_field_name,
-            custom_field_placeholder: offer.custom_field_placeholder,
-            custom_field_required: offer.custom_field_required,
-            custom_field_2_name: offer.custom_field_2_name,
-            custom_field_2_placeholder: offer.custom_field_2_placeholder,
-            custom_field_2_required: offer.custom_field_2_required,
-            custom_field_3_name: offer.custom_field_3_name,
-            custom_field_3_placeholder: offer.custom_field_3_placeholder,
-            custom_field_3_required: offer.custom_field_3_required,
-            discount_target_type: offer.discount_target_type,
-            discount_code: offer.discount_code,
-            included_variants: offer.included_variants,
-            link_to_product: offer.link_to_product,
-            multi_layout: offer.multi_layout,
-            must_accept: offer.must_accept,
-            offerable_product_shopify_ids: offer.offerable_product_shopify_ids,
-            offerable_type: offer.offerable_type,
-            autopilot_quantity: offer.autopilot_quantity,
-            excluded_tags: offer.excluded_tags,
-            offer_css: offer.css,
-            offer_cta: offer.cta_a,
-            offer_cta_alt: offer.uses_ab_test ? offer.cta_b : '',
-            offer_text: offer.text_a,
-            offer_text_alt: offer.uses_ab_test ? offer.text_b : '',
-            product_image_size: offer.product_image_size,
-            products_to_remove: offer.products_to_remove,
-            publish_status: status ? "published" : "draft",
-            remove_if_no_longer_valid: offer.remove_if_no_longer_valid,
-            redirect_to_product: offer.redirect_to_product,
-            rules_json: offer.rules_json,
-            ruleset_type: offer.ruleset_type,
-            show_variant_price: offer.show_variant_price,
-            show_product_image: offer.show_product_image,
-            show_product_title: offer.show_product_title,
-            show_product_price: offer.show_product_price,
-            show_compare_at_price: offer.show_compare_at_price,
-            show_nothanks: offer.show_nothanks,
-            show_quantity_selector: offer.show_quantity_selector,
-            show_custom_field: offer.show_custom_field,
-            stop_showing_after_accepted: offer.stop_showing_after_accepted,
-            theme: offer.theme,
-            title: offer.title,
-            in_cart_page: offer.in_cart_page,
-            in_ajax_cart: offer.in_ajax_cart,
-            in_product_page: offer.in_product_page,
-            css_options: offer.css_options,
-            custom_css: offer.custom_css,
-            placement_setting_attributes: placement_setting,
-            save_as_default_setting: save_as_default_setting,
-            advanced_placement_setting_attributes: offer.advanced_placement_setting
-        };
-        if (shop.has_recharge && offer.recharge_subscription_id) {
-            ots.recharge_subscription_id = offer.recharge_subscription_id;
-            ots.interval_unit = offer.interval_unit;
-            ots.interval_frequency = offer.interval_frequency;
-        }
+
         setIsLoading(true);
         setShop(prev => {
             let data = {
@@ -359,38 +275,18 @@ export default function EditPage() {
                 })
             return data
         });
+
         if (location.state != null && location.state?.offerID == null) {
             try {
-                const response = await fetch(`/api/v2/offers/create/${shop?.shop_id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({offer: ots})
-                });
-                const responseData = await response.json();
-                setOffer(responseData.offer);
-                location.state.offerID = responseData.offer.id;
+                let responseData = await createOffer(offer, shop, status)
+                location.state.offerID = responseData.offer.id
                 setIsLoading(false);
             } catch (error) {
                 console.error('Error:', error);
             }
         } else {
             try {
-                const response = await fetch(`/api/v2/offers/${offer.id}/update/${shop.shop_id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({offer: ots, shop: shopAndHost.shop, host: shopAndHost.host})
-                });
-                const responseData = await response.json();
-                responseData.text = responseData?.offer?.text_a?.replace("{{ product_title }}", responseData.offer.offerable_product_details[0]?.title)
-                responseData.cta = responseData?.offer?.cta_a;
-                for(var i=0; i<responseData.offer.offerable_product_details.length; i++) {
-                    responseData.offer.offerable_product_details[i].preview_mode = true;
-                }
-                setOffer(responseData.offer);
+                await saveOffer(offer, location, shop, status);
                 setIsLoading(false);
             } catch (error) {
                 console.error('Error:', error);
