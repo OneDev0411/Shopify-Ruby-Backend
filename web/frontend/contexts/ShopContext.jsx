@@ -1,5 +1,6 @@
-import { createContext, useState } from 'react';
-import { OFFER_DEFAULTS } from "./shared/constants/EditOfferOptions.js";
+import {createContext, useContext, useEffect, useRef, useState} from 'react';
+
+const ShopContext = createContext({});
 
 const SETTINGS_DEFAULTS = {
   shop_id: undefined,
@@ -10,10 +11,14 @@ const SETTINGS_DEFAULTS = {
     button: {},
   }
 }
-export default function ShopSettingProvider({ children }) {
+
+export default function ShopProvider({ children }) {
+  const [shop, setShop] = useState({});
+  const [planName, setPlanName] = useState("");
+  const [trialDays, setTrialDays] = useState();
+  const [hasOffers, setHasOffers] = useState();
   const [shopSettings, setShopSettings] = useState({...SETTINGS_DEFAULTS});
 
-  //Called whenever the shop changes in any child component
   function updateShopSettingsAttributes(updatedValue, ...updatedKey) {
     if (updatedKey.length == 1) {
       setShopSettings(previousState => {
@@ -46,12 +51,21 @@ export default function ShopSettingProvider({ children }) {
   }
 
   return (
-    <ShopSettingContext.Provider
-      value={{shopSettings, setShopSettings, updateShopSettingsAttributes, resetSettings}}
+    <ShopContext.Provider
+      value={{shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers, updateShopSettingsAttributes, shopSettings, resetSettings, setShopSettings}}
     >
       {children}
-    </ShopSettingContext.Provider>
+    </ShopContext.Provider>
   );
 }
 
-export const ShopSettingContext = createContext(OFFER_DEFAULTS);
+// custom hook
+export const useShopState = () => {
+  const ctx = useContext(ShopContext);
+
+  if (!ctx) {
+    throw new Error("useShop must be used within the ShopProvider");
+  }
+
+  return ctx;
+};
