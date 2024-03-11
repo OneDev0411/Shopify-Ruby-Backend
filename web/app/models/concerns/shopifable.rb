@@ -954,19 +954,6 @@ module Shopifable
   ####  CLASS METHODS IN THE MIXIN #####
 
   class_methods do
-
-    # This method will return shop acc to the shopify domain, it is receving through params.
-    # Will return the shop if it finds through shopify_domain, otherwise if shop can be find through
-    # myshopify_domain, means that user is re-installing the old shop, so we will enable the old shop,
-    # and deletes the newly created shop.
-
-    # While enabling the old shop, we are using access scopes of new shop and updating the coloum because
-    # user can change them before re installing and can be caught through new shop that is created with that data.
-
-    def fetch_shop(current_shopify_domain)
-      Shop.where(shopify_domain: current_shopify_domain).first
-    end
-
     def search_shops_by_criteria(search_type, search)
       shops_order = 'installed_at DESC NULLS LAST'
       if search_type.present? && search_type == 'recent'

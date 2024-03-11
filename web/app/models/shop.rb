@@ -19,7 +19,7 @@ class Shop < ApplicationRecord
   has_many :shop_action, dependent: :destroy
 
   before_create :set_up_for_shopify
-  after_create :shop_setup
+  after_create :shop_selection_and_setup
 
   # scope to make product specific keys for redis cache
   scope :shopify_products_ids_with_prefix, -> (id) {
@@ -42,26 +42,52 @@ class Shop < ApplicationRecord
   include ActionView::Helpers::DateHelper
   include ShopWorker
 
-  def shop_setup
+  def shop_selection_and_setup
+
+    # finding if duplicates of shop exists
+    puts "After Create"
     shops = Shop.where(shopify_domain: self.shopify_domain)
+
+    puts "Shop Count: #{shops.count}"
+
+
+    # finding the old and new shops here in case of re-install.
     current_shop = Shop.find_by_shopify_domain(self.shopify_domain)
+    puts "New shop founded...." if current_shop
     old_shop = Shop.find_by_myshopify_domain(self.shopify_domain)
 
+    puts "Old shop founded...." if old_shop
+
+    # this is the case when 2 shops exists with the same shopify_domain so we are delelting the second shop
+    # which is the newer/current shop and re enabling the previous/original one.
     if shops.count > 1
       current_shop = shops.second
       old_shop = shops.first
     end
 
+    # This  will return shop acc to the shopify domain, it is receving through params.
+    # Will return the shop if it finds through shopify_domain, otherwise if shop can be find through
+    # myshopify_domain, means that user is re-installing the old shop, so we will enable the old shop,
+    # and deletes the newly created shop.
+
     if shops.count > 1 || (old_shop.present? && !old_shop.id.eql?(current_shop&.id))
+      puts 'Im IN...'
       token = current_shop.shopify_token
       scopes = current_shop.access_scopes
+      puts 'Destroying Shop !!!'
       current_shop&.destroy_completely
+      puts 'Re enabling old shop...'
       old_shop.enable_reinstalled_shop(self.shopify_domain, token, scopes)
+      puts 'Shop Setup completed in re enable'
       return
     end
-
-
     self.update(is_shop_active: true)
+
+    self.shop_setup
+    puts 'Shop Setup completed on first install'
+  end
+
+  def shop_setup
     ShopAction.create(
       shop_id: self.id,
       action_timestamp: Time.now.utc.to_i,
@@ -88,14 +114,22 @@ class Shop < ApplicationRecord
     shop_actions = ShopAction.where(shop_id: self.id)
     shop_actions.delete_all if shop_actions.any?
     pending_jobs&.delete_all
-    theme_app_extension&.delete
-    begin 
+    theme_app_extension&.delete 
+    begin
       destroy
-      puts 'Shop Destroyed Successfully'
-    rescue => e
-      puts "Shop couldnot be destroyed."
-      puts e
+      puts 'Shop Destroyed.'
+    rescue => error
+
+      # if due to any unknown error new shop decline to delete we will change it shopify domain so when
+      # fetch shop on re installed is called, one shop with the shopify domain exists and can be returned
+      # that will be the original/old one. We are changing domain for the new one.
+      # Later on production we can see why these shops were not deleted due to any possible associaiton that
+      # were not deleted above due to which this shop couldn't be destroyed.
+
+      self.update_column(:shopify_domain, "#{self.shopify_domain}_deletable")
+      puts "Shop couldn't be destroyed #{error}"
     end
+
   end
 
   def active_offers
