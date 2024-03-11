@@ -12,6 +12,7 @@ import "../components/stylesheets/mainstyle.css";
 import {ThemeAppCard} from "../components/CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
+import { CHAT_APP_ID } from "../assets/index.js";
 
 export default function HomePage() {
   const app = useAppBridge();
@@ -38,7 +39,7 @@ export default function HomePage() {
 
   const notifyIntercom = (icu_shop) => {
     window.Intercom('boot', {
-      app_id: window.CHAT_APP_ID,
+      app_id: CHAT_APP_ID,
       id: icu_shop.id,
       email: icu_shop.email,
       phone: icu_shop.phone_number,

@@ -10,7 +10,7 @@ import {
   VerticalStack,
   VideoThumbnail, Tabs, LegacyCard, Layout,
 } from "@shopify/polaris";
-import {homeImage} from "../assets/index.js";
+import { CHAT_APP_ID, homeImage } from "../assets/index.js";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 
@@ -139,7 +139,7 @@ function HelpSection({ handleOpen, info, disablePrimary }) {
     // Intercom needs to be initialized/booted before it can be used.
     const { currentShop } = shopData;
     window.Intercom('boot', {
-      app_id: window.CHAT_APP_ID,
+      app_id: CHAT_APP_ID,
       id: currentShop.id,
       email: currentShop.email,
       phone: currentShop.phone_number,
