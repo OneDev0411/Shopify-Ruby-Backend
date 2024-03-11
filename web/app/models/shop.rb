@@ -43,6 +43,24 @@ class Shop < ApplicationRecord
   include ShopWorker
 
   def shop_setup
+    shops = Shop.where(shopify_domain: self.shopify_domain)
+    current_shop = Shop.find_by_shopify_domain(self.shopify_domain)
+    old_shop = Shop.find_by_myshopify_domain(self.shopify_domain)
+
+    if shops.count > 1
+      current_shop = shops.second
+      old_shop = shops.first
+    end
+
+    if shops.count > 1 || (old_shop.present? && !old_shop.id.eql?(current_shop&.id))
+      token = current_shop.shopify_token
+      scopes = current_shop.access_scopes
+      current_shop&.destroy_completely
+      old_shop.enable_reinstalled_shop(self.shopify_domain, token, scopes)
+      return
+    end
+
+
     self.update(is_shop_active: true)
     ShopAction.create(
       shop_id: self.id,
@@ -56,6 +74,28 @@ class Shop < ApplicationRecord
     signup_for_referral_program
     select_plan('trial_plan')
     track_installation
+  end
+
+  # This method is intended to delete shops that are forcefully being created and controlled by 
+  # shopify app gem on re-install, We enable the the old shop and deletes the new one. 
+  # Never use this method on un-install app.
+
+  def destroy_completely
+    subscription&.delete
+    products&.delete_all
+    offers&.delete_all
+    shop_events&.delete_all
+    shop_actions = ShopAction.where(shop_id: self.id)
+    shop_actions.delete_all if shop_actions.any?
+    pending_jobs&.delete_all
+    theme_app_extension&.delete
+    begin 
+      destroy
+      puts 'Shop Destroyed Successfully'
+    rescue => e
+      puts "Shop couldnot be destroyed."
+      puts e
+    end
   end
 
   def active_offers
