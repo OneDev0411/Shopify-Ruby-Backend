@@ -26,7 +26,7 @@ const AbAnalytics = (props) => {
             }
         })
         .catch((error) => {
-            console.error('An error occurred while making the API call:', error);
+            console.log('An error occurred while making the API call:', error);
         })
     }, []); 
 

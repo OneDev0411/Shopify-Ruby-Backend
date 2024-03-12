@@ -349,7 +349,7 @@ async function fetchShopData(shop) {
       trialDays: data.days_remaining_in_trial,
     };
   } catch (error) {
-    console.error("Failed to fetch shop data:", error);
+    console.log("Failed to fetch shop data:", error);
     throw error;
   }
 }

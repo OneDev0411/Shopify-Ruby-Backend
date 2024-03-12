@@ -69,7 +69,7 @@
               return response.json();
           })
           .catch((error) => {
-              console.error('Error:', error);
+              console.log('Error:', error);
           });
     };
 
@@ -435,7 +435,7 @@
                   localStorage.setItem('country', customerCountryCode);
               })
               .catch((error) => {
-                  console.error('Error:', error);
+                  console.log('Error:', error);
               });
         } else {
             customerCountryCode = locallyStoredCountry
@@ -489,7 +489,7 @@
                   window.location.reload();
               })
               .catch((error) => {
-                  console.error('Error:', error);
+                  console.log('Error:', error);
               });
         }
     };
@@ -1491,7 +1491,7 @@
                   'Content-Type': 'application/json'
               },
           }
-        ).catch(error => console.error(error));
+        ).catch(error => console.log(error));
     }
 
 

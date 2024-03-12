@@ -76,7 +76,7 @@ const EditOfferView = () => {
         }
       })
       .catch((error) => {
-        console.error('An error occurred while making the API call:', error);
+        console.log('An error occurred while making the API call:', error);
       })
   }
 
@@ -94,7 +94,7 @@ const EditOfferView = () => {
         }
       })
       .catch((error) => {
-        console.error('An error occurred while making the API call:', error);
+        console.log('An error occurred while making the API call:', error);
       })
   }
 

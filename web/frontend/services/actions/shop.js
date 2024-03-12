@@ -32,7 +32,7 @@ export const getShopOffersStats = async (shopify_domain, period) => {
     });
     return response;
     } catch (error) {
-      console.error('An error occurred while making the API call:', error);
+      console.log('An error occurred while making the API call:', error);
       return null; 
     }
 }

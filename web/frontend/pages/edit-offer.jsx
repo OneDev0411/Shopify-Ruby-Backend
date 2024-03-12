@@ -282,14 +282,14 @@ export default function EditPage() {
                 location.state.offerID = responseData.offer.id
                 setIsLoading(false);
             } catch (error) {
-                console.error('Error:', error);
+                console.log('Error:', error);
             }
         } else {
             try {
                 await saveOffer(offer, location, shop, status);
                 setIsLoading(false);
             } catch (error) {
-                console.error('Error:', error);
+                console.log('Error:', error);
             }
         }
         navigateTo('/offer');
