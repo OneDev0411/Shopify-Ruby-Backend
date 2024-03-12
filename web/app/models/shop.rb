@@ -21,21 +21,6 @@ class Shop < ApplicationRecord
   before_create :set_up_for_shopify
   after_create :shop_setup
 
-  # scope to make product specific keys for redis cache
-  scope :shopify_products_ids_with_prefix, -> (id) {
-    joins(:products).pluck(Arel.sql("CONCAT('shopify_product_', products.shopify_id)"))
-  }
-
-  # scope to make collection specific keys for redis cache
-  scope :shopify_collections_ids_with_prefix, -> (id) {
-    Collection.where(collections: { shop_id: id }).pluck(Arel.sql("CONCAT('shopify_collection_', shopify_id)"))
-  }
-
-  # scope to combine all keys to cache in redis
-  scope :shopify_products_and_collections_ids, -> (id) {
-    shopify_products_ids_with_prefix(id) + shopify_collections_ids_with_prefix(id)
-  }
-
   include Shopifable
   include Graphable
 
@@ -1415,13 +1400,25 @@ class Shop < ApplicationRecord
     }
   end
 
+  # To make product specific keys for redis cache
+  def shopify_products_ids_with_prefix
+    products.pluck(Arel.sql("CONCAT('shopify_product_', products.shopify_id)"), 1)
+  end
+
+  # To make collection specific keys for redis cache
+  def shopify_collections_ids_with_prefix
+    Collection.where(collections: { shop_id: id }).pluck(Arel.sql("CONCAT('shopify_collection_', shopify_id)"), 1)
+  end
+
+  def shopify_products_and_collections_ids
+    shopify_products_ids_with_prefix + shopify_collections_ids_with_prefix
+  end
+
   def remove_cache_keys_for_uninstalled_shop
-    $redis_cache.del(*self.class.shopify_products_and_collections_ids(id))
+    $redis_cache.del(*shopify_products_and_collections_ids)
   end
 
   def store_cache_keys_on_reinstall
-    keys_to_cache = (self.class.shopify_products_and_collections_ids(id)).map { |key| 
-                                                                                [key, 1] }
-    $redis_cache.mset(*keys_to_cache)
+    $redis_cache.mset(*shopify_products_and_collections_ids)
   end
 end
