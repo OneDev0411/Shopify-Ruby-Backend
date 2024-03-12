@@ -79,7 +79,7 @@ export default function HomePage() {
       
         // notify intercom as soon as app is loaded and shop info is fetched
         notifyIntercom(data.shop);
-
+        setIsLoading(false);
       }})
       .catch((error) => {
         console.log("error", error);
