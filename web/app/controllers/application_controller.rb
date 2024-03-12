@@ -27,7 +27,8 @@ class ApplicationController < ActionController::Base
   def find_shop
     redirect_to login_path and return unless defined?(current_shopify_domain)
 
-    @icushop = Shop.find_or_create_shop(current_shopify_domain)
+    @icushop =  Shop.where(shopify_domain: current_shopify_domain).first
+
     @icushop.check_shopify_token(@current_shopify_session&.access_token)
 
     # check to see if current token is valid, otherwise need a new login

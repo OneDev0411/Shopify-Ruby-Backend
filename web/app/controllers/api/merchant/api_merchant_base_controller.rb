@@ -15,7 +15,7 @@ module Api
 
       def find_shop
         if params[:shop].present?
-          @icushop = Shop.find_or_create_shop(params['shop'])
+          @icushop = Shop.where(shopify_domain: params['shop']).first
         else
           @icushop = Shop.find(params['shop_id'])
         end

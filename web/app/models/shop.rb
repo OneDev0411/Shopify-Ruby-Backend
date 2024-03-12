@@ -50,12 +50,11 @@ class Shop < ApplicationRecord
 
     puts "Shop Count: #{shops.count}"
 
-
     # finding the old and new shops here in case of re-install.
     current_shop = Shop.find_by_shopify_domain(self.shopify_domain)
     puts "New shop founded...." if current_shop
+    
     old_shop = Shop.find_by_myshopify_domain(self.shopify_domain)
-
     puts "Old shop founded...." if old_shop
 
     # this is the case when 2 shops exists with the same shopify_domain so we are delelting the second shop
@@ -82,7 +81,6 @@ class Shop < ApplicationRecord
       return
     end
     self.update(is_shop_active: true)
-
     self.shop_setup
     puts 'Shop Setup completed on first install'
   end
