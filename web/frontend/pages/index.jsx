@@ -12,8 +12,6 @@ import "../components/stylesheets/mainstyle.css";
 import {ThemeAppCard} from "../components/CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
-import { setIsSubscriptionUnpaid } from "../store/reducers/subscriptionPaidStatusSlice.js";
-// import { storeSession, loadSession, deleteSession, deleteSessions, findSessionsByShop} from '../components/SessionStorage';
 
 export default function HomePage() {
   const app = useAppBridge();
@@ -78,13 +76,10 @@ export default function HomePage() {
         if (data.theme_app_extension) {
           setIsLegacy(data.theme_app_extension.theme_version === "Vintage");
         }
-
-        // storeSession is a endpoint for sessions torage, it's call here to check if session is being stored correctly on not.
-        // findSessionsByShop(fetch) call function of your chouce to test any enpoint.
-
+      
         // notify intercom as soon as app is loaded and shop info is fetched
         notifyIntercom(data.shop);
-        setIsLoading(false);
+
       }})
       .catch((error) => {
         console.log("error", error);
