@@ -12,3 +12,8 @@ elsif @icushop.plan&.flex_plan?
 elsif @icushop.plan&.trial_plan?
   json.plan :trial
 end
+
+subscription = @shop.subscription
+if subscription
+  json.subscription_not_paid subscription.subscription_not_paid
+end

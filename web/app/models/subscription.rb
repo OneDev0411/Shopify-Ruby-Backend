@@ -148,7 +148,7 @@ class Subscription < ApplicationRecord
             else
               (plan.price_in_cents / 100.0).round(2)
             end
-    test_mode = icushop.admin? || Rails.env.development?
+    test_mode = icushop.admin? || Rails.env.development? || ENV["SUBSCRIPTION_TEST_MODE"]&.downcase == 'true'
     opts = {
       recurring_application_charge: {
         name: "In Cart Upsell - #{plan.name}",
@@ -167,7 +167,7 @@ class Subscription < ApplicationRecord
     begin
       url = "https://#{icushop.shopify_domain}/admin/api/#{SHOPIFY_API_VERSION}/recurring_application_charges.json"
       res = HTTParty.post(url, body: opts.to_json, headers: icushop.api_headers)
-      update shopify_charge_id: res['recurring_application_charge']['id']
+      update shopify_charge_id: res['recurring_application_charge']['id'], status: 'pending_charge_approval'
       # res.get('recurring_application_charge.confirmation_url')
       res['recurring_application_charge']['confirmation_url']
     rescue StandardError => e
@@ -363,5 +363,24 @@ class Subscription < ApplicationRecord
   def update_subscription(plan)
     update_attribute(:offers_limit, plan.offers_limit)
     update_attribute(:views_limit, plan.views_limit)
+  end
+
+  def shopify_subscription_status
+    shop.activate_session
+    begin
+      charge_response = ShopifyAPI::RecurringApplicationCharge.find(id: self.shopify_charge_id)
+      if charge_response.status != 'active'
+        self.remove_recurring_charge
+      end
+    rescue StandardError => e
+      ErrorNotifier.call(e)
+    end
+  end
+
+  def subscription_not_paid
+    self&.plan&.internal_name == 'plan_based_billing' &&
+      self&.shopify_charge_id.nil? &&
+      self&.status == 'approved' &&
+      self.shop.is_shop_active
   end
 end

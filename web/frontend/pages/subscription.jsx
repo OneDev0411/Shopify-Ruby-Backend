@@ -25,6 +25,7 @@ export default function Subscription() {
     const app = useAppBridge();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [isSubscriptionUnpaid, setIsSubscriptionUnpaid] = useState(false);
 
     async function handlePlanChange (internal_name) {
         let redirect = Redirect.create(app);
@@ -71,6 +72,7 @@ export default function Subscription() {
                 setTrialDays(data.days_remaining_in_trial);
                 setActiveOffersCount(data.active_offers_count);
                 setUnpublishedOfferIds(data.unpublished_offer_ids)
+                setIsSubscriptionUnpaid(data.subscription_not_paid)
            })
            .catch((error) => {
             setError(error);
@@ -123,7 +125,7 @@ export default function Subscription() {
                 </Layout.Section>
                 <Layout.Section>
                   <LegacyCard title="In Cart Upsell & Cross-sell Unlimited - Paid Subscription"
-                              primaryFooterAction={(planName==='flex' && isSubscriptionActive(currentSubscription)) ? null : {content: 'Upgrade', onClick: () => handlePlanChange('plan_based_billing')}}
+                              primaryFooterAction={(planName==='flex' && isSubscriptionActive(currentSubscription)) && !isSubscriptionUnpaid ? null : {content: 'Upgrade', onClick: () => handlePlanChange('plan_based_billing')}}
                               sectioned
                   >
                     <LegacyStack>

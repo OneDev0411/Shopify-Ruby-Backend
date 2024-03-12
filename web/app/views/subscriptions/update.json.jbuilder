@@ -12,3 +12,7 @@ else
     json.message "On Free Plan Now"
   end
 end
+
+if @message
+  json.message @message
+end
