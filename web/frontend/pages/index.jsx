@@ -91,9 +91,7 @@ export default function HomePage() {
       })
   }, [setCurrentShop, setPlanName, setTrialDays])
 
-  if (error) {
-    return <ErrorPage />;
-  }
+  if (error) { return < ErrorPage showBranding={true} />; }
 
   return (
     <Page>

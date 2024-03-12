@@ -1,13 +1,15 @@
 import React from "react";
 import { CustomTitleBar} from "../components";
 
-const ErrorPage = () => {
+const ErrorPage = ({ showBranding }) => {
   return (
     <div style={{ textAlign: "center", padding: "50px" }}>
-      <CustomTitleBar
+      { showBranding &&
+        <CustomTitleBar
         title="In Cart Upsell & Cross Sell"
         image={"https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/ICU-Logo-Small.png"}
       />
+      }
       <img
         src={ "https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/ErrorPage.png" }
         alt= "Error Image"

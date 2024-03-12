@@ -39,7 +39,7 @@ const AbAnalytics = (props) => {
         getAbAnalytics(props.offerId, shopAndHost.shop, 'b', setBAnalytics)
       },[]);
 
-    if (error) { return <ErrorPage />; }
+      if (error) { return < ErrorPage />; }
 
     return (
       <>

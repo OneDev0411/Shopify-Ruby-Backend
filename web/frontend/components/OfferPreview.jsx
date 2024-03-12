@@ -9,14 +9,14 @@ import Flex from './layouts/template_multi_flex';
 import {useAuthenticatedFetch} from "../hooks/index.js";
 import {useSelector} from "react-redux";
 import {OfferContext} from "../OfferContext.jsx";
+import ErrorPage from "../components/ErrorPage";
 
 
 export function OfferPreview(props) {
 	const { offer, updateOffer, updateNestedAttributeOfOffer } = useContext(OfferContext);
 	const shopAndHost = useSelector(state => state.shopAndHost);
-
+	const [error, setError] = useState(null);
 	const [carouselLoading, setCarouselLoading] = useState(false);
-	
 	const fetch = useAuthenticatedFetch(shopAndHost.host);
 
 	useEffect(() => {
@@ -56,6 +56,7 @@ export function OfferPreview(props) {
 					}
 				})
 				.catch((error) => {
+					setError(error)
 					console.log("Error > ", error);
 				})
 		}
@@ -198,6 +199,8 @@ export function OfferPreview(props) {
 		}
 	}
 
+	if (error) { return <ErrorPage />; }
+	
 	return(
 		<div>
 			{
