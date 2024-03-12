@@ -27,16 +27,11 @@ module Api
           if (!@icushop.in_trial_period? && (@icushop.plan.present? && @icushop.plan.internal_name == 'trial_plan')) || @icushop&.plan.nil?
             @icushop.plan = Plan.find_by(:internal_name => 'free_plan')
             @icushop.subscription.update_attribute(:free_plan_after_trial, false)
-            if @icushop.plan.internal_name == 'free_plan'
-              offers = @icushop.offers.where(active: true)
-              offers.length > 0 && @icushop.unpublish_extra_offers
-            end
+            @icushop.unpublish_extra_offers
           end
 
-
-
-          if @icushop.in_trial_period? && @icushop.plan.internal_name == 'trial_plan'
-            @icushop.subscription.update_attribute(:free_plan_after_trial, true)
+          if @icushop.subscription.status == 'pending_charge_approval'
+            @icushop.subscription.shopify_subscription_status
           end
 
           return true if @admin || (@icushop.in_trial_period?) || (@icushop.plan.present? && @icushop.subscription.status == 'approved')
