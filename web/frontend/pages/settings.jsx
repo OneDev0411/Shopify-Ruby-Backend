@@ -8,6 +8,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Redirect, Toast } from '@shopify/app-bridge/actions';
 import { Partners, SettingTabs, CustomTitleBar } from "../components";
 import { useAuthenticatedFetch } from "../hooks";
+import ErrorPage from "../components/ErrorPage.jsx"
 
 export default function Settings() {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -15,6 +16,7 @@ export default function Settings() {
     const [currentShop, setCurrentShop] = useState(null);
     const [formData, setFormData] = useState({});
     const app = useAppBridge();
+    const [error, setError] = useState(null);
 
     const fetchCurrentShop = useCallback(async () => {
         let redirect = Redirect.create(app);
@@ -42,6 +44,7 @@ export default function Settings() {
                 })
             })
             .catch((error) => {
+                setError(error);
                 console.log("Error > ", error);
             })
     }, [])
@@ -107,6 +110,7 @@ export default function Settings() {
                 // window.location.reload();
             })
             .catch((error) => {
+                setError(error)
                 console.log("Error", error);
             })
     }
@@ -147,6 +151,8 @@ export default function Settings() {
             return data
         });
     }
+
+    if (error) { return < ErrorPage showBranding={true} />; }
 
     return (
         <>

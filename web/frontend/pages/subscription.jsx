@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import { useEffect, useState, useCallback } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import { isSubscriptionActive } from "../services/actions/subscription";
+import ErrorPage from "../components/ErrorPage.jsx"
 
 export default function Subscription() {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -23,6 +24,7 @@ export default function Subscription() {
     const [unpublishedOfferIds, setUnpublishedOfferIds] = useState();
     const app = useAppBridge();
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     async function handlePlanChange (internal_name) {
         let redirect = Redirect.create(app);
@@ -50,6 +52,7 @@ export default function Subscription() {
                 }
            })
            .catch((error) => {
+            setError(error);
             console.log("error", error);
            })
     }
@@ -70,6 +73,7 @@ export default function Subscription() {
                 setUnpublishedOfferIds(data.unpublished_offer_ids)
            })
            .catch((error) => {
+            setError(error);
             console.log("error", error);
            })
       }, []);
@@ -78,6 +82,8 @@ export default function Subscription() {
         fetchSubscription();
       }, [fetchSubscription]);
     
+  if (error) { return < ErrorPage showBranding={true} />; }
+
   return (
     <Page>
         <CustomTitleBar title='Billing' icon={BillingStatementDollarMajor}/>

@@ -14,6 +14,7 @@ import {OfferContext} from "../OfferContext.jsx";
 import {useOffer} from "../hooks/useOffer.js";
 import {useAppBridge} from '@shopify/app-bridge-react';
 import {Toast} from '@shopify/app-bridge/actions';
+import ErrorPage from "../components/ErrorPage.jsx"
 
 export default function EditPage() {
     const { offer, setOffer } = useContext(OfferContext);
@@ -22,6 +23,7 @@ export default function EditPage() {
     const app = useAppBridge();
     const navigateTo = useNavigate();
     const location = useLocation();
+    const [error, setError] = useState(null);
 
     const [enablePublish, setEnablePublish] = useState(false)
 
@@ -99,6 +101,8 @@ export default function EditPage() {
                     setIsLoading(false);
                 })
                 .catch((error) => {
+                    setError(error);
+                    setIsLoading(false);
                     console.log("Error > ", error);
                 })
         } else {
@@ -150,11 +154,13 @@ export default function EditPage() {
                       setIsLoading(false);
                   })
                   .catch((error) => {
+                    setError(error);
                       setIsLoading(false);
                       console.log("Error > ", error);
                   })
             })
             .catch((error) => {
+                setError(error);
                 setIsLoading(false);
                 console.log("Error > ", error);
             })
@@ -271,6 +277,7 @@ export default function EditPage() {
                     console.log('updated shop settings', data)
                 })
                 .catch((error) => {
+                    setError(error);
                     console.log('an error during api call', error)
                 })
             return data
@@ -282,6 +289,7 @@ export default function EditPage() {
                 location.state.offerID = responseData.offer.id
                 setIsLoading(false);
             } catch (error) {
+                setError(error);
                 console.log('Error:', error);
             }
         } else {
@@ -348,6 +356,8 @@ export default function EditPage() {
     const enableOrDisablePublish = (enable) => {
         setEnablePublish(enable);
     };
+
+    if (error) { return < ErrorPage/>; }
 
     return (
         <div className="edit-offer" style={{

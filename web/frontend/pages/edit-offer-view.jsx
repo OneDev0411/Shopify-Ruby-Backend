@@ -26,6 +26,7 @@ import {
   OFFER_DRAFT,
   OFFER_PUBLISH
 } from "../shared/constants/EditOfferOptions.js";
+import ErrorPage from "../components/ErrorPage.jsx"
 
 const EditOfferView = () => {
   const { offer, setOffer, updateOffer } = useContext(OfferContext);
@@ -40,6 +41,8 @@ const EditOfferView = () => {
   const handleEditOffer = (offer_id) => {
     navigateTo('/edit-offer', { state: { offerID: offer_id } });
   }
+  const [error, setError] = useState(null);
+
 
   const toggleOfferActivation = async (activate) => {
 
@@ -58,6 +61,7 @@ const EditOfferView = () => {
         console.log("there was an issue deactivating the offer")
       }
     }).catch((error) => {
+      setError(error);
       console.log('Error:', error);
     })
   }
@@ -76,6 +80,7 @@ const EditOfferView = () => {
         }
       })
       .catch((error) => {
+        setError(error);
         console.log('An error occurred while making the API call:', error);
       })
   }
@@ -94,6 +99,7 @@ const EditOfferView = () => {
         }
       })
       .catch((error) => {
+        setError(error);
         console.log('An error occurred while making the API call:', error);
       })
   }
@@ -116,7 +122,9 @@ const EditOfferView = () => {
           setIsLoading(false);
         })
         .catch((error) => {
-            console.log("Error > ", error);
+          setError(error);
+          setIsLoading(false);
+          console.log("Error > ", error);
         });
     }
 
@@ -130,6 +138,8 @@ const EditOfferView = () => {
         return {...previousState, [updatedKey]: updatedValue};
     });
   }
+  if (error) { return < ErrorPage/>; }
+
   return (
     <AppProvider i18n={[]}>
       <div className="page-space">

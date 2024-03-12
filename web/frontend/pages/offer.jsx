@@ -7,6 +7,7 @@ import {AddProductMajor} from '@shopify/polaris-icons';
 
 import {CustomTitleBar, OffersList} from '../components';
 import {useAuthenticatedFetch} from "../hooks";
+import ErrorPage from "../components/ErrorPage.jsx"
 
 export default function Offers() {
   const shopAndHost = useSelector(state => state.shopAndHost);
@@ -14,6 +15,7 @@ export default function Offers() {
   const navigateTo = useNavigate();
 
   const [hasOffers, setHasOffers] = useState();
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetch(`/api/v2/merchant/current_shop?shop=${shopAndHost.shop}`, {
@@ -27,6 +29,7 @@ export default function Offers() {
         setHasOffers(data.has_offers);
       })
       .catch((error) => {
+        setError(error);
         console.log("error", error);
       })
   }, [setHasOffers]);
@@ -34,6 +37,8 @@ export default function Offers() {
     const handleOpenOfferPage = () => {
       navigateTo('/edit-offer', { state: { offerID: null } });
     }
+
+    if (error) { return < ErrorPage showBranding={true} />; }
 
     return (
       <>
