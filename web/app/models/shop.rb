@@ -744,6 +744,27 @@ class Shop < ApplicationRecord
     end
   end
 
+  def enable_reinstalled_shop(s_domain, s_token, a_scopes)
+    begin
+      update_columns(shopify_domain: s_domain,
+      myshopify_domain: nil,
+      installed_at: Time.now.utc,
+      uninstalled_at: nil,
+      access_scopes: a_scopes,
+      is_shop_active: true,
+      shopify_token: s_token)
+      
+      if subscription.present?
+        subscription.status = 'approved'
+        subscription.save
+      end
+    rescue => e
+      ErrorNotifier.call(e)
+    end
+    shop_setup
+    # store_cache_keys_on_reinstall
+  end
+
   def signup_for_referral_program
     # First Promoter is the referral platform that we are using for referral tracking purposes
     customer = customer_by_shopify_domain
