@@ -19,7 +19,7 @@ const Summary = (props) => {
     }
 
     const getShopOffersStats = (period) => {
-      fetch(`/api/merchant/shop_offers_stats_times_loaded`, {
+      fetch(`/api/v2/merchant/shop_offers_stats_times_loaded`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ const Summary = (props) => {
     };
 
     const getOfferStats = () => {
-        fetch(`/api/merchant/offer_stats`, {
+        fetch(`/api/v2/merchant/offer_stats`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

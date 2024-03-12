@@ -6,7 +6,7 @@ export const useShopSettings = () => {
   const authFetch = useAuthenticatedFetch(shopAndHost.host);
 
   const fetchShopSettings = async (shopAttr) => {
-    const response = await authFetch(`/api/merchant/shop_settings`, {
+    const response = await authFetch(`/api/v2/merchant/shop_settings`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -17,7 +17,7 @@ export const useShopSettings = () => {
   };
 
   const updateShopSettings = async (shopAttr) => {
-    const response = await authFetch('/api/merchant/update_shop_settings', {
+    const response = await authFetch('/api/v2/merchant/update_shop_settings', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

@@ -62,7 +62,7 @@ const EditOfferView = () => {
   }
 
   const handleDuplicateOffer = () => {
-    fetch(`/api/merchant/offers/${offerID}/duplicate`, {
+    fetch(`/api/v2/merchant/offers/${offerID}/duplicate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -80,7 +80,7 @@ const EditOfferView = () => {
   }
 
   const handleDeleteOffer = () => {
-    fetch(`/api/merchant/offers/${offerID}`, {
+    fetch(`/api/v2/merchant/offers/${offerID}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'

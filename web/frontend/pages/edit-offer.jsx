@@ -5,7 +5,6 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import {Icon, Layout, Page, Spinner, Tabs} from '@shopify/polaris';
 import {DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
 import {Redirect} from '@shopify/app-bridge/actions';
-
 import {useAuthenticatedFetch} from "../hooks";
 import {FirstTab, FourthTab, SecondTab, ThirdTab} from "../components";
 import {OfferPreview} from "../components/OfferPreview";
@@ -45,7 +44,6 @@ export default function EditPage() {
     const [updatePreviousAppOffer, setUpdatePreviousAppOffer] = useState(false);
 
     const offerID = location?.state?.offerID;
-    const fetch = useAuthenticatedFetch(shopAndHost.host);
 
     let advanced_placement_setting = {}
 
@@ -81,42 +79,43 @@ export default function EditPage() {
 
         } else {
             setIsLoading(true);
-                fetchOffer(offerID, shopAndHost.shop).then((response) => {
-                    if (response.status === 200) {
-                        return response.json()
-                    }
-                    navigateTo('/offer');
-                }).then((data) => {
-                    setInitialVariants({...data.included_variants});
-                    if (data.offerable_product_details.length > 0) {
-                        updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
-                    }
-                    updateCheckKeysValidity('cta', data.cta_a);
-                    for (var i = 0; i < data.offerable_product_details.length; i++) {
-                        data.offerable_product_details[i].preview_mode = true;
-                    }
-                    setOffer({...data});
-                    setInitialOfferableProductDetails(data.offerable_product_details);
+            fetchOffer(offerID, shopAndHost.shop).then((response) => {
+                if (response.status === 200) {
+                    return response.json()
+                }
+                navigateTo('/offer');
+            }).then((data) => {
+                setInitialVariants({...data.included_variants});
+                if (data.offerable_product_details.length > 0) {
+                    updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
+                }
+                updateCheckKeysValidity('cta', data.cta_a);
+                for (var i = 0; i < data.offerable_product_details.length; i++) {
+                    data.offerable_product_details[i].preview_mode = true;
+                }
+                setOffer({...data});
+                setInitialOfferableProductDetails(data.offerable_product_details);
 
-                    fetchShopSettings({admin: null})
-                      .then((response) => {
-                          return response.json()
-                      })
-                      .then((data) => {
-                          updateSettingsOrRedirect(data)
-                          setUpdatePreviousAppOffer(!updatePreviousAppOffer);
-                          setIsLoading(false);
-                      })
-                      .catch((error) => {
-                          setIsLoading(false);
-                          console.log("Error > ", error);
-                      })
-                })
-                .catch((error) => {
-                    setIsLoading(false);
-                    console.log("Error > ", error);
-                })
-
+                  fetchShopSettings({admin: null})
+                  .then((response) => {
+                      return response.json()
+                  })
+                  .then((data) => {
+                      updateSettingsOrRedirect(data)
+                      setShop(data.shop_settings);
+                      setThemeAppExtension(data.theme_app_extension)
+                      setUpdatePreviousAppOffer(!updatePreviousAppOffer);
+                      setIsLoading(false);
+                  })
+                  .catch((error) => {
+                      setIsLoading(false);
+                      console.log("Error > ", error);
+                  })
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                console.log("Error > ", error);
+            })
             setIsLoading(true);
         }
         return function cleanup() {

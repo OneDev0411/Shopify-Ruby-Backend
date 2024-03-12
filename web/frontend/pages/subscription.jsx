@@ -27,7 +27,7 @@ export default function Subscription() {
     async function handlePlanChange (internal_name) {
         let redirect = Redirect.create(app);
 
-        fetch('/api/merchant/subscription', {
+        fetch('/api/v2/merchant/subscription', {
             method: 'PUT',
                headers: {
                  'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ export default function Subscription() {
     }
 
     const fetchSubscription = useCallback(() => {
-        fetch(`/api/merchant/current_subscription?shop=${shopAndHost.shop}`, {
+        fetch(`/api/v2/merchant/current_subscription?shop=${shopAndHost.shop}`, {
             method: 'GET',
                headers: {
                  'Content-Type': 'application/json',

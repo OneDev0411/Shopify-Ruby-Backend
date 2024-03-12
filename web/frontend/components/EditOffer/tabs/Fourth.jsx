@@ -26,8 +26,10 @@ export function FourthTab(props) {
     const handleAjaxDomSelector = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_ajax_dom_selector"), []);
     const handleAjaxDomAction = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_ajax_dom_action"), []);
     const handleOfferCss = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "custom_css"), []);
-    
-    const [isLegacy, setIsLegacy] = useState(shopSettings.theme_version === 'Vintage');
+
+    const [isLegacy, setIsLegacy] = useState(
+      props.shop.theme_version !== '2.0' || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true'
+    );
     const [openBanner, setOpenBanner] = useState(false);
 
     useEffect(() => {

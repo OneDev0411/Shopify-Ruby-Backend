@@ -12,6 +12,7 @@ import "../components/stylesheets/mainstyle.css";
 import {ThemeAppCard} from "../components/CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
+import { CHAT_APP_ID } from "../assets/index.js";
 
 export default function HomePage() {
   const app = useAppBridge();
@@ -38,7 +39,7 @@ export default function HomePage() {
 
   const notifyIntercom = (icu_shop) => {
     window.Intercom('boot', {
-      app_id: window.CHAT_APP_ID,
+      app_id: CHAT_APP_ID,
       id: icu_shop.id,
       email: icu_shop.email,
       phone: icu_shop.phone_number,
@@ -56,7 +57,7 @@ export default function HomePage() {
   useEffect(() => {
     let redirect = Redirect.create(app);
     setIsLoading(true);
-    fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
+    fetch(`/api/v2/merchant/current_shop?shop=${shopAndHost.shop}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -74,7 +75,7 @@ export default function HomePage() {
         setTrialDays(data.days_remaining_in_trial);
 
         if (data.theme_app_extension) {
-          setIsLegacy(data.theme_app_extension.theme_version === "Vintage");
+          setIsLegacy(data.theme_app_extension.theme_version === "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
         }
 
         // notify intercom as soon as app is loaded and shop info is fetched
@@ -109,16 +110,6 @@ export default function HomePage() {
             handleButtonClick={handleOpenOfferPage}
           />
           <Layout>
-            <Layout.Section>
-              <div className="banner-btn">
-                <Banner
-                  action={{content: 'Take the survey', onAction: handleOpenGoogleForm }}
-                  status="info"
-                >
-                  <p>We're delighted to welcome you to the new & improved In Cart Upsell & Cross-Sell! If you encounter any unexpected issues or need assistance with the new User Interface, please don't hesitate to contact our support team. Additionally, if you can spare 5 minutes, we'd greatly appreciate your feedback. Thank you!</p>
-                </Banner>
-              </div>
-            </Layout.Section>
             {isSubscriptionActive(currentShop?.subscription) && planName!=='free' && trialDays>0 &&
               <Layout.Section>
                 <Banner status="info">

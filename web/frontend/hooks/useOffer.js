@@ -31,7 +31,7 @@ export const useOffer = () => {
     let responseData
 
     try {
-      const response = await authFetch(`/api/offers/${offer.id}/update/${shop.shop_id}`, {
+      const response = await authFetch(`/api/v2/offers/${offer.id}/update/${shop.shop_id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'

@@ -248,7 +248,7 @@ module Shopifable
       graphql = %{ { products(first: 20, query:"title:*#{query}*") { edges { node { id title featuredImage { transformedSrc(maxHeight: 50, maxWidth: 50) }  } } } } }
     end
     res = HTTParty.post(graphql_url, headers: api_headers, body: { query: graphql, variables: ''}.to_json)
-    res.parsed_response['data']['products']['edges'].map { |prod|
+    res&.parsed_response.dig('data', 'products', 'edges')&.map { |prod|
       {
         id: prod['node']['id'].gsub("gid://shopify/Product/","").to_i,
         title: prod.dig("node", "title"),
@@ -951,59 +951,24 @@ module Shopifable
 
   class_methods do
 
-    # Public Method
-    # Get shop or create it.
-    #
-    # Also deal with shop that already exists and uninstalled in the past. Connect new_shop to
-    # old_shop and delete the new_shop record to keep associations and shops table clean from
-    # garbage entries.
-    #
-    # Parameters:
-    # current_shopify_domain -  String
-    #
-    # Returns: Shop Object.
-    def find_or_create_shop(current_shopify_domain)
+    # This method will return shop acc to the shopify domain, it is receving through params.
+    # Will return the shop if it finds through shopify_domain, otherwise if shop can be find through
+    # myshopify_domain, means that user is re-installing the old shop, so we will enable the old shop,
+    # and deletes the newly created shop.
+
+    # While enabling the old shop, we are using access scopes of new shop and updating the coloum because
+    # user can change them before re installing and can be caught through new shop that is created with that data.
+
+    def fetch_shop(current_shopify_domain)
       icushop = Shop.find_by(shopify_domain: current_shopify_domain)
-
-      old_shop = Shop.find_by(shopify_domain: current_shopify_domain)
-
-      if old_shop.present? && icushop.id != old_shop.id
-        # logging to Rollbar
-        # Rollbar.info('Reinstall', { shop: current_shopify_domain, uninstall: old_shop.uninstalled_at, reinstall: Time.now.utc })
-
-        # copying from new_shop to old_shop
-        old_shop.update_columns(JSON.parse(icushop.to_json).except('id', 'created_at'))
-        old_shop.installed_at = icushop.created_at
-
-        # re-doing errands for old_shop after reinstall
-        old_shop.async_setup
-        old_shop.set_up_for_shopify
-        old_shop.save!
-
-        # since we are all set connecting new installation to already existing shop
-        # destroying garbage shop now
-        begin
-          icushop.destroy
-        rescue ActiveRecord::InvalidForeignKey => error
-          # force destroy associations for new_shop and then destroy new_shop
-          ShopEvent.where(shop_id: icushop.id).update(shop_id: old_shop.id)
-          icushop.orders.update_all(shop_id: old_shop.id)
-          # for subscription, we shouldn't destroy new one right away. Instead,
-          # we should copy that to the older one, to stay aligned with the shopify charge ID,
-          # as older subscriptions is already connected to existing shop and other relations
-          if icushop.subscription.present?
-            old_shop.subscription.update_columns(JSON.parse(icushop.subscription.to_json).except('id', 'shop_id', 'created_at'))
-            icushop.subscription.destroy
-          end
-          icushop.destroy
-        end
-
-        icushop = old_shop
-        Sidekiq::Client.push('class' => 'ShopWorker::EnsureInCartUpsellWebhooksJob', 'args' => [icushop.id], 'queue' => 'default', 'at' => Time.now.to_i)
-
-        icushop.store_cache_keys_on_reinstall
+      old_shop = Shop.find_by(myshopify_domain: current_shopify_domain)
+      if old_shop.present? && icushop&.id != old_shop.id
+        old_shop.enable_reinstalled_shop(current_shopify_domain,
+                                         icushop.shopify_token,
+                                         icushop.access_scopes)
+        icushop.destroy_completely
+        return old_shop
       end
-
       icushop
     end
 

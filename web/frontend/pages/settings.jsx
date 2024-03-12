@@ -57,7 +57,7 @@ export default function Settings() {
     };
 
     const toggleActivation = async () => {
-        fetch(`/api/merchant/toggle_activation?shop=${shopAndHost.shop}`, {
+        fetch(`/api/v2/merchant/toggle_activation?shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -87,7 +87,6 @@ export default function Settings() {
                 custom_cart_page_dom_selector: formData.cartDomSelector, custom_cart_page_dom_action: formData.cartDomAction, custom_ajax_dom_selector: formData.ajaxDomSelector,
                 custom_ajax_dom_action: formData.ajaxDomAction
             }
-
             updateShopSettings(shopSettings)
                 .then((response) => { return response.json(); })
                 .then((data) => {

@@ -27,7 +27,7 @@ export function OfferPreview(props) {
 		setTimeout(function(){ setCarouselLoading(false) }, 500);
 
 		if (!props.previewMode) {
-			fetch(`/api/merchant/offer_settings`, {
+			fetch(`/api/v2/merchant/offer_settings`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

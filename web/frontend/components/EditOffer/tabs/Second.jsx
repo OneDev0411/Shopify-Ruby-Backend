@@ -59,10 +59,12 @@ export function SecondTab(props) {
     const [templateImagesURL, setTemplateImagesURL] = useState({});
     const [storedThemeNames, setStoredThemeName] = useState([]);
 
-    const [isLegacy, setIsLegacy] = useState(shopSettings.theme_version === 'Vintage');
+    const [isLegacy, setIsLegacy] = useState(
+      props.shop.theme_version !== '2.0' || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true'
+    );
 
     useEffect(() => {
-        fetch(`/api/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
+        fetch(`/api/v2/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -619,7 +621,7 @@ export function SecondTab(props) {
     }, []);
 
     function getSelectedItems(item_type) {
-        return fetch(`/api/merchant/offer/shopify_ids_from_rule`, {
+        return fetch(`/api/v2/merchant/offer/shopify_ids_from_rule`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -708,7 +710,7 @@ export function SecondTab(props) {
                 </div>
             )}
 
-            {(selected === "ajax" && !props.themeAppExtension?.theme_app_embed && !isLegacy ) && (
+            {(selected === "ajax" && !props.themeAppExtension?.theme_app_embed && !isLegacy) && (
               <div style={{marginBottom: "10px"}} className="polaris-banner-container">
                   <Banner title="You are using Shopify's Theme Editor" tone='warning'>
                       <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
