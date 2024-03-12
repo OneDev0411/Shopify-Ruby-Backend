@@ -27,7 +27,7 @@ class Product < ApplicationRecord
       if variants_json.present?
         variants_json.first['price']
       else
-        variants.empty? ? 0.0 : variants.first['price']
+        0.0
       end
     end
   end

@@ -46,7 +46,7 @@ export default defineConfig({
   root: dirname(fileURLToPath(import.meta.url)),
   plugins: [react()],
   define: {
-    "process.env.SHOPIFY_API_KEY": JSON.stringify(process.env.SHOPIFY_API_KEY),
+    "process.env.SHOPIFY_API_KEY": JSON.stringify(process.env.SHOPIFY_API_KEY)
   },
   resolve: {
     preserveSymlinks: true,
@@ -59,6 +59,7 @@ export default defineConfig({
       "^/(\\?.*)?$": proxyOptions,
       "^/js(/|(\\?.*)?$)": proxyOptions,
       "^/api(/|(\\?.*)?$)": proxyOptions,
+      "^/proxy(/|(\\?.*)?$)": proxyOptions,
     },
   },
 });

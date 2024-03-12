@@ -17,16 +17,16 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthenticatedFetch } from "../hooks";
 import { useSelector } from "react-redux";
+import {
+  OffersListSortOptions,
+  OffersResourceName
+} from '../shared/constants/Others';
 import {CreateOfferCard} from "./CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 
-export function OffersList(props) {
+export function OffersList({ pageSize }) {
   const app = useAppBridge();
-  const resourceName = {
-    singular: 'offer',
-    plural: 'offers',
-  };
   const [isLoading, setIsLoading] = useState(true);
   const [taggedWith, setTaggedWith] = useState('');
   const [queryValue, setQueryValue] = useState(null);
@@ -43,13 +43,9 @@ export function OffersList(props) {
     setModalActive(!modalActive)
   }, [modalActive]);
 
-  const sendOfferList =
-    props.getOfferListData &&
-    useCallback((newValue) => props.getOfferListData(newValue), []);
-
   useEffect(() => {
     let redirect = Redirect.create(app);
-    fetch('/api/merchant/offers_list', {
+    fetch('/api/v2/merchant/offers_list', {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
@@ -71,16 +67,13 @@ export function OffersList(props) {
         setOffersData(data.offers);
         setFilteredData(data.offers);
         setIsLoading(false);
-        if(sendOfferList){
-          data.offers.length > 0 ? sendOfferList(true) : sendOfferList(false);
-        }
       }}).catch((error) => {
         console.log('Fetch error >> ', error);
       });
   }, []);
 
   // Pagination configuration
-  const itemsPerPage = 5;
+  const itemsPerPage = pageSize || 5;
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -194,13 +187,6 @@ export function OffersList(props) {
       ]
     : [];
 
-  const sortOptions = [
-    {label: 'Date Desc', value: 'date_des'},
-    {label: 'Date Asc', value: 'date_asc'},
-    {label: 'Clicks', value: 'clicks'},
-    {label: 'Revenue', value: 'revenue'},
-  ];
-
   const rowMarkup = paginatedData.map(
     ({ id, title, status, clicks, views, revenue }, index) => (
       <IndexTable.Row
@@ -227,7 +213,7 @@ export function OffersList(props) {
     selectedResources.forEach(function (resource) {
       if(paginatedData.find(obj => obj['id'] === resource)?.offerable_type != 'auto')
       {
-        let url = `/api/merchant/offers/${resource}/duplicate`;
+        let url = `/api/v2/merchant/offers/${resource}/duplicate`;
         fetch(url, {
           method: 'POST',
           headers: {
@@ -253,7 +239,7 @@ export function OffersList(props) {
 
   function deleteSelectedOffer() {
     selectedResources.forEach(function (resource) {
-      let url = `/api/merchant/offers/${resource}`;
+      let url = `/api/v2/merchant/offers/${resource}`;
       fetch(url, {
         method: 'DELETE',
         headers: {
@@ -274,7 +260,7 @@ export function OffersList(props) {
 
   function activateSelectedOffer() {
     selectedResources.forEach(function (resource) {
-      let url = '/api/merchant/offer_activate';
+      let url = '/api/v2/merchant/offer_activate';
       fetch(url, {
         method: 'POST',
         headers: {
@@ -297,7 +283,7 @@ export function OffersList(props) {
 
   function deactivateSelectedOffer() {
     selectedResources.forEach(function (resource) {
-      let url = '/api/merchant/offer_deactivate';
+      let url = '/api/v2/merchant/offer_deactivate';
       fetch(url, {
         method: 'POST',
         headers: {
@@ -361,19 +347,19 @@ export function OffersList(props) {
                     <Select
                       labelInline
                       label="Sort"
-                      options={sortOptions}
+                      options={OffersListSortOptions}
                       value={sortValue}
                       onChange={handleSortChange}
                     />
                   </div>
                 </div>
                 <IndexTable
-                  sortOptions={sortOptions}
+                  sortOptions={OffersListSortOptions}
                   sortable={[false, false, true, true, true]}
               sortDirection={'descending'}
                   sortColumnIndex={4}
                   sort={{ handleSorting }}
-                  resourceName={resourceName}
+                  resourceName={OffersResourceName}
                   itemCount={paginatedData.length}
                   selectedItemsCount={
                 allResourcesSelected ? 'All' : selectedResources.length

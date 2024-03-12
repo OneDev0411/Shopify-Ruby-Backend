@@ -7,6 +7,7 @@ class Shop < ApplicationRecord
   has_one :plan, through: :subscription
   has_one :customer
   has_one :customer_by_shopify_domain, primary_key: 'shopify_domain', class_name: 'Customer', foreign_key: 'shopify_domain'
+  has_one :theme_app_extension
   has_many :offers
   has_many :orders
   has_many :daily_stats, -> (shop) { where("created_at > \'#{ shop.stats_from || Time.parse('2000-01-01')}\'") }
@@ -40,7 +41,7 @@ class Shop < ApplicationRecord
 
   include ActionView::Helpers::DateHelper
   include ShopWorker
-  
+
   def shop_setup
     self.update(is_shop_active: true)
     ShopAction.create(
@@ -55,6 +56,21 @@ class Shop < ApplicationRecord
     signup_for_referral_program
     select_plan('trial_plan')
     track_installation
+  end
+
+  # This method is intended to delete shops that are forcefully being created and controlled by 
+  # shopify app gem on re-install, We enable the the old shop and deletes the new one. 
+  # Never use this method on un-install app.
+
+  def destroy_completely
+    subscription.delete if subscription.present?
+    products.delete_all if products.any?
+    offers.delete_all if offers.any?
+    begin
+      destroy
+    rescue => error
+      ErrorNotifier.call(error)
+    end
   end
 
   def active_offers
@@ -459,6 +475,7 @@ class Shop < ApplicationRecord
     begin
       force_purge_cache
     rescue ActiveResource::UnauthorizedAccess => e
+      ErrorNotifier.call(e)
       return e.message
     end
   end
@@ -580,7 +597,7 @@ class Shop < ApplicationRecord
     j = Sidekiq::Client.push('class' => 'ShopWorker::ForcePurgeCacheJob', 'args' => [id], 'queue' => 'shop', 'at' => Time.now.to_i)
     update_column(:publish_job, j)
 
-    if ENV["PUBLISH_SCRIPT_VIA_API"].downcase == 'true'
+    if ENV["PUBLISH_SCRIPT_VIA_API"]&.downcase == 'true'
       query_headers = {
         'Content-Type' => 'application/json',
         'accept' => 'application/json',
@@ -605,7 +622,7 @@ class Shop < ApplicationRecord
   #
   # Returns Httparty::response object.
   def force_purge_cache
-    if script_tag_id.blank?
+    if script_tag_id.blank? && !theme_app_extension&.theme_app_complete && ENV['ENABLE_THEME_APP_EXTENSION']&.downcase != 'true'
       puts "No script tag - creating"
       create_script_tag
     else
@@ -626,7 +643,7 @@ class Shop < ApplicationRecord
       session = activate_session
       client=ShopifyAPI::Clients::Graphql::Admin.new(session: session)
       ShopifyAPI::Webhooks::Registry.get_webhook_id(topic: "products/create", client: client)
-      
+
     rescue ActiveResource::UnauthorizedAccess
       needed = true
     end
@@ -642,34 +659,54 @@ class Shop < ApplicationRecord
       is_shop_active
   end
 
-    # the customer has uninstalled the app
+  # the customer has uninstalled the app
   def mark_as_cancelled
     begin
       unpublish_all_offers
-
       # This needs to go in a delayed job
       # Order.where(shop_id: self.id).delete_all
       update_columns(uninstalled_at: Time.now.utc, myshopify_domain: shopify_domain,
                      shopify_token: nil, shopify_domain: "#{shopify_domain}_OLD", access_scopes: 'uninstalled',
                      is_shop_active: false)
 
-      $customerio.track(id, 'uninstalled')
-      $customerio.identify(id: id, email: email, active: false, shopify_plan: shopify_plan_name, app_plan_name: self.plan&.name, created_at: created_at.to_i, updated_at: Time.now.to_i, status: "uninstalled")
-      track_uninstallation if ENV['ENV']=="PRODUCTION"
       if subscription.present?
-        ShopEvent.create(shop_id: id, title: 'Cancelled', revenue_impact: (subscription.price_in_cents / 100.0 * -1))
+        ShopEvent.create(shop_id: id, title: 'Cancelled', 
+                         revenue_impact: (subscription.price_in_cents / 100.0 * -1))
         subscription.status = 'cancelled'
         subscription.save
+        puts 'Cancelling Subscription...'
       end
-
+      track_uninstallation
+      remove_cache_keys_for_uninstalled_shop
       # Finally, delete from FirstPromoter as we don't want to pay commission against this shop anymore
       delete_from_referral_program
-      remove_cache_keys_for_uninstalled_shop
     rescue StandardError => e
       delete_from_referral_program
-      Rollbar.error('Error uninstalling the app >> ', e)
+      ErrorNotifier.call(e)
     end
   end
+
+  def enable_reinstalled_shop(s_domain, s_token, a_scopes)
+    begin
+      update_columns(shopify_domain: s_domain,
+      myshopify_domain: nil,
+      installed_at: Time.now.utc,
+      uninstalled_at: nil,
+      access_scopes: a_scopes,
+      is_shop_active: true,
+      shopify_token: s_token)
+      
+      if subscription.present?
+        subscription.status = 'approved'
+        subscription.save
+      end
+    rescue => e
+      ErrorNotifier.call(e)
+    end
+    shop_setup
+    store_cache_keys_on_reinstall
+  end
+
 
   def signup_for_referral_program
     # First Promoter is the referral platform that we are using for referral tracking purposes
@@ -696,9 +733,11 @@ class Shop < ApplicationRecord
     customer = customer_by_shopify_domain
     if customer.present? && customer.is_referral_tracked
       response_code, response_body = ReferralIntegrations::FirstPromoter.delete_referral(customer.shopify_domain)
-
       if response_code == 200
-        ShopEvent.create(shop_id: id, title: "Lead Deleted from FirstPromoter", body: "Response: #{response_body}", revenue_impact: (subscription.price_in_cents / 100.0 * -1))
+        ShopEvent.create(shop_id: id,
+                          title: "Lead Deleted from FirstPromoter", 
+                          body: "Response: #{response_body}", 
+                          revenue_impact: (subscription.price_in_cents / 100.0 * -1))
       end
     end
   end
@@ -823,6 +862,7 @@ class Shop < ApplicationRecord
       wizard_token: wizard_token,
       finder_token: finder_token,
       has_branding: subscription.try(:has_branding) || false,
+      has_pro_features: has_pro_features?,
       css_options: css_options.present? ? css_options : { main: {}, button: {}, text: {} },
       custom_bg_color: custom_bg_color,
       custom_text_color: custom_text_color,
@@ -834,7 +874,7 @@ class Shop < ApplicationRecord
       shop_id: id,
       default_template_settings: default_template_settings,
       has_redirect_to_product: has_redirect_to_product?,
-      has_pro_features: has_pro_features?
+      theme_version: theme_app_extension&.theme_version || ''
     }
 
     admin ? std_settings.merge(admin_settings) : std_settings
@@ -1095,7 +1135,7 @@ class Shop < ApplicationRecord
 
   #Unpublish all offers except first when merchant switches to free plan
   def unpublish_extra_offers
-    first_active_offer_id = self.unpublished_offer_ids? ? self.unpublished_offer_ids.last : self.offers.active.last&.id
+    first_active_offer_id = self.unpublished_offer_ids? ? self.unpublished_offer_ids.last : self.offers.active.first&.id
     if first_active_offer_id.present?
       @offers = self.offers.where.not(id: first_active_offer_id)
       @offers.update({ published_at: nil, active: false })
@@ -1127,9 +1167,9 @@ class Shop < ApplicationRecord
       subscription.shop = self
       subscription.status = 'approved'
       subscription.update_subscription(plan)
-      subscription.save      
+      subscription.save
     end
-    if plan.free_plan?
+    if !plan.nil? and plan.free_plan?
       self.unpublish_extra_offers if self.offers.present?
     end
     # subscription.update_attribute(:free_plan_after_trial, false)
@@ -1137,7 +1177,58 @@ class Shop < ApplicationRecord
 
   def offer_data_with_stats
     data = []
-    offers.each do |offer|
+    offers
+      .select('offers.id, offers.shop_id, offers.title, offers.active, offers.total_clicks, offers.total_views, offers.total_revenue, offers.created_at, offers.offerable_type')
+      .group('offers.id')
+      .each do |offer|
+        data << {
+          id: offer.id,
+          title: offer.title,
+          status: offer.active,
+          clicks: offer.total_clicks,
+          views: offer.total_views,
+          revenue: offer.total_revenue,
+          created_at: offer.created_at.to_datetime,
+          offerable_type: offer.offerable_type,
+        }
+    end
+    return data
+  end
+
+  def offer_data_with_stats_by_period(period)
+    data = []
+
+    start_date = period_hash_to_offers[period][:start_date]
+    end_date = period_hash_to_offers[period][:end_date]
+
+    # First before join to the offers table, get daily_stats and offer_events
+    # data which their created_at is between start_date and end_date
+    daily_stats_subquery = DailyStat
+      .select('offer_id, SUM(times_clicked) as total_clicks, SUM(times_loaded) as total_views')
+      .where(created_at: start_date..end_date)
+      .group(:offer_id)
+
+    offer_events_subquery = OfferEvent
+      .select('offer_id, SUM(amount) as total_revenue')
+      .where(created_at: start_date..end_date)
+      .where(action: 'sale')
+      .group(:offer_id)
+
+    # Reorder the offers data due to the default query of offer model
+    # If the data isn't reordered, the query result is wrong due to two order queries
+    # one is the default order by position_order and another one is a order by total_revenue
+    offers
+    .reorder('')
+    .joins("LEFT OUTER JOIN (#{daily_stats_subquery.to_sql}) ds ON ds.offer_id = offers.id")
+    .joins("LEFT OUTER JOIN (#{offer_events_subquery.to_sql}) oe ON oe.offer_id = offers.id")
+    .select('offers.id, offers.shop_id, offers.title, offers.active, offers.created_at, offers.offerable_type,
+            COALESCE(ds.total_clicks, 0) AS total_clicks,
+            COALESCE(ds.total_views, 0) AS total_views,
+            COALESCE(oe.total_revenue, 0) as total_revenue')
+    .group('offers.id, ds.total_clicks, ds.total_views, oe.total_revenue')
+    .order('total_revenue DESC')
+    .limit(3)
+    .each do |offer|
       data << {
         id: offer.id,
         title: offer.title,
@@ -1146,10 +1237,118 @@ class Shop < ApplicationRecord
         views: offer.total_views,
         revenue: offer.total_revenue,
         created_at: offer.created_at.to_datetime,
-        offerable_type: offer.offerable_type,
       }
     end
     return data
+  end
+
+  def publish_or_delete_script_tag
+    if (!self.theme_app_extension.theme_app_complete || self.theme_app_extension.theme_version != '2.0') && ENV['ENABLE_THEME_APP_EXTENSION']&.downcase != 'true'
+      self.publish_async
+    elsif !script_tag_id.nil?
+      self.disable_javascript
+    end
+  end
+
+  def proxy_offers
+    offers = []
+
+    self.offers.where(active: true).each do | offer |
+      new_offer = {
+        id: offer.id,
+        rules: offer.rules_json,
+        text_a:  (offer.offer_text || ''),
+        text_b:  (offer.offer_text_alt || ''),
+        cta_a:  offer.offer_cta,
+        cta_b:  offer.offer_cta_alt,
+        css: offer.offer_css,
+        show_product_image: offer.show_product_image,
+        product_image_size: offer.product_image_size || 'medium',
+        link_to_product: offer.link_to_product,
+        theme: offer.theme,
+        shop: {
+          path_to_cart: self.path_to_cart,
+          extra_css_classes: self.extra_css_classes,
+        },
+        show_nothanks: offer.show_nothanks || false,
+        calculated_image_url:  offer.calculated_image_url ,
+        hide_variants_wrapper: offer.offerable_type == 'product' && offer.product.available_json_variants.count == 1,
+        show_variant_price: offer.show_variant_price || false,
+        uses_ab_test: offer.uses_ab_test?,
+        ruleset_type: offer.ruleset_type,
+        offerable_type:  offer.offerable_type,
+        offerable_product_shopify_ids: offer.offerable_product_shopify_ids.compact,
+        offerable_product_details: offer.offerable_product_details(true, true),
+        checkout_after_accepted: offer.checkout_after_accepted || false,
+        discount_code:  offer.discount_target_type == 'code' ? offer.discount_code : false,
+        stop_showing_after_accepted: offer.stop_showing_after_accepted || false,
+        products_to_remove: offer.product_ids_to_remove,
+        show_powered_by: self.subscription.has_branding,
+        show_spinner: self.show_spinner?,
+        must_accept: offer.must_accept || false,
+        show_quantity_selector: offer.show_quantity_selector || false,
+        powered_by_text_color: offer.powered_by_text_color,
+        powered_by_link_color: offer.powered_by_link_color,
+        multi_layout: offer.multi_layout || 'compact',
+        show_custom_field: offer.show_custom_field || false,
+        custom_field_name: offer.custom_field_name,
+        custom_field_placeholder: offer.custom_field_placeholder,
+        custom_field_required: offer.custom_field_required || false,
+        custom_field_2_name: offer.custom_field_2_name,
+        custom_field_2_placeholder: offer.custom_field_2_placeholder,
+        custom_field_2_required: offer.custom_field_2_required || false,
+        custom_field_3_name: offer.custom_field_3_name,
+        custom_field_3_placeholder: offer.custom_field_3_placeholder,
+        custom_field_3_required: offer.custom_field_3_required || false,
+        show_compare_at_price: offer.show_compare_at_price?,
+        redirect_to_product: self.has_redirect_to_product? && offer.redirect_to_product?,
+        show_product_price: offer.show_product_price?,
+        show_product_title: offer.show_product_title?,
+        in_cart_page:  offer.in_cart_page?,
+        in_ajax_cart:  offer.in_ajax_cart?,
+        in_product_page:  offer.in_product_page?,
+        css_options:  offer.css_options || {},
+        custom_css: offer.custom_css
+      }
+
+      if offer.winner.present?
+        new_offer[:winning_version] = offer.winner
+      end
+
+      if offer.offerable_type == 'auto'
+        new_offer[:autopilot_data] = self.autopilot_data
+        new_offer[:autopilot_quantity] = offer.autopilot_quantity || 1
+      end
+
+      if self.has_recharge && offer.recharge_subscription_id.present?
+        new_offer[:has_recharge]             = self.has_recharge && offer.recharge_subscription_id.present?
+        new_offer[:interval_unit]            = offer.interval_unit
+        new_offer[:interval_frequency]       = offer.interval_frequency.to_i
+        new_offer[:recharge_subscription_id] = offer.recharge_subscription_id.to_i
+      end
+
+      if self.has_remove_offer
+        new_offer[:remove_if_no_longer_valid] = offer.remove_if_no_longer_valid
+      end
+
+      offers << new_offer
+    end
+
+    offers
+  end
+
+  def proxy_shop_settings
+    {
+      ajax_refresh_code: self.ajax_refresh_code,
+      canonical_domain: self.canonical_domain,
+      has_recharge: self.has_recharge,
+      has_remove_offer: self.has_remove_offer,
+      has_geo_offers: self.has_geo_offers,
+      uses_ajax_cart: self.uses_ajax_cart,
+      has_shopify_multicurrency: self.enabled_presentment_currencies.present? && self.enabled_presentment_currencies.length > 0,
+      show_spinner: self.show_spinner?,
+      uses_customer_tags: self.uses_customer_tags? || false,
+    }
   end
 
   private

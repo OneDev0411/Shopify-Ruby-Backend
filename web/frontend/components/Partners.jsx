@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useAuthenticatedFetch } from "../hooks";
+import { PartnersSliderSettings } from '../shared/constants/PartnersSliderSettings';
 
 export function Partners() {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -13,44 +14,6 @@ export function Partners() {
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [partners, setPartners] = useState(null);
     let slider;
-
-    const settings = {
-      dots: false,
-      infinite: true,
-      speed: 500,
-      slidesToShow: 3,
-      slidesToScroll: 1,
-      responsive: [
-        {
-          breakpoint: 1200,
-          settings: {
-            slidesToShow: 3,
-            slidesToScroll: 1,
-          }
-        },
-        {
-          breakpoint: 991,
-          settings: {
-            slidesToShow: 3,
-            slidesToScroll: 1,
-          }
-        },
-        {
-          breakpoint: 767,
-          settings: {
-            slidesToShow: 2,
-            slidesToScroll: 1
-          }
-        },
-        {
-          breakpoint: 576,
-          settings: {
-            slidesToShow: 1,
-            slidesToScroll: 1
-          }
-        }
-      ]
-    };
 
     function next(){
       slider.slickNext();
@@ -60,7 +23,7 @@ export function Partners() {
     }
 
     const getAllPartners = useCallback(async ()=>{
-      fetch(`/api/merchant/partners?shop=${shopAndHost.shop}`, {
+      fetch(`/api/v2/merchant/partners?shop=${shopAndHost.shop}`, {
         method: 'GET',
            headers: {
              'Content-Type': 'application/json',
@@ -89,7 +52,7 @@ export function Partners() {
         <div className="space-4"></div>
           <Grid >
             <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 12, lg: 12, xl: 12}}>
-                <Slider ref={c => (slider = c)} {...settings}>
+                <Slider ref={c => (slider = c)} {...PartnersSliderSettings}>
                   {partners && partners.map((partner, index) => (
                     <Grid key={index}>
                       <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 12, lg: 12, xl: 12}}>

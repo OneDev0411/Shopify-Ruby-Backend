@@ -3,6 +3,7 @@ import "../components/stylesheets/editOfferStyle.css";
 import { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuthenticatedFetch } from '../hooks';
+import { ABTestingOptions } from '../shared/constants/Others';
 
 const AbAnalytics = (props) => {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -11,7 +12,7 @@ const AbAnalytics = (props) => {
     const fetch = useAuthenticatedFetch(shopAndHost.host);
 
     const getAbAnalytics = useCallback((offerId, shop, version, setRequiredState) => {
-        fetch(`/api/merchant/offers/load_ab_analytics`, {
+        fetch(`/api/v2/merchant/offers/load_ab_analytics`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -53,30 +54,20 @@ const AbAnalytics = (props) => {
                 </Grid>
             </div>
             <div className="card-space">
-                <Grid>
-                    <Grid.Cell columnSpan={{xs: 6, sm: 6, md: 6, lg: 6, xl: 6}}>
-                        <Text variant="body" as="p" >
-                            Option A
-                        </Text>
-                    </Grid.Cell>
-                    <Grid.Cell columnSpan={{xs: 6, sm: 6, md: 6, lg: 6, xl: 6}}>
-                        <Text variant="body" as="p" >
-                            {aAnalytics}
-                        </Text>
-                    </Grid.Cell>
-                </Grid>
-                <Grid>
-                    <Grid.Cell columnSpan={{xs: 6, sm: 6, md: 6, lg: 6, xl: 6}}>
-                        <Text variant="body" as="p" >
-                            Option B
-                        </Text>
-                    </Grid.Cell>
-                    <Grid.Cell columnSpan={{xs: 6, sm: 6, md: 6, lg: 6, xl: 6}}>
-                        <Text variant="body" as="p">
-                            {bAnalytics}
-                        </Text>
-                    </Grid.Cell>
-                </Grid>
+                {ABTestingOptions.map((option, index) => (
+                    <Grid key={index}>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }}>
+                            <Text variant="body" as="p">
+                                {option}
+                            </Text>
+                        </Grid.Cell>
+                        <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }}>
+                            <Text variant="body" as="p">
+                                {index === 0 ? aAnalytics : bAnalytics}
+                            </Text>
+                        </Grid.Cell>
+                    </Grid>
+                ))}
             </div>
           </Card>
         </AppProvider>

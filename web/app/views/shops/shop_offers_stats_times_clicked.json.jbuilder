@@ -1,0 +1,1 @@
+json.stat_times_clicked @stat_times_clicked

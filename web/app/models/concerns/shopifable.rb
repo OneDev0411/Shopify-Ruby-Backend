@@ -98,7 +98,7 @@ module Shopifable
 
   def fetch_active_shopify_theme
     activate_session
-    shopify_theme = ShopifyAPI::Theme.all.map{|t| t if t.role == 'main'}.compact.first
+    shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
     if shopify_theme.nil?
       raise 'Could not find active Shopify Theme via API'
     else
@@ -130,7 +130,7 @@ module Shopifable
   # Public. Like the above, sets up app using presets, if presets are available
   def fetch_colors_for_active_theme
     activate_session
-    shopify_theme = ShopifyAPI::Theme.all.map{|t| t if t.role == 'main'}.compact.first
+    shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
     if shopify_theme.nil?
       return {result: false, message: 'Could not find active Shopify Theme' }
     else
@@ -218,7 +218,6 @@ module Shopifable
   def activate_session
     begin
       raise "ShopifyToken Not Present for shop: ##{id}, #{shopify_domain}" if shopify_token.nil?
-
       session = ShopifyAPI::Auth::Session.new(shop: shopify_domain, access_token: shopify_token)
       ShopifyAPI::Context.activate_session(session)
       return session
@@ -249,7 +248,7 @@ module Shopifable
       graphql = %{ { products(first: 20, query:"title:*#{query}*") { edges { node { id title featuredImage { transformedSrc(maxHeight: 50, maxWidth: 50) }  } } } } }
     end
     res = HTTParty.post(graphql_url, headers: api_headers, body: { query: graphql, variables: ''}.to_json)
-    res.parsed_response['data']['products']['edges'].map { |prod|
+    res&.parsed_response.dig('data', 'products', 'edges')&.map { |prod|
       {
         id: prod['node']['id'].gsub("gid://shopify/Product/","").to_i,
         title: prod.dig("node", "title"),
@@ -341,7 +340,7 @@ module Shopifable
     a.each do |v|
       b[v] += 1
     end
-    self.top_sellers = b.sort_by{|k,v| v }.reverse[0 .. 49].map{|i| i[0].to_i }
+    self.top_sellers = b.sort_by{ |k,v| v }.reverse[0 .. 49].map{ |i| i[0].to_i }
     self.top_sellers_updated_at = Time.now.utc
     save
   end
@@ -350,7 +349,7 @@ module Shopifable
     regenerate_top_sellers
     batch_fetch_shopify_products(top_sellers) # update data on each product
     use_weighted_autopilot = has_weighted_autopilot?
-    products.where(shopify_id: top_sellers).map{|p| p.set_most_popular_companions(use_weighted_autopilot) }
+    products.where(shopify_id: top_sellers).map{ |p| p.set_most_popular_companions(use_weighted_autopilot) }
   end
 
   def enable_autopilot_status
@@ -395,9 +394,9 @@ module Shopifable
     batch_fetch_shopify_products(product_ids)
     puts "fetching #{product_ids.count} products companions"
     if opts[:since]
-      products.where(shopify_id: product_ids).where('most_popular_companions_updated_at is null OR most_popular_companions_updated_at < ?', opts[:since]).map{|p| p.set_most_popular_companions(use_weighted_autopilot) }
+      products.where(shopify_id: product_ids).where('most_popular_companions_updated_at is null OR most_popular_companions_updated_at < ?', opts[:since]).map{ |p| p.set_most_popular_companions(use_weighted_autopilot) }
     else
-      products.where(shopify_id: product_ids).map{|p| p.set_most_popular_companions(use_weighted_autopilot) }
+      products.where(shopify_id: product_ids).map{ |p| p.set_most_popular_companions(use_weighted_autopilot) }
     end
     self.companions_status = 'complete'
     self.companions_status_updated_at = Time.now.utc
@@ -444,7 +443,7 @@ module Shopifable
       fetch_data_on_companions
       # This sets the offerable_product_shopify_ids field for AUTOPILOT
       offer = offers.where(offerable_type: 'auto').first
-      offer.offerable_product_shopify_ids = (autopilot_companions.map{|c| [c[0], c[1].map(&:first)] }.flatten + autopilot_bestsellers).uniq
+      offer.offerable_product_shopify_ids = (autopilot_companions.map{ |c| [c[0], c[1].map(&:first)] }.flatten + autopilot_bestsellers).uniq
 
       offer.save
     end
@@ -555,7 +554,7 @@ module Shopifable
       remote_products = HTTParty.get(url, headers: headers).parsed_response['products']
       puts "  #{remote_products.length} products found"
       next unless remote_products.present?
-      all_products_found += remote_products.map{|p| p['id']}
+      all_products_found += remote_products.map{ |p| p['id'] }
       remote_products.each do |s_product|
         l_product = Product.find_or_create_by(shop_id: id, shopify_id: s_product['id'])
         l_product.apply_new_data(s_product)
@@ -635,7 +634,7 @@ module Shopifable
       Rails.logger.info("Enqueuing to ShopWorker::CreateScriptTagJob for shop # #{self.id} : #{self.shopify_domain}")
       Sidekiq::Client.push('class' => 'ShopWorker::CreateScriptTagJob', 'args' => [self.id], 'queue' => 'default', 'at' => Time.now.to_i)
     end
-   
+
     update_column(soft_purge_only, opts[:soft_purge_only]) if opts[:soft_purge_only]
     tag_updated
   end
@@ -691,7 +690,7 @@ module Shopifable
   #Called to get name of the theme for the current shop
   def active_theme_for_dafault_template
     activate_session
-    shopify_theme = ShopifyAPI::Theme.all.map{|t| t if t.role == 'main'}.compact.first
+    shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
     if shopify_theme.nil?
       return {result: false, message: 'Could not find active Shopify Theme via API' }
     else
@@ -703,6 +702,118 @@ module Shopifable
     return {result: true, message: shopify_theme_name }
   end
 
+  def theme_app_extension_check
+    keys = check_offers_placement
+    keys_without_ajax = keys.map(&:clone)
+    blocks_added = 0
+
+    check_app_embed_enabled
+    keys_without_ajax.pop if keys.include?('ajax')
+
+    update_theme_version
+
+    if keys_without_ajax.length.positive?
+      keys_without_ajax.each do |key|
+        next blocks_added unless (key == 'templates/product.json' && theme_app_extension.product_block_added) ||
+          (key == 'templates/cart.json' && theme_app_extension.cart_block_added) ||
+          (key == 'templates/collection.json' && theme_app_extension.collection_block_added)
+
+        blocks_added += 1
+      end
+    end
+
+    all_blocks_enabled = ((blocks_added == keys_without_ajax.length) &&
+      ((keys.include?('ajax') && theme_app_extension&.theme_app_embed) || keys.exclude?('ajax')))
+
+    if !theme_app_extension&.theme_app_complete && ((all_blocks_enabled && offers.present?) || offers.blank?)
+      theme_app_extension.update(theme_app_complete: true)
+
+      unless script_tag_id.nil? && self.theme_app_extension.theme_version != '2.0'
+        disable_javascript
+      end
+    end
+  end
+
+  def check_offers_placement
+    keys = []
+
+    unless offers.find(&:in_cart_page).nil?
+      keys.push('templates/cart.json')
+    end
+
+    unless offers.find(&:in_product_page).nil?
+      keys.push('templates/product.json')
+    end
+
+    unless offers.find { |off|
+      !(off.rules_json.find { |rule| rule['item_type'] == 'collection' }).nil?
+    }.nil?
+      keys.push('templates/collection.json')
+    end
+
+    unless offers.find(&:in_ajax_cart).nil?
+      keys.push('ajax')
+    end
+
+    keys
+  end
+
+  def update_theme_version
+    activate_session
+
+    app_blocks_added = []
+    app_blocks_supported = 0
+    assets = []
+    keys = %w[templates/product.json templates/cart.json templates/collection.json]
+
+    shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
+
+    if shopify_theme
+      assets = ShopifyAPI::Asset.all(theme_id: shopify_theme.id)
+    end
+
+    assets.each do |asset|
+      if keys.include?(asset.key)
+        search_results = search_asset_value(asset.key, shopify_theme.id, app_blocks_added, app_blocks_supported)
+        app_blocks_supported = search_results[:app_blocks_supported] if search_results[:app_blocks_supported].present?
+        app_blocks_added = search_results[:app_blocks_added] if search_results[:app_blocks_added].present?
+      end
+    end
+
+    if app_blocks_supported.positive?
+      self.theme_app_extension.update(theme_version: '2.0')
+    else
+      self.theme_app_extension.update(theme_version: 'Vintage')
+    end
+
+    update_false_theme_values(app_blocks_added)
+  end
+
+  def check_app_embed_enabled
+    activate_session
+    asset = []
+
+    shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
+
+    unless shopify_theme.nil?
+      asset = ShopifyAPI::Asset.all(asset: { key: 'config/settings_data.json' }, theme_id: shopify_theme.id).compact.first
+    end
+
+    return if asset.nil?
+
+    asset = JSON.parse(asset.value || '')
+    blocks = asset['current']['blocks']
+
+    return if blocks.nil?
+
+    blocks.each do |_block_id, block|
+      if block['type'].include?("app_block_embed/#{ENV['SHOPIFY_ICU_EXTENSION_APP_ID']}")
+        self.theme_app_extension.update(theme_app_embed: !block['disabled'])
+        break
+      end
+    end
+  end
+
   private
 
   # Private. defines the webhooks used in the store.
@@ -710,7 +821,7 @@ module Shopifable
   # Returns Array.
   def shopify_webhook_topics
     %w[app/uninstalled orders/create shop/update products/create products/update
-       collections/create collections/update products/delete]
+       collections/create collections/update products/delete themes/publish themes/update]
   end
 
   # Private. Find changed pĺans events for the last month.
@@ -840,57 +951,24 @@ module Shopifable
 
   class_methods do
 
-    # Public Method
-    # Get shop or create it.
-    #
-    # Also deal with shop that already exists and uninstalled in the past. Connect new_shop to
-    # old_shop and delete the new_shop record to keep associations and shops table clean from
-    # garbage entries.
-    #
-    # Parameters:
-    # current_shopify_domain -  String
-    #
-    # Returns: Shop Object.
-    def find_or_create_shop(current_shopify_domain)
+    # This method will return shop acc to the shopify domain, it is receving through params.
+    # Will return the shop if it finds through shopify_domain, otherwise if shop can be find through
+    # myshopify_domain, means that user is re-installing the old shop, so we will enable the old shop,
+    # and deletes the newly created shop.
+
+    # While enabling the old shop, we are using access scopes of new shop and updating the coloum because
+    # user can change them before re installing and can be caught through new shop that is created with that data.
+
+    def fetch_shop(current_shopify_domain)
       icushop = Shop.find_by(shopify_domain: current_shopify_domain)
-
       old_shop = Shop.find_by(myshopify_domain: current_shopify_domain)
-
-      if old_shop.present? && icushop.id != old_shop.id
-        # logging to Rollbar
-        # Rollbar.info('Reinstall', { shop: current_shopify_domain, uninstall: old_shop.uninstalled_at, reinstall: Time.now.utc })
-
-        # copying from new_shop to old_shop
-        old_shop.update_columns(JSON.parse(icushop.to_json).except('id', 'created_at'))
-        old_shop.installed_at = icushop.created_at
-
-        # re-doing errands for old_shop after reinstall
-        old_shop.async_setup
-        old_shop.set_up_for_shopify
-        old_shop.save!
-
-        # since we are all set connecting new installation to already existing shop
-        # destroying garbage shop now
-        begin
-          icushop.destroy
-        rescue ActiveRecord::InvalidForeignKey => error
-          # force destroy associations for new_shop and then destroy new_shop
-          ShopEvent.where(shop_id: icushop.id).update(shop_id: old_shop.id)
-          icushop.orders.update_all(shop_id: old_shop.id)
-          # for subscription, we shouldn't destroy new one right away. Instead,
-          # we should copy that to the older one, to stay aligned with the shopify charge ID,
-          # as older subscriptions is already connected to existing shop and other relations
-          if icushop.subscription.present?
-            old_shop.subscription.update_columns(JSON.parse(icushop.subscription.to_json).except('id', 'shop_id', 'created_at'))
-            icushop.subscription.destroy
-          end
-          icushop.destroy
-        end
-
-        icushop = old_shop
-        icushop.store_cache_keys_on_reinstall
+      if old_shop.present? && icushop&.id != old_shop.id
+        old_shop.enable_reinstalled_shop(current_shopify_domain,
+                                         icushop.shopify_token,
+                                         icushop.access_scopes)
+        icushop.destroy_completely
+        return old_shop
       end
-
       icushop
     end
 
@@ -932,6 +1010,93 @@ module Shopifable
     def search_for(str)
       str.strip!
       where('name ilike ? OR shopify_domain ilike ? OR email ilike ? OR custom_domain ilike ? OR finder_token=? OR id=?', "%#{str}%", "%#{str}%", "%#{str}%", "%#{str}%", str, str.to_i)
+    end
+  end
+
+  def search_asset_value(asset_key, theme_id, app_blocks_added, app_blocks_supported)
+    asset_value = ShopifyAPI::Asset.all(asset: { key: asset_key }, theme_id: theme_id).compact.first
+
+    unless asset_value.nil?
+      asset_value = JSON.parse(asset_value.value || '')
+
+      if asset_value.present?
+        main = asset_value['sections'].select { |id, section| id == 'main' || section['type'].starts_with?('main-') }
+
+        app_blocks_supported = check_app_blocks_support(main, theme_id, app_blocks_supported)
+
+        app_blocks_added = update_theme_app_extension(asset_value, asset_key, app_blocks_added)
+      end
+    end
+    { 'app_blocks_added': app_blocks_added, 'app_blocks_supported': app_blocks_supported}
+  end
+
+  def check_app_blocks_support(main, theme_id, app_blocks_supported)
+    main&.each do |_section_id, section|
+      section_asset = ShopifyAPI::Asset.all(
+        asset: { key: "sections/#{section['type']}.liquid" }, theme_id: theme_id
+      ).compact.first
+
+      unless section_asset.nil?
+        schema_match = /\{%\s+schema\s+%}([\s\S]*?)\{%\s+endschema\s+%}/m.match(section_asset.value)
+
+        unless schema_match.nil?
+          schema_match = schema_match[0]
+          schema_match.slice! '{% schema %}'
+          schema_match.slice! '{% endschema %}'
+
+          schema = JSON.parse(schema_match)
+
+          unless schema.nil? || schema['blocks'].nil?
+            accepted_blocks = schema['blocks'].select { |block| block['type'] == '@app' }
+            if accepted_blocks.length.positive?
+              app_blocks_supported += 1
+              break
+            end
+          end
+        end
+      end
+    end
+    app_blocks_supported
+  end
+
+  def update_theme_app_extension(asset_value, asset_key, app_blocks_added)
+
+    asset_value['sections'].each do |_sections_id, sections|
+      sections.each do |section_id, section|
+
+        next unless section_id == 'blocks'
+
+        section.each do |_block_id, block|
+          next unless block['type']&.include?("app_block/#{ENV['SHOPIFY_ICU_EXTENSION_APP_ID']}")
+
+          if asset_key == 'templates/product.json'
+            self.theme_app_extension.update(product_block_added: true)
+          end
+          if asset_key == 'templates/cart.json'
+            self.theme_app_extension.update(cart_block_added: true)
+          end
+          if asset_key == 'templates/collection.json'
+            self.theme_app_extension.update(collection_block_added: true)
+          end
+          app_blocks_added.push(asset_key)
+          break
+        end
+      end
+    end
+    app_blocks_added
+  end
+
+  def update_false_theme_values(app_blocks_added)
+    unless app_blocks_added.include?('templates/product.json')
+      self.theme_app_extension.update(product_block_added: false)
+    end
+
+    unless app_blocks_added.include?('templates/cart.json')
+      self.theme_app_extension.update(cart_block_added: false)
+    end
+
+    unless app_blocks_added.include?('templates/collection.json')
+      self.theme_app_extension.update(collection_block_added: false)
     end
   end
 end

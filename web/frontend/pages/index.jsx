@@ -11,8 +11,10 @@ import { fetchShopData } from "../services/actions/shop";
 import { CustomTitleBar, OffersList, OrderOverTimeData, TotalSalesData } from "../components";
 
 import "../components/stylesheets/mainstyle.css";
+import {ThemeAppCard} from "../components/CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
+import { CHAT_APP_ID } from "../assets/index.js";
 
 import ModalChoosePlan from "../components/modal_ChoosePlan.jsx";
 import { setIsSubscriptionUnpaid } from "../store/reducers/subscriptionPaidStatusSlice.js";
@@ -28,9 +30,11 @@ export default function HomePage() {
   const [planName, setPlanName] = useState();
   const [trialDays, setTrialDays] = useState();
   const [hasOffers, setHasOffers] = useState();
+  const [themeAppExtension, setThemeAppExtension] = useState();
   const [isLoading, setIsLoading] = useState(false);
 
   const navigateTo = useNavigate();
+  const [isLegacy, setIsLegacy] = useState(true);
 
   const handleOpenOfferPage = () => {
     navigateTo('/edit-offer', { state: { offerID: null } });
@@ -42,7 +46,7 @@ export default function HomePage() {
 
   const notifyIntercom = (icu_shop) => {
     window.Intercom('boot', {
-      app_id: window.CHAT_APP_ID,
+      app_id: CHAT_APP_ID,
       id: icu_shop.id,
       email: icu_shop.email,
       phone: icu_shop.phone_number,
@@ -66,10 +70,15 @@ export default function HomePage() {
           redirect.dispatch(Redirect.Action.APP, data.redirect_to);
       } else {
         setHasOffers(data.has_offers);
+        setThemeAppExtension(data.theme_app_extension);
         setCurrentShop(data.shop);
         setPlanName(data.plan);
         setTrialDays(data.days_remaining_in_trial);
         reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
+
+        if (data.theme_app_extension) {
+          setIsLegacy(data.theme_app_extension.theme_version === "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
+        }
 
         // notify intercom as soon as app is loaded and shop info is fetched
         notifyIntercom(data.shop);
@@ -104,16 +113,6 @@ export default function HomePage() {
             handleButtonClick={handleOpenOfferPage}
           />
           <Layout>
-            <Layout.Section>
-              <div className="banner-btn">
-                <Banner
-                  action={{content: 'Take the survey', onAction: handleOpenGoogleForm }}
-                  status="info"
-                >
-                  <p>We're delighted to welcome you to the new & improved In Cart Upsell & Cross-Sell! If you encounter any unexpected issues or need assistance with the new User Interface, please don't hesitate to contact our support team. Additionally, if you can spare 5 minutes, we'd greatly appreciate your feedback. Thank you!</p>
-                </Banner>
-              </div>
-            </Layout.Section>
             {isSubscriptionActive(currentShop?.subscription) && planName!=='free' && trialDays>0 &&
               <Layout.Section>
                 <Banner status="info">
@@ -121,6 +120,13 @@ export default function HomePage() {
                 </Banner>
               </Layout.Section>
             }
+
+            {!isLegacy && (
+              <ThemeAppCard
+                shopData={currentShop}
+                themeAppExtension={themeAppExtension}
+              />
+            )}
 
             {planName ==='free' && (
               <Layout.Section>

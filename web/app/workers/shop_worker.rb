@@ -15,7 +15,10 @@ module ShopWorker
     include Sidekiq::Worker
     sidekiq_options queue: 'stats'
 
+    
     def perform(new_stat)
+      offer = Offer.find_by(id: new_stat[:offer_id]).join(:shop).where(shops: {is_shop_active: true}).limit(1).present?
+      return if offer.blank?
       OfferStat.create_offer_stat(new_stat)
     end
   end
@@ -25,6 +28,8 @@ module ShopWorker
     sidekiq_options queue: 'stats'
 
     def perform(new_event)
+      offer = Offer.find_by(id: new_event[:offerId]).join(:shop).where(shops: {is_shop_active: true}).limit(1).present?
+      return if offer.blank?
       OfferEvent.create_offer_event(new_event)
     end
   end
@@ -34,6 +39,8 @@ module ShopWorker
     sidekiq_options queue: 'sale_stats'
 
     def perform(order_data)
+      shop = Shop.find_by(order_data[:shopify_id]).where(is_shop_active: true).limit(1)
+      return if shop.blank?
       OfferEvent.create_offer_sale_stat(order_data)
     end
   end
@@ -114,7 +121,7 @@ module ShopWorker
   class UpdateOffersIfNeededJob
     include Sidekiq::Worker
     def perform(subscription_id)
-      subscription = Subscription.find_by(id: subscription_id)
+      subscription = Subscription.find_by(id: subscription_id).join(:shop).where(shops: {is_shop_active: true}).limit(1)
       return if subscription.blank?
       subscription.update_offers_if_needed
     end
@@ -132,7 +139,7 @@ module ShopWorker
   class UpdateProductJob
     include Sidekiq::Worker
     def perform(id)
-      product = Product.find_by(id: id)
+      product = Product.find_by(id: id).join(:shop).where(shops: {is_shop_active: true}).limit(1).present?
       return if product.blank?
       product.update_from_shopify_new
     end
@@ -201,7 +208,7 @@ module ShopWorker
 
   class RecordOrderJob
     include Sidekiq::Worker
-    sidekiq_options queue: 'low'
+    sidekiq_options queue: 'orders'
 
     def perform(shopify_url, order_data)
       shop = Shop.find_by(shopify_domain: shopify_url)
@@ -236,7 +243,7 @@ module ShopWorker
   class AddInitialChargeToSubscriptionJob
     include Sidekiq::Worker
     def perform(subscription_id)
-      sub = Subscription.find_by(id: subscription_id)
+      sub = Subscription.find_by(id: subscription_id).join(:shop).where(shops: {is_shop_active: true}).limit(1).present?
       return if sub.blank?
       return if sub.plan.try(:id) != 19
 
@@ -306,6 +313,22 @@ module ShopWorker
       shop.activate_session
       shop.create_script_tag
       shop.force_purge_cache
+    end
+  end
+
+  class ThemeUpdateJob
+    include Sidekiq::Worker
+    sidekiq_options queue: 'low'
+
+    def perform(shopify_domain)
+      shop = Shop.find_by(shopify_domain: shopify_domain)
+      return if shop.blank?
+
+      if shop.theme_app_extension.nil?
+        shop.theme_app_extension = ThemeAppExtension.new
+      end
+
+      shop.theme_app_extension_check
     end
   end
 end

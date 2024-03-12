@@ -1,13 +1,23 @@
 import React, {useEffect} from 'react';
-import {useState, useCallback} from 'react';
+import { useState, useCallback } from 'react';
 import { Page ,Grid, Select } from '@shopify/polaris';
-import {AnalyticsMinor} from '@shopify/polaris-icons';
-import { TotalSalesData, OrderOverTimeData, CustomTitleBar} from "../components";
+import { AnalyticsMinor } from '@shopify/polaris-icons';
+import { GenericFooter } from '../components/GenericFooter';
+import { DateRangeOptions } from '../shared/constants/AnalyticsOptions';
 import "../components/stylesheets/mainstyle.css";
 import ModalChoosePlan from '../components/modal_ChoosePlan';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchShopData } from '../services/actions/shop';
 import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatusSlice';
+import {
+  TotalSalesData,
+  ConversionRate,
+  TopPerformingOffersData,
+  OrderOverTimeData,
+  CustomTitleBar,
+  AbTestingData,
+  ClickThroughtRateData
+} from "../components";
 
 export default function AnalyticsOffers() {
     const shopAndHost = useSelector((state) => state.shopAndHost);
@@ -48,7 +58,7 @@ export default function AnalyticsOffers() {
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
             <Select
               label="Date range"
-              options={options}
+              options={DateRangeOptions}
               onChange={setTimePeriod}
               value={period}
             />
@@ -56,19 +66,23 @@ export default function AnalyticsOffers() {
         </Grid>
         <div className="space-10"></div>
         <div id={"graphs"}>
-        <Grid>
-          <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <TotalSalesData period={period}/>
-          </Grid.Cell>
-          {/*<Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>*/}
-          {/*  <ConversionRate period={period}/>*/}
-          {/*</Grid.Cell>*/}
-          <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-            <OrderOverTimeData period={period}/>
-          </Grid.Cell>
-        </Grid>
+          <Grid>
+            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 4, xl: 4 }}>
+              <TotalSalesData period={period}/>
+              <AbTestingData period={period} />
+            </Grid.Cell>
+            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 4, xl: 4 }}>
+              <ConversionRate period={period}/>
+              <ClickThroughtRateData period={period} />
+            </Grid.Cell>
+            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 4, xl: 4 }}>
+              <OrderOverTimeData period={period}/>
+              <TopPerformingOffersData period={period} />
+            </Grid.Cell>
+          </Grid>
         </div>
         <div className='space-10'></div>
+        <GenericFooter text="Learn more about " linkUrl="#" linkText="analytics" />
       </Page>
-    );
-  }
+  );
+}

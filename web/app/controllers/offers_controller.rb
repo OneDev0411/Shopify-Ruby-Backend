@@ -35,14 +35,16 @@ class OffersController < AuthenticatedController
 
     if offer.save
       $customerio.track(@icushop.id, 'offer created')
-      @icushop.publish_async
+
+      @icushop.publish_or_delete_script_tag
+
       render json: { message: 'success', offer_id: offer.id, offer: offer.library_json }
     else
       render json: { message: 'could not save', errors: offer.errors }
     end
   end
 
-  # POST  api/offers/:id/update/:shop_id(.:format)
+  # POST  api/v2/offers/:id/update/:shop_id(.:format)
   # The CURRENT offer update method
   def update_from_builder
     offer = @icushop.offers.find_by(id: params[:id])
@@ -87,7 +89,9 @@ class OffersController < AuthenticatedController
     end
 
     if offer.update(my_params)
-      @icushop.publish_async
+
+      @icushop.publish_or_delete_script_tag
+
       render json: { offer: offer.library_json }, status: :ok
     else
       render json: offer.errors, status: :bad_request
@@ -109,11 +113,12 @@ class OffersController < AuthenticatedController
     old_offer_ids = @icushop.old_offers || []
     old_offer_ids << params[:id]
     @icushop.update_attribute(:old_offers, old_offer_ids.uniq)
-    @icushop.publish_async
+    @icushop.publish_or_delete_script_tag
+
     render json: { message: "Offer Deleted", offers: @icushop.offer_data_with_stats}
   end
 
-  
+
   private
 
   def set_shop
@@ -152,8 +157,8 @@ class OffersController < AuthenticatedController
                                                                  :template_product_id, :template_cart_id, :template_ajax_id],
                                   advanced_placement_setting_attributes: [:id, :custom_product_page_dom_selector, :custom_product_page_dom_action,
                                                                          :custom_cart_page_dom_selector, :custom_cart_page_dom_action,
-                                                                         :custom_ajax_dom_selector, :custom_ajax_dom_action, 
+                                                                         :custom_ajax_dom_selector, :custom_ajax_dom_action,
                                                                          :advanced_placement_setting_enabled]).to_h
   end
- 
+
 end

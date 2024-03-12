@@ -1,6 +1,4 @@
-import { forwardRef, useState, useEffect, useRef } from "react";
 import TemplateComponent from 'react-mustache-template-component';
-import themeCss from '../../assets/theme.css';
 import { useSelector } from 'react-redux';
 
 export default function Flex(props) {

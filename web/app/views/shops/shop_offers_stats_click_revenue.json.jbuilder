@@ -1,0 +1,1 @@
+json.stat_click_revenue @stat_click_revenue

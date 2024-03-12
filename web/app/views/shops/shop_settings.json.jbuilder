@@ -1,1 +1,2 @@
 json.shop_settings @shop_settings
+json.theme_app_extension @icushop.theme_app_extension

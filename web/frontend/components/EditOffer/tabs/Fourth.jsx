@@ -5,36 +5,74 @@ import {
     Button,
     TextField,
     Checkbox,
-    Select, Text
+    Select, Text, Banner
 } from "@shopify/polaris";
-import { useState, useCallback } from "react";
+import {useState, useCallback, useEffect, useContext} from "react";
 import React from "react";
+import {Link} from "react-router-dom";
+import { DOMActionOptions } from "../../../shared/constants/DOMActionOptions";
+import {OfferContext} from "../../../OfferContext.jsx";
 
 // Advanced Tab
 export function FourthTab(props) {
+    const { offer, updateOffer, updateNestedAttributeOfOffer } = useContext(OfferContext);
+    const handleChange = useCallback((newChecked) => updateOffer("save_as_default_setting", newChecked), []);
+    const handleProductDomSelector = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting",  "custom_product_page_dom_selector"), []);
+    const handleProductDomAction = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_product_page_dom_action"), []);
+    const handleCartDomSelector = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_cart_page_dom_selector"), []);
+    const handleCartDomAction = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_cart_page_dom_action"), []);
+    const handleAjaxDomSelector = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_ajax_dom_selector"), []);
+    const handleAjaxDomAction = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_ajax_dom_action"), []);
+    const handleOfferCss = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "custom_css"), []);
 
-    const [checked, setChecked] = useState(false);
-    const handleChange = useCallback((newChecked) => props.updateOffer("save_as_default_setting", newChecked), []);
-    const handleProductDomSelector = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "advanced_placement_setting",  "custom_product_page_dom_selector"), []);
-    const handleProductDomAction = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_product_page_dom_action"), []);
-    const handleCartDomSelector = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_cart_page_dom_selector"), []);
-    const handleCartDomAction = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_cart_page_dom_action"), []);
-    const handleAjaxDomSelector = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_ajax_dom_selector"), []);
-    const handleAjaxDomAction = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_ajax_dom_action"), []);
-    const handleOfferCss = useCallback((newValue) => props.updateNestedAttributeOfOffer(newValue, "custom_css"), []);
+    const [isLegacy, setIsLegacy] = useState(
+      props.shop.theme_version !== '2.0' || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true'
+    );
+    const [openBanner, setOpenBanner] = useState(false);
 
-    const options = [
-        {label: 'prepend()', value: 'prepend'},
-        {label: 'append()', value: 'append'},
-        {label: 'after()', value: 'after'},
-        {label: 'before()', value: 'before'}
-    ];
+    useEffect(() => {
+        if (!isLegacy) {
+            updateNestedAttributeOfOffer(false, "advanced_placement_setting", "advanced_placement_setting_enabled");
+        }
+    }, [])
 
     return (
         <>
+            { !isLegacy && !offer.in_ajax_cart &&
+              (
+                <div style={{marginBottom: "10px"}} className="polaris-banner-container">
+                    <Banner title="You are using Shopify's Theme Editor"  tone='warning'>
+                        <p>Please use the theme editor to place the offers where you would like it.</p><br/>
+                        <p><Link
+                          to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?template=${offer.in_product_page ? 'product' : 'cart' }&addAppBlockId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block&target=${offer.in_product_page ? 'mainSection' : 'newAppsSection'}`}
+                          target="_blank">Click here</Link> to go to the theme editor</p>
+                    </Banner>
+                </div>
+              )
+            }
+
+            { !isLegacy && offer.in_ajax_cart &&
+              (
+                <div style={{marginBottom: "10px"}} className="polaris-banner-container">
+                    <Banner title="You are using Shopify's Theme Editor" status={props.themeAppExtension?.theme_app_embed ? 'success' : 'warning'}>
+                        {!props.themeAppExtension?.theme_app_embed ?
+                            <>
+                                <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
+                                <p><Link
+                                to={`https://${props.shop.shopify_domain}/admin/themes/current/editor?context=apps&template=${offer.in_product_page ? 'product' : 'cart' }&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
+                                target="_blank">Click here</Link> to go to theme editor</p>
+                            </>
+                        :
+                          <p>Advanced settings are no longer needed for Shopify's Theme Editor. You've already enabled the app, all you need to do is publish your offer and it will appear in your Ajax cart</p>
+                        }
+                    </Banner>
+                </div>
+              )
+            }
+
             {/* <LegacyCard sectioned title="Offer placement - advanced settings" actions={[{ content: 'View help doc' }]}> */}
             <LegacyCard sectioned title="Offer placement - advanced settings">
-                {(!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled) && (
+                {(!offer?.advanced_placement_setting?.advanced_placement_setting_enabled) && (
                     <>
                         <b>To edit Advanced settings, enable "Advanced Placement Settings" option on the Placement tab.</b>
                         <br/><br/><br/>
@@ -46,19 +84,19 @@ export function FourthTab(props) {
                     </div>
                     <TextField
                         label="DOM Selector" 
-                        value={props.offer?.advanced_placement_setting?.custom_product_page_dom_selector} 
+                        value={offer?.advanced_placement_setting?.custom_product_page_dom_selector}
                         onChange={handleProductDomSelector} type="text" 
-                        disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                        disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                     />
                     <div className="space-4"/>
 
                     <Select
                         label="DOM action"
                         id="productDomAction"
-                        options={options}
+                        options={DOMActionOptions}
                         onChange={handleProductDomAction}
-                        value={props.offer?.advanced_placement_setting?.custom_product_page_dom_action}
-                        disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                        value={offer?.advanced_placement_setting?.custom_product_page_dom_action}
+                        disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                     />
                 </div>
                 <hr className="legacy-card-hr" />
@@ -69,18 +107,18 @@ export function FourthTab(props) {
                     </div>
                     <TextField
                         label="DOM Selector" 
-                        value={props.offer?.advanced_placement_setting?.custom_cart_page_dom_selector} 
+                        value={offer?.advanced_placement_setting?.custom_cart_page_dom_selector}
                         onChange={handleCartDomSelector} 
-                        disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                        disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                     />
                     <div className="space-4"/>
                     <Select
                         label="DOM action"
                         id="productDomAction"
-                        options={options}
+                        options={DOMActionOptions}
                         onChange={handleCartDomAction}
-                        value={props.offer?.advanced_placement_setting?.custom_cart_page_dom_action}
-                        disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                        value={offer?.advanced_placement_setting?.custom_cart_page_dom_action}
+                        disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                     />
 
                 </div>
@@ -92,19 +130,19 @@ export function FourthTab(props) {
                     </div>
                     <TextField
                         label="DOM Selector" 
-                        value={props.offer?.advanced_placement_setting?.custom_ajax_dom_selector} 
+                        value={offer?.advanced_placement_setting?.custom_ajax_dom_selector}
                         onChange={handleAjaxDomSelector} 
-                        disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                        disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                     />
                     <div className="space-4"/>
 
                     <Select
                         label="DOM action"
                         id="productDomAction"
-                        options={options}
+                        options={DOMActionOptions}
                         onChange={handleAjaxDomAction}
-                        value={props.offer?.advanced_placement_setting?.custom_ajax_dom_action}
-                        disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                        value={offer?.advanced_placement_setting?.custom_ajax_dom_action}
+                        disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                     />
                     <div className="space-4"/>
                 </div>
@@ -117,7 +155,7 @@ export function FourthTab(props) {
                     </div>
 
                     <TextField
-                        value={props.offer?.custom_css}
+                        value={offer?.custom_css}
                         onChange={handleOfferCss}
                         multiline={6}
                     />
@@ -128,9 +166,9 @@ export function FourthTab(props) {
                     label="Save as default settings"
                     helpText="This placement will apply to all offers created in the future.
                      They can be edited in the Settings section."
-                    checked={props.offer?.save_as_default_setting}
+                    checked={offer?.save_as_default_setting}
                     onChange={handleChange}
-                    disabled={!props.offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                    disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
                 />
             </LegacyCard>
             <div className="space-10"></div>

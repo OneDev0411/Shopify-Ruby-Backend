@@ -112,11 +112,11 @@ class Offer < ApplicationRecord
     }
 
     deets = shop.products.where(shopify_id: offerable_product_shopify_ids).active.limit(limit).map do |p|
-              if filter_included_variants && included_variants.present?
-                product_opts[:included_variants] = included_variants[p.shopify_id.to_s] || []
-              end
-              p.offerable_details(product_opts)
-            end
+      if filter_included_variants && included_variants.present?
+        product_opts[:included_variants] = included_variants[p.shopify_id.to_s] || []
+      end
+      p.offerable_details(product_opts)
+    end
     if instock_only
       deets.map { |d| d if d[:available_json_variants].length > 0 }.compact.sort_by { |a|
                     offerable_product_shopify_ids.index(a[:id]) }
@@ -134,21 +134,13 @@ class Offer < ApplicationRecord
     elsif offerable_type =='collection'
       offerable_shopify_title || collection.try(:title) || '(Collection Deleted From Store)'
     elsif offerable_type == 'multi'
-      if offerable_product_details.empty?
-        ''
-      else
-        offerable_product_details.first[:title]
-      end
+      @my_offerable_product_details&.first[:title] || ''
     end
   end
 
   def offerable_price
     if offerable_type == 'multi'
-      if offerable_product_details.present?
-        offerable_product_details.first[:price]
-      else
-        0.0
-      end
+      @my_offerable_product_details&.first[:price] || 0.0
     elsif offerable_type == 'collection'
       if collection.nil? || collection.products.empty?
         0.0
@@ -172,11 +164,7 @@ class Offer < ApplicationRecord
 
   def offerable_compare_at_price
     if offerable_type == 'multi'
-      if offerable_product_details.present?
-        offerable_product_details.first[:compare_at_price]
-      else
-        0.0
-      end
+      @my_offerable_product_details&.first[:compare_at_price] || 0.0
     elsif offerable_type == 'collection'
       if collection.nil? || collection.products.empty?
         0.0
@@ -368,7 +356,7 @@ class Offer < ApplicationRecord
   # Return hashmap.
   def library_json
     limit_offerables = offerable_type == 'auto' ? 10 : nil
-    my_offerable_product_details = offerable_product_details(false, true, limit_offerables)
+    @my_offerable_product_details = offerable_product_details(false, true, limit_offerables)
     res = {
       id: id,
       rules_json: rules_json,
@@ -400,7 +388,7 @@ class Offer < ApplicationRecord
       ruleset_type: ruleset_type,
       offerable_type:  offerable_type,
       offerable_product_shopify_ids: offerable_product_shopify_ids,
-      offerable_product_details: my_offerable_product_details,
+      offerable_product_details: @my_offerable_product_details,
       checkout_after_accepted: checkout_after_accepted || false,
       discount_code:  discount_code || '',
       discount_target_type:  discount_target_type || 'none',
@@ -492,6 +480,10 @@ class Offer < ApplicationRecord
     end
   end
 
+  def created_in_between(start_date, end_date)
+    created_at >= start_date && created_at <= end_date
+  end
+
   ##### Methods for describing statistics about the offer #######
   def total_times_shown(variant=nil)
     q = ['times', variant, 'loaded'].compact.join('_').to_sym
@@ -503,17 +495,7 @@ class Offer < ApplicationRecord
     daily_stats.sum(q)
   end
 
-  def ctr(version='all')
-    if version == 'a'
-      shown = total_times_shown('orig')
-      clicked = total_times_clicked('orig')
-    elsif version == 'b'
-      shown = total_times_shown('alt')
-      clicked = total_times_clicked('alt')
-    else
-      shown = total_times_shown
-      clicked = total_times_clicked
-    end
+  def ctr(shown, clicked)
     if shown == 0
       0.0
     else
@@ -521,18 +503,11 @@ class Offer < ApplicationRecord
     end
   end
 
-  def ctr_string(version='all')
-    if version == 'a'
-      shown = total_times_shown('orig')
-    elsif version == 'b'
-      shown = total_times_shown('alt')
-    else
-      shown = total_times_shown
-    end
+  def ctr_string(shown, ctr_result)
     if shown == 0
       "N/A"
     else
-      ctr(version).round(2).to_s + " %"
+      "#{ctr_result.round(2)} %"
     end
   end
 
@@ -546,7 +521,11 @@ class Offer < ApplicationRecord
     b = alt_expected - total_times_clicked("alt")
     chi_squared = (a * a / orig_expected) + (b * b / alt_expected)
     if chi_squared > 3.84 # 95%
-      ctr('a') > ctr('b') ? 'a' : 'b'
+      shownOrig = total_times_shown('orig')
+      clickedOrig = total_times_clicked('orig')
+      shownAlt = total_times_shown('alt')
+      clickedAlt = total_times_clicked('alt')
+      ctr(shownOrig, clickedOrig) > ctr(shownAlt, clickedAlt) ? 'a' : 'b'
     else
       nil
     end
@@ -710,7 +689,7 @@ class Offer < ApplicationRecord
   #
   # Returns float.
   def average_product_price
-    prices = offerable_product_details.map { |d| d[:price].to_f }
+    prices = @my_offerable_product_details.map { |d| d[:price].to_f }
     prices.reduce(:+).to_f / prices.size # average
   end
 

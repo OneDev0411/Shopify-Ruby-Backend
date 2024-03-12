@@ -1,6 +1,9 @@
 import {
+    HorizontalStack,
     LegacyCard,
     VerticalStack,
+    Text,
+    Divider,
 } from '@shopify/polaris';
 import React, { useEffect, useState } from 'react';
 import { PolarisVizProvider, StackedAreaChart } from '@shopify/polaris-viz';
@@ -16,12 +19,13 @@ export function TotalSalesData(props) {
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [salesTotal, setSalesTotal] = useState(0);
     const [salesData, setSalesData] = useState(0);
-    const [loading, setLoading] = useState(false); 
+    const [loading, setLoading] = useState(false);
+
     function getSalesData(period) {
         let redirect = Redirect.create(app);
         if(loading) return;
         setLoading(true)
-        fetch(`/api/merchant/shop_sale_stats`, {
+        fetch(`/api/v2/merchant/shop_sale_stats`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -42,9 +46,11 @@ export function TotalSalesData(props) {
                 setLoading(false)
             })
     }
+
     useEffect(() => {
         getSalesData(props.period);
     }, [props.period])
+
     return (
         <PolarisVizProvider
             themes={{
@@ -56,7 +62,7 @@ export function TotalSalesData(props) {
                 }
             }}
         >
-            <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Total Sales`} sectioned>`
+            <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Total Sales`} sectioned>
                 {salesData ? (<h3 className="report-money"><strong>${salesTotal}</strong></h3>) : null}
                 <div className="space-4"></div>
                 <p>SALES OVER TIME</p><br />
@@ -91,9 +97,8 @@ export function ConversionRate(props) {
     const [converted, setConverted] = useState(0);
     const [totalDisplayed, setTotalDisplayed] = useState(0);
 
-    function getOffersStats(period) {
-        let redirect = Redirect.create(app);
-        fetch(`/api/merchant/shop_offers_stats`, {
+    function getOffersStats(endpointUrl, period, callback) {
+        fetch(endpointUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -102,20 +107,47 @@ export function ConversionRate(props) {
         })
             .then((response) => { return response.json(); })
             .then((data) => {
-                if (data.redirect_to) {
-                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
-                } else {
-                setAddedToCart(data.offers_stats.times_clicked);
-                setTotalDisplayed(data.offers_stats.times_loaded);
-                setReachedCheckout(data.offers_stats.times_checkedout);
-                setConverted(data.orders_through_offers_count);
-            }})
+                callback(data)
+            })
             .catch((error) => {
                 console.log("error", error);
             })
     }
+
+    function getOffersStatsTimesLoaded(period) {
+        let redirect = Redirect.create(app);
+        getOffersStats(
+            `/api/v2/merchant/shop_offers_stats_times_loaded`, 
+            period, 
+            (data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                } else {
+                setTotalDisplayed(data.stat_times_loaded);
+                setConverted(data.orders_through_offers_count);
+            }});
+    }
+
+    function getOffersStatsTimesClicked(period) {
+        getOffersStats(
+            `/api/v2/merchant/shop_offers_stats_times_clicked`,
+            period,
+            (data) => { setAddedToCart(data.stat_times_clicked); }
+        )
+    }
+
+    function getOffersStatsTimesCheckedout(period) {
+        getOffersStats(
+            `/api/v2/merchant/shop_offers_stats_times_checkedout`,
+            period,
+            (data) => { setReachedCheckout(data.stat_times_checkedout); }
+        )
+    }
+
     useEffect(() => {
-        getOffersStats(props.period);
+        getOffersStatsTimesLoaded(props.period);
+        getOffersStatsTimesClicked(props.period);
+        getOffersStatsTimesCheckedout(props.period);
     }, [props.period])
 
     return (
@@ -123,7 +155,7 @@ export function ConversionRate(props) {
             <h3 className="report-money"><strong>{totalDisplayed > 0 ? ((converted / totalDisplayed) * 100).toFixed(2) : 0}%</strong></h3>
             <div className="space-4"></div>
             <p>CONVERSION FUNNEL</p><br />
-            <VerticalStack gap="10">
+            <VerticalStack gap={"6"}>
                 <div height="50px">
                     <span>Added to cart</span><span style={{ float: 'right' }}>{totalDisplayed > 0 ? ((addedToCart / totalDisplayed) * 100).toFixed(2) : 0}%</span>
                     <div style={{ color: 'grey' }}>{addedToCart >= 0 ? addedToCart : 0} sessions</div>
@@ -154,7 +186,7 @@ export function OrderOverTimeData(props) {
         let redirect = Redirect.create(app);
         if(loading) return;
         setLoading(true)
-        fetch(`/api/merchant/shop_orders_stats`, {
+        fetch(`/api/v2/merchant/shop_orders_stats`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -175,9 +207,11 @@ export function OrderOverTimeData(props) {
                 setLoading(false)
             })
     }
+
     useEffect(() => {
         getOrdersData(props.period);
     }, [props.period])
+
     return (
         <PolarisVizProvider
             themes={{
@@ -213,7 +247,38 @@ export function OrderOverTimeData(props) {
 
 }
 
-export function AbTestingData() {
+export function TopPerformingOffersData(props) {
+    const app = useAppBridge();
+    const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
+    const [offersData, setOffersData] = useState([]);
+
+    function getOffersData(period) {
+        let redirect = Redirect.create(app);
+        fetch(`/api/v2/merchant/offers_list_by_period`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ shop: shopAndHost.shop, period: period }),
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                } else {
+                setOffersData(data.offers);
+            }})
+            .catch((error) => {
+                console.log("error", error);
+            })
+    }
+
+    useEffect(() => {
+        getOffersData(props.period);
+    }, [props.period])
 
     return (
         <PolarisVizProvider
@@ -226,56 +291,143 @@ export function AbTestingData() {
                 }
             }}
         >
-            <StackedAreaChart
-                comparisonMetric={{
-                    accessibilityLabel: 'trending up 6%',
-                    metric: '6%',
-                    trend: 'positive'
-                }}
-                data={[
+            <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Top performing offers`} sectioned>
+                <div className="space-4"></div>
+                <VerticalStack align='center'>
                     {
-                        "name": "Orders",
-                        "data": [
-                            {
-                                "key": "January",
-                                "value": 4200
-                            },
-                            {
-                                "key": "February",
-                                "value": 5000
-                            },
-                            {
-                                "key": "March",
-                                "value": 5700
-                            },
-                            {
-                                "key": "April",
-                                "value": 5500
-                            },
-                            {
-                                "key": "May",
-                                "value": 5300
-                            },
-                            {
-                                "key": "June",
-                                "value": 5600
-                            },
-                            {
-                                "key": "July",
-                                "value": 3200
-                            }
-                        ]
-                    },
-                ]}
-                legendPosition="left"
-                theme='Light'
-            />
+                        offersData.map((item, idx) => {
+                            return (
+                                <div key={idx}>
+                                    <Divider />
+                                    <div style={{ padding: '16px 0' }}>
+                                        <HorizontalStack align="space-between">
+                                            <Text as="p">{item.title}</Text>
+                                            <Text as="p">{item.clicks} clicks</Text>
+                                            <Text as="p">$ {item.revenue}</Text>
+                                        </HorizontalStack>
+                                    </div>
+                                </div>
+                            )
+                        })
+                    }
+                </VerticalStack>
+            </LegacyCard>
+        </PolarisVizProvider>
+    )
+}
+
+export function AbTestingData(props) {
+    const app = useAppBridge();
+    const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
+    const [salesTotal, setSalesTotal] = useState(0);
+    const [salesData, setSalesData] = useState(0);
+    const [loading, setLoading] = useState(false);
+
+    function getSalesData(period) {
+        let redirect = Redirect.create(app);
+        if(loading) return;
+        setLoading(true)
+
+        fetch(`/api/v2/merchant/shop_sale_stats`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ shop: shopAndHost.shop, period: period }),
+        })
+            .then((response) => { return response.json(); })
+            .then((data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                } else {
+                setSalesTotal(data.sales_stats.sales_total)
+                setSalesData(data.sales_stats.results);
+            }})
+            .catch((error) => {
+                console.log("error", error);
+            }).finally(() => {
+                setLoading(false)
+            })
+    }
+
+    useEffect(() => {
+        getSalesData(props.period);
+    }, [props.period])
+
+    return (
+        <PolarisVizProvider
+            themes={{
+                Default: {
+                    arc: {
+                        cornerRadius: 5,
+                        thickness: 50
+                    }
+                }
+            }}
+        >
+            <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} A/B testing`} sectioned>
+                {salesData ? (<h3 className="report-money"><strong>${salesTotal}</strong></h3>) : null}
+                <div className="space-4"></div>
+                <p>SALES OVER TIME</p><br />
+                {loading ? "Loading..." : salesData ? (<StackedAreaChart
+                    isAnimated={true}
+                    comparisonMetric={{
+                        accessibilityLabel: 'trending up 6%',
+                        metric: '6%',
+                        trend: 'positive'
+                    }}
+                    data={[
+                        {
+                            "name": "Revenue",
+                                "data": salesData
+                        },
+                    ]}
+                    legendPosition="left"
+                    theme='Light'
+                />) : null}
+            </LegacyCard>
         </PolarisVizProvider>
     );
 
 }
 
-export function ClickThroughtRateData() {
+export function ClickThroughtRateData(props) {
+    const app = useAppBridge();
+    const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
+    const [clicksTotal, setClicksTotal] = useState(0);
+    const [clicksData, setClicksData] = useState(null);
+    const [loading, setLoading] = useState(false); 
+
+    function getClicksData(period) {
+        let redirect = Redirect.create(app);
+        if(loading) return;
+        setLoading(true)
+        fetch(`/api/v2/merchant/shop_clicks_stats`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ shop: shopAndHost.shop, period: period }),
+        })
+            .then((response) => { return response.json(); })
+            .then((data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                } else {
+                setClicksTotal(data.clicks_stats.clicks_total)
+                setClicksData(data.clicks_stats.results)
+            }})
+            .catch((error) => {
+                console.log("error", error);
+            }).finally(() => {
+                setLoading(false)
+            })
+    }
+    useEffect(() => {
+        getClicksData(props.period);
+    }, [props.period])
 
     return (
         <PolarisVizProvider
@@ -288,50 +440,25 @@ export function ClickThroughtRateData() {
                 }
             }}
         >
-            <StackedAreaChart
-                comparisonMetric={{
-                    accessibilityLabel: 'trending up 6%',
-                    metric: '6%',
-                    trend: 'positive'
-                }}
-                data={[
-                    {
-                        "name": "Orders",
-                        "data": [
-                            {
-                                "key": "January",
-                                "value": 4200
-                            },
-                            {
-                                "key": "February",
-                                "value": 5000
-                            },
-                            {
-                                "key": "March",
-                                "value": 5700
-                            },
-                            {
-                                "key": "April",
-                                "value": 5500
-                            },
-                            {
-                                "key": "May",
-                                "value": 5300
-                            },
-                            {
-                                "key": "June",
-                                "value": 5600
-                            },
-                            {
-                                "key": "July",
-                                "value": 3200
-                            }
-                        ]
-                    },
-                ]}
-                legendPosition="left"
-                theme='Light'
-            />
+            <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Click through rate`} sectioned>
+                {clicksData ? (<h3 className="report-money"><strong>{clicksTotal}</strong></h3>) : null}
+                <div className="space-4"></div>
+                <p>Clicks through rate over time</p><br />
+                <div className="space-5"></div>
+                {loading ? "Loading..." : clicksData ? (<StackedAreaChart
+                    comparisonMetric={{
+                        accessibilityLabel: 'trending up 6%',
+                        metric: '6%',
+                        trend: 'positive'
+                    }}
+                    data={[{
+                        "name": "Clicks through rate",
+                        "data": clicksData
+                    }]}
+                    legendPosition="left"
+                    theme='Light'
+                />) : null}
+            </LegacyCard>
         </PolarisVizProvider>
     );
 }

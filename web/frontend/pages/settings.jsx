@@ -25,7 +25,7 @@ export default function Settings() {
     const fetchCurrentShop = useCallback(async () => {
         let redirect = Redirect.create(app);
 
-        fetch(`/api/merchant/shop_settings`, {
+        fetch(`/api/v2/merchant/shop_settings`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ export default function Settings() {
     }
 
     const toggleActivation = async () => {
-        fetch(`/api/merchant/toggle_activation?shop=${shopAndHost.shop}`, {
+        fetch(`/api/v2/merchant/toggle_activation?shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -130,7 +130,7 @@ export default function Settings() {
                 custom_cart_page_dom_selector: formData.cartDomSelector, custom_cart_page_dom_action: formData.cartDomAction, custom_ajax_dom_selector: formData.ajaxDomSelector,
                 custom_ajax_dom_action: formData.ajaxDomAction
             }
-            fetch('/api/merchant/update_shop_settings', {
+            fetch('/api/v2/merchant/update_shop_settings', {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
