@@ -13,6 +13,7 @@ import {ThemeAppCard} from "../components/CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { CHAT_APP_ID } from "../assets/index.js";
+import ErrorPage from "../components/ErrorPage.jsx"
 
 export default function HomePage() {
   const app = useAppBridge();
@@ -25,6 +26,7 @@ export default function HomePage() {
   const [hasOffers, setHasOffers] = useState();
   const [themeAppExtension, setThemeAppExtension] = useState();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const navigateTo = useNavigate();
   const [isLegacy, setIsLegacy] = useState(true);
@@ -57,35 +59,41 @@ export default function HomePage() {
   useEffect(() => {
     let redirect = Redirect.create(app);
     setIsLoading(true);
-    fetch(`/api/v2/merchant/current_shop?shop=${shopAndHost.shop}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then( (response) => { return response.json(); })
-      .then( (data) => {
-        if (data.redirect_to) {
-          redirect.dispatch(Redirect.Action.APP, data.redirect_to);
-      } else {
-        setHasOffers(data.has_offers);
-        setThemeAppExtension(data.theme_app_extension);
-        setCurrentShop(data.shop);
-        setPlanName(data.plan);
-        setTrialDays(data.days_remaining_in_trial);
+      fetch(`/api/v2/merchant/current_shop?shop=${shopAndHost.shop}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        })
+        .then( (response) => { return response.json(); })
+        .then( (data) => {
+          if (data.redirect_to) {
+            redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+        } else {
+          setHasOffers(data.has_offers);
+          setThemeAppExtension(data.theme_app_extension);
+          setCurrentShop(data.shop);
+          setPlanName(data.plan);
+          setTrialDays(data.days_remaining_in_trial);
 
-        if (data.theme_app_extension) {
-          setIsLegacy(data.theme_app_extension.theme_version === "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
-        }
+          if (data.theme_app_extension) {
+            setIsLegacy(data.theme_app_extension.theme_version === "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
+          }
 
-        // notify intercom as soon as app is loaded and shop info is fetched
-        notifyIntercom(data.shop);
-        setIsLoading(false);
+          // notify intercom as soon as app is loaded and shop info is fetched
+          notifyIntercom(data.shop);
+          setIsLoading(false);
       }})
       .catch((error) => {
-        console.log("error", error);
+        setError(error);
+        setIsLoading(false);
+        console.log("Error", error);
       })
   }, [setCurrentShop, setPlanName, setTrialDays])
+
+  if (error) {
+    return <ErrorPage />;
+  }
 
   return (
     <Page>

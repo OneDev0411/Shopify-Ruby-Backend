@@ -12,6 +12,8 @@ import { useSelector } from 'react-redux';
 import '@shopify/polaris-viz/build/esm/styles.css';
 import { Redirect } from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
+import ErrorPage from "../components/ErrorPage";
+
 
 export function TotalSalesData(props) {
     const app = useAppBridge();
@@ -20,6 +22,7 @@ export function TotalSalesData(props) {
     const [salesTotal, setSalesTotal] = useState(0);
     const [salesData, setSalesData] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     function getSalesData(period) {
         let redirect = Redirect.create(app);
@@ -41,9 +44,11 @@ export function TotalSalesData(props) {
                 setSalesData(data.sales_stats.results);
                 }})
             .catch((error) => {
-                console.log("error", error);
+                setError(error);
+                setLoading(false);
+                console.log("Error", error);
             }).finally(() => {
-                setLoading(false)
+                setLoading(false);
             })
     }
 
@@ -51,6 +56,8 @@ export function TotalSalesData(props) {
         getSalesData(props.period);
     }, [props.period])
 
+    if (error) { return <ErrorPage />; }
+    
     return (
         <PolarisVizProvider
             themes={{
@@ -96,6 +103,7 @@ export function ConversionRate(props) {
     const [reachedCheckout, setReachedCheckout] = useState(0);
     const [converted, setConverted] = useState(0);
     const [totalDisplayed, setTotalDisplayed] = useState(0);
+    const [error, setError] = useState(null);
 
     function getOffersStats(endpointUrl, period, callback) {
         fetch(endpointUrl, {
@@ -110,6 +118,7 @@ export function ConversionRate(props) {
                 callback(data)
             })
             .catch((error) => {
+                setError(error);
                 console.log("error", error);
             })
     }
@@ -150,6 +159,7 @@ export function ConversionRate(props) {
         getOffersStatsTimesCheckedout(props.period);
     }, [props.period])
 
+    if (error) { return <ErrorPage />; }
     return (
         <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Conversion Rate`} sectioned>
             <h3 className="report-money"><strong>{totalDisplayed > 0 ? ((converted / totalDisplayed) * 100).toFixed(2) : 0}%</strong></h3>
@@ -181,6 +191,7 @@ export function OrderOverTimeData(props) {
     const [ordersTotal, setOrdersTotal] = useState(0);
     const [ordersData, setOrdersData] = useState(null);
     const [loading, setLoading] = useState(false); 
+    const [error, setError] = useState(null);
 
     function getOrdersData(period) {
         let redirect = Redirect.create(app);
@@ -202,6 +213,7 @@ export function OrderOverTimeData(props) {
                 setOrdersData(data.orders_stats.results)
             }})
             .catch((error) => {
+                setError(error);
                 console.log("error", error);
             }).finally(() => {
                 setLoading(false)
@@ -211,6 +223,8 @@ export function OrderOverTimeData(props) {
     useEffect(() => {
         getOrdersData(props.period);
     }, [props.period])
+
+    if (error) { return <ErrorPage />; }
 
     return (
         <PolarisVizProvider
@@ -252,6 +266,7 @@ export function TopPerformingOffersData(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [offersData, setOffersData] = useState([]);
+    const [error, setError] = useState(null);
 
     function getOffersData(period) {
         let redirect = Redirect.create(app);
@@ -272,6 +287,7 @@ export function TopPerformingOffersData(props) {
                 setOffersData(data.offers);
             }})
             .catch((error) => {
+                setError(error);
                 console.log("error", error);
             })
     }
@@ -279,6 +295,8 @@ export function TopPerformingOffersData(props) {
     useEffect(() => {
         getOffersData(props.period);
     }, [props.period])
+
+    if (error) { return <ErrorPage />; }
 
     return (
         <PolarisVizProvider
@@ -323,6 +341,7 @@ export function AbTestingData(props) {
     const [salesTotal, setSalesTotal] = useState(0);
     const [salesData, setSalesData] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     function getSalesData(period) {
         let redirect = Redirect.create(app);
@@ -345,6 +364,8 @@ export function AbTestingData(props) {
                 setSalesData(data.sales_stats.results);
             }})
             .catch((error) => {
+                setError(error);
+                setLoading(false);
                 console.log("error", error);
             }).finally(() => {
                 setLoading(false)
@@ -354,6 +375,8 @@ export function AbTestingData(props) {
     useEffect(() => {
         getSalesData(props.period);
     }, [props.period])
+
+    if (error) { return <ErrorPage />; }
 
     return (
         <PolarisVizProvider
@@ -428,6 +451,8 @@ export function ClickThroughtRateData(props) {
     useEffect(() => {
         getClicksData(props.period);
     }, [props.period])
+
+    if (error) { return (<ErrorPage />); }
 
     return (
         <PolarisVizProvider
