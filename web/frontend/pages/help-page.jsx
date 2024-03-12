@@ -1,7 +1,7 @@
 import {Link,Icon,Modal, LegacyCard, Page, Layout, Image, LegacyStack, Grid, List} from "@shopify/polaris";
 import {helpImage} from "../assets";
 import {HintMajor} from '@shopify/polaris-icons';
-import {useRef, useState, useCallback} from 'react';
+import {useRef, useState, useCallback, useEffect} from 'react';
 import "../components/stylesheets/mainstyle.css";
 import { CustomTitleBar } from "../components";
 import {
@@ -9,17 +9,36 @@ import {
 } from '@shopify/polaris-icons';
 import { HelpLinks } from "../shared/constants/HelpPageLinks";
 
+import ModalChoosePlan from '../components/modal_ChoosePlan';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchShopData } from "../services/actions/shop";
+import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatusSlice';
+
 export default function HelpPage() {
     const [active, setActive] = useState(false);
+    const shopAndHost = useSelector((state) => state.shopAndHost);
+    const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
+    const reduxDispatch = useDispatch();
     const handleClose = useCallback(() => {
         setActive(false);
       }, []);
+
+    useEffect(() => {
+        // in case of page refresh
+        if (isSubscriptionUnpaid === null) {
+            fetchShopData(shopAndHost.shop).then((data) => {
+                reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
+            });
+        }
+    }, [isSubscriptionUnpaid]);
+
 
     const videoModal = useRef(null);
     const activator = videoModal;
 
   return (
     <Page>
+      { isSubscriptionUnpaid && <ModalChoosePlan /> }
       <CustomTitleBar title='Help' icon={QuestionMarkMinor} />
       <Layout>
             <Layout.Section>

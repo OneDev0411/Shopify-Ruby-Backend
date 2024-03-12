@@ -3,12 +3,15 @@ import {
     SettingsMajor
 } from '@shopify/polaris-icons';
 import { useAppBridge } from '@shopify/app-bridge-react'
-import { useSelector } from 'react-redux';
 import React, {useState, useEffect, useCallback, useContext} from "react";
-import { Redirect, Toast } from '@shopify/app-bridge/actions';
-import { Partners, SettingTabs, CustomTitleBar } from "../components";
 import { useAuthenticatedFetch, useShopSettings } from "../hooks";
 import {useShopState} from "../contexts/ShopContext.jsx";
+import {useDispatch, useSelector} from 'react-redux';
+import { Redirect, Toast } from '@shopify/app-bridge/actions';
+import { Partners, SettingTabs, CustomTitleBar } from "../components";
+import ModalChoosePlan from '../components/modal_ChoosePlan'
+import { fetchShopData } from '../services/actions/shop';
+import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatusSlice';
 
 export default function Settings() {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -17,6 +20,9 @@ export default function Settings() {
     const { shopSettings, setShopSettings, updateShopSettingsAttributes, resetSettings } = useShopState();
     const [formData, setFormData] = useState({});
     const app = useAppBridge();
+
+    const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
+    const reduxDispatch = useDispatch();
 
     const fetchCurrentShop = useCallback(async () => {
         let redirect = Redirect.create(app);
@@ -43,7 +49,13 @@ export default function Settings() {
 
     useEffect(() => {
         fetchCurrentShop()
-
+        // in case of page refresh
+        if (isSubscriptionUnpaid === null) {
+            fetchShopData(shopAndHost.shop).then((data) => {
+                reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
+            });
+        }
+        
         return function cleanup() {
             resetSettings();
         };
@@ -114,6 +126,7 @@ export default function Settings() {
     return (
         <>
             <Page>
+                { isSubscriptionUnpaid && <ModalChoosePlan /> }
                 <CustomTitleBar title='Settings' icon={SettingsMajor} buttonText='Save' handleButtonClick={handleSave} />
                 <LegacyCard sectioned>
                     {(shopSettings?.activated) ? (
