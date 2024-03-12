@@ -40,7 +40,7 @@ export const getShopOffersStats = async (shopify_domain, period) => {
 
 export async function fetchShopData(shop) {
   try {
-    const response = await fetch(`/api/merchant/current_shop?shop=${shop}`, {
+    const response = await fetch(`/api/v2/merchant//current_shop?shop=${shop}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
