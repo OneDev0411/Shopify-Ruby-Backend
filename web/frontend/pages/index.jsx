@@ -20,6 +20,7 @@ import ErrorPage from "../components/ErrorPage.jsx"
 import ModalChoosePlan from "../components/modal_ChoosePlan.jsx";
 import { setIsSubscriptionUnpaid } from "../store/reducers/subscriptionPaidStatusSlice.js";
 import {useShopState} from "../contexts/ShopContext.jsx";
+import PageContainer from "../components/PageContainer.jsx";
 
 export default function HomePage() {
   const app = useAppBridge();
@@ -92,7 +93,7 @@ export default function HomePage() {
   if (error) { return < ErrorPage showBranding={true} />; }
 
   return (
-    <Page>
+    <PageContainer showABTestBanner>
       {isLoading ? (
         <div
           style={{
@@ -155,6 +156,6 @@ export default function HomePage() {
           <div className="space-10"></div>
         </>
     )}
-    </Page>
+    </PageContainer>
   );
 };

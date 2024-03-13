@@ -40,6 +40,7 @@ Rails.application.routes.draw do
         get 'autopilot_details', to: 'shops#autopilot_details'
         post 'enable_autopilot', to: 'shops#enable_autopilot'
         get 'enable_autopilot_status', to: 'shops#enable_autopilot_status'
+        get 'ab_test_banner_page', to: 'shops#ab_test_banner_page'
 
         post 'offers_list', to: 'offers#offers_list'
         post 'offer_stats', to: 'offers#offer_stats'

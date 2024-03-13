@@ -330,6 +330,19 @@ class Shop < ApplicationRecord
     end
   end
 
+  def ab_test_banner_page
+    redis_key = "ab_test_banner_page"
+    if $redis.hexists(redis_key, self.shopify_domain)
+      page = $redis.hget(redis_key, self.shopify_domain)
+    else
+      pages = ["offer", "dashboard"]
+      page = pages.sample
+      $redis.hset(redis_key, self.shopify_domain, page)
+    end
+
+    page
+  end
+
   def has_autopilot?
     if read_attribute(:has_autopilot) == true
       true

@@ -232,6 +232,11 @@ module Api
           render json: { message: @icushop.enable_autopilot_status }
         end
 
+        # GET api/v2/merchant/ab_test_banner_page
+        def ab_test_banner_page
+          render json: { page: @icushop.ab_test_banner_page }
+        end
+
         private
 
         def shop_params
