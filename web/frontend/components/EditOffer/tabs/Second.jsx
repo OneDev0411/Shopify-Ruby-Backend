@@ -60,7 +60,7 @@ export function SecondTab(props) {
     const [storedThemeNames, setStoredThemeName] = useState([]);
 
     const [isLegacy, setIsLegacy] = useState(
-      props.shop.theme_version !== '2.0' || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true'
+      props.themeAppExtension.theme_version !== '2.0' || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true'
     );
 
     useEffect(() => {
