@@ -27,12 +27,19 @@ export default function AnalyticsOffers() {
     );
     const reduxDispatch = useDispatch();
     const [error, setError] = useState(null);
+    const [showBanner, setShowBanner] = useState(false); 
     const setTimePeriod = useCallback((val) => {
       setPeriod(val)
     },[]);
 
+    const handleDismiss = () => {
+      setError(null);
+      setShowBanner(false);
+    };
+
     const handleError = () => {
       setError('Some of your analytics data failed to load, so your stats may not be complete.');
+      setShowBanner(true);
     };
     useEffect(() => {
       // in case of page refresh
@@ -57,8 +64,8 @@ export default function AnalyticsOffers() {
       <Page>
         { isSubscriptionUnpaid && <ModalChoosePlan /> }
          <CustomTitleBar title='Analytics' icon={AnalyticsMinor} />
-          { error && (
-            <Banner title="Data Failed To Load" onDismiss={() => {}}>
+          { error && showBanner && (
+            <Banner title="Data Failed To Load" onDismiss={(handleDismiss)}>
               <p> {error} </p>
             </Banner>
           )}
