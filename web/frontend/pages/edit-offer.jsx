@@ -19,7 +19,7 @@ import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function EditPage() {
     const { offer, setOffer } = useContext(OfferContext);
-    const { shopSettings, setShopSettings, resetSettings } = useShopState();
+    const { shopSettings, setShopSettings } = useShopState();
     const { fetchOffer, saveOffer, createOffer } = useOffer();
     const { fetchShopSettings, updateShopSettings } = useShopSettings();
     const shopAndHost = useSelector(state => state.shopAndHost);
