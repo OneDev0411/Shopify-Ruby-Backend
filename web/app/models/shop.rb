@@ -859,7 +859,8 @@ class Shop < ApplicationRecord
       shop_id: id,
       default_template_settings: default_template_settings,
       has_redirect_to_product: has_redirect_to_product?,
-      theme_version: theme_app_extension&.theme_version || ''
+      theme_version: theme_app_extension&.theme_version || '',
+      offers_limit_reached: offers_limit_reached?
     }
 
     admin ? std_settings.merge(admin_settings) : std_settings
