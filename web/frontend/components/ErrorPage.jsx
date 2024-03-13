@@ -11,12 +11,12 @@ const ErrorPage = ({ showBranding }) => {
       />
       }
       <img
-        src={ "https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/ErrorPage.png" }
+        src={ import.meta.env.VITE_REACT_APP_ERROR_IMG_URL }
         alt= "Error Image"
         style={{ maxWidth: "100%", maxHeight: "400px", marginTop: "20px" }}
       />
-      <h2 style={{ fontSize: "22px", fontStyle: "bold", lineHeight: "45px" }} >We've experienced an error</h2>
-      <p style={{ fontSize: "17px" }} >It's been reported and our engineers are investigating the issue.</p>
+      <h2 style={{ fontSize: "22px", fontStyle: "bold", lineHeight: "45px" }}> { import.meta.env.VITE_REACT_APP_ERROR_TITLE } </h2>
+      <p style={{ fontSize: "17px" }}> { import.meta.env.VITE_REACT_APP_ERROR_CONTENT } </p>
     </div>
   );
 };
