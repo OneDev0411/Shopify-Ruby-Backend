@@ -1,8 +1,8 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {useSelector} from "react-redux";
-import {useLocation, useNavigate} from 'react-router-dom';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 
-import {Icon, Layout, Page, Spinner, Tabs} from '@shopify/polaris';
+import {Banner, Icon, Layout, Page, Spinner, Tabs} from '@shopify/polaris';
 import {DesktopMajor, MobileMajor} from '@shopify/polaris-icons';
 import {Redirect} from '@shopify/app-bridge/actions';
 import {useAuthenticatedFetch} from "../hooks";
@@ -298,7 +298,7 @@ export default function EditPage() {
                 <Page
                     backAction={{content: 'Offers', url: '/offer'}}
                     title="Create new offer"
-                    primaryAction={{content: 'Publish', disabled: enablePublish, onClick: publishOffer}}
+                    primaryAction={{content: 'Publish', disabled: enablePublish || shop?.offers_limit_reached, onClick: publishOffer}}
                     secondaryActions={[{content: 'Save Draft', disabled: false, onAction: () => saveDraft()}]}
                     style={{overflow: 'hidden'}}
                 >
@@ -312,6 +312,12 @@ export default function EditPage() {
                                     disclosureText="More views"
                                     fitted
                                 >
+                                    { shop?.offers_limit_reached && (
+                                      <Banner status="info">
+                                          <p>You are currently at the limit for published offers. <Link
+                                            to="/subscription">Click here</Link> to upgrade your plan and get access to more offers and features!</p>
+                                      </Banner>
+                                    )}
                                     <div className='space-4'></div>
                                     
                                     {selected == 0 ?
@@ -337,8 +343,8 @@ export default function EditPage() {
                                         : ""}
                                     {selected == 3 ?
                                         // page was imported from components folder
-                                        <FourthTab saveDraft={saveDraft} publishOffer={publishOffer}
-                                                   enablePublish={enablePublish}  themeAppExtension={themeAppExtension}/>
+                                        <FourthTab shopifyDomain={shopSettings.shopify_domain} shopifysaveDraft={saveDraft} publishOffer={publishOffer}
+                                                   enablePublish={enablePublish} themeAppExtension={themeAppExtension}/>
                                         : ""}
                                 </Tabs>
                             </div>
