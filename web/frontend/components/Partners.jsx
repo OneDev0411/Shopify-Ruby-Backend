@@ -50,7 +50,7 @@ export function Partners() {
       getAllPartners();
     }, [getAllPartners]);
 
-    if (error) { return < ErrorPage />; }
+    // if (error) { return < ErrorPage />; }
 
     return(<>
       <LegacyCard sectioned title="Recommended Apps" id={"LegacyCardYpadding"}>

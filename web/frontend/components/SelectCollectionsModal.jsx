@@ -85,7 +85,7 @@ export function SelectCollectionsModal(props) {
    getCollections();
   }, []);
 
-  if (error) { return < ErrorPage />; }
+  // if (error) { return < ErrorPage />; }
 
   return (
     <>

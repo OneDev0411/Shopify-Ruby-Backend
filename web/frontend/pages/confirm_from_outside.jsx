@@ -3,7 +3,7 @@ import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from '@shopify/app-bridge-react';
 import { useSelector } from "react-redux";
 import { useAuthenticatedFetch } from "../hooks";
-import ErrorPage from "../components/ErrorPage"
+import { Toast } from '@shopify/app-bridge/actions';
 
 const ConfirmFromOutside = () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -13,7 +13,6 @@ const ConfirmFromOutside = () => {
   const redirect = Redirect.create(app);
   const shopAndHost = useSelector(state => state.shopAndHost);
   const fetch = useAuthenticatedFetch(shopAndHost.host);
-  const [error, setError] = useState(null);
 
   async function renderConfirmCharge(){
 
@@ -36,16 +35,20 @@ const ConfirmFromOutside = () => {
       }
      })
      .catch((error) => {
-      setError(error);
-      console.log("error", error);
+      const toastOptions = {
+        message: 'An error occurred. Please try again later.',
+        duration: 3000,
+        isError: true,
+      };
+      const toastError = Toast.create(app, toastOptions);
+      toastError.dispatch(Toast.Action.SHOW);
+      console.log("Error:", error);
      })
   }
 
   useEffect(async () => {
     await renderConfirmCharge();
   }, []);
-  if (error) { return < ErrorPage/>; }
-
   return <div></div>;
 };
 

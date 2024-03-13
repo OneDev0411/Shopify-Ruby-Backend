@@ -81,7 +81,7 @@ export function SelectProductsModal(props) {
       getProducts();
   }, []);
 
-  if (error) { return < ErrorPage />; }
+  // if (error) { return < ErrorPage />; }
 
   return (
     <>
