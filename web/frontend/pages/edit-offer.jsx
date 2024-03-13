@@ -61,7 +61,7 @@ export default function EditPage() {
                     updateSettingsOrRedirect(data)
 
                     let newOffer = {...offer};
-                    newOffer.advanced_placement_setting ={
+                    newOffer.advanced_placement_setting = {
                       custom_product_page_dom_selector: data.shop_settings.custom_product_page_dom_selector,
                       custom_product_page_dom_action: data.shop_settings.custom_product_page_dom_action,
                       custom_cart_page_dom_selector: data.shop_settings.custom_cart_page_dom_selector,
@@ -102,8 +102,6 @@ export default function EditPage() {
                   })
                   .then((data) => {
                       updateSettingsOrRedirect(data)
-                      setShop(data.shop_settings);
-                      setThemeAppExtension(data.theme_app_extension)
                       setUpdatePreviousAppOffer(!updatePreviousAppOffer);
                       setIsLoading(false);
                   })
@@ -120,7 +118,6 @@ export default function EditPage() {
         }
         return function cleanup() {
             setOffer(OFFER_DEFAULTS);
-            resetSettings();
         };
     },[]);
 
@@ -129,7 +126,7 @@ export default function EditPage() {
         if (data.redirect_to) {
             redirect.dispatch(Redirect.Action.APP, data.redirect_to);
         } else {
-            if (Object.keys(data.shop_settings.css_options.main).length == 0) {
+            if (Object.keys(data.shop_settings.css_options.main).length === 0) {
                 data.shop_settings.css_options.main.color = "#2B3D51";
                 data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
                 data.shop_settings.css_options.button.color = "#FFFFFF";
@@ -201,7 +198,7 @@ export default function EditPage() {
             let data = {
                 ...prev, uses_ajax_cart: shop_uses_ajax_cart
             }
-            updateShopSettings(shopSettings)
+            updateShopSettings(data)
                 .then((response) => { return response.json(); })
                 .then((data) => {
                     console.log('updated shop settings', data)
@@ -343,7 +340,7 @@ export default function EditPage() {
                                         : ""}
                                     {selected == 3 ?
                                         // page was imported from components folder
-                                        <FourthTab shopifyDomain={shopSettings.shopify_domain} shopifysaveDraft={saveDraft} publishOffer={publishOffer}
+                                        <FourthTab shopifysaveDraft={saveDraft} publishOffer={publishOffer}
                                                    enablePublish={enablePublish} themeAppExtension={themeAppExtension}/>
                                         : ""}
                                 </Tabs>

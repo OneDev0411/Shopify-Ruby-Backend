@@ -2,7 +2,7 @@ import {createContext, useContext, useEffect, useRef, useState} from 'react';
 
 const ShopContext = createContext({});
 
-const SETTINGS_DEFAULTS = {
+export const SETTINGS_DEFAULTS = {
   shop_id: undefined,
   offer_css: '',
   css_options: {
@@ -44,10 +44,6 @@ export default function ShopProvider({ children }) {
         }
       }));
     }
-  }
-
-  function resetSettings () {
-    setShopSettings(SETTINGS_DEFAULTS);
   }
 
   return (

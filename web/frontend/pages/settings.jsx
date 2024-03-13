@@ -5,7 +5,7 @@ import {
 import { useAppBridge } from '@shopify/app-bridge-react'
 import React, {useState, useEffect, useCallback, useContext} from "react";
 import { useAuthenticatedFetch, useShopSettings } from "../hooks";
-import {useShopState} from "../contexts/ShopContext.jsx";
+import {SETTINGS_DEFAULTS, useShopState} from "../contexts/ShopContext.jsx";
 import {useDispatch, useSelector} from 'react-redux';
 import { Redirect, Toast } from '@shopify/app-bridge/actions';
 import { Partners, SettingTabs, CustomTitleBar } from "../components";
@@ -48,17 +48,17 @@ export default function Settings() {
     }, [])
 
     useEffect(() => {
-        fetchCurrentShop()
+        if (shopSettings === SETTINGS_DEFAULTS) {
+            fetchCurrentShop()
+        }
+
         // in case of page refresh
         if (isSubscriptionUnpaid === null) {
             fetchShopData(shopAndHost.shop).then((data) => {
                 reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
             });
         }
-        
-        return function cleanup() {
-            resetSettings();
-        };
+
     }, [fetchCurrentShop]);
 
     const handleFormChange = (value, id) => {
@@ -99,7 +99,7 @@ export default function Settings() {
                 custom_cart_page_dom_selector: formData.cartDomSelector, custom_cart_page_dom_action: formData.cartDomAction, custom_ajax_dom_selector: formData.ajaxDomSelector,
                 custom_ajax_dom_action: formData.ajaxDomAction
             }
-            updateShopSettings(shopSettings)
+            updateShopSettings(data)
                 .then((response) => { return response.json(); })
                 .then((data) => {
                     const toastOptions = {
