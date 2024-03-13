@@ -1416,10 +1416,14 @@ class Shop < ApplicationRecord
   end
 
   def remove_cache_keys_for_uninstalled_shop
-    $redis_cache.del(*shopify_products_and_collections_ids)
+    ids = shopify_products_and_collections_ids
+
+    $redis_cache.del(*ids) unless ids.blank?
   end
 
   def store_cache_keys_on_reinstall
-    $redis_cache.mset(*shopify_products_and_collections_ids)
+    ids = shopify_products_and_collections_ids
+
+    $redis_cache.mset(*ids) unless ids.blank?
   end
 end
