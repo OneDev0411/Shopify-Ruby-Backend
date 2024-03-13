@@ -69,6 +69,8 @@ export default function HomePage() {
         if (data.redirect_to) {
           redirect.dispatch(Redirect.Action.APP, data.redirect_to);
       } else {
+        console.log('ENV:', process.env)
+        console.log('ENV:', process.env.REACT_APP_ERROR_IMG_URL)
         setHasOffers(data.has_offers);
         setThemeAppExtension(data.theme_app_extension);
         setCurrentShop(data.shop);
