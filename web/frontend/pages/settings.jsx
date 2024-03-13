@@ -17,7 +17,7 @@ export default function Settings() {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const { fetchShopSettings, updateShopSettings } = useShopSettings();
-    const { shopSettings, setShopSettings, updateShopSettingsAttributes, resetSettings } = useShopState();
+    const { shopSettings, setShopSettings, updateShopSettingsAttributes } = useShopState();
     const [formData, setFormData] = useState({});
     const app = useAppBridge();
 

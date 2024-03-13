@@ -48,7 +48,7 @@ export default function ShopProvider({ children }) {
 
   return (
     <ShopContext.Provider
-      value={{shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers, updateShopSettingsAttributes, shopSettings, resetSettings, setShopSettings}}
+      value={{shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers, updateShopSettingsAttributes, shopSettings, setShopSettings}}
     >
       {children}
     </ShopContext.Provider>
