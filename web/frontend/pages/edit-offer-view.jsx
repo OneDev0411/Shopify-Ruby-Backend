@@ -18,6 +18,8 @@ import { useAuthenticatedFetch } from "../hooks";
 import AbAnalytics from "../components/abAnalytics";
 import "../components/stylesheets/mainstyle.css";
 import {OfferContext} from "../OfferContext.jsx";
+import { useAppBridge } from '@shopify/app-bridge-react'
+import { Toast } from '@shopify/app-bridge/actions';
 import {useOffer} from "../hooks/useOffer.js";
 import {
   OFFER_ACTIVATE_URL,
@@ -30,6 +32,7 @@ import ErrorPage from "../components/ErrorPage.jsx"
 
 const EditOfferView = () => {
   const { offer, setOffer, updateOffer } = useContext(OfferContext);
+  const app = useAppBridge();
   const { fetchOffer } = useOffer();
   const shopAndHost = useSelector((state) => state.shopAndHost);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,8 +64,14 @@ const EditOfferView = () => {
         console.log("there was an issue deactivating the offer")
       }
     }).catch((error) => {
-      setError(error);
-      console.log('Error:', error);
+      const toastOptions = {
+        message: 'An error occurred. Please try again later.',
+        duration: 3000,
+        isError: true,
+      };
+      const toastError = Toast.create(app, toastOptions);
+      toastError.dispatch(Toast.Action.SHOW);
+      console.log("Error:", error);
     })
   }
 
@@ -80,7 +89,13 @@ const EditOfferView = () => {
         }
       })
       .catch((error) => {
-        setError(error);
+        const toastOptions = {
+          message: 'An error occurred. Please try again later.',
+          duration: 3000,
+          isError: true,
+        };
+        const toastError = Toast.create(app, toastOptions);
+        toastError.dispatch(Toast.Action.SHOW);
         console.log('An error occurred while making the API call:', error);
       })
   }
@@ -99,7 +114,13 @@ const EditOfferView = () => {
         }
       })
       .catch((error) => {
-        setError(error);
+        const toastOptions = {
+          message: 'An error occurred. Please try again later.',
+          duration: 3000,
+          isError: true,
+        };
+        const toastError = Toast.create(app, toastOptions);
+        toastError.dispatch(Toast.Action.SHOW);
         console.log('An error occurred while making the API call:', error);
       })
   }

@@ -53,8 +53,14 @@ export default function Subscription() {
                 }
            })
            .catch((error) => {
-            setError(error);
-            console.log("error", error);
+            const toastOptions = {
+              message: 'An error occurred. Please try again later.',
+              duration: 3000,
+              isError: true,
+            };
+            const toastError = Toast.create(app, toastOptions);
+            toastError.dispatch(Toast.Action.SHOW);
+            console.log("Error:", error);
            })
     }
 
@@ -75,8 +81,8 @@ export default function Subscription() {
                 setIsSubscriptionUnpaid(data.subscription_not_paid)
            })
            .catch((error) => {
-            setError(error);
-            console.log("error", error);
+              setError(error);
+              console.log("error", error);
            })
       }, []);
 

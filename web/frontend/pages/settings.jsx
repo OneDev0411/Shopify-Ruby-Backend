@@ -122,8 +122,14 @@ export default function Settings() {
                 // window.location.reload();
             })
             .catch((error) => {
-                setError(error)
-                console.log("Error", error);
+                const toastOptions = {
+                    message: 'An error occurred. Please try again later.',
+                    duration: 3000,
+                    isError: true,
+                };
+                const toastError = Toast.create(app, toastOptions);
+                toastError.dispatch(Toast.Action.SHOW, toastOptions);
+                console.log("Error:", error);
             })
     }
 

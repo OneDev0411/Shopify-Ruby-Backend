@@ -289,7 +289,14 @@ export default function EditPage() {
                 location.state.offerID = responseData.offer.id
                 setIsLoading(false);
             } catch (error) {
-                setError(error);
+                setIsLoading(false);
+                const toastOptions = {
+                    message: 'An error occurred. Please try again later.',
+                    duration: 3000,
+                    isError: true,
+                  };
+                  const toastError = Toast.create(app, toastOptions);
+                  toastError.dispatch(Toast.Action.SHOW);
                 console.log('Error:', error);
             }
         } else {
@@ -298,6 +305,14 @@ export default function EditPage() {
                 setIsLoading(false);
             } catch (error) {
                 console.log('Error:', error);
+                setIsLoading(false);
+                const toastOptions = {
+                    message: 'An error occurred. Please try again later.',
+                    duration: 3000,
+                    isError: true,
+                  };
+                  const toastError = Toast.create(app, toastOptions);
+                  toastError.dispatch(Toast.Action.SHOW);
             }
         }
         navigateTo('/offer');
