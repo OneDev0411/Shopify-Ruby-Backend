@@ -756,6 +756,7 @@ class Shop < ApplicationRecord
       
       if subscription.present?
         subscription.status = 'approved'
+        subscription.shopify_charge_id = nil
         subscription.save
       end
     rescue => e
