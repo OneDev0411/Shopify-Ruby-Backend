@@ -8,11 +8,13 @@ import Carousel from './layouts/template_multi_carousel';
 import Flex from './layouts/template_multi_flex';
 import {useAuthenticatedFetch} from "../hooks/index.js";
 import {useSelector} from "react-redux";
-import {OfferContext} from "../OfferContext.jsx";
+import {OfferContext} from "../contexts/OfferContext.jsx";
+import {useShopState} from "../contexts/ShopContext.jsx";
 
 
 export function OfferPreview(props) {
 	const { offer, updateOffer, updateNestedAttributeOfOffer } = useContext(OfferContext);
+	const { shopSettings } = useShopState();
 	const shopAndHost = useSelector(state => state.shopAndHost);
 
 	const [carouselLoading, setCarouselLoading] = useState(false);
@@ -39,7 +41,7 @@ export function OfferPreview(props) {
 					let offerSettings = {...data};
 
 					if(Object.keys(offer.css_options).length == 0) {
-						updateOffer("css_options", props.shop.css_options)
+						updateOffer("css_options", shopSettings.css_options)
 					}
 					if(!offer.placement_setting) {
 						updateNestedAttributeOfOffer(true, "placement_setting", "default_product_page");

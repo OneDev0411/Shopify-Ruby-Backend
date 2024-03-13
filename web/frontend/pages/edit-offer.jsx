@@ -10,14 +10,18 @@ import {FirstTab, FourthTab, SecondTab, ThirdTab} from "../components";
 import {OfferPreview} from "../components/OfferPreview";
 import "../components/stylesheets/mainstyle.css";
 import {EditOfferTabs, OFFER_DEFAULTS} from '../shared/constants/EditOfferOptions';
-import {OfferContext} from "../OfferContext.jsx";
+import {OfferContext} from "../contexts/OfferContext.jsx";
 import {useOffer} from "../hooks/useOffer.js";
 import {useAppBridge} from '@shopify/app-bridge-react';
 import {Toast} from '@shopify/app-bridge/actions';
+import {useShopSettings} from "../hooks/useShopSettings.js";
+import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function EditPage() {
     const { offer, setOffer } = useContext(OfferContext);
+    const { shopSettings, setShopSettings, resetSettings } = useShopState();
     const { fetchOffer, saveOffer, createOffer } = useOffer();
+    const { fetchShopSettings, updateShopSettings } = useShopSettings();
     const shopAndHost = useSelector(state => state.shopAndHost);
     const app = useAppBridge();
     const navigateTo = useNavigate();
@@ -35,22 +39,11 @@ export default function EditPage() {
     const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState({});
     const [themeAppExtension, setThemeAppExtension] = useState();
 
-    const [shop, setShop] = useState({
-        shop_id: undefined,
-        offer_css: '',
-        css_options: {
-            main: {},
-            text: {},
-            button: {},
-        }
-    });
-
     const [isLoading, setIsLoading] = useState(false);
 
     const [updatePreviousAppOffer, setUpdatePreviousAppOffer] = useState(false);
 
     const offerID = location?.state?.offerID;
-    const fetch = useAuthenticatedFetch(shopAndHost.host);
 
     let advanced_placement_setting = {}
 
@@ -59,34 +52,16 @@ export default function EditPage() {
         let redirect = Redirect.create(app);
         if (location?.state?.offerID == null) {
             setIsLoading(true);
-            fetch(`/api/v2/merchant/shop_settings`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({shop_attr: {admin: null}, shop: shopAndHost.shop}),
-            })
+            // fetching shop settings
+            fetchShopSettings({admin: null})
                 .then((response) => {
                     return response.json()
                 })
                 .then((data) => {
-                    if (data.redirect_to) {
-                        redirect.dispatch(Redirect.Action.APP, data.redirect_to);
-                    } else {
-                        if (Object.keys(data.shop_settings.css_options.main).length == 0) {
-                            data.shop_settings.css_options.main.color = "#2B3D51";
-                            data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
-                            data.shop_settings.css_options.button.color = "#FFFFFF";
-                            data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
-                            data.shop_settings.css_options.widows = '100%';
-                        }
-                    }
-                    setShop(data.shop_settings);
-
-                    setThemeAppExtension(data.theme_app_extension)
+                    updateSettingsOrRedirect(data)
 
                     let newOffer = {...offer};
-                    newOffer.advanced_placement_setting ={
+                    newOffer.advanced_placement_setting = {
                       custom_product_page_dom_selector: data.shop_settings.custom_product_page_dom_selector,
                       custom_product_page_dom_action: data.shop_settings.custom_product_page_dom_action,
                       custom_cart_page_dom_selector: data.shop_settings.custom_cart_page_dom_selector,
@@ -101,6 +76,7 @@ export default function EditPage() {
                 .catch((error) => {
                     console.log("Error > ", error);
                 })
+
         } else {
             setIsLoading(true);
             fetchOffer(offerID, shopAndHost.shop).then((response) => {
@@ -120,33 +96,13 @@ export default function EditPage() {
                 setOffer({...data});
                 setInitialOfferableProductDetails(data.offerable_product_details);
 
-                fetch(`/api/v2/merchant/shop_settings`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({shop_attr: {admin: null}, shop: shopAndHost.shop}),
-                })
+                  fetchShopSettings({admin: null})
                   .then((response) => {
                       return response.json()
                   })
                   .then((data) => {
-                      if (data.redirect_to) {
-                          redirect.dispatch(Redirect.Action.APP, data.redirect_to);
-                      } else {
-                          if (Object.keys(data.shop_settings.css_options.main).length == 0) {
-                              data.shop_settings.css_options.main.color = "#2B3D51";
-                              data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
-                              data.shop_settings.css_options.button.color = "#FFFFFF";
-                              data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
-                              data.shop_settings.css_options.widows = '100%';
-                          }
-                      }
-                      setShop(data.shop_settings);
-                      setThemeAppExtension(data.theme_app_extension)
-
+                      updateSettingsOrRedirect(data)
                       setUpdatePreviousAppOffer(!updatePreviousAppOffer);
-
                       setIsLoading(false);
                   })
                   .catch((error) => {
@@ -158,7 +114,6 @@ export default function EditPage() {
                 setIsLoading(false);
                 console.log("Error > ", error);
             })
-
             setIsLoading(true);
         }
         return function cleanup() {
@@ -166,39 +121,30 @@ export default function EditPage() {
         };
     },[]);
 
+
+    function updateSettingsOrRedirect(data) {
+        if (data.redirect_to) {
+            redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+        } else {
+            if (Object.keys(data.shop_settings.css_options.main).length === 0) {
+                data.shop_settings.css_options.main.color = "#2B3D51";
+                data.shop_settings.css_options.main.backgroundColor = "#AAAAAA";
+                data.shop_settings.css_options.button.color = "#FFFFFF";
+                data.shop_settings.css_options.button.backgroundColor = "#2B3D51";
+                data.shop_settings.css_options.widows = '100%';
+            }
+        }
+
+        setShopSettings(data.shop_settings);
+        setThemeAppExtension(data.theme_app_extension)
+    }
+
+    // TODO: Relocate to offer context
     //Called whenever the checkKeysValidity changes in any child component
     function updateCheckKeysValidity(updatedKey, updatedValue) {
         setCheckKeysValidity(previousState => {
             return {...previousState, [updatedKey]: updatedValue};
         });
-    }
-
-    //Called whenever the shop changes in any child component
-    function updateShop(updatedValue, ...updatedKey) {
-        if (updatedKey.length == 1) {
-            setShop(previousState => {
-                return {...previousState, [updatedKey[0]]: updatedValue};
-            });
-        } else if (updatedKey.length == 2) {
-            setShop(previousState => ({
-                ...previousState,
-                [updatedKey[0]]: {
-                    ...previousState[updatedKey[0]],
-                    [updatedKey[1]]: updatedValue
-                }
-            }));
-        } else if (updatedKey.length == 3) {
-            setShop(previousState => ({
-                ...previousState,
-                [updatedKey[0]]: {
-                    ...previousState[updatedKey[0]],
-                    [updatedKey[1]]: {
-                        ...previousState[updatedKey[0]][updatedKey[1]],
-                        [updatedKey[2]]: updatedValue
-                    }
-                }
-            }));
-        }
     }
 
     //Called to update the initial variants of the offer
@@ -208,8 +154,6 @@ export default function EditPage() {
 
     const save = async (status) =>  {
         if (offer.title === "") {
-            console.log("offer", offer)
-
             const toastNotice = Toast.create(app, {
                 message: 'Offer requires a title',
                 duration: 3000,
@@ -221,11 +165,6 @@ export default function EditPage() {
         }
 
         if (offer.offerable_product_details.length < 1) {
-            const toastOptions = {
-                message: 'Offer requires a title',
-                duration: 3000,
-                isError: true,
-            };
             const toastNotice = Toast.create(app, {
                 message: 'Offer requires a valid item',
                 duration: 3000,
@@ -255,17 +194,11 @@ export default function EditPage() {
         }
 
         setIsLoading(true);
-        setShop(prev => {
+        setShopSettings(prev => {
             let data = {
                 ...prev, uses_ajax_cart: shop_uses_ajax_cart
             }
-            fetch('/api/v2/merchant/update_shop_settings', {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ shop_attr: data, shop: shopAndHost.shop, admin: data.admin, json: true }),
-            })
+            updateShopSettings(data)
                 .then((response) => { return response.json(); })
                 .then((data) => {
                     console.log('updated shop settings', data)
@@ -278,7 +211,7 @@ export default function EditPage() {
 
         if (location.state != null && location.state?.offerID == null) {
             try {
-                let responseData = await createOffer(offer, shop, status)
+                let responseData = await createOffer(offer, shopSettings, status)
                 location.state.offerID = responseData.offer.id
                 setIsLoading(false);
             } catch (error) {
@@ -286,7 +219,7 @@ export default function EditPage() {
             }
         } else {
             try {
-                await saveOffer(offer, location, shop, status);
+                await saveOffer(offer, location, shopSettings, status);
                 setIsLoading(false);
             } catch (error) {
                 console.error('Error:', error);
@@ -304,11 +237,11 @@ export default function EditPage() {
     const handlePreTabChange = useCallback((selectedPreTabIndex) => {
         setSelectedPre(selectedPreTabIndex);
         if (selectedPreTabIndex == 0) {
-            setShop(previousState => {
+            setShopSettings(previousState => {
                 return {...previousState, selectedView: 'desktop'};
             });
         } else {
-            setShop(previousState => {
+            setShopSettings(previousState => {
                 return {...previousState, selectedView: 'mobile'};
             });
         }
@@ -386,8 +319,7 @@ export default function EditPage() {
                                     
                                     {selected == 0 ?
                                         // page was imported from components folder
-                                        <FirstTab shop={shop}
-                                                  updateCheckKeysValidity={updateCheckKeysValidity}
+                                        <FirstTab updateCheckKeysValidity={updateCheckKeysValidity}
                                                   handleTabChange={changeTab} initialVariants={initialVariants}
                                                   updateInitialVariants={updateInitialVariants}
                                                   autopilotCheck={autopilotCheck} setAutopilotCheck={setAutopilotCheck}
@@ -396,22 +328,19 @@ export default function EditPage() {
                                         : ""}
                                     {selected == 1 ?
                                         // page was imported from components folder
-                                        <SecondTab shop={shop}
-                                                   updateShop={updateShop}
-                                                   autopilotCheck={autopilotCheck} handleTabChange={changeTab}
+                                        <SecondTab autopilotCheck={autopilotCheck} handleTabChange={changeTab}
                                                    enableOrDisablePublish={enableOrDisablePublish} themeAppExtension={themeAppExtension}
                                         />
                                         : ""}
                                     {selected == 2 ?
                                         // page was imported from components folder
-                                        <ThirdTab updateShop={updateShop} saveDraft={saveDraft} publishOffer={publishOffer}
+                                        <ThirdTab saveDraft={saveDraft} publishOffer={publishOffer}
                                                   autopilotCheck={autopilotCheck} enablePublish={enablePublish}
                                                   handleTabChange={changeTab}/>
                                         : ""}
                                     {selected == 3 ?
                                         // page was imported from components folder
-                                        <FourthTab shop={shop} updateShop={updateShop}
-                                                   saveDraft={saveDraft} publishOffer={publishOffer}
+                                        <FourthTab shopifysaveDraft={saveDraft} publishOffer={publishOffer}
                                                    enablePublish={enablePublish} themeAppExtension={themeAppExtension}/>
                                         : ""}
                                 </Tabs>
@@ -428,13 +357,11 @@ export default function EditPage() {
                                 >
                                     <div style={{paddingTop: '40px', marginTop: '-40px'}}></div>
                                     {selectedPre == 0 ?
-                                        <OfferPreview shop={shop}
-                                                      checkKeysValidity={checkKeysValidity}
+                                        <OfferPreview checkKeysValidity={checkKeysValidity}
                                                       updateCheckKeysValidity={updateCheckKeysValidity}
                                                       updatePreviousAppOffer={updatePreviousAppOffer}/>
                                         :
-                                        <OfferPreview shop={shop}
-                                                      checkKeysValidity={checkKeysValidity}
+                                        <OfferPreview checkKeysValidity={checkKeysValidity}
                                                       updateCheckKeysValidity={updateCheckKeysValidity}
                                                       updatePreviousAppOffer={updatePreviousAppOffer}/>}
                                 </Tabs>
