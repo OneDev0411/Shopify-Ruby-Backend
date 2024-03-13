@@ -343,6 +343,16 @@ class Shop < ApplicationRecord
     page
   end
 
+  def ab_test_banner_click
+    ShopAction.create(
+      shop_id: self.id,
+      action_timestamp: Time.now.utc.to_i,
+      shopify_domain: self.shopify_domain,
+      action: 'click_on_ab_test_banner',
+      source: "icu-redesign_click_on_ab_test_banner_#{self.ab_test_banner_page}"
+    )
+  end
+
   def has_autopilot?
     if read_attribute(:has_autopilot) == true
       true

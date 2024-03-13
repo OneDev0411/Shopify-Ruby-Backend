@@ -1,6 +1,6 @@
 import React from "react";
-
 import { Page } from "@shopify/polaris";
+
 import ABTestBanner from "./ABTestBanner";
 
 const PageContainer = ({ showABTestBanner = false, children, ...props }) => {

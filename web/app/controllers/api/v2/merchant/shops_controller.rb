@@ -237,6 +237,12 @@ module Api
           render json: { page: @icushop.ab_test_banner_page }
         end
 
+        # GET  api/v2/merchant/ab_test_banner_click
+        def ab_test_banner_click
+          @icushop.ab_test_banner_click
+          head :ok
+        end
+
         private
 
         def shop_params
