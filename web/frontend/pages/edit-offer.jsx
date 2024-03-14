@@ -295,7 +295,7 @@ export default function EditPage() {
                 <Page
                     backAction={{content: 'Offers', url: '/offer'}}
                     title="Create new offer"
-                    primaryAction={{content: 'Publish', disabled: enablePublish || shop?.offers_limit_reached, onClick: publishOffer}}
+                    primaryAction={{content: 'Publish', disabled: enablePublish || shopSettings?.offers_limit_reached, onClick: publishOffer}}
                     secondaryActions={[{content: 'Save Draft', disabled: false, onAction: () => saveDraft()}]}
                     style={{overflow: 'hidden'}}
                 >
@@ -309,7 +309,7 @@ export default function EditPage() {
                                     disclosureText="More views"
                                     fitted
                                 >
-                                    { shop?.offers_limit_reached && (
+                                    { shopSettings?.offers_limit_reached && (
                                       <Banner status="info">
                                           <p>You are currently at the limit for published offers. <Link
                                             to="/subscription">Click here</Link> to upgrade your plan and get access to more offers and features!</p>

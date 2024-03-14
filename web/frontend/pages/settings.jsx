@@ -48,8 +48,17 @@ export default function Settings() {
     }, [])
 
     useEffect(() => {
-        if (shopSettings === SETTINGS_DEFAULTS) {
+        if (shopSettings.shop_id === undefined) {
             fetchCurrentShop()
+        } else {
+            setFormData({
+                productDomSelector: shopSettings?.custom_product_page_dom_selector,
+                productDomAction: shopSettings?.custom_product_page_dom_action,
+                cartDomSelector: shopSettings?.custom_cart_page_dom_selector,
+                cartDomAction: shopSettings?.custom_cart_page_dom_action,
+                ajaxDomSelector: shopSettings?.custom_ajax_dom_selector,
+                ajaxDomAction: shopSettings?.custom_ajax_dom_action,
+            })
         }
 
         // in case of page refresh
