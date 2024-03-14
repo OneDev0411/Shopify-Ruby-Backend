@@ -1,20 +1,19 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { Banner } from "@shopify/polaris";
 import { Toast } from "@shopify/app-bridge/actions";
 import { useAppBridge } from "@shopify/app-bridge-react";
 
 import { useAuthenticatedFetch } from "../hooks";
-import { setABTestBannerPage } from "../store/reducers/abTestBannerPage";
 
 const ABTestBanner = () => {
   const app = useAppBridge();
   const location = useLocation();
-  const reduxDispatch = useDispatch();
-  const abTestBannerPage = useSelector((state) => state.abTestBannerPage.page);
   const shopAndHost = useSelector((state) => state.shopAndHost);
   const fetch = useAuthenticatedFetch(shopAndHost.host);
+
+  const [abTestBannerPage, setAbTestBannerPage] = useState(null);
 
   const openBanner = useMemo(() => {
     if (location.pathname === "/" && abTestBannerPage === "dashboard") {
@@ -27,7 +26,7 @@ const ABTestBanner = () => {
   }, [location.pathname, abTestBannerPage]);
 
   useEffect(() => {
-    if (abTestBannerPage === null) {
+    if (localStorage.getItem("abTestBannerPage") === null) {
       fetch(`/api/v2/merchant/ab_test_banner_page?shop=${shopAndHost.shop}`, {
         method: "GET",
         headers: {
@@ -38,13 +37,16 @@ const ABTestBanner = () => {
           return response.json();
         })
         .then((data) => {
-          reduxDispatch(setABTestBannerPage(data.page));
+          setAbTestBannerPage(data.page);
+          localStorage.setItem("abTestBannerPage", data.page);
         })
         .catch((error) => {
           console.log("error", error);
         });
+    } else {
+      setAbTestBannerPage(localStorage.getItem("abTestBannerPage"));
     }
-  }, [abTestBannerPage]);
+  }, []);
 
   const handleOnClickBanner = () => {
     fetch(`/api/v2/merchant/ab_test_banner_click?shop=${shopAndHost.shop}`, {
