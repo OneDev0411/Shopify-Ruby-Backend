@@ -185,7 +185,7 @@ export function FirstTab(props) {
         props.updateInitialVariants(offer.included_variants);
         var responseCount = 0;
         const promises = selectedProducts.map((productId) =>
-            fetch(`/api/v2/merchant/products/multi/${productId}?shop_id=${props.shop.shop_id}&shop=${shopAndHost.shop}`, {
+            fetch(`/api/v2/merchant/products/multi/${productId}?shop_id=${shopSettings.shop_id}&shop=${shopAndHost.shop}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
