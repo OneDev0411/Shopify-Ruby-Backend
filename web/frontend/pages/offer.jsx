@@ -13,12 +13,13 @@ import ModalChoosePlan from '../components/modal_ChoosePlan';
 import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatusSlice';
 import { fetchShopData } from "../services/actions/shop";
 import {useShopState} from "../contexts/ShopContext.jsx";
-import PageContainer from '../components/PageContainer';
+import ABTestBanner from '../components/ABTestBanner';
 
 export default function Offers() {
   const shopAndHost = useSelector(state => state.shopAndHost);
   const navigateTo = useNavigate();
   const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
+  const [planName, setPlanName] = useState();
   const [error, setError] = useState(null);
   const { hasOffers, setHasOffers } = useShopState();
   const reduxDispatch = useDispatch();
@@ -26,6 +27,7 @@ export default function Offers() {
   useEffect(() => {
     fetchShopData(shopAndHost.shop)
       .then((data) => {
+        setPlanName(data.plan);
         setHasOffers(data.has_offers);
         reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
       })
@@ -45,7 +47,7 @@ export default function Offers() {
       <>
         { isSubscriptionUnpaid && <ModalChoosePlan /> }
         <div className="min-height-container">
-          <PageContainer fullWidth showABTestBanner>
+          <Page fullWidth>
             {hasOffers ? (
               <CustomTitleBar
                 image={AddProductMajor}
@@ -60,6 +62,7 @@ export default function Offers() {
               />
             )}
             <Layout>
+              <ABTestBanner planName={planName} />
               <Layout.Section>
                 <div style={{marginTop: '54px'}}>
                   <OffersList pageSize={20}/>
@@ -67,7 +70,7 @@ export default function Offers() {
               </Layout.Section>
             </Layout>
             <div className="space-10"></div>
-          </PageContainer>
+          </Page>
         </div>
       </>
     );

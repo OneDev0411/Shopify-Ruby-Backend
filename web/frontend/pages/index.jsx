@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {useDispatch, useSelector} from 'react-redux';
-import {Link, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 import { Banner, Grid, Layout, Page, Spinner} from "@shopify/polaris";
 
@@ -20,7 +20,7 @@ import ErrorPage from "../components/ErrorPage.jsx"
 import ModalChoosePlan from "../components/modal_ChoosePlan.jsx";
 import { setIsSubscriptionUnpaid } from "../store/reducers/subscriptionPaidStatusSlice.js";
 import {useShopState} from "../contexts/ShopContext.jsx";
-import PageContainer from "../components/PageContainer.jsx";
+import ABTestBanner from "../components/ABTestBanner.jsx";
 
 export default function HomePage() {
   const app = useAppBridge();
@@ -93,7 +93,7 @@ export default function HomePage() {
   if (error) { return < ErrorPage showBranding={true} />; }
 
   return (
-    <PageContainer showABTestBanner>
+    <Page>
       {isLoading ? (
         <div
           style={{
@@ -131,14 +131,7 @@ export default function HomePage() {
               />
             )}
 
-            {planName ==='free' && (
-              <Layout.Section>
-                <Banner status="info">
-                  <p>You are currently on the free plan and only one offer can be published at a time. <Link
-                    to="/subscription">Click here</Link> to see the features available or to upgrade your plan</p>
-                </Banner>
-              </Layout.Section>
-            )}
+              <ABTestBanner planName={planName} />
               <Layout.Section>
                 <OffersList />
                 {hasOffers && (
@@ -156,6 +149,6 @@ export default function HomePage() {
           <div className="space-10"></div>
         </>
     )}
-    </PageContainer>
+    </Page>
   );
 };
