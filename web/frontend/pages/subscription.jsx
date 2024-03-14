@@ -12,13 +12,13 @@ import { useSelector } from 'react-redux';
 import { useEffect, useState, useCallback } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import { isSubscriptionActive } from "../services/actions/subscription";
+import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function Subscription() {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [currentSubscription, setCurrentSubscription] = useState(null);
-    const [planName, setPlanName] = useState();
-    const [trialDays, setTrialDays] = useState();
+    const { planName, setPlanName, trialDays, setTrialDays } = useShopState()
     const [activeOffersCount, setActiveOffersCount] = useState();
     const [unpublishedOfferIds, setUnpublishedOfferIds] = useState();
     const app = useAppBridge();

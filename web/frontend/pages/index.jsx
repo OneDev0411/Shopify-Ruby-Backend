@@ -18,18 +18,14 @@ import { CHAT_APP_ID } from "../assets/index.js";
 
 import ModalChoosePlan from "../components/modal_ChoosePlan.jsx";
 import { setIsSubscriptionUnpaid } from "../store/reducers/subscriptionPaidStatusSlice.js";
+import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function HomePage() {
   const app = useAppBridge();
   const shopAndHost = useSelector(state => state.shopAndHost);
   const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
-  const fetch = useAuthenticatedFetch(shopAndHost.host);
   const reduxDispatch = useDispatch();
-
-  const [currentShop, setCurrentShop] = useState(null);
-  const [planName, setPlanName] = useState();
-  const [trialDays, setTrialDays] = useState();
-  const [hasOffers, setHasOffers] = useState();
+  const { shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers } = useShopState()
   const [themeAppExtension, setThemeAppExtension] = useState();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -71,7 +67,7 @@ export default function HomePage() {
       } else {
         setHasOffers(data.has_offers);
         setThemeAppExtension(data.theme_app_extension);
-        setCurrentShop(data.shop);
+        setShop(data.shop);
         setPlanName(data.plan);
         setTrialDays(data.days_remaining_in_trial);
         reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
@@ -113,7 +109,7 @@ export default function HomePage() {
             handleButtonClick={handleOpenOfferPage}
           />
           <Layout>
-            {isSubscriptionActive(currentShop?.subscription) && planName!=='free' && trialDays>0 &&
+            {isSubscriptionActive(shop?.subscription) && planName!=='free' && trialDays>0 &&
               <Layout.Section>
                 <Banner status="info">
                   <p>{ trialDays } days remaining for the trial period</p>
@@ -123,7 +119,7 @@ export default function HomePage() {
 
             {!isLegacy && (
               <ThemeAppCard
-                shopData={currentShop}
+                shopData={shop}
                 themeAppExtension={themeAppExtension}
               />
             )}
