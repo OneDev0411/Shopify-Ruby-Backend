@@ -131,7 +131,11 @@ export default function HomePage() {
               />
             )}
 
-              <ABTestBanner planName={planName} />
+              {planName === "free" && (
+                <Layout.Section>
+                  <ABTestBanner />
+                </Layout.Section>
+              )}
               <Layout.Section>
                 <OffersList />
                 {hasOffers && (

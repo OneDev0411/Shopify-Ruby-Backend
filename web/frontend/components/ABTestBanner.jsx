@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Banner, Layout } from "@shopify/polaris";
+import { Banner } from "@shopify/polaris";
 
 import { useAuthenticatedFetch } from "../hooks";
 
-const ABTestBanner = ({ planName }) => {
+const ABTestBanner = () => {
   const navigateTo = useNavigate();
   const location = useLocation();
   const shopAndHost = useSelector((state) => state.shopAndHost);
@@ -14,9 +14,6 @@ const ABTestBanner = ({ planName }) => {
   const [abTestBannerPage, setAbTestBannerPage] = useState(null);
 
   const openBanner = () => {
-    if (planName !=='free') {
-      return false;
-    }
     if (location.pathname === "/" && abTestBannerPage === "dashboard") {
       return true;
     }
@@ -39,8 +36,10 @@ const ABTestBanner = ({ planName }) => {
           return response.json();
         })
         .then((data) => {
-          setAbTestBannerPage(data.page);
-          localStorage.setItem("abTestBannerPage", data.page);
+          if (data.page !== "") {
+            setAbTestBannerPage(data.page);
+            localStorage.setItem("abTestBannerPage", data.page);
+          }
         })
         .catch((error) => {
           console.log("error", error);
@@ -68,18 +67,16 @@ const ABTestBanner = ({ planName }) => {
   return (
     <>
       {openBanner() && (
-        <Layout.Section>
-          <Banner status="info">
-            <p>
-              You are currently on the free plan and only one offer can be
-              published at a time.
-              <a href="#" onClick={handleOnClickBanner}>
-                Click here
-              </a>{" "}
-              to see the features available or to upgrade your plan
-            </p>
-          </Banner>
-        </Layout.Section>
+        <Banner status="info">
+          <p>
+            You are currently on the free plan and only one offer can be
+            published at a time.
+            <a href="#" onClick={handleOnClickBanner}>
+              Click here
+            </a>{" "}
+            to see the features available or to upgrade your plan
+          </p>
+        </Banner>
       )}
     </>
   );

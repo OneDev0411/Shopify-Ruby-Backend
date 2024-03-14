@@ -62,7 +62,11 @@ export default function Offers() {
               />
             )}
             <Layout>
-              <ABTestBanner planName={planName} />
+              {planName === "free" && (
+                <Layout.Section>
+                  <ABTestBanner />
+                </Layout.Section>
+              )}
               <Layout.Section>
                 <div style={{marginTop: '54px'}}>
                   <OffersList pageSize={20}/>
