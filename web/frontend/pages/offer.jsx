@@ -47,7 +47,7 @@ export default function Offers() {
       <>
         { isSubscriptionUnpaid && <ModalChoosePlan /> }
         <div className="min-height-container">
-          <Page fullWidth>
+          <Page>
             {hasOffers ? (
               <CustomTitleBar
                 image={AddProductMajor}
