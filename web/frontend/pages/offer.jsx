@@ -11,14 +11,14 @@ import {useAuthenticatedFetch} from "../hooks";
 import ModalChoosePlan from '../components/modal_ChoosePlan';
 import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatusSlice';
 import { fetchShopData } from "../services/actions/shop";
+import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function Offers() {
   const shopAndHost = useSelector(state => state.shopAndHost);
-  const fetch = useAuthenticatedFetch(shopAndHost.host);
   const navigateTo = useNavigate();
   const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
 
-  const [hasOffers, setHasOffers] = useState();
+  const { hasOffers, setHasOffers } = useShopState();
   const reduxDispatch = useDispatch();
 
   useEffect(() => {
