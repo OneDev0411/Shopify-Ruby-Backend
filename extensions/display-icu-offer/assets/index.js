@@ -257,7 +257,7 @@
         let pageRulesResults = [];
 
         if (offer?.rules) {
-            for (let rule of offer?.rules) {
+            for (let rule of offer.rules) {
                 let ruleResult = await pageSatisfiesRule(rule);
                 pageRulesResults.push(ruleResult);
             }
@@ -282,7 +282,7 @@
         let cartRulesResults = [];
 
         if (offer?.rules) {
-            for (let rule of offer?.rules) {
+            for (let rule of offer.rules) {
                 let ruleResult = await cartSatisfiesRule(rule);
                 cartRulesResults.push(ruleResult);
             }
