@@ -83,7 +83,7 @@ export default function HomePage() {
       .catch((error) => {
         console.log("error", error);
       })
-  }, [setCurrentShop, setPlanName, setTrialDays, reduxDispatch])
+  }, [setShop, setPlanName, setTrialDays, reduxDispatch])
 
   return (
     <Page>
