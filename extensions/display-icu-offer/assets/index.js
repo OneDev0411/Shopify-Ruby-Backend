@@ -10,7 +10,6 @@
     let cFields = [];
     let customerTags = [];
     let cartTotalPrice = 0.0;
-    let in_collection_page = false;
     let collections = [];
     let customerCountryCode = '';
     let isAnAjaxCall = false;
@@ -88,7 +87,7 @@
     const pageSatisfiesOfferConditions = async () => {
         return (!isOfferDismissed() &&
           !(offer.stop_showing_after_accepted && isOfferAlreadyAccepted() && await doesCartContainOffer()) &&
-          ((offer.in_cart_page && isCartPage()) || (offer.in_product_page && isProductPage()) || (in_collection_page && isCollectionsPage())))
+          ((offer.in_cart_page && isCartPage()) || (offer.in_product_page && isProductPage())))
     }
 
     const pageSatisfiesRule = async (rule) => {
@@ -152,18 +151,12 @@
     const visibleOnProductOrColRule = async (itemType, itemShopifyID, isEqualRule) => {
         let isVisible = false;
 
-        if (itemType === 'product' && isProductPage()) {
-
+        if (itemType === 'product') {
             let currentProductID = await currentProductPageProductID();
             isVisible = itemShopifyID === currentProductID
-
-        } else if (itemType === 'collection' && isCollectionsPage()) {
-            in_collection_page = true;
+        } else if (itemType === 'collection') {
             await getCollection();
-
-            let pathName = window.location.pathname.replace('/collections/', '');
-
-            isVisible = collections.some(col => col.handle === pathName);
+            isVisible = collections.some(col => col.collects_json.includes(currentProductID));
         }
 
         return isEqualRule ? isVisible : !isVisible;
@@ -572,8 +565,7 @@
                     if (!offerOnPage) {
                         if (
                           (offer.in_product_page && isProductPage()) ||
-                          (offer.in_cart_page && isCartPage()) ||
-                          (in_collection_page && isCollectionsPage())
+                          (offer.in_cart_page && isCartPage())
                         ) {
                             await createOffer();
                         }
@@ -582,10 +574,6 @@
                     if (off.in_ajax_cart && !ajaxOfferOnPage) {
                         await createAjaxOffer();
                     }
-
-                    in_collection_page = false;
-
-
                 }
             }
         }
@@ -664,8 +652,7 @@
 
                               if (
                                 (offer.in_product_page && isProductPage()) ||
-                                (offer.in_cart_page && isCartPage()) ||
-                                (in_collection_page && isCollectionsPage())
+                                (offer.in_cart_page && isCartPage())
                               ) {
                                   await createOffer();
                               }
@@ -680,13 +667,81 @@
                               }
 
                               trackEvent('show', offer.id);
-                              in_collection_page = false;
                           }
                       } else if (off.remove_if_no_longer_valid) {
                           offersToRemoveFromCart.push(off);
                       }
 
                   }
+
+                  if (Shopify.designMode) {
+                      let offers_for_product_pages = data.offers.filter( off => off.in_product_page).length;
+                      let offers_for_cart_page =  data.offers.filter( off => off.in_cart_page).length;
+
+                      if ((offers_for_product_pages === 0 && isProductPage()) || (offers_for_cart_page === 0 && isCartPage())) {
+                          offer = {
+                              theme: 'custom',
+                              show_product_image: true,
+                              multi_layout: 'stack',
+                              id: 1,
+                              css_options: {
+                                  main: {
+                                      color: "#2B3D51",
+                                      backgroundColor: "#ECF0F1",
+                                      marginTop: '0px',
+                                      marginBottom: '0px',
+                                      borderStyle: 'none',
+                                      borderWidth: 0,
+                                      borderRadius: 0,
+                                  },
+                                  text: {
+                                      fontFamily: "Arial",
+                                      fontSize: '16px',
+                                  },
+                                  button: {
+                                      color: "#FFFFFF",
+                                      backgroundColor: "#2B3D51",
+                                      fontFamily: "Arial",
+                                      fontSize: "16px",
+                                      borderRadius: 0,
+                                  },
+                              },
+                              show_product_price: true,
+                              show_nothanks: false,
+                              text_a: 'Would you like to add a Test Product?',
+                              link_to_product: false,
+                              show_compare_at_price: false,
+                              offerable_product_shopify_ids: [],
+                              show_quantity_selector: true,
+                              show_spinner: false,
+                              cta_a: 'Add to Cart',
+                              shop: {
+                                  path_to_cart: '/'
+                              },
+                              offerable_product_details: [
+                                  {
+                                      id: 1,
+                                      title: 'Test Product',
+                                      medium_image_url: 'in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/billing-ICU-Logo-Small.png',
+                                      available_json_variants: [
+                                          {
+                                              unparenthesized_price: '$99.99',
+                                              currencies: [
+                                                  {
+                                                      label: 'USD',
+                                                      price: '99.99',
+                                                      compare_at_price: '99.99'
+                                                  }
+                                              ]
+                                          }
+                                      ]
+                                  }
+                              ]
+                          }
+                          await createOffer();
+                      }
+                  }
+
 
                   removeInvalidOffers(offersToRemoveFromCart);
               }
@@ -866,7 +921,8 @@
 
     const createContainer = (addAjax) => {
         const nudgeContainer = document.createElement('div');
-        nudgeContainer.className = `nudge-offer ${offer.theme} ${offer.show_product_image ? 'with-image' : ''} multi ${offer.multi_layout} ${offer.extra_css_classes || ''}`;
+        nudgeContainer.className = `nudge-offer ${offer.theme} ${offer.show_product_image ? 'with-image' : ''} 
+        multi ${offer.multi_layout} ${offer.extra_css_classes || ''} ${Shopify.designMode ? 'preview-stack': ''}`;
         nudgeContainer.id = `${addAjax ? 'nudge-ajax-' : '' }nudge-offer-${offer.id}`;
 
         createContainerCSS(nudgeContainer);
@@ -953,7 +1009,7 @@
 
     const replaceLiquidOfferTag = (offer_text, offerTitle) => {
         let productID = offer.offerable_product_shopify_ids[0];
-        let productFound = offer.offerable_product_details.find(prod => prod.id === productID);
+        let productFound = offer.offerable_product_details?.find(prod => prod.id === productID);
 
         if (productFound) {
             offer_text = offer_text.replace('{{ product_title }}', productFound.title);
@@ -1017,7 +1073,13 @@
             createProductInfoElements(parentWrapper, addAjax);
         }
 
-        parentWrapper.appendChild(createAddToCart(addAjax));
+        if (offer.multi_layout !== 'compact') {
+            let detailsContainer = parentWrapper.querySelector('.details');
+
+            if (detailsContainer) detailsContainer.appendChild(createAddToCart(addAjax))
+        } else {
+            parentWrapper.appendChild(createAddToCart(addAjax));
+        }
 
         variantsContainer.appendChild(parentWrapper);
     }
@@ -1290,7 +1352,12 @@
         cartButton.type = 'submit';
         cartButton.name = 'add';
         cartButton.className = 'bttn product-price';
-        cartButton.onclick =  async (e) => await addToCart(e);
+
+        if (Shopify.designMode) {
+            cartButton.onclick =  (e) => e.preventDefault();
+        } else {
+            cartButton.onclick =  async (e) => await addToCart(e);
+        }
 
         createCtaCSS(cartButton);
 

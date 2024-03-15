@@ -73,10 +73,10 @@ export default function HomePage() {
         setPlanName(data.plan);
         setTrialDays(data.days_remaining_in_trial);
         reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
-
-          if (data.theme_app_extension) {
-            setIsLegacy(data.theme_app_extension.theme_version === "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
-          }
+        
+        if (data.theme_app_extension) {
+          setIsLegacy(data.theme_app_extension.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
+        }
 
           // notify intercom as soon as app is loaded and shop info is fetched
           notifyIntercom(data.shop);
@@ -123,13 +123,6 @@ export default function HomePage() {
               </Layout.Section>
             }
 
-            {!isLegacy && (
-              <ThemeAppCard
-                shopData={shop}
-                themeAppExtension={themeAppExtension}
-              />
-            )}
-
             {planName ==='free' && (
               <Layout.Section>
                 <Banner status="info">
@@ -138,6 +131,14 @@ export default function HomePage() {
                 </Banner>
               </Layout.Section>
             )}
+
+            {!isLegacy && (
+              <ThemeAppCard
+                shopData={currentShop}
+                themeAppExtension={themeAppExtension}
+              />
+            )}
+
               <Layout.Section>
                 <OffersList />
                 {hasOffers && (
