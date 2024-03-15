@@ -13,6 +13,7 @@ import '@shopify/polaris-viz/build/esm/styles.css';
 import { Redirect } from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 
+
 export function TotalSalesData(props) {
     const app = useAppBridge();
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -20,7 +21,6 @@ export function TotalSalesData(props) {
     const [salesTotal, setSalesTotal] = useState(0);
     const [salesData, setSalesData] = useState(0);
     const [loading, setLoading] = useState(false);
-
     function getSalesData(period) {
         let redirect = Redirect.create(app);
         if(loading) return;
@@ -41,9 +41,11 @@ export function TotalSalesData(props) {
                 setSalesData(data.sales_stats.results);
                 }})
             .catch((error) => {
-                console.log("error", error);
+                if (props.onError) {
+                    props.onError(error);
+                }
             }).finally(() => {
-                setLoading(false)
+                setLoading(false);
             })
     }
 
@@ -96,7 +98,6 @@ export function ConversionRate(props) {
     const [reachedCheckout, setReachedCheckout] = useState(0);
     const [converted, setConverted] = useState(0);
     const [totalDisplayed, setTotalDisplayed] = useState(0);
-
     function getOffersStats(endpointUrl, period, callback) {
         fetch(endpointUrl, {
             method: 'POST',
@@ -110,7 +111,9 @@ export function ConversionRate(props) {
                 callback(data)
             })
             .catch((error) => {
-                console.log("error", error);
+                if (props.onError) {
+                    props.onError(error);
+                }
             })
     }
 
@@ -181,7 +184,6 @@ export function OrderOverTimeData(props) {
     const [ordersTotal, setOrdersTotal] = useState(0);
     const [ordersData, setOrdersData] = useState(null);
     const [loading, setLoading] = useState(false); 
-
     function getOrdersData(period) {
         let redirect = Redirect.create(app);
         if(loading) return;
@@ -202,7 +204,9 @@ export function OrderOverTimeData(props) {
                 setOrdersData(data.orders_stats.results)
             }})
             .catch((error) => {
-                console.log("error", error);
+                if (props.onError) {
+                    props.onError(error);
+                }
             }).finally(() => {
                 setLoading(false)
             })
@@ -211,6 +215,7 @@ export function OrderOverTimeData(props) {
     useEffect(() => {
         getOrdersData(props.period);
     }, [props.period])
+
 
     return (
         <PolarisVizProvider
@@ -272,13 +277,16 @@ export function TopPerformingOffersData(props) {
                 setOffersData(data.offers);
             }})
             .catch((error) => {
-                console.log("error", error);
+                if (props.onError) {
+                    props.onError(error);
+                }
             })
     }
 
     useEffect(() => {
         getOffersData(props.period);
     }, [props.period])
+
 
     return (
         <PolarisVizProvider
@@ -323,7 +331,6 @@ export function AbTestingData(props) {
     const [salesTotal, setSalesTotal] = useState(0);
     const [salesData, setSalesData] = useState(0);
     const [loading, setLoading] = useState(false);
-
     function getSalesData(period) {
         let redirect = Redirect.create(app);
         if(loading) return;
@@ -345,7 +352,9 @@ export function AbTestingData(props) {
                 setSalesData(data.sales_stats.results);
             }})
             .catch((error) => {
-                console.log("error", error);
+                if (props.onError) {
+                    props.onError(error);
+                }
             }).finally(() => {
                 setLoading(false)
             })
@@ -354,6 +363,7 @@ export function AbTestingData(props) {
     useEffect(() => {
         getSalesData(props.period);
     }, [props.period])
+
 
     return (
         <PolarisVizProvider
@@ -420,7 +430,9 @@ export function ClickThroughtRateData(props) {
                 setClicksData(data.clicks_stats.results)
             }})
             .catch((error) => {
-                console.log("error", error);
+                if (props.onError) {
+                    props.onError(error);
+                }
             }).finally(() => {
                 setLoading(false)
             })

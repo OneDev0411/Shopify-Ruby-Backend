@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import { useState, useCallback } from 'react';
-import { Page ,Grid, Select } from '@shopify/polaris';
+import { Page ,Grid, Select, Banner } from '@shopify/polaris';
 import { AnalyticsMinor } from '@shopify/polaris-icons';
 import { GenericFooter } from '../components/GenericFooter';
 import { DateRangeOptions } from '../shared/constants/AnalyticsOptions';
@@ -26,10 +26,21 @@ export default function AnalyticsOffers() {
       (state) => state.subscriptionPaidStatus.isSubscriptionUnpaid
     );
     const reduxDispatch = useDispatch();
+    const [error, setError] = useState(null);
+    const [showBanner, setShowBanner] = useState(false); 
     const setTimePeriod = useCallback((val) => {
       setPeriod(val)
     },[]);
 
+    const handleDismiss = () => {
+      setError(null);
+      setShowBanner(false);
+    };
+
+    const handleError = () => {
+      setError('Some of your analytics data failed to load, so your stats may not be complete.');
+      setShowBanner(true);
+    };
     useEffect(() => {
       // in case of page refresh
       if (isSubscriptionUnpaid === null) {
@@ -52,7 +63,12 @@ export default function AnalyticsOffers() {
     return (
       <Page>
         { isSubscriptionUnpaid && <ModalChoosePlan /> }
-         <CustomTitleBar title='Analytics' icon={AnalyticsMinor} />  
+         <CustomTitleBar title='Analytics' icon={AnalyticsMinor} />
+          { error && showBanner && (
+            <Banner title="Data Failed To Load" onDismiss={(handleDismiss)}>
+              <p> {error} </p>
+            </Banner>
+          )}
         <div className="space-10"></div>
         <Grid>
           <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
@@ -68,16 +84,16 @@ export default function AnalyticsOffers() {
         <div id={"graphs"}>
           <Grid>
             <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 4, xl: 4 }}>
-              <TotalSalesData period={period}/>
-              <AbTestingData period={period} />
+              <TotalSalesData period={period} onError={handleError}/>
+              <AbTestingData period={period} onError={handleError}/>
             </Grid.Cell>
             <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 4, xl: 4 }}>
-              <ConversionRate period={period}/>
-              <ClickThroughtRateData period={period} />
+              <ConversionRate period={period} onError={handleError}/>
+              <ClickThroughtRateData period={period} onError={handleError} />
             </Grid.Cell>
             <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 4, xl: 4 }}>
-              <OrderOverTimeData period={period}/>
-              <TopPerformingOffersData period={period} />
+              <OrderOverTimeData period={period} onError={handleError}/>
+              <TopPerformingOffersData period={period} onError={handleError} />
             </Grid.Cell>
           </Grid>
         </div>

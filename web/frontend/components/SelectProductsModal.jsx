@@ -2,6 +2,7 @@ import { useState, useEffect, memo } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalAddProduct } from './modal_AddProduct';
 import { useAuthenticatedFetch } from "../hooks";
+import ErrorPage from "../components/ErrorPage"
 
 export function SelectProductsModal(props) {
   const shopAndHost = useSelector(state => state.shopAndHost);
@@ -10,6 +11,7 @@ export function SelectProductsModal(props) {
   const [productData, setProductData] = useState([]);
   const [resourceListLoading, setResourceListLoading] = useState(true);
   const [query, setQuery] = useState("");
+  const [error, setError] = useState(null);
 
   function updateQuery(childData) {
     setResourceListLoading(true);
@@ -31,6 +33,7 @@ export function SelectProductsModal(props) {
         setResourceListLoading(false);
       })
       .catch((error) => {
+        setError(error);
         console.log("Error > ", error);
       })
 
@@ -58,6 +61,7 @@ export function SelectProductsModal(props) {
         return data
       })
       .catch((error) => {
+        setError(error);
         console.log("# Error getProducts > ", JSON.stringify(error));
       })
   }
@@ -76,6 +80,8 @@ export function SelectProductsModal(props) {
   useEffect(() => {
       getProducts();
   }, []);
+
+  // if (error) { return < ErrorPage />; }
 
   return (
     <>

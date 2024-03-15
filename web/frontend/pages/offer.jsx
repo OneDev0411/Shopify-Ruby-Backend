@@ -7,6 +7,7 @@ import {AddProductMajor} from '@shopify/polaris-icons';
 
 import {CustomTitleBar, OffersList} from '../components';
 import {useAuthenticatedFetch} from "../hooks";
+import ErrorPage from "../components/ErrorPage.jsx"
 
 import ModalChoosePlan from '../components/modal_ChoosePlan';
 import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatusSlice';
@@ -17,7 +18,7 @@ export default function Offers() {
   const shopAndHost = useSelector(state => state.shopAndHost);
   const navigateTo = useNavigate();
   const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
-
+  const [error, setError] = useState(null);
   const { hasOffers, setHasOffers } = useShopState();
   const reduxDispatch = useDispatch();
 
@@ -28,6 +29,7 @@ export default function Offers() {
         reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
       })
       .catch((error) => {
+        setError(error);
         console.log("error", error);
       })
   }, [setHasOffers]);
@@ -35,6 +37,8 @@ export default function Offers() {
     const handleOpenOfferPage = () => {
       navigateTo('/edit-offer', { state: { offerID: null } });
     }
+
+    if (error) { return < ErrorPage showBranding={true} />; }
 
     return (
       <>

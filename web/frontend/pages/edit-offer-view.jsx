@@ -17,6 +17,8 @@ import { OfferPreview } from "../components/OfferPreview";
 import { useAuthenticatedFetch } from "../hooks";
 import AbAnalytics from "../components/abAnalytics";
 import "../components/stylesheets/mainstyle.css";
+import { useAppBridge } from '@shopify/app-bridge-react'
+import { Toast } from '@shopify/app-bridge/actions';
 import {OfferContext} from "../contexts/OfferContext.jsx";
 import {useOffer} from "../hooks/useOffer.js";
 import {
@@ -26,9 +28,11 @@ import {
   OFFER_DRAFT,
   OFFER_PUBLISH
 } from "../shared/constants/EditOfferOptions.js";
+import ErrorPage from "../components/ErrorPage.jsx"
 
 const EditOfferView = () => {
   const { offer, setOffer, updateOffer } = useContext(OfferContext);
+  const app = useAppBridge();
   const { fetchOffer } = useOffer();
   const shopAndHost = useSelector((state) => state.shopAndHost);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,6 +44,8 @@ const EditOfferView = () => {
   const handleEditOffer = (offer_id) => {
     navigateTo('/edit-offer', { state: { offerID: offer_id } });
   }
+  const [error, setError] = useState(null);
+
 
   const toggleOfferActivation = async (activate) => {
 
@@ -57,7 +63,14 @@ const EditOfferView = () => {
         console.log("there was an issue deactivating the offer")
       }
     }).catch((error) => {
-      console.log('Error:', error);
+      const toastOptions = {
+        message: 'An error occurred. Please try again later.',
+        duration: 3000,
+        isError: true,
+      };
+      const toastError = Toast.create(app, toastOptions);
+      toastError.dispatch(Toast.Action.SHOW);
+      console.log("Error:", error);
     })
   }
 
@@ -75,7 +88,14 @@ const EditOfferView = () => {
         }
       })
       .catch((error) => {
-        console.error('An error occurred while making the API call:', error);
+        const toastOptions = {
+          message: 'An error occurred. Please try again later.',
+          duration: 3000,
+          isError: true,
+        };
+        const toastError = Toast.create(app, toastOptions);
+        toastError.dispatch(Toast.Action.SHOW);
+        console.log('An error occurred while making the API call:', error);
       })
   }
 
@@ -93,7 +113,14 @@ const EditOfferView = () => {
         }
       })
       .catch((error) => {
-        console.error('An error occurred while making the API call:', error);
+        const toastOptions = {
+          message: 'An error occurred. Please try again later.',
+          duration: 3000,
+          isError: true,
+        };
+        const toastError = Toast.create(app, toastOptions);
+        toastError.dispatch(Toast.Action.SHOW);
+        console.log('An error occurred while making the API call:', error);
       })
   }
 
@@ -113,10 +140,12 @@ const EditOfferView = () => {
           }
           updateCheckKeysValidity('cta', data.cta_a);
           setIsLoading(false);
-      })
-      .catch((error) => {
+        })
+        .catch((error) => {
+          setError(error);
+          setIsLoading(false);
           console.log("Error > ", error);
-      });
+        });
     }
 
     return function cleanup() {
@@ -129,6 +158,8 @@ const EditOfferView = () => {
         return {...previousState, [updatedKey]: updatedValue};
     });
   }
+  if (error) { return < ErrorPage/>; }
+
   return (
     <AppProvider i18n={[]}>
       <div className="page-space">

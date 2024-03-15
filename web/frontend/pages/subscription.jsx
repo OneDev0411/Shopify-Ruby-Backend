@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import { useEffect, useState, useCallback } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import { isSubscriptionActive } from "../services/actions/subscription";
+import ErrorPage from "../components/ErrorPage.jsx"
 import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function Subscription() {
@@ -23,6 +24,7 @@ export default function Subscription() {
     const [unpublishedOfferIds, setUnpublishedOfferIds] = useState();
     const app = useAppBridge();
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [isSubscriptionUnpaid, setIsSubscriptionUnpaid] = useState(false);
 
     async function handlePlanChange (internal_name) {
@@ -51,7 +53,14 @@ export default function Subscription() {
                 }
            })
            .catch((error) => {
-            console.log("error", error);
+            const toastOptions = {
+              message: 'An error occurred. Please try again later.',
+              duration: 3000,
+              isError: true,
+            };
+            const toastError = Toast.create(app, toastOptions);
+            toastError.dispatch(Toast.Action.SHOW);
+            console.log("Error:", error);
            })
     }
 
@@ -72,7 +81,8 @@ export default function Subscription() {
                 setIsSubscriptionUnpaid(data.subscription_not_paid)
            })
            .catch((error) => {
-            console.log("error", error);
+              setError(error);
+              console.log("error", error);
            })
       }, []);
 
@@ -80,6 +90,8 @@ export default function Subscription() {
         fetchSubscription();
       }, [fetchSubscription]);
     
+  if (error) { return < ErrorPage showBranding={true} />; }
+
   return (
     <Page>
         <CustomTitleBar title='Billing' icon={BillingStatementDollarMajor}/>

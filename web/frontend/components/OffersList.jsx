@@ -24,6 +24,7 @@ import {
 import {CreateOfferCard} from "./CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
+import ErrorPage from "../components/ErrorPage";
 
 export function OffersList({ pageSize }) {
   const app = useAppBridge();
@@ -33,6 +34,8 @@ export function OffersList({ pageSize }) {
   const [offersData, setOffersData] = useState([]);
   const [sortValue, setSortValue] = useState('today');
   const [filteredData, setFilteredData] = useState([]);
+  const [error, setError] = useState(null);
+
   const shopAndHost = useSelector(state => state.shopAndHost);
   const fetch = useAuthenticatedFetch(shopAndHost.host);
 
@@ -68,6 +71,7 @@ export function OffersList({ pageSize }) {
         setFilteredData(data.offers);
         setIsLoading(false);
       }}).catch((error) => {
+        setError(error);
         console.log('Fetch error >> ', error);
       });
   }, []);
@@ -228,6 +232,7 @@ export function OffersList({ pageSize }) {
             selectedResources.shift();
           })
         .catch(() => {
+          setError(error);
         })
       }
       else {
@@ -254,6 +259,7 @@ export function OffersList({ pageSize }) {
           selectedResources.shift();
         })
         .catch((error) => {
+          setError(error);
         })
     });
   }
@@ -269,14 +275,14 @@ export function OffersList({ pageSize }) {
         body: JSON.stringify({ offer: { offer_id: resource }, shop: shopAndHost.shop })
       })
         .then((response) => response.json())
-        .then((data) => {
+        .then(() => {
           const dataDup = [...offersData];
           dataDup.find((o) => o.id == resource).status = true;
-
           setOffersData([...dataDup]);
           selectedResources.shift();
         })
         .catch((error) => {
+          setError(error);
         })
     });
   }
@@ -300,6 +306,7 @@ export function OffersList({ pageSize }) {
           selectedResources.shift();
         })
         .catch((error) => {
+          setError(error);
         })
     });
   }
@@ -311,6 +318,8 @@ export function OffersList({ pageSize }) {
     navigateTo('/edit-offer-view', { state: { offerID: offer_id } });
   }
 
+  if (error) { return < ErrorPage showBranding={false} />; 
+}
   return (
     <div className="narrow-width-layout">
       {isLoading ? (

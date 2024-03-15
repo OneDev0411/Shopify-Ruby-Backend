@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, AppProvider, Text, Image, Grid, Link, Spinner } from '@shopify/polaris';
 import "../components/stylesheets/editOfferStyle.css";
 import { useAuthenticatedFetch } from '../hooks';
+import ErrorPage from "../components/ErrorPage.jsx"
 
 const Summary = (props) => {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -12,6 +13,8 @@ const Summary = (props) => {
     const [offerStats, setOfferStats] = useState({});
     const [converted, setConverted] = useState(0);
     const [totalDisplayed, setTotalDisplayed] = useState(0);
+    const [error, setError] = useState(null);
+
     const navigateTo = useNavigate();
 
     const handleViewAnalytics = () => {
@@ -33,6 +36,7 @@ const Summary = (props) => {
           setIsLoading(false);
         })
         .catch((error) => {
+          setError(error);
           console.log("error", error);
         });
     };
@@ -51,7 +55,8 @@ const Summary = (props) => {
                 setIsLoading(false);
             })
             .catch((error) => {
-                console.log("error", error);
+              setError(error);
+              console.log("error", error);
             });
     };
 
@@ -60,6 +65,8 @@ const Summary = (props) => {
       getOfferStats();
       getShopOffersStats('daily');
     }, [shopAndHost.shop]);
+
+    if (error) { return < ErrorPage/>; }
 
     return (
       <>

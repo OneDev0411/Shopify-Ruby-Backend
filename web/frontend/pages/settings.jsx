@@ -9,6 +9,8 @@ import {SETTINGS_DEFAULTS, useShopState} from "../contexts/ShopContext.jsx";
 import {useDispatch, useSelector} from 'react-redux';
 import { Redirect, Toast } from '@shopify/app-bridge/actions';
 import { Partners, SettingTabs, CustomTitleBar } from "../components";
+import { useAuthenticatedFetch } from "../hooks";
+import ErrorPage from "../components/ErrorPage.jsx"
 import ModalChoosePlan from '../components/modal_ChoosePlan'
 import { fetchShopData } from '../services/actions/shop';
 import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatusSlice';
@@ -20,6 +22,7 @@ export default function Settings() {
     const { shopSettings, setShopSettings, updateShopSettingsAttributes } = useShopState();
     const [formData, setFormData] = useState({});
     const app = useAppBridge();
+    const [error, setError] = useState(null);
 
     const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
     const reduxDispatch = useDispatch();
@@ -43,6 +46,7 @@ export default function Settings() {
                 })
             })
             .catch((error) => {
+                setError(error);
                 console.log("Error > ", error);
             })
     }, [])
@@ -97,7 +101,14 @@ export default function Settings() {
                 // window.location.reload();
             })
             .catch((error) => {
-                console.log("Error", error);
+                const toastOptions = {
+                    message: 'An error occurred. Please try again later.',
+                    duration: 3000,
+                    isError: true,
+                };
+                const toastError = Toast.create(app, toastOptions);
+                toastError.dispatch(Toast.Action.SHOW, toastOptions);
+                console.log("Error:", error);
             })
     }
 
@@ -131,6 +142,8 @@ export default function Settings() {
             return data
         });
     }
+
+    if (error) { return < ErrorPage showBranding={true} />; }
 
     return (
         <>

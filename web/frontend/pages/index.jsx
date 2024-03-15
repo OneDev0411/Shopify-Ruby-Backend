@@ -15,6 +15,7 @@ import {ThemeAppCard} from "../components/CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { CHAT_APP_ID } from "../assets/index.js";
+import ErrorPage from "../components/ErrorPage.jsx"
 
 import ModalChoosePlan from "../components/modal_ChoosePlan.jsx";
 import { setIsSubscriptionUnpaid } from "../store/reducers/subscriptionPaidStatusSlice.js";
@@ -28,6 +29,7 @@ export default function HomePage() {
   const { shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers } = useShopState()
   const [themeAppExtension, setThemeAppExtension] = useState();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const navigateTo = useNavigate();
   const [isLegacy, setIsLegacy] = useState(true);
@@ -72,18 +74,22 @@ export default function HomePage() {
         setTrialDays(data.days_remaining_in_trial);
         reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
 
-        if (data.theme_app_extension) {
-          setIsLegacy(data.theme_app_extension.theme_version === "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
-        }
+          if (data.theme_app_extension) {
+            setIsLegacy(data.theme_app_extension.theme_version === "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
+          }
 
-        // notify intercom as soon as app is loaded and shop info is fetched
-        notifyIntercom(data.shop);
-        setIsLoading(false);
+          // notify intercom as soon as app is loaded and shop info is fetched
+          notifyIntercom(data.shop);
+          setIsLoading(false);
       }})
       .catch((error) => {
-        console.log("error", error);
+        setError(error);
+        setIsLoading(false);
+        console.log("Error", error);
       })
   }, [setShop, setPlanName, setTrialDays, reduxDispatch])
+
+  if (error) { return < ErrorPage showBranding={true} />; }
 
   return (
     <Page>
