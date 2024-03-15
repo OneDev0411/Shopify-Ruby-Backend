@@ -9,7 +9,6 @@ import {SETTINGS_DEFAULTS, useShopState} from "../contexts/ShopContext.jsx";
 import {useDispatch, useSelector} from 'react-redux';
 import { Redirect, Toast } from '@shopify/app-bridge/actions';
 import { Partners, SettingTabs, CustomTitleBar } from "../components";
-import { useAuthenticatedFetch } from "../hooks";
 import ErrorPage from "../components/ErrorPage.jsx"
 import ModalChoosePlan from '../components/modal_ChoosePlan'
 import { fetchShopData } from '../services/actions/shop';
