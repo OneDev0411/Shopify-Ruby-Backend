@@ -212,12 +212,12 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
       <div className="leadin-card">
         <div style={{marginBottom: '11px'}} className="center-content">
           <Text variant="headingLg" as="h2" fontWeight="regular">
-            Add ICU to your stores theme
+            Enable In Cart Upsell & Cross-Sell in your theme editor.
           </Text>
         </div>
         <div style={{marginBottom: '35px'}} className="center-content">
           <Text variant="headingSm" as="p" fontWeight="regular" color="subdued">
-            Start by creating your first offer and publishing it to your store
+            In Cart Upsell & Cross-Sell uses App Blocks and App Embeds for ease of use, faster response times, and customization. Follow the steps below to get it all setup!
           </Text>
         </div>
         <div style={{marginBottom: '35px'}} className={"video-intro-section"}>
@@ -225,16 +225,19 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
           <div style={{marginBottom: '20px'}} className={"homepage-info"}>
             <Text variant="headingSm" as="p" fontWeight="regular" >
               <ol>
-                <li>Click on the button below to go to the theme settings</li>
-                <li>You should be on the {tab.title}</li>
-                <li>The app should already be added to the apps section</li>
-                { tab.title.includes('Embedded') ?
-                  <li>The app will already be enabled by clicking the button</li>
-                  :
-                  <li>Drag the app section into your preferred placement area</li>
-                }
-                <li>Click save</li>
-                <li>Return to ICU, you're done!</li>
+              {tab.title.includes('Ajax') ?
+                <>
+                  <li>Click on the <b>{tabs.buttonName}</b> button below, a new tab will open up, and the app block will be automatically added for you.</li>
+                  <li>
+                    You will see your current published offers or a placeholder offer, if you don't have any published offers on this page,
+                    to show you the widget position. If you are happy with it, skip to step 4.
+                  </li>
+                  <li>To readjust the placement of the widget, simply drag and drop the app block from the <b>menu on the left-hand side</b> of the theme editor.</li>
+                </>
+              :
+                <li>Click on the <b>Enable App Embed</b> button below, the embed will be automatically toggled on for you.</li>
+              }
+                <li>Click <b>save</b>, and close this tab to return to the app, you’re done!</li>
               </ol>
             </Text>
           </div>
@@ -244,17 +247,17 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
           <ButtonGroup>
             { !tab.title.includes('Embedded') ?
               <Button primary
-                      url={`https://${shopData?.shopify_domain}/admin/themes/current/editor?template=${tab.handle}&addAppBlockId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block&target=mainSection`}
+                      url={`https://${shopData?.shopify_domain}/admin/themes/current/editor?template=${tab.handle}&addAppBlockId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/${tab.panelID}&target=mainSection`}
                       target="_blank"
               >
-                Add to {tab.title}
+                {tab.buttonName}
               </Button>
               :
               <Button primary
-                      url={`https://${shopData?.shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/app_block_embed`}
+                      url={`https://${shopData?.shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/${tab.panelID}`}
                       target="_blank"
               >
-                Add to {tab.title}
+                {tab.buttonName}
               </Button>
             }
             <Button
@@ -279,34 +282,29 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
   const tabs = [
     {
       id: 'product-page-embed',
-      content: 'Product Page Extension',
+      content: 'Product Page',
       title: 'Product Page',
       showTab: !themeAppExtension?.product_block_added,
-      panelID: 'product-page-extension',
-      handle: 'product'
+      panelID: 'product_app_block',
+      handle: 'product',
+      buttonName: 'Add to Product Page'
     },
     {
       id: 'cart-page-embed',
-      content: 'Cart Page Extension',
+      content: 'Cart Page',
       title: 'Cart Page',
       showTab: !themeAppExtension?.cart_block_added,
-      panelID: 'cart-page-extension',
-      handle: 'cart'
+      panelID: 'cart_app_block',
+      handle: 'cart',
+      buttonName: 'Add to Cart Page'
     },
     {
       id: 'ajax-cart-embed',
-      content: 'Ajax Cart Extension',
+      content: 'Ajax Cart Page',
       title: 'Embedded Apps settings',
       showTab: !themeAppExtension?.theme_app_embed,
-      panelID: 'ajax-cart-extension',
-    },
-    {
-      id: 'collections-page-embed',
-      content: 'Collections Page Extension',
-      title: 'Collections Page',
-      showTab: !themeAppExtension?.collection_block_added,
-      panelID: 'collection-page-extension',
-      handle: 'collection'
+      panelID: 'ajax_cart_app_block',
+      buttonName: 'Enable App Embed'
     },
   ];
   const availableTabs = tabs.filter( tab => tab.showTab);
