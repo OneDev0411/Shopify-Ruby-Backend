@@ -14,10 +14,10 @@ const ABTestBanner = () => {
   const [abTestBannerPage, setAbTestBannerPage] = useState(null);
 
   const openBanner = () => {
-    if (location.pathname === "/" && abTestBannerPage === "dashboard") {
-      return true;
-    }
-    if (location.pathname.endsWith(abTestBannerPage)) {
+    if (
+      (location.pathname === "/" && abTestBannerPage === "dashboard") ||
+      location.pathname.endsWith(abTestBannerPage)
+    ) {
       return true;
     }
 
