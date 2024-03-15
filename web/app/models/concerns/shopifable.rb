@@ -746,7 +746,7 @@ module Shopifable
     end
 
     unless offers.find { |off|
-      !(off.rules_json.find { |rule| rule['item_type'] == 'collection' }).nil?
+      !(off.rules_json&.find { |rule| rule['item_type'] == 'collection' }).nil?
     }.nil?
       keys.push('templates/collection.json')
     end
