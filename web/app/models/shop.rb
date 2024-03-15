@@ -330,6 +330,29 @@ class Shop < ApplicationRecord
     end
   end
 
+  def ab_test_banner_page
+    redis_key = "ab_test_banner_page"
+    if $redis.hexists(redis_key, self.shopify_domain)
+      page = $redis.hget(redis_key, self.shopify_domain)
+    else
+      pages = ["offer", "dashboard"]
+      page = pages.sample
+      $redis.hset(redis_key, self.shopify_domain, page)
+    end
+
+    page
+  end
+
+  def ab_test_banner_click
+    ShopAction.create(
+      shop_id: self.id,
+      action_timestamp: Time.now.utc.to_i,
+      shopify_domain: self.shopify_domain,
+      action: 'click_on_ab_test_banner',
+      source: "icu-redesign_click_on_ab_test_banner_#{self.ab_test_banner_page}"
+    )
+  end
+
   def has_autopilot?
     if read_attribute(:has_autopilot) == true
       true

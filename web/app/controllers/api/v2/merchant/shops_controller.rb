@@ -232,6 +232,24 @@ module Api
           render json: { message: @icushop.enable_autopilot_status }
         end
 
+        # GET api/v2/merchant/ab_test_banner_page
+        def ab_test_banner_page
+          if @icushop.plan&.free_plan?
+            page = @icushop.ab_test_banner_page
+          else
+            page = ""
+          end
+          render json: { page: page }
+        end
+
+        # GET  api/v2/merchant/ab_test_banner_click
+        def ab_test_banner_click
+          if @icushop.plan&.free_plan?
+            @icushop.ab_test_banner_click
+          end
+          head :ok
+        end
+
         private
 
         def shop_params
