@@ -15,23 +15,21 @@ import {ThemeAppCard} from "../components/CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { CHAT_APP_ID } from "../assets/index.js";
+import ErrorPage from "../components/ErrorPage.jsx"
 
 import ModalChoosePlan from "../components/modal_ChoosePlan.jsx";
 import { setIsSubscriptionUnpaid } from "../store/reducers/subscriptionPaidStatusSlice.js";
+import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function HomePage() {
   const app = useAppBridge();
   const shopAndHost = useSelector(state => state.shopAndHost);
   const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
-  const fetch = useAuthenticatedFetch(shopAndHost.host);
   const reduxDispatch = useDispatch();
-
-  const [currentShop, setCurrentShop] = useState(null);
-  const [planName, setPlanName] = useState();
-  const [trialDays, setTrialDays] = useState();
-  const [hasOffers, setHasOffers] = useState();
+  const { shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers } = useShopState()
   const [themeAppExtension, setThemeAppExtension] = useState();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const navigateTo = useNavigate();
   const [isLegacy, setIsLegacy] = useState(true);
@@ -71,23 +69,27 @@ export default function HomePage() {
       } else {
         setHasOffers(data.has_offers);
         setThemeAppExtension(data.theme_app_extension);
-        setCurrentShop(data.shop);
+        setShop(data.shop);
         setPlanName(data.plan);
         setTrialDays(data.days_remaining_in_trial);
         reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
-
+        
         if (data.theme_app_extension) {
           setIsLegacy(data.theme_app_extension.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
         }
 
-        // notify intercom as soon as app is loaded and shop info is fetched
-        notifyIntercom(data.shop);
-        setIsLoading(false);
+          // notify intercom as soon as app is loaded and shop info is fetched
+          notifyIntercom(data.shop);
+          setIsLoading(false);
       }})
       .catch((error) => {
-        console.log("error", error);
+        setError(error);
+        setIsLoading(false);
+        console.log("Error", error);
       })
-  }, [setCurrentShop, setPlanName, setTrialDays, reduxDispatch])
+  }, [setShop, setPlanName, setTrialDays, reduxDispatch])
+
+  if (error) { return < ErrorPage showBranding={true} />; }
 
   return (
     <Page>
@@ -113,7 +115,7 @@ export default function HomePage() {
             handleButtonClick={handleOpenOfferPage}
           />
           <Layout>
-            {isSubscriptionActive(currentShop?.subscription) && planName!=='free' && trialDays>0 &&
+            {isSubscriptionActive(shop?.subscription) && planName!=='free' && trialDays>0 &&
               <Layout.Section>
                 <Banner status="info">
                   <p>{ trialDays } days remaining for the trial period</p>

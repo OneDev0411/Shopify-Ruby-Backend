@@ -5,6 +5,7 @@ import { SearchProductsList } from './SearchProductsList';
 import { countriesList } from "../components/countries.js";
 import { useAuthenticatedFetch } from "../hooks";
 import { CartItemOptions } from '../shared/constants/Others';
+import ErrorPage from "../components/ErrorPage";
 
 export function ModalAddConditions(props) {
   const shopAndHost = useSelector(state => state.shopAndHost);
@@ -14,6 +15,8 @@ export function ModalAddConditions(props) {
   const [productData, setProductData] = useState("");
   const [item, setItem] = useState("product");
   const [resourceListLoading, setResourceListLoading] = useState(false);
+  const [error, setError] = useState(null);
+
 
   function findProduct() {
     return (props.rule.rule_selector === 'cart_at_least' || props.rule.rule_selector === 'cart_at_most' || props.rule.rule_selector === 'cart_exactly' || props.rule.rule_selector === 'cart_does_not_contain' || props.rule.rule_selector === 'cart_contains_variant' || props.rule.rule_selector === 'cart_does_not_contain_variant' || props.rule.rule_selector === 'cart_contains_item_from_vendor' || props.rule.rule_selector === 'on_product_this_product_or_in_collection' || props.rule.rule_selector === 'on_product_not_this_product_or_not_in_collection')
@@ -50,6 +53,8 @@ export function ModalAddConditions(props) {
         setProductData(data);
       })
       .catch((error) => {
+        setError(error);
+        console.log("Error", error)
       })
   }
 
@@ -72,6 +77,8 @@ export function ModalAddConditions(props) {
     return names;
   }
 
+  if (error) { return <ErrorPage />; }
+  
   return (
     <>
       <LegacyStack distribution='fillEvenly'>

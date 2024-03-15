@@ -7,12 +7,15 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useAuthenticatedFetch } from "../hooks";
 import { PartnersSliderSettings } from '../shared/constants/PartnersSliderSettings';
+import ErrorPage from "../components/ErrorPage";
 
 export function Partners() {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [partners, setPartners] = useState(null);
+    const [error, setError] = useState(null);
+
     let slider;
 
     function next(){
@@ -34,6 +37,7 @@ export function Partners() {
         setPartners(data.partners);
        })
        .catch((error) => {
+        setError(error)
         console.log("error", error);
        })
      }, [])
@@ -45,6 +49,8 @@ export function Partners() {
     useEffect(() => {
       getAllPartners();
     }, [getAllPartners]);
+
+    // if (error) { return < ErrorPage />; }
 
     return(<>
       <LegacyCard sectioned title="Recommended Apps" id={"LegacyCardYpadding"}>

@@ -4,11 +4,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuthenticatedFetch } from '../hooks';
 import { ABTestingOptions } from '../shared/constants/Others';
+import ErrorPage from "../components/ErrorPage";
 
 const AbAnalytics = (props) => {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const [aAnalytics, setAAnalytics] = useState();
     const [bAnalytics, setBAnalytics] = useState();
+    const [error, setError] = useState(null);
+
     const fetch = useAuthenticatedFetch(shopAndHost.host);
 
     const getAbAnalytics = useCallback((offerId, shop, version, setRequiredState) => {
@@ -26,7 +29,8 @@ const AbAnalytics = (props) => {
             }
         })
         .catch((error) => {
-            console.error('An error occurred while making the API call:', error);
+            setError(error);
+            console.log('An error occurred while making the API call:', error);
         })
     }, []); 
 
@@ -34,6 +38,8 @@ const AbAnalytics = (props) => {
         getAbAnalytics(props.offerId, shopAndHost.shop, 'a', setAAnalytics)
         getAbAnalytics(props.offerId, shopAndHost.shop, 'b', setBAnalytics)
       },[]);
+
+      if (error) { return < ErrorPage />; }
 
     return (
       <>

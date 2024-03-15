@@ -3,6 +3,7 @@ import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from '@shopify/app-bridge-react';
 import { useSelector } from "react-redux";
 import { useAuthenticatedFetch } from "../hooks";
+import { Toast } from '@shopify/app-bridge/actions';
 
 const ConfirmFromOutside = () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -34,7 +35,14 @@ const ConfirmFromOutside = () => {
       }
      })
      .catch((error) => {
-      console.log("error", error);
+      const toastOptions = {
+        message: 'An error occurred. Please try again later.',
+        duration: 3000,
+        isError: true,
+      };
+      const toastError = Toast.create(app, toastOptions);
+      toastError.dispatch(Toast.Action.SHOW);
+      console.log("Error:", error);
      })
   }
 
