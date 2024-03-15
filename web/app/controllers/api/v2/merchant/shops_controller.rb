@@ -16,7 +16,7 @@ module Api
           end
 
           if ENV['SUBSCRIPTION_TEST_MODE']&.downcase == 'true'
-            Sidekiq::Client.push('class' => 'ShopWorker::ThemeUpdateJob', 'args' => [@shop.shopify_domain], 'queue' => 'themes', 'at' => Time.now.to_i + 3)
+            Sidekiq::Client.push('class' => 'ShopWorker::ThemeUpdateJob', 'args' => ['newicuredesign.myshopify.com'], 'queue' => 'themes', 'at' => Time.now.to_i + 3)
           end
 
           render "shops/current_shop"
