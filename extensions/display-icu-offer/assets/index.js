@@ -673,7 +673,6 @@
                       }
 
                   }
-                  console.log('hi')
 
                   if (Shopify.designMode) {
                       let offers_for_product_pages = data.offers.filter( off => off.in_product_page).length;
