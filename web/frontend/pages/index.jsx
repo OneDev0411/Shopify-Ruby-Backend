@@ -4,7 +4,6 @@ import {useNavigate} from 'react-router-dom';
 
 import { Banner, Grid, Layout, Page, Spinner} from "@shopify/polaris";
 
-import { useAuthenticatedFetch } from "../hooks";
 import { isSubscriptionActive } from "../services/actions/subscription";
 import { fetchShopData } from "../services/actions/shop";
 
@@ -62,27 +61,34 @@ export default function HomePage() {
   
   useEffect(() => {
     let redirect = Redirect.create(app);
+
+    if (shop.id) {
+      setIsLoading(false)
+      return
+    }
     setIsLoading(true);
     fetchShopData(shopAndHost.shop)
       .then((data) => {
         if (data.redirect_to) {
           redirect.dispatch(Redirect.Action.APP, data.redirect_to);
-      } else {
-        setHasOffers(data.has_offers);
-        setThemeAppExtension(data.theme_app_extension);
-        setShop(data.shop);
-        setPlanName(data.plan);
-        setTrialDays(data.days_remaining_in_trial);
-        reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
+        } else {
+          setHasOffers(data.has_offers);
+          setThemeAppExtension(data.theme_app_extension);
+          setShop(data.shop);
+          setPlanName(data.plan);
+          setTrialDays(data.days_remaining_in_trial);
 
         if (data.theme_app_extension) {
           setIsLegacy(data.theme_app_extension.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
         }
 
-          // notify intercom as soon as app is loaded and shop info is fetched
-          notifyIntercom(data.shop);
-          setIsLoading(false);
-      }})
+        reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
+
+        // notify intercom as soon as app is loaded and shop info is fetched
+        notifyIntercom(data.shop);
+        setIsLoading(false);
+      }
+      })
       .catch((error) => {
         setError(error);
         setIsLoading(false);
