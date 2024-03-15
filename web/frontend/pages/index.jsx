@@ -74,7 +74,7 @@ export default function HomePage() {
         setPlanName(data.plan);
         setTrialDays(data.days_remaining_in_trial);
         reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
-        
+
         if (data.theme_app_extension) {
           setIsLegacy(data.theme_app_extension.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
         }
@@ -132,7 +132,7 @@ export default function HomePage() {
 
               {!isLegacy && (
                 <ThemeAppCard
-                  shopData={currentShop}
+                  shopData={shop}
                   themeAppExtension={themeAppExtension}
                 />
               )}
