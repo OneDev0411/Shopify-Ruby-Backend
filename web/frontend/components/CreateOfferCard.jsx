@@ -229,8 +229,7 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
                 <>
                   <li>Click on the <b>{tabs.buttonName}</b> button below, a new tab will open up, and the app block will be automatically added for you.</li>
                   <li>
-                    You will see your current published offers or a placeholder offer, if you don't have any published offers on this page,
-                    to show you the widget position. If you are happy with it, skip to step 4.
+                    You will see the placement of any currently published offers, or if you don't have any published, a placeholder offer will show you the widget position. If you are happy with it, skip to step 4.
                   </li>
                   <li>To readjust the placement of the widget, simply drag and drop the app block from the <b>menu on the left-hand side</b> of the theme editor.</li>
                 </>
