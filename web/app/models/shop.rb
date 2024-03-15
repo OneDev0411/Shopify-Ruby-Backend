@@ -859,7 +859,8 @@ class Shop < ApplicationRecord
       shop_id: id,
       default_template_settings: default_template_settings,
       has_redirect_to_product: has_redirect_to_product?,
-      theme_version: theme_app_extension&.theme_version || ''
+      theme_version: theme_app_extension&.theme_version || '',
+      offers_limit_reached: offers_limit_reached?
     }
 
     admin ? std_settings.merge(admin_settings) : std_settings
@@ -1415,10 +1416,14 @@ class Shop < ApplicationRecord
   end
 
   def remove_cache_keys_for_uninstalled_shop
-    $redis_cache.del(*shopify_products_and_collections_ids)
+    ids = shopify_products_and_collections_ids
+
+    $redis_cache.del(*ids) unless ids.blank?
   end
 
   def store_cache_keys_on_reinstall
-    $redis_cache.mset(*shopify_products_and_collections_ids)
+    ids = shopify_products_and_collections_ids
+
+    $redis_cache.mset(*ids) unless ids.blank?
   end
 end

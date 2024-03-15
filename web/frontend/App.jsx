@@ -1,15 +1,15 @@
 import { BrowserRouter } from "react-router-dom";
 import { NavigationMenu } from "@shopify/app-bridge-react";
 import Routes from "./Routes";
-
 import {
   AppBridgeProvider,
   QueryProvider,
   PolarisProvider,
 } from "./components";
+import OfferProvider from "./contexts/OfferContext.jsx";
+import ShopProvider from "./contexts/ShopContext.jsx";
 import { intercomSettingsConfig } from "./assets";
 import { useEffect } from "react";
-import OfferProvider from "./OfferContext.jsx";
 
 export default function App() {
   // Any .tsx or .jsx files in /pages will become a route
@@ -53,9 +53,11 @@ export default function App() {
                 },
               ]}
             />
-          <OfferProvider>
-            <Routes pages={pages} />
-          </OfferProvider>
+            <ShopProvider>
+                <OfferProvider>
+                  <Routes pages={pages} />
+                </OfferProvider>
+            </ShopProvider>
           </QueryProvider>
         </AppBridgeProvider>
       </BrowserRouter>

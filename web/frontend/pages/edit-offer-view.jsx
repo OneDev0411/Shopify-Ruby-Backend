@@ -17,9 +17,9 @@ import { OfferPreview } from "../components/OfferPreview";
 import { useAuthenticatedFetch } from "../hooks";
 import AbAnalytics from "../components/abAnalytics";
 import "../components/stylesheets/mainstyle.css";
-import {OfferContext} from "../OfferContext.jsx";
 import { useAppBridge } from '@shopify/app-bridge-react'
 import { Toast } from '@shopify/app-bridge/actions';
+import {OfferContext} from "../contexts/OfferContext.jsx";
 import {useOffer} from "../hooks/useOffer.js";
 import {
   OFFER_ACTIVATE_URL,
@@ -60,7 +60,6 @@ const EditOfferView = () => {
         updateOffer("publish_status", activate ? OFFER_PUBLISH : OFFER_DRAFT)
         updateOffer("active", activate)
       } else {
-        // TODO: send out an error message here
         console.log("there was an issue deactivating the offer")
       }
     }).catch((error) => {
