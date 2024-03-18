@@ -19,15 +19,14 @@ export default function Offers() {
   const shopAndHost = useSelector(state => state.shopAndHost);
   const navigateTo = useNavigate();
   const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
-  const [planName, setPlanName] = useState();
   const [error, setError] = useState(null);
-  const { hasOffers, setHasOffers } = useShopState();
+  const { hasOffers, setHasOffers, shopSettings, updateShopSettingsAttributes } = useShopState();
   const reduxDispatch = useDispatch();
 
   useEffect(() => {
     fetchShopData(shopAndHost.shop)
       .then((data) => {
-        setPlanName(data.plan);
+        updateShopSettingsAttributes(data.offers_limit_reached, "offers_limit_reached");
         setHasOffers(data.has_offers);
         reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
       })
@@ -62,7 +61,7 @@ export default function Offers() {
               />
             )}
             <Layout>
-              {planName === "free" && (
+              {shopSettings?.offers_limit_reached && (
                 <Layout.Section>
                   <ABTestBanner />
                 </Layout.Section>
