@@ -27,7 +27,7 @@ export default function HomePage() {
   const shopAndHost = useSelector(state => state.shopAndHost);
   const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
   const reduxDispatch = useDispatch();
-  const { shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers } = useShopState()
+  const { shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers, shopSettings, updateShopSettingsAttributes } = useShopState()
   const [themeAppExtension, setThemeAppExtension] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -73,6 +73,7 @@ export default function HomePage() {
         setShop(data.shop);
         setPlanName(data.plan);
         setTrialDays(data.days_remaining_in_trial);
+        updateShopSettingsAttributes(data.offers_limit_reached, "offers_limit_reached");
         reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
         
         if (data.theme_app_extension) {
@@ -124,7 +125,7 @@ export default function HomePage() {
               </Layout.Section>
             }
 
-              {planName === "free" && (
+              {shopSettings?.offers_limit_reached && (
                 <Layout.Section>
                   <ABTestBanner />
                 </Layout.Section>
