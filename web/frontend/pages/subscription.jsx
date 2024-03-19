@@ -19,13 +19,12 @@ export default function Subscription() {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [currentSubscription, setCurrentSubscription] = useState(null);
-    const { planName, setPlanName, trialDays, setTrialDays } = useShopState()
+    const { planName, setPlanName, trialDays, setTrialDays, isSubscriptionUnpaid, setIsSubscriptionUnpaid } = useShopState()
     const [activeOffersCount, setActiveOffersCount] = useState();
     const [unpublishedOfferIds, setUnpublishedOfferIds] = useState();
     const app = useAppBridge();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [isSubscriptionUnpaid, setIsSubscriptionUnpaid] = useState(false);
 
     async function handlePlanChange (internal_name) {
         let redirect = Redirect.create(app);

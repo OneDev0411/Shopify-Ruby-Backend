@@ -3,7 +3,7 @@ import {
     SettingsMajor
 } from '@shopify/polaris-icons';
 import { useAppBridge } from '@shopify/app-bridge-react'
-import React, {useState, useEffect, useCallback, useContext} from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import { useAuthenticatedFetch, useShopSettings } from "../hooks";
 import {SETTINGS_DEFAULTS, useShopState} from "../contexts/ShopContext.jsx";
 import {useDispatch, useSelector} from 'react-redux';
@@ -12,7 +12,6 @@ import { Partners, SettingTabs, CustomTitleBar } from "../components";
 import ErrorPage from "../components/ErrorPage.jsx"
 import ModalChoosePlan from '../components/modal_ChoosePlan'
 import { fetchShopData } from '../services/actions/shop';
-import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatusSlice';
 
 export default function Settings() {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -23,8 +22,7 @@ export default function Settings() {
     const app = useAppBridge();
     const [error, setError] = useState(null);
 
-    const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
-    const reduxDispatch = useDispatch();
+    const { setIsSubscriptionUnpaid } = useShopState();
 
     useEffect(() => {
         fetchCurrentShop();
@@ -47,7 +45,7 @@ export default function Settings() {
                     ajaxDomSelector: data.shop_settings?.custom_ajax_dom_selector,
                     ajaxDomAction: data.shop_settings?.custom_ajax_dom_action,
                 })
-                reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
+                setIsSubscriptionUnpaid(data.subscription_not_paid)
             })
             .catch((error) => {
                 setError(error);
@@ -129,7 +127,7 @@ export default function Settings() {
     return (
         <>
             <Page>
-                { isSubscriptionUnpaid && <ModalChoosePlan /> }
+                <ModalChoosePlan />
                 <CustomTitleBar title='Settings' icon={SettingsMajor} buttonText='Save' handleButtonClick={handleSave} />
                 <LegacyCard sectioned>
                     {(shopSettings?.activated) ? (
