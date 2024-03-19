@@ -1,9 +1,11 @@
 import {useCallback, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal } from '@shopify/polaris';
+import {useShopState} from "../contexts/ShopContext.jsx";
 
 const ModalChoosePlan = () => {
   const navigateTo = useNavigate();
+  const { isSubscriptionUnpaid } = useShopState();
 
   useEffect(() => {
     const modalContent = document.getElementById('not-dismissable-modal');
@@ -27,7 +29,7 @@ const ModalChoosePlan = () => {
 
   return (
     <Modal
-      open={true}
+      open={isSubscriptionUnpaid}
       onClose={() => false}
       title="Choose Plan"
       primaryAction={{

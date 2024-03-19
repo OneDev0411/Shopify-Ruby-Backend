@@ -18,7 +18,7 @@ import ABTestBanner from '../components/ABTestBanner';
 export default function Offers() {
   const shopAndHost = useSelector(state => state.shopAndHost);
   const navigateTo = useNavigate();
-  const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
+  const { setIsSubscriptionUnpaid } = useShopState();
   const [error, setError] = useState(null);
   const { hasOffers, setHasOffers, shopSettings, updateShopSettingsAttributes } = useShopState();
   const reduxDispatch = useDispatch();
@@ -28,7 +28,7 @@ export default function Offers() {
       .then((data) => {
         updateShopSettingsAttributes(data.offers_limit_reached, "offers_limit_reached");
         setHasOffers(data.has_offers);
-        reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
+        setIsSubscriptionUnpaid(data.subscription_not_paid);
       })
       .catch((error) => {
         setError(error);
@@ -44,7 +44,7 @@ export default function Offers() {
 
     return (
       <>
-        { isSubscriptionUnpaid && <ModalChoosePlan /> }
+        <ModalChoosePlan />
         <div className="min-height-container">
           <Page>
             {hasOffers ? (

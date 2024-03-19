@@ -19,6 +19,7 @@ export default function ShopProvider({ children }) {
   const [hasOffers, setHasOffers] = useState();
   const [shopSettings, setShopSettings] = useState({...SETTINGS_DEFAULTS});
   const [themeAppExtension, setThemeAppExtension] = useState();
+  const [isSubscriptionUnpaid, setIsSubscriptionUnpaid] = useState(false);
 
   function updateShopSettingsAttributes(updatedValue, ...updatedKey) {
     if (updatedKey.length == 1) {
@@ -62,7 +63,9 @@ export default function ShopProvider({ children }) {
         shopSettings,
         setShopSettings,
         themeAppExtension,
-        setThemeAppExtension
+        setThemeAppExtension,
+        isSubscriptionUnpaid,
+        setIsSubscriptionUnpaid
       }}
     >
       {children}

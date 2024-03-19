@@ -10,15 +10,14 @@ import {
 import { HelpLinks } from "../shared/constants/HelpPageLinks";
 
 import ModalChoosePlan from '../components/modal_ChoosePlan';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { fetchShopData } from "../services/actions/shop";
-import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatusSlice';
+import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function HelpPage() {
     const [active, setActive] = useState(false);
     const shopAndHost = useSelector((state) => state.shopAndHost);
-    const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
-    const reduxDispatch = useDispatch();
+    const { isSubscriptionUnpaid, setIsSubscriptionUnpaid } = useShopState();
     const handleClose = useCallback(() => {
         setActive(false);
       }, []);
@@ -27,7 +26,7 @@ export default function HelpPage() {
         // in case of page refresh
         if (isSubscriptionUnpaid === null) {
             fetchShopData(shopAndHost.shop).then((data) => {
-                reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
+                setIsSubscriptionUnpaid(data.subscription_not_paid)
             });
         }
     }, [isSubscriptionUnpaid]);
@@ -38,7 +37,7 @@ export default function HelpPage() {
 
   return (
     <Page>
-      { isSubscriptionUnpaid && <ModalChoosePlan /> }
+      <ModalChoosePlan />
       <CustomTitleBar title='Help' icon={QuestionMarkMinor} />
       <Layout>
             <Layout.Section>
