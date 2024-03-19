@@ -19,7 +19,6 @@ export default function Offers() {
   const shopAndHost = useSelector(state => state.shopAndHost);
   const navigateTo = useNavigate();
   const { setIsSubscriptionUnpaid } = useShopState();
-  const [planName, setPlanName] = useState();
   const [error, setError] = useState(null);
   const { hasOffers, setHasOffers, shopSettings, updateShopSettingsAttributes } = useShopState();
   const reduxDispatch = useDispatch();

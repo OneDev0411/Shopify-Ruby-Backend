@@ -23,7 +23,8 @@ import ABTestBanner from "../components/ABTestBanner.jsx";
 export default function HomePage() {
   const app = useAppBridge();
   const shopAndHost = useSelector(state => state.shopAndHost);
-  const { shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers, shopSettings, updateShopSettingsAttributes, isSubscriptionU
+  const { shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers, shopSettings,
+    updateShopSettingsAttributes, setIsSubscriptionUnpaid } = useShopState();
   const [themeAppExtension, setThemeAppExtension] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
