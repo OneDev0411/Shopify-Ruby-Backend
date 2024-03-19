@@ -47,13 +47,11 @@ export default function EditPage() {
 
     const offerID = location?.state?.offerID;
 
-    let advanced_placement_setting = {}
 
     //Call on initial render
     useEffect(() => {
         let redirect = Redirect.create(app);
         if (location?.state?.offerID == null) {
-            setIsLoading(true);
             // fetching shop settings
             fetchShopSettings({admin: null})
                 .then((response) => {
@@ -73,11 +71,9 @@ export default function EditPage() {
                     };
 
                     setOffer(newOffer);
-                    setIsLoading(false);
                 })
                 .catch((error) => {
                     setError(error);
-                    setIsLoading(false);
                     console.log("Error > ", error);
                 })
 
@@ -99,20 +95,19 @@ export default function EditPage() {
                 }
                 setOffer({...data});
                 setInitialOfferableProductDetails(data.offerable_product_details);
+                setIsLoading(false);
 
-                  fetchShopSettings({admin: null})
+                fetchShopSettings({admin: null})
                   .then((response) => {
                       return response.json()
                   })
                   .then((data) => {
                       updateSettingsOrRedirect(data)
                       setUpdatePreviousAppOffer(!updatePreviousAppOffer);
-                      setIsLoading(false);
                   })
                   .catch((error) => {
                     setError(error);
-                      setIsLoading(false);
-                      console.log("Error > ", error);
+                    console.log("Error > ", error);
                   })
             })
             .catch((error) => {
@@ -120,7 +115,6 @@ export default function EditPage() {
                 setIsLoading(false);
                 console.log("Error > ", error);
             })
-            setIsLoading(true);
         }
         return function cleanup() {
             setOffer(OFFER_DEFAULTS);
