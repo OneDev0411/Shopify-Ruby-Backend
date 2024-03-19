@@ -256,9 +256,11 @@
     const checkPageRules = async () => {
         let pageRulesResults = [];
 
-        for (let rule of offer?.rules) {
-            let ruleResult = await pageSatisfiesRule(rule);
-            pageRulesResults.push(ruleResult);
+        if (offer?.rules) {
+            for (let rule of offer.rules) {
+                let ruleResult = await pageSatisfiesRule(rule);
+                pageRulesResults.push(ruleResult);
+            }
         }
 
         if (pageRulesResults.length > 0) {
@@ -279,9 +281,11 @@
 
         let cartRulesResults = [];
 
-        for (let rule of offer?.rules) {
-            let ruleResult = await cartSatisfiesRule(rule);
-            cartRulesResults.push(ruleResult);
+        if (offer?.rules) {
+            for (let rule of offer.rules) {
+                let ruleResult = await cartSatisfiesRule(rule);
+                cartRulesResults.push(ruleResult);
+            }
         }
 
         if (cartRulesResults.length > 0) {
