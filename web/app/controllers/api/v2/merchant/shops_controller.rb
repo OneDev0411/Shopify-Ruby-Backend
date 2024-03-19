@@ -234,7 +234,7 @@ module Api
 
         # GET api/v2/merchant/ab_test_banner_page
         def ab_test_banner_page
-          if @icushop.plan&.free_plan?
+          if @icushop.offers_limit_reached?
             page = @icushop.ab_test_banner_page
           else
             page = ""
@@ -244,7 +244,7 @@ module Api
 
         # GET  api/v2/merchant/ab_test_banner_click
         def ab_test_banner_click
-          if @icushop.plan&.free_plan?
+          if @icushop.offers_limit_reached?
             @icushop.ab_test_banner_click
           end
           head :ok
