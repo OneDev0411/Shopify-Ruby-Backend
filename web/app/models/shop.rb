@@ -659,12 +659,13 @@ class Shop < ApplicationRecord
   end
 
   def active?
+    activated &&
     uninstalled_at.blank? &&
-      shopify_token.present? &&
-      shopify_plan_name != 'cancelled' &&
-      shopify_plan_name != 'frozen' &&
-      shopify_plan_name != 'dormant' &&
-      is_shop_active
+    shopify_token.present? &&
+    shopify_plan_name != 'cancelled' &&
+    shopify_plan_name != 'frozen' &&
+    shopify_plan_name != 'dormant' &&
+    is_shop_active
   end
 
   # the customer has uninstalled the app
