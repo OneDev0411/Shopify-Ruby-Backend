@@ -17,16 +17,13 @@ import { CHAT_APP_ID } from "../assets/index.js";
 import ErrorPage from "../components/ErrorPage.jsx"
 
 import ModalChoosePlan from "../components/modal_ChoosePlan.jsx";
-import { setIsSubscriptionUnpaid } from "../store/reducers/subscriptionPaidStatusSlice.js";
 import {useShopState} from "../contexts/ShopContext.jsx";
 import ABTestBanner from "../components/ABTestBanner.jsx";
 
 export default function HomePage() {
   const app = useAppBridge();
   const shopAndHost = useSelector(state => state.shopAndHost);
-  const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
-  const reduxDispatch = useDispatch();
-  const { shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers } = useShopState()
+  const { shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers, isSubscriptionUnpaid, setIsSubscriptionUnpaid } = useShopState();
   const [themeAppExtension, setThemeAppExtension] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -77,12 +74,12 @@ export default function HomePage() {
           setShop(data.shop);
           setPlanName(data.plan);
           setTrialDays(data.days_remaining_in_trial);
+          setIsSubscriptionUnpaid(data.subscription_not_paid)
 
         if (data.theme_app_extension) {
           setIsLegacy(data.theme_app_extension.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
         }
 
-        reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
 
         // notify intercom as soon as app is loaded and shop info is fetched
         notifyIntercom(data.shop);
@@ -94,7 +91,7 @@ export default function HomePage() {
         setIsLoading(false);
         console.log("Error", error);
       })
-  }, [setShop, setPlanName, setTrialDays, reduxDispatch])
+  }, [])
 
   if (error) { return < ErrorPage showBranding={true} />; }
 
@@ -114,7 +111,7 @@ export default function HomePage() {
         </div>
       ) : (
         <>
-          {isSubscriptionUnpaid && <ModalChoosePlan />}
+          <ModalChoosePlan />
           <CustomTitleBar
             title="In Cart Upsell & Cross Sell"
             image={"https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/ICU-Logo-Small.png"}
