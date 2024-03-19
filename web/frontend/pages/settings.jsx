@@ -45,7 +45,6 @@ export default function Settings() {
                     ajaxDomSelector: data.shop_settings?.custom_ajax_dom_selector,
                     ajaxDomAction: data.shop_settings?.custom_ajax_dom_action,
                 })
-                setIsSubscriptionUnpaid(data.subscription_not_paid)
             })
             .catch((error) => {
                 setError(error);
