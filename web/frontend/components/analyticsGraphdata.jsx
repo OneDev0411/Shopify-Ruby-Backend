@@ -13,6 +13,7 @@ import '@shopify/polaris-viz/build/esm/styles.css';
 import { Redirect } from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 
+
 export function TotalSalesData(props) {
     const app = useAppBridge();
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -20,12 +21,11 @@ export function TotalSalesData(props) {
     const [salesTotal, setSalesTotal] = useState(0);
     const [salesData, setSalesData] = useState(0);
     const [loading, setLoading] = useState(false);
-
     function getSalesData(period) {
         let redirect = Redirect.create(app);
         if(loading) return;
         setLoading(true)
-        fetch(`/api/merchant/shop_sale_stats`, {
+        fetch(`/api/v2/merchant/shop_sale_stats`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -41,9 +41,11 @@ export function TotalSalesData(props) {
                 setSalesData(data.sales_stats.results);
                 }})
             .catch((error) => {
-                console.log("error", error);
+                if (props.onError) {
+                    props.onError(error);
+                }
             }).finally(() => {
-                setLoading(false)
+                setLoading(false);
             })
     }
 
@@ -96,7 +98,6 @@ export function ConversionRate(props) {
     const [reachedCheckout, setReachedCheckout] = useState(0);
     const [converted, setConverted] = useState(0);
     const [totalDisplayed, setTotalDisplayed] = useState(0);
-
     function getOffersStats(endpointUrl, period, callback) {
         fetch(endpointUrl, {
             method: 'POST',
@@ -110,14 +111,16 @@ export function ConversionRate(props) {
                 callback(data)
             })
             .catch((error) => {
-                console.log("error", error);
+                if (props.onError) {
+                    props.onError(error);
+                }
             })
     }
 
     function getOffersStatsTimesLoaded(period) {
         let redirect = Redirect.create(app);
         getOffersStats(
-            `/api/merchant/shop_offers_stats_times_loaded`, 
+            `/api/v2/merchant/shop_offers_stats_times_loaded`, 
             period, 
             (data) => {
                 if (data.redirect_to) {
@@ -130,7 +133,7 @@ export function ConversionRate(props) {
 
     function getOffersStatsTimesClicked(period) {
         getOffersStats(
-            `/api/merchant/shop_offers_stats_times_clicked`,
+            `/api/v2/merchant/shop_offers_stats_times_clicked`,
             period,
             (data) => { setAddedToCart(data.stat_times_clicked); }
         )
@@ -138,7 +141,7 @@ export function ConversionRate(props) {
 
     function getOffersStatsTimesCheckedout(period) {
         getOffersStats(
-            `/api/merchant/shop_offers_stats_times_checkedout`,
+            `/api/v2/merchant/shop_offers_stats_times_checkedout`,
             period,
             (data) => { setReachedCheckout(data.stat_times_checkedout); }
         )
@@ -181,12 +184,11 @@ export function OrderOverTimeData(props) {
     const [ordersTotal, setOrdersTotal] = useState(0);
     const [ordersData, setOrdersData] = useState(null);
     const [loading, setLoading] = useState(false); 
-
     function getOrdersData(period) {
         let redirect = Redirect.create(app);
         if(loading) return;
         setLoading(true)
-        fetch(`/api/merchant/shop_orders_stats`, {
+        fetch(`/api/v2/merchant/shop_orders_stats`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -202,7 +204,9 @@ export function OrderOverTimeData(props) {
                 setOrdersData(data.orders_stats.results)
             }})
             .catch((error) => {
-                console.log("error", error);
+                if (props.onError) {
+                    props.onError(error);
+                }
             }).finally(() => {
                 setLoading(false)
             })
@@ -211,6 +215,7 @@ export function OrderOverTimeData(props) {
     useEffect(() => {
         getOrdersData(props.period);
     }, [props.period])
+
 
     return (
         <PolarisVizProvider
@@ -255,7 +260,7 @@ export function TopPerformingOffersData(props) {
 
     function getOffersData(period) {
         let redirect = Redirect.create(app);
-        fetch(`/api/merchant/offers_list_by_period`, {
+        fetch(`/api/v2/merchant/offers_list_by_period`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -272,13 +277,16 @@ export function TopPerformingOffersData(props) {
                 setOffersData(data.offers);
             }})
             .catch((error) => {
-                console.log("error", error);
+                if (props.onError) {
+                    props.onError(error);
+                }
             })
     }
 
     useEffect(() => {
         getOffersData(props.period);
     }, [props.period])
+
 
     return (
         <PolarisVizProvider
@@ -323,13 +331,12 @@ export function AbTestingData(props) {
     const [salesTotal, setSalesTotal] = useState(0);
     const [salesData, setSalesData] = useState(0);
     const [loading, setLoading] = useState(false);
-
     function getSalesData(period) {
         let redirect = Redirect.create(app);
         if(loading) return;
         setLoading(true)
 
-        fetch(`/api/merchant/shop_sale_stats`, {
+        fetch(`/api/v2/merchant/shop_sale_stats`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -345,7 +352,9 @@ export function AbTestingData(props) {
                 setSalesData(data.sales_stats.results);
             }})
             .catch((error) => {
-                console.log("error", error);
+                if (props.onError) {
+                    props.onError(error);
+                }
             }).finally(() => {
                 setLoading(false)
             })
@@ -354,6 +363,7 @@ export function AbTestingData(props) {
     useEffect(() => {
         getSalesData(props.period);
     }, [props.period])
+
 
     return (
         <PolarisVizProvider
@@ -404,7 +414,7 @@ export function ClickThroughtRateData(props) {
         let redirect = Redirect.create(app);
         if(loading) return;
         setLoading(true)
-        fetch(`/api/merchant/shop_clicks_stats`, {
+        fetch(`/api/v2/merchant/shop_clicks_stats`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -420,7 +430,9 @@ export function ClickThroughtRateData(props) {
                 setClicksData(data.clicks_stats.results)
             }})
             .catch((error) => {
-                console.log("error", error);
+                if (props.onError) {
+                    props.onError(error);
+                }
             }).finally(() => {
                 setLoading(false)
             })

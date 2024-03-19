@@ -8,7 +8,7 @@ import {
 } from "@shopify/polaris";
 import "@shopify/polaris/build/esm/styles.css";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import {useState, useEffect, useContext} from "react";
 import { useSelector } from "react-redux";
 import { GenericFooter } from "../components";
 import Summary from "../components/Summary";
@@ -17,126 +17,149 @@ import { OfferPreview } from "../components/OfferPreview";
 import { useAuthenticatedFetch } from "../hooks";
 import AbAnalytics from "../components/abAnalytics";
 import "../components/stylesheets/mainstyle.css";
+import { useAppBridge } from '@shopify/app-bridge-react'
+import { Toast } from '@shopify/app-bridge/actions';
+import {OfferContext} from "../contexts/OfferContext.jsx";
+import {useOffer} from "../hooks/useOffer.js";
+import {
+  OFFER_ACTIVATE_URL,
+  OFFER_DEACTIVATE_URL,
+  OFFER_DEFAULTS,
+  OFFER_DRAFT,
+  OFFER_PUBLISH
+} from "../shared/constants/EditOfferOptions.js";
+import ErrorPage from "../components/ErrorPage.jsx"
 
 const EditOfferView = () => {
+  const { offer, setOffer, updateOffer } = useContext(OfferContext);
+  const app = useAppBridge();
+  const { fetchOffer } = useOffer();
   const shopAndHost = useSelector((state) => state.shopAndHost);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const offerID = localStorage.getItem('Offer-ID');
-  const fetch = useAuthenticatedFetch(shopAndHost.host);
-  const [offerStatus, setOfferStatus] = useState('');
+  const fetch = useAuthenticatedFetch(shopAndHost.host)
   const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState();
   const [checkKeysValidity, setCheckKeysValidity] = useState({});
-  const [offer, setOffer] = useState({});
   const navigateTo = useNavigate();
   const handleEditOffer = (offer_id) => {
     navigateTo('/edit-offer', { state: { offerID: offer_id } });
   }
+  const [error, setError] = useState(null);
 
-  const handleOfferActivation = () => {
-    fetch(`/api/merchant/offer_activate`, {
+
+  const toggleOfferActivation = async (activate) => {
+
+    await fetch(activate ? OFFER_ACTIVATE_URL : OFFER_DEACTIVATE_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ offer: { offer_id: offerID }, shop: shopAndHost.shop })
-    })
-    .then((response) => response.json())
-    .then(() => {
-      offer.active = true;
-      setOfferStatus('published');
-    })
-    .catch((error) => {
-      console.error('An error occurred while making the API call:', error);
-    })
-  }
-
-  const handleOfferDeactivation = () => {
-    fetch('/api/merchant/offer_deactivate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ offer: { offer_id: offerID }, shop: shopAndHost.shop })
-    })
-    .then((response) => response.json())
-    .then((data) => {
-      offer.active = false;
-      setOfferStatus('draft');
-    })
-    .catch((error) => {
-      console.error('An error occurred while making the API call:', error);
+    }).then((response) => {
+      if ([200,204].includes(response.status)) {
+        updateOffer("publish_status", activate ? OFFER_PUBLISH : OFFER_DRAFT)
+        updateOffer("active", activate)
+      } else {
+        console.log("there was an issue deactivating the offer")
+      }
+    }).catch((error) => {
+      const toastOptions = {
+        message: 'An error occurred. Please try again later.',
+        duration: 3000,
+        isError: true,
+      };
+      const toastError = Toast.create(app, toastOptions);
+      toastError.dispatch(Toast.Action.SHOW);
+      console.log("Error:", error);
     })
   }
 
   const handleDuplicateOffer = () => {
-    fetch(`/api/merchant/offers/${offerID}/duplicate`, {
+    fetch(`/api/v2/merchant/offers/${offerID}/duplicate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ offer_id: offerID, shop: shopAndHost.shop })
     })
-      .then((response) => response.json())
-      .then(() => {
-        navigateTo('/offer')
+      .then((response) => {
+        if ([200,204].includes(response.status)) {
+          navigateTo('/offer');
+        }
       })
       .catch((error) => {
-        console.error('An error occurred while making the API call:', error);
+        const toastOptions = {
+          message: 'An error occurred. Please try again later.',
+          duration: 3000,
+          isError: true,
+        };
+        const toastError = Toast.create(app, toastOptions);
+        toastError.dispatch(Toast.Action.SHOW);
+        console.log('An error occurred while making the API call:', error);
       })
   }
 
   const handleDeleteOffer = () => {
-    fetch(`/api/merchant/offers/${offerID}`, {
+    fetch(`/api/v2/merchant/offers/${offerID}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ offer_id: offerID, shop: shopAndHost.shop })
     })
-      .then((response) => response.json())
-      .then(() => {
-        navigateTo('/offer');
+      .then((response) => {
+        if ([200,204].includes(response.status)) {
+          navigateTo('/offer');
+        }
       })
       .catch((error) => {
-        console.error('An error occurred while making the API call:', error);
+        const toastOptions = {
+          message: 'An error occurred. Please try again later.',
+          duration: 3000,
+          isError: true,
+        };
+        const toastError = Toast.create(app, toastOptions);
+        toastError.dispatch(Toast.Action.SHOW);
+        console.log('An error occurred while making the API call:', error);
       })
   }
 
   useEffect(() => {
     if (offerID != null) {
       setIsLoading(true);
-      fetch(`/api/merchant/load_offer_details`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({offer: {offer_id: offerID}, shop: shopAndHost.shop}),
-      })
-        .then((response) => {
-            return response.json()
-        })
-        .then((data) => {
+      fetchOffer(offerID, shopAndHost.shop).then((response) => {
+        if (response.status === 200) {
+          return response.json()
+        }
+        navigateTo('/offer');
+      }).then((data) => {
           setOffer({...data});
           setInitialOfferableProductDetails(data.offerable_product_details);
-          setIsLoading(false);
-          offer.publish_status == 'published' ? setOfferStatus('published') : setOfferStatus('draft');
           if (data.offerable_product_details.length > 0) {
             updateCheckKeysValidity('text', data.text_a.replace("{{ product_title }}", data.offerable_product_details[0]?.title));
           }
           updateCheckKeysValidity('cta', data.cta_a);
+          setIsLoading(false);
         })
         .catch((error) => {
-            console.log("Error > ", error);
-        })
-      setIsLoading(false);
-  }
-  },[offer.publish_status]);
+          setError(error);
+          setIsLoading(false);
+          console.log("Error > ", error);
+        });
+    }
+
+    return function cleanup() {
+      setOffer(OFFER_DEFAULTS);
+    };
+  },[]);
 
   function updateCheckKeysValidity(updatedKey, updatedValue) {
     setCheckKeysValidity(previousState => {
         return {...previousState, [updatedKey]: updatedValue};
     });
   }
+  if (error) { return < ErrorPage/>; }
+
   return (
     <AppProvider i18n={[]}>
       <div className="page-space">
@@ -158,7 +181,7 @@ const EditOfferView = () => {
               }}}
               title={offer.title}
               titleMetadata={
-                offerStatus == "published" ? (
+                offer.publish_status === "published" ? (
                   <Badge status="success">Published</Badge>
                 ) : (
                   <Badge>Unpublished</Badge>
@@ -166,8 +189,8 @@ const EditOfferView = () => {
               }
               secondaryActions={[
                 {
-                  content: (offerStatus == 'draft') ? 'Publish' : 'Unpublish',
-                  onAction: () => offerStatus == 'draft' ? handleOfferActivation() : handleOfferDeactivation(),
+                  content: (offer.publish_status === 'draft') ? 'Publish' : 'Unpublish',
+                  onAction: () => offer.publish_status === 'draft' ? toggleOfferActivation(true) : toggleOfferActivation(false),
                 },
                 {
                   content: 'Edit', 
@@ -196,7 +219,7 @@ const EditOfferView = () => {
                 <Grid>
                   <Grid.Cell columnSpan={{xs: 6, sm: 6, md: 6, lg: 8, xl: 8}}>
                     <div className="widget-visibility">
-                      <OfferPreview offer={offer} checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity} previewMode/>
+                      <OfferPreview checkKeysValidity={checkKeysValidity} updateCheckKeysValidity={updateCheckKeysValidity} previewMode/>
                     </div>
                   </Grid.Cell>
                   <Grid.Cell columnSpan={{xs: 6, sm: 6, md: 6, lg: 4, xl: 4}}>

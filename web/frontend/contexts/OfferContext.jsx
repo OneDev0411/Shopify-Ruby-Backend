@@ -1,8 +1,8 @@
-import {createContext, useState} from 'react';
-import {OFFER_DEFAULTS} from "./shared/constants/EditOfferOptions.js";
+import {createContext, useEffect, useRef, useState} from 'react';
+import {OFFER_DEFAULTS} from "../shared/constants/EditOfferOptions.js";
 
 export default function OfferProvider({ children }) {
-  const [offer, setOffer] = useState(OFFER_DEFAULTS);
+  const [offer, setOffer] = useState({...OFFER_DEFAULTS});
 
   //Called whenever the offer changes in any child component
   function updateOffer(updatedKey, updatedValue) {
@@ -57,6 +57,8 @@ export default function OfferProvider({ children }) {
   // Called to update the included variants in offer
   function updateIncludedVariants(selectedItem, selectedVariants) {
     const updatedOffer = {...offer};
+
+    console.log("updatedOffer from variants", updatedOffer)
     if (Array.isArray(selectedItem)) {
       for (var key in selectedVariants) {
         updatedOffer.included_variants[key] = selectedVariants[key];
@@ -67,6 +69,8 @@ export default function OfferProvider({ children }) {
     setOffer({...updatedOffer});
   }
 
+
+
   return (
     <OfferContext.Provider
       value={{offer, setOffer, updateOffer, updateProductsOfOffer, updateIncludedVariants, updateNestedAttributeOfOffer}}
@@ -76,4 +80,4 @@ export default function OfferProvider({ children }) {
   );
 }
 
-export const OfferContext = createContext({});
+export const OfferContext = createContext(OFFER_DEFAULTS);

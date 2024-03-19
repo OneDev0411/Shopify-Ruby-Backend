@@ -248,7 +248,7 @@ module Shopifable
       graphql = %{ { products(first: 20, query:"title:*#{query}*") { edges { node { id title featuredImage { transformedSrc(maxHeight: 50, maxWidth: 50) }  } } } } }
     end
     res = HTTParty.post(graphql_url, headers: api_headers, body: { query: graphql, variables: ''}.to_json)
-    res.parsed_response['data']['products']['edges'].map { |prod|
+    res&.parsed_response.dig('data', 'products', 'edges')&.map { |prod|
       {
         id: prod['node']['id'].gsub("gid://shopify/Product/","").to_i,
         title: prod.dig("node", "title"),
@@ -634,7 +634,7 @@ module Shopifable
       Rails.logger.info("Enqueuing to ShopWorker::CreateScriptTagJob for shop # #{self.id} : #{self.shopify_domain}")
       Sidekiq::Client.push('class' => 'ShopWorker::CreateScriptTagJob', 'args' => [self.id], 'queue' => 'default', 'at' => Time.now.to_i)
     end
-   
+
     update_column(soft_purge_only, opts[:soft_purge_only]) if opts[:soft_purge_only]
     tag_updated
   end
@@ -715,15 +715,16 @@ module Shopifable
     if keys_without_ajax.length.positive?
       keys_without_ajax.each do |key|
         next blocks_added unless (key == 'templates/product.json' && theme_app_extension.product_block_added) ||
-          (key == 'templates/cart.json' && theme_app_extension.cart_block_added) ||
-          (key == 'templates/collection.json' && theme_app_extension.collection_block_added)
+          (key == 'templates/cart.json' && theme_app_extension.cart_block_added)
 
         blocks_added += 1
       end
     end
 
-    unless (!theme_app_extension&.theme_app_complete && ((blocks_added == keys_without_ajax.length) &&
-      ((keys.include?('ajax') && theme_app_embed) || keys.exclude?('ajax')))) && offers.present?
+    all_blocks_enabled = ((blocks_added == keys_without_ajax.length) &&
+      ((keys.include?('ajax') && theme_app_extension&.theme_app_embed) || keys.exclude?('ajax')))
+
+    if !theme_app_extension&.theme_app_complete && ((all_blocks_enabled && offers.present?) || offers.blank?)
       theme_app_extension.update(theme_app_complete: true)
 
       unless script_tag_id.nil? && self.theme_app_extension.theme_version != '2.0'
@@ -743,12 +744,6 @@ module Shopifable
       keys.push('templates/product.json')
     end
 
-    unless offers.find { |off|
-      !(off.rules_json.find { |rule| rule['item_type'] == 'collection' }).nil?
-    }.nil?
-      keys.push('templates/collection.json')
-    end
-
     unless offers.find(&:in_ajax_cart).nil?
       keys.push('ajax')
     end
@@ -762,7 +757,7 @@ module Shopifable
     app_blocks_added = []
     app_blocks_supported = 0
     assets = []
-    keys = %w[templates/product.json templates/cart.json templates/collection.json]
+    keys = %w[templates/product.json templates/cart.json]
 
     shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
 
@@ -802,17 +797,14 @@ module Shopifable
     asset = JSON.parse(asset.value || '')
     blocks = asset['current']['blocks']
 
-    return if blocks.nil?
-
-    block_found = nil
+    if blocks.nil?
+      self.theme_app_extension.update(theme_app_embed: false)
+      return
+    end
 
     blocks.each do |_block_id, block|
-      if block['type'].include?("app_block_embed/#{ENV['SHOPIFY_ICU_EXTENSION_APP_ID']}")
-        block_found = block
-      end
-
-      if block_found.nil?
-        self.theme_app_extension.update(theme_app_embed: block_found['disabled'])
+      if block['type'].include?("ajax_cart_app_block/#{ENV['SHOPIFY_ICU_EXTENSION_APP_ID']}")
+        self.theme_app_extension.update(theme_app_embed: !block['disabled'])
         break
       end
     end
@@ -955,59 +947,24 @@ module Shopifable
 
   class_methods do
 
-    # Public Method
-    # Get shop or create it.
-    #
-    # Also deal with shop that already exists and uninstalled in the past. Connect new_shop to
-    # old_shop and delete the new_shop record to keep associations and shops table clean from
-    # garbage entries.
-    #
-    # Parameters:
-    # current_shopify_domain -  String
-    #
-    # Returns: Shop Object.
-    def find_or_create_shop(current_shopify_domain)
+    # This method will return shop acc to the shopify domain, it is receving through params.
+    # Will return the shop if it finds through shopify_domain, otherwise if shop can be find through
+    # myshopify_domain, means that user is re-installing the old shop, so we will enable the old shop,
+    # and deletes the newly created shop.
+
+    # While enabling the old shop, we are using access scopes of new shop and updating the coloum because
+    # user can change them before re installing and can be caught through new shop that is created with that data.
+
+    def fetch_shop(current_shopify_domain)
       icushop = Shop.find_by(shopify_domain: current_shopify_domain)
-
-      old_shop = Shop.find_by(shopify_domain: current_shopify_domain)
-
-      if old_shop.present? && icushop.id != old_shop.id
-        # logging to Rollbar
-        # Rollbar.info('Reinstall', { shop: current_shopify_domain, uninstall: old_shop.uninstalled_at, reinstall: Time.now.utc })
-
-        # copying from new_shop to old_shop
-        old_shop.update_columns(JSON.parse(icushop.to_json).except('id', 'created_at'))
-        old_shop.installed_at = icushop.created_at
-
-        # re-doing errands for old_shop after reinstall
-        old_shop.async_setup
-        old_shop.set_up_for_shopify
-        old_shop.save!
-
-        # since we are all set connecting new installation to already existing shop
-        # destroying garbage shop now
-        begin
-          icushop.destroy
-        rescue ActiveRecord::InvalidForeignKey => error
-          # force destroy associations for new_shop and then destroy new_shop
-          ShopEvent.where(shop_id: icushop.id).update(shop_id: old_shop.id)
-          icushop.orders.update_all(shop_id: old_shop.id)
-          # for subscription, we shouldn't destroy new one right away. Instead,
-          # we should copy that to the older one, to stay aligned with the shopify charge ID,
-          # as older subscriptions is already connected to existing shop and other relations
-          if icushop.subscription.present?
-            old_shop.subscription.update_columns(JSON.parse(icushop.subscription.to_json).except('id', 'shop_id', 'created_at'))
-            icushop.subscription.destroy
-          end
-          icushop.destroy
-        end
-
-        icushop = old_shop
-        Sidekiq::Client.push('class' => 'ShopWorker::EnsureInCartUpsellWebhooksJob', 'args' => [icushop.id], 'queue' => 'default', 'at' => Time.now.to_i)
-
-        icushop.store_cache_keys_on_reinstall
+      old_shop = Shop.find_by(myshopify_domain: current_shopify_domain)
+      if old_shop.present? && icushop&.id != old_shop.id
+        old_shop.enable_reinstalled_shop(current_shopify_domain,
+                                         icushop.shopify_token,
+                                         icushop.access_scopes)
+        icushop.destroy_completely
+        return old_shop
       end
-
       icushop
     end
 
@@ -1114,9 +1071,6 @@ module Shopifable
           if asset_key == 'templates/cart.json'
             self.theme_app_extension.update(cart_block_added: true)
           end
-          if asset_key == 'templates/collection.json'
-            self.theme_app_extension.update(collection_block_added: true)
-          end
           app_blocks_added.push(asset_key)
           break
         end
@@ -1132,10 +1086,6 @@ module Shopifable
 
     unless app_blocks_added.include?('templates/cart.json')
       self.theme_app_extension.update(cart_block_added: false)
-    end
-
-    unless app_blocks_added.include?('templates/collection.json')
-      self.theme_app_extension.update(collection_block_added: false)
     end
   end
 end

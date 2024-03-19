@@ -1084,4 +1084,8 @@
   transition: all 200ms ease-out 0s;
   transform: translate3d(-120%, 0px, 0px);
 }
+
+#nudge-offer-list .preview-stack {
+  text-align: left;
+}
 /*# sourceMappingURL=themes.css.map */

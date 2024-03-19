@@ -185,7 +185,7 @@ export function ModalAddProduct(props) {
         props.setResourceListLoading(true);
         let shopifyId = id[id.length - 1]
 
-        fetch(`/api/merchant/products/shopify/${shopifyId}?shop_id=${props.shop_id}&shop=${shopAndHost.shop}`, {
+        fetch(`/api/v2/merchant/products/shopify/${shopifyId}?shop_id=${props.shop_id}&shop=${shopAndHost.shop}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

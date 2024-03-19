@@ -12,22 +12,25 @@ import { useSelector } from 'react-redux';
 import { useEffect, useState, useCallback } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import { isSubscriptionActive } from "../services/actions/subscription";
+import ErrorPage from "../components/ErrorPage.jsx"
+import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function Subscription() {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [currentSubscription, setCurrentSubscription] = useState(null);
-    const [planName, setPlanName] = useState();
-    const [trialDays, setTrialDays] = useState();
+    const { planName, setPlanName, trialDays, setTrialDays } = useShopState()
     const [activeOffersCount, setActiveOffersCount] = useState();
     const [unpublishedOfferIds, setUnpublishedOfferIds] = useState();
     const app = useAppBridge();
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [isSubscriptionUnpaid, setIsSubscriptionUnpaid] = useState(false);
 
     async function handlePlanChange (internal_name) {
         let redirect = Redirect.create(app);
 
-        fetch('/api/merchant/subscription', {
+        fetch('/api/v2/merchant/subscription', {
             method: 'PUT',
                headers: {
                  'Content-Type': 'application/json',
@@ -50,12 +53,19 @@ export default function Subscription() {
                 }
            })
            .catch((error) => {
-            console.log("error", error);
+            const toastOptions = {
+              message: 'An error occurred. Please try again later.',
+              duration: 3000,
+              isError: true,
+            };
+            const toastError = Toast.create(app, toastOptions);
+            toastError.dispatch(Toast.Action.SHOW);
+            console.log("Error:", error);
            })
     }
 
     const fetchSubscription = useCallback(() => {
-        fetch(`/api/merchant/current_subscription?shop=${shopAndHost.shop}`, {
+        fetch(`/api/v2/merchant/current_subscription?shop=${shopAndHost.shop}`, {
             method: 'GET',
                headers: {
                  'Content-Type': 'application/json',
@@ -68,9 +78,11 @@ export default function Subscription() {
                 setTrialDays(data.days_remaining_in_trial);
                 setActiveOffersCount(data.active_offers_count);
                 setUnpublishedOfferIds(data.unpublished_offer_ids)
+                setIsSubscriptionUnpaid(data.subscription_not_paid)
            })
            .catch((error) => {
-            console.log("error", error);
+              setError(error);
+              console.log("error", error);
            })
       }, []);
 
@@ -78,6 +90,8 @@ export default function Subscription() {
         fetchSubscription();
       }, [fetchSubscription]);
     
+  if (error) { return < ErrorPage showBranding={true} />; }
+
   return (
     <Page>
         <CustomTitleBar title='Billing' icon={BillingStatementDollarMajor}/>
@@ -93,7 +107,7 @@ export default function Subscription() {
           </div>
         ) : (
           <>
-            <div className="auto-height">
+            <div className="auto-height paid-subscription">
               <Layout>
                 <Layout.Section>
                   {(isSubscriptionActive(currentSubscription) && planName!=='free' && trialDays>0) ? (
@@ -116,71 +130,86 @@ export default function Subscription() {
                   Choose a Plan
                 </Layout.Section>
                 <Layout.Section>
-                  <LegacyCard title="Paid"
-                              primaryFooterAction={(planName==='flex' && isSubscriptionActive(currentSubscription)) ? null : {content: 'Upgrade', onClick: () => handlePlanChange('plan_based_billing')}}
+                  <LegacyCard title="In Cart Upsell & Cross-sell Unlimited - Paid Subscription"
+                              primaryFooterAction={(planName==='flex' && isSubscriptionActive(currentSubscription)) && !isSubscriptionUnpaid ? null : {content: 'Upgrade', onClick: () => handlePlanChange('plan_based_billing')}}
                               sectioned
                   >
                     <LegacyStack>
                       <LegacyStack.Item>
-                        {(planName==='flex' && isSubscriptionActive(currentSubscription)) ? (
-                          <p><small>Current Plan</small></p>
-                        ) : (
-                          <p><small>Recommended</small></p>
-                        )}
-                        <div className="space-4"></div>
-                        <p>
-                          500 Offers<br/>
-                          Geo targeting<br/>
-                          Autopilot (AI-generated offers feature)<br/>
-                          A/B testing<br/>
-                          Advanced discount terms<br/>
-                          Live onboarding<br/>
-                          Success manager support<br/>
-                          Remove "Power by In Cart Upsell" water mark on offer box
-                        </p>
-                        <div className="space-4"></div>
-                        <p>
-                          <b>Shopify Basic</b><br/>
-                          $19.99/month<br/>
-                          <div className="space-1"></div>
+                        <div className="recommended-current">
+                          {(planName==='flex' && isSubscriptionActive(currentSubscription)) ? (
+                            <p><small>Current Plan</small></p>
+                          ) : (
+                            <p><small>Recommended</small></p>
+                          )}
+                        </div>
+                        <p className="subscription-subtitle">Upgrade now on our 30-DAY FREE TRIAL!</p>
+                        <hr className="my-24" />
+                        <div className="pl-10">
+                          <p className="bold space-4">Features</p>
+                          <div className="features-grid">
+                            <div className="features">
+                              <p className="subscription-feature">500 Upsell Offers</p>
+                              <p className="subscription-desc">Create as many as you want!</p>
+                              <p className="subscription-feature">Unlimited Upsell orders</p>
+                              <p className="subscription-desc">No order limit!</p>
+                              <p className="subscription-feature">Autopilot AI offers</p>
+                              <p className="subscription-desc">Automatic offers feature, simply let it run</p>
+                              <p className="subscription-feature">Autopilot AI offers</p>
+                              <p className="subscription-desc">Cart, AJAX cart, & product page offers</p>
+                              <p className="subscription-feature">Offer multiple upsells</p>
+                              <p className="subscription-desc">A/B testing</p>
+                              <p className="subscription-feature">Learn which offers perform the best</p>
+                              <p className="subscription-desc">Offer discounts with upsell offers</p>
+                              <p className="subscription-feature">Conditional logic</p>
+                              <p className="subscription-desc">Show the right offer based on set conditions</p>
+                              <p className="subscription-feature">Custom design & placement</p>
+                              <p className="subscription-desc">Full offer box design customization </p>
+                            </div>
+                            <Image
+                              source={billingImg}
+                              alt="upgrade subscription"
+                              width={200}
+                            />
+                          </div>
+                        </div>
+                        <hr className="my-24" />
+                        <div className="pl-10">
+                          <p className="bold space-4">Pricing</p>
+                          <p className="mb-16">Paid app subscription plan pricing is based on your Shopify store’s subscription</p>
 
-                          <b>Shopify Standard</b><br/>
-                          $29.99/month<br/>
-                          <div className="space-1"></div>
+                          <div className="pricing-grid">
+                            <p><b>Shopify Subscription</b></p>
+                            <p><b>In Cart Upsell & Cross Sell Unlimited price</b></p>
+                            <p className="mt-14">Basic</p>
+                            <p className="mt-14">$19.99/mo</p>
+                            <p className="mt-14">Shopify</p>
+                            <p className="mt-14">$29.99/mo</p>
+                            <p className="mt-14">Advanced</p>
+                            <p className="mt-14">$59.99/mo</p>
+                            <p className="mt-14">Plus</p>
+                            <p className="mt-14">$99.99/mo</p>
+                          </div>
+                        </div>
 
-                          <b>Shopify Advanced</b><br/>
-                          $59.99/month<br/>
-                          <div className="space-1"></div>
-
-                          <b>Shopify Plus</b><br/>
-                          $99.99/month
-                        </p>
-                      </LegacyStack.Item>
-                      <LegacyStack.Item>
-                        <Image
-                          source={billingImg}
-                          alt="upgrade subscription"
-                          width={200}
-                        />
                       </LegacyStack.Item>
                     </LegacyStack>
                   </LegacyCard>
                 </Layout.Section>
                 <Layout.Section secondary>
                   <LegacyCard title="Free" sectioned primaryFooterAction={(planName==='free' || planName === "trial" && isSubscriptionActive(currentSubscription)) ? null : {content: 'Downgrade', onClick: () => handlePlanChange('free_plan'), id: 'btnf'}}>
-                    {(planName==='free' && isSubscriptionActive(currentSubscription)) ? (
-                      <p><small>Current Plan</small></p>
-                    ) : (
-                      <p><small>Not Recommended</small></p>
-                    )}
-                    <div className="space-4"></div>
-                    <p>
-                      Limited offer<br/>
-                      Geo targeting<br/>
-                      Advanced discount terms<br/>
-                      "Power by In Cart Upsell" water mark on offer box
-                      <br/><br/>
-                    </p>
+                    <div className="recommended-current">
+                      {(planName==='free' && isSubscriptionActive(currentSubscription)) ? (
+                        <p><small>Current Plan</small></p>
+                      ) : (
+                        <p><small>Not Recommended</small></p>
+                      )}
+                    </div>
+                    <p className="subscription-subtitle">1 branded upsell offer</p>
+                    <div className="mt-28">
+                      <p><b>1 upsell offer only</b></p>
+                      <p>with “Powered by In Cart Upsell” watermark at bottom of offer block</p>
+                    </div>
                   </LegacyCard>
                 </Layout.Section>
               </Layout>

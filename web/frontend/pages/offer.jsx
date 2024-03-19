@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from 'react-router-dom';
 
 import {Layout, Page} from '@shopify/polaris';
@@ -7,26 +7,31 @@ import {AddProductMajor} from '@shopify/polaris-icons';
 
 import {CustomTitleBar, OffersList} from '../components';
 import {useAuthenticatedFetch} from "../hooks";
+import ErrorPage from "../components/ErrorPage.jsx"
+
+import ModalChoosePlan from '../components/modal_ChoosePlan';
+import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatusSlice';
+import { fetchShopData } from "../services/actions/shop";
+import {useShopState} from "../contexts/ShopContext.jsx";
+import ABTestBanner from '../components/ABTestBanner';
 
 export default function Offers() {
   const shopAndHost = useSelector(state => state.shopAndHost);
-  const fetch = useAuthenticatedFetch(shopAndHost.host);
   const navigateTo = useNavigate();
-
-  const [hasOffers, setHasOffers] = useState();
+  const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
+  const [error, setError] = useState(null);
+  const { hasOffers, setHasOffers, shopSettings, updateShopSettingsAttributes } = useShopState();
+  const reduxDispatch = useDispatch();
 
   useEffect(() => {
-    fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then( (response) => { return response.json(); })
-      .then( (data) => {
+    fetchShopData(shopAndHost.shop)
+      .then((data) => {
+        updateShopSettingsAttributes(data.offers_limit_reached, "offers_limit_reached");
         setHasOffers(data.has_offers);
+        reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
       })
       .catch((error) => {
+        setError(error);
         console.log("error", error);
       })
   }, [setHasOffers]);
@@ -35,10 +40,13 @@ export default function Offers() {
       navigateTo('/edit-offer', { state: { offerID: null } });
     }
 
+    if (error) { return < ErrorPage showBranding={true} />; }
+
     return (
       <>
+        { isSubscriptionUnpaid && <ModalChoosePlan /> }
         <div className="min-height-container">
-          <Page fullWidth>
+          <Page>
             {hasOffers ? (
               <CustomTitleBar
                 image={AddProductMajor}
@@ -53,9 +61,14 @@ export default function Offers() {
               />
             )}
             <Layout>
+              {shopSettings?.offers_limit_reached && (
+                <Layout.Section>
+                  <ABTestBanner />
+                </Layout.Section>
+              )}
               <Layout.Section>
                 <div style={{marginTop: '54px'}}>
-                  <OffersList />
+                  <OffersList pageSize={20}/>
                 </div>
               </Layout.Section>
             </Layout>
