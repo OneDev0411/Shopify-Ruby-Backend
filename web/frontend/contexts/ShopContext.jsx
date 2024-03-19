@@ -18,6 +18,7 @@ export default function ShopProvider({ children }) {
   const [trialDays, setTrialDays] = useState();
   const [hasOffers, setHasOffers] = useState();
   const [shopSettings, setShopSettings] = useState({...SETTINGS_DEFAULTS});
+  const [themeAppExtension, setThemeAppExtension] = useState();
 
   function updateShopSettingsAttributes(updatedValue, ...updatedKey) {
     if (updatedKey.length == 1) {
@@ -48,7 +49,21 @@ export default function ShopProvider({ children }) {
 
   return (
     <ShopContext.Provider
-      value={{shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers, updateShopSettingsAttributes, shopSettings, setShopSettings}}
+      value={{
+        shop,
+        setShop,
+        planName,
+        setPlanName,
+        trialDays,
+        setTrialDays,
+        hasOffers,
+        setHasOffers,
+        updateShopSettingsAttributes,
+        shopSettings,
+        setShopSettings,
+        themeAppExtension,
+        setThemeAppExtension
+      }}
     >
       {children}
     </ShopContext.Provider>
