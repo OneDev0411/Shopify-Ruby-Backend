@@ -10,13 +10,9 @@ import {
 import { HelpLinks } from "../shared/constants/HelpPageLinks";
 
 import ModalChoosePlan from '../components/modal_ChoosePlan';
-import { useSelector } from 'react-redux';
-import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function HelpPage() {
     const [active, setActive] = useState(false);
-    const shopAndHost = useSelector((state) => state.shopAndHost);
-    const { isSubscriptionUnpaid, setIsSubscriptionUnpaid } = useShopState();
     const handleClose = useCallback(() => {
         setActive(false);
       }, []);

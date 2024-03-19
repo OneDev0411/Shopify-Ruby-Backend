@@ -9,9 +9,8 @@ import {SETTINGS_DEFAULTS, useShopState} from "../contexts/ShopContext.jsx";
 import {useDispatch, useSelector} from 'react-redux';
 import { Redirect, Toast } from '@shopify/app-bridge/actions';
 import { Partners, SettingTabs, CustomTitleBar } from "../components";
-import ErrorPage from "../components/ErrorPage.jsx"
-import ModalChoosePlan from '../components/modal_ChoosePlan'
-import { fetchShopData } from '../services/actions/shop';
+import ErrorPage from "../components/ErrorPage.jsx";
+import ModalChoosePlan from '../components/modal_ChoosePlan';
 
 export default function Settings() {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -21,8 +20,6 @@ export default function Settings() {
     const [formData, setFormData] = useState({});
     const app = useAppBridge();
     const [error, setError] = useState(null);
-
-    const { setIsSubscriptionUnpaid } = useShopState();
 
     useEffect(() => {
         fetchCurrentShop();
