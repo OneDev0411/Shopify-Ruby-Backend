@@ -26,7 +26,7 @@ export default function HomePage() {
   const shopAndHost = useSelector(state => state.shopAndHost);
   const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
   const reduxDispatch = useDispatch();
-  const { shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers } = useShopState()
+  const { shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers, shopSettings, updateShopSettingsAttributes } = useShopState()
   const [themeAppExtension, setThemeAppExtension] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -77,17 +77,19 @@ export default function HomePage() {
           setShop(data.shop);
           setPlanName(data.plan);
           setTrialDays(data.days_remaining_in_trial);
+          updateShopSettingsAttributes(data.offers_limit_reached, "offers_limit_reached");
 
-        if (data.theme_app_extension) {
-          setIsLegacy(data.theme_app_extension.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
+
+          if (data.theme_app_extension) {
+            setIsLegacy(data.theme_app_extension.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
+          }
+
+          reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
+
+          // notify intercom as soon as app is loaded and shop info is fetched
+          notifyIntercom(data.shop);
+          setIsLoading(false);
         }
-
-        reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
-
-        // notify intercom as soon as app is loaded and shop info is fetched
-        notifyIntercom(data.shop);
-        setIsLoading(false);
-      }
       })
       .catch((error) => {
         setError(error);
@@ -130,7 +132,7 @@ export default function HomePage() {
               </Layout.Section>
             }
 
-              {planName === "free" && (
+              {shopSettings?.offers_limit_reached && (
                 <Layout.Section>
                   <ABTestBanner />
                 </Layout.Section>

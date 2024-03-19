@@ -715,8 +715,7 @@ module Shopifable
     if keys_without_ajax.length.positive?
       keys_without_ajax.each do |key|
         next blocks_added unless (key == 'templates/product.json' && theme_app_extension.product_block_added) ||
-          (key == 'templates/cart.json' && theme_app_extension.cart_block_added) ||
-          (key == 'templates/collection.json' && theme_app_extension.collection_block_added)
+          (key == 'templates/cart.json' && theme_app_extension.cart_block_added)
 
         blocks_added += 1
       end
@@ -745,12 +744,6 @@ module Shopifable
       keys.push('templates/product.json')
     end
 
-    unless offers.find { |off|
-      !(off.rules_json.find { |rule| rule['item_type'] == 'collection' }).nil?
-    }.nil?
-      keys.push('templates/collection.json')
-    end
-
     unless offers.find(&:in_ajax_cart).nil?
       keys.push('ajax')
     end
@@ -764,7 +757,7 @@ module Shopifable
     app_blocks_added = []
     app_blocks_supported = 0
     assets = []
-    keys = %w[templates/product.json templates/cart.json templates/collection.json]
+    keys = %w[templates/product.json templates/cart.json]
 
     shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
 
@@ -804,10 +797,13 @@ module Shopifable
     asset = JSON.parse(asset.value || '')
     blocks = asset['current']['blocks']
 
-    return if blocks.nil?
+    if blocks.nil?
+      self.theme_app_extension.update(theme_app_embed: false)
+      return
+    end
 
     blocks.each do |_block_id, block|
-      if block['type'].include?("app_block_embed/#{ENV['SHOPIFY_ICU_EXTENSION_APP_ID']}")
+      if block['type'].include?("ajax_cart_app_block/#{ENV['SHOPIFY_ICU_EXTENSION_APP_ID']}")
         self.theme_app_extension.update(theme_app_embed: !block['disabled'])
         break
       end
@@ -1075,9 +1071,6 @@ module Shopifable
           if asset_key == 'templates/cart.json'
             self.theme_app_extension.update(cart_block_added: true)
           end
-          if asset_key == 'templates/collection.json'
-            self.theme_app_extension.update(collection_block_added: true)
-          end
           app_blocks_added.push(asset_key)
           break
         end
@@ -1093,10 +1086,6 @@ module Shopifable
 
     unless app_blocks_added.include?('templates/cart.json')
       self.theme_app_extension.update(cart_block_added: false)
-    end
-
-    unless app_blocks_added.include?('templates/collection.json')
-      self.theme_app_extension.update(collection_block_added: false)
     end
   end
 end
