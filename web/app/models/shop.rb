@@ -27,6 +27,50 @@ class Shop < ApplicationRecord
   include ActionView::Helpers::DateHelper
   include ShopWorker
 
+  def shop_selection_and_setup
+    puts "After Create"
+    
+    # Fetch all shops matching either shopify_domain or myshopify_domain
+    matching_shops = Shop.where("shopify_domain = :domain OR myshopify_domain = :domain", domain: self.shopify_domain).order(created_at: :desc)
+    shops = matching_shops.select { |shop| shop.shopify_domain == self.shopify_domain }
+    puts "Shop Count: #{shops.count}"
+    
+     # Separate the current shop and old shop based on the domains
+    current_shop = shops.first
+    puts "New shop found...." if current_shop
+
+    old_shop = matching_shops.find { |shop| shop.myshopify_domain == self.shopify_domain }
+    puts "Old shop found...." if old_shop
+
+    # this is the case when 2 shops exists with the same shopify_domain so we are delelting the second shop
+    # which is the newer/current shop and re enabling the previous/original one.
+    if shops.count > 1
+      current_shop = shops.second
+      old_shop = shops.first
+    end
+
+    # This  will return shop acc to the shopify domain, it is receving through params.
+    # Will return the shop if it finds through shopify_domain, otherwise if shop can be find through
+    # myshopify_domain, means that user is re-installing the old shop, so we will enable the old shop,
+    # and deletes the newly created shop.
+
+    if shops.count > 1 || (old_shop.present? && !old_shop.id.eql?(current_shop&.id))
+      puts 'Im IN...'
+      token = current_shop.shopify_token
+      scopes = current_shop.access_scopes
+      puts 'Destroying Shop !!!'
+      current_shop&.destroy_completely
+      puts 'Re enabling old shop...'
+      old_shop.enable_reinstalled_shop(self.shopify_domain, token, scopes)
+      puts 'Shop Setup completed in re enable'
+      return
+    end
+    self.update(is_shop_active: true)
+
+    self.shop_setup
+    puts 'Shop Setup completed on first install'
+  end
+
   def shop_setup
     self.update(is_shop_active: true)
     ShopAction.create(
