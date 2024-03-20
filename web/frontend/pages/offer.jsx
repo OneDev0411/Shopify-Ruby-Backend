@@ -21,7 +21,6 @@ export default function Offers() {
   const { setIsSubscriptionUnpaid } = useShopState();
   const [error, setError] = useState(null);
   const { hasOffers, setHasOffers, shopSettings, updateShopSettingsAttributes } = useShopState();
-  const reduxDispatch = useDispatch();
 
   useEffect(() => {
     fetchShopData(shopAndHost.shop)

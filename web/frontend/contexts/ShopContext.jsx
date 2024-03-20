@@ -18,8 +18,8 @@ export default function ShopProvider({ children }) {
   const [trialDays, setTrialDays] = useState();
   const [hasOffers, setHasOffers] = useState();
   const [shopSettings, setShopSettings] = useState({...SETTINGS_DEFAULTS});
+  const [isSubscriptionUnpaid, setIsSubscriptionUnpaid] = useState(null);
   const [themeAppExtension, setThemeAppExtension] = useState();
-  const [isSubscriptionUnpaid, setIsSubscriptionUnpaid] = useState(false);
 
   function updateShopSettingsAttributes(updatedValue, ...updatedKey) {
     if (updatedKey.length == 1) {

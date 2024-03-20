@@ -2,10 +2,14 @@ import {useCallback, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal } from '@shopify/polaris';
 import {useShopState} from "../contexts/ShopContext.jsx";
+import {useAuthenticatedFetch} from "../hooks/index.js";
+import {useSelector} from "react-redux";
 
 const ModalChoosePlan = () => {
   const navigateTo = useNavigate();
-  const { isSubscriptionUnpaid } = useShopState();
+  const shopAndHost = useSelector((state) => state.shopAndHost);
+  const fetch = useAuthenticatedFetch(shopAndHost.host);
+  const { isSubscriptionUnpaid, setIsSubscriptionUnpaid } = useShopState();
 
   useEffect(() => {
     const modalContent = document.getElementById('not-dismissable-modal');
@@ -21,6 +25,17 @@ const ModalChoosePlan = () => {
         }
       }
     }
+
+    if(isSubscriptionUnpaid === null) {
+      fetch('api/v2/merchant/is_subscription_unpaid', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ shop: shopAndHost.shop })
+      }).then(response => response.json()).then((response) => { setIsSubscriptionUnpaid(response.subscription_not_paid) });
+    }
+
   }, [])
 
   const handleChoosePlan = useCallback(() => {
@@ -28,7 +43,7 @@ const ModalChoosePlan = () => {
   }, [navigateTo]);
 
   return (
-    <Modal
+  <Modal
       open={isSubscriptionUnpaid}
       onClose={() => false}
       title="Choose Plan"

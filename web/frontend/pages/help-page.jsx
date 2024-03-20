@@ -10,27 +10,12 @@ import {
 import { HelpLinks } from "../shared/constants/HelpPageLinks";
 
 import ModalChoosePlan from '../components/modal_ChoosePlan';
-import { useSelector } from 'react-redux';
-import { fetchShopData } from "../services/actions/shop";
-import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function HelpPage() {
     const [active, setActive] = useState(false);
-    const shopAndHost = useSelector((state) => state.shopAndHost);
-    const { isSubscriptionUnpaid, setIsSubscriptionUnpaid } = useShopState();
     const handleClose = useCallback(() => {
         setActive(false);
       }, []);
-
-    useEffect(() => {
-        // in case of page refresh
-        if (isSubscriptionUnpaid === null) {
-            fetchShopData(shopAndHost.shop).then((data) => {
-                setIsSubscriptionUnpaid(data.subscription_not_paid)
-            });
-        }
-    }, [isSubscriptionUnpaid]);
-
 
     const videoModal = useRef(null);
     const activator = videoModal;
