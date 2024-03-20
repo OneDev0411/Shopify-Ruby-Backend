@@ -19,6 +19,8 @@ import {
   ClickThroughtRateData
 } from "../components";
 import {useShopState} from "../contexts/ShopContext.jsx";
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
 
 export default function AnalyticsOffers() {
     const shopAndHost = useSelector((state) => state.shopAndHost);
@@ -29,6 +31,12 @@ export default function AnalyticsOffers() {
       setPeriod(val)
     },[]);
 
+    useEffect(()=> {
+      onLCP(traceStat, {reportSoftNavs: true});
+      onFID(traceStat, {reportSoftNavs: true});
+      onCLS(traceStat, {reportSoftNavs: true});
+    }, []);
+    
     const handleDismiss = () => {
       setError(null);
       setShowBanner(false);

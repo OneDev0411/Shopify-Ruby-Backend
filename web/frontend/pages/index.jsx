@@ -19,6 +19,8 @@ import ErrorPage from "../components/ErrorPage.jsx"
 import ModalChoosePlan from "../components/modal_ChoosePlan.jsx";
 import {useShopState} from "../contexts/ShopContext.jsx";
 import ABTestBanner from "../components/ABTestBanner.jsx";
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
 
 export default function HomePage() {
   const app = useAppBridge();
@@ -46,6 +48,12 @@ export default function HomePage() {
   const [isLegacy, setIsLegacy] = useState(
     themeAppExtension?.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true'
   );
+
+  useEffect(()=> {
+    onLCP(traceStat, {reportSoftNavs: true});
+    onFID(traceStat, {reportSoftNavs: true});
+    onCLS(traceStat, {reportSoftNavs: true});
+  }, []);
 
   const handleOpenOfferPage = () => {
     navigateTo('/edit-offer', { state: { offerID: null } });

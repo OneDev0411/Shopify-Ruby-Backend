@@ -10,6 +10,9 @@ import OfferProvider from "./contexts/OfferContext.jsx";
 import ShopProvider from "./contexts/ShopContext.jsx";
 import { intercomSettingsConfig } from "./assets";
 import { useEffect } from "react";
+import { perf } from "./services/firebase/perf.js";
+perf.instrumentationEnabled = true;
+perf.dataCollectionEnabled = true;
 
 export default function App() {
   // Any .tsx or .jsx files in /pages will become a route

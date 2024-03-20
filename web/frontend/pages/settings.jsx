@@ -11,6 +11,8 @@ import { Redirect, Toast } from '@shopify/app-bridge/actions';
 import { Partners, SettingTabs, CustomTitleBar } from "../components";
 import ErrorPage from "../components/ErrorPage.jsx";
 import ModalChoosePlan from '../components/modal_ChoosePlan';
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
 
 export default function Settings() {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -21,6 +23,12 @@ export default function Settings() {
     const app = useAppBridge();
     const [error, setError] = useState(null);
 
+    useEffect(()=> {
+        onLCP(traceStat, {reportSoftNavs: true});
+        onFID(traceStat, {reportSoftNavs: true});
+        onCLS(traceStat, {reportSoftNavs: true});
+      }, []);
+      
     useEffect(() => {
         fetchCurrentShop();
     }, []);

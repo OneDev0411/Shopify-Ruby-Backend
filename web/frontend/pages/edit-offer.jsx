@@ -17,6 +17,8 @@ import {Toast} from '@shopify/app-bridge/actions';
 import ErrorPage from "../components/ErrorPage.jsx"
 import {useShopSettings} from "../hooks/useShopSettings.js";
 import {useShopState} from "../contexts/ShopContext.jsx";
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
 
 export default function EditPage() {
     const { offer, setOffer } = useContext(OfferContext);
@@ -46,6 +48,11 @@ export default function EditPage() {
 
     const offerID = location?.state?.offerID;
 
+    useEffect(()=> {
+        onLCP(traceStat, {reportSoftNavs: true});
+        onFID(traceStat, {reportSoftNavs: true});
+        onCLS(traceStat, {reportSoftNavs: true});
+      }, []);
 
     //Call on initial render
     useEffect(() => {

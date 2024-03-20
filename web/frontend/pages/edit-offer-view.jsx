@@ -30,6 +30,8 @@ import {
 } from "../shared/constants/EditOfferOptions.js";
 import ErrorPage from "../components/ErrorPage.jsx"
 import UpgradeSubscriptionModal from "../components/UpgradeSubscriptionModal.jsx";
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
 
 const EditOfferView = () => {
   const { offer, setOffer, updateOffer } = useContext(OfferContext);
@@ -43,6 +45,12 @@ const EditOfferView = () => {
   const [checkKeysValidity, setCheckKeysValidity] = useState({});
   const navigateTo = useNavigate();
   const [openModal, setOpenModal] = useState(false);
+
+  useEffect(()=> {
+    onLCP(traceStat, {reportSoftNavs: true});
+    onFID(traceStat, {reportSoftNavs: true});
+    onCLS(traceStat, {reportSoftNavs: true});
+  }, []);
 
   const handleEditOffer = (offer_id) => {
     navigateTo('/edit-offer', { state: { offerID: offer_id } });
