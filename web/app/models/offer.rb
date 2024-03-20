@@ -18,7 +18,7 @@ class Offer < ApplicationRecord
   has_one :advanced_placement_setting, dependent: :destroy
   accepts_nested_attributes_for :advanced_placement_setting
 
-  after_save :populate_object_from_shopify
+  after_save :populate_object_from_shopify_in_background
 
   after_create :assign_initial_position_order
   attr_accessor :offerable_name
@@ -707,6 +707,13 @@ class Offer < ApplicationRecord
         item.get_details_after_create if item.title.blank?
       end
     end
+  end
+
+  # Private. Get all the info for a Product or Collection related to a rule (trigger).
+  #
+  # Return. Boolean.
+  def populate_object_from_shopify_in_background
+    Sidekiq::Client.push('class' => 'ShopWorker::OfferPopulatorJob', 'args' => [self.id], 'queue' => 'products', 'at' => Time.now.to_i)
   end
 
   # Public. Give us what collections are we using in the rules.

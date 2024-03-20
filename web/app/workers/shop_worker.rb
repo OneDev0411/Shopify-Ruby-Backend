@@ -11,6 +11,17 @@ module ShopWorker
     end
   end
 
+  class DisableJavaScriptJob
+    include Sidekiq::Worker
+    include Sidekiq::Status::Worker
+    sidekiq_options queue: 'scripts', retry: 2
+    def perform(shop_id)
+      icushop = Shop.find_by(id: shop_id)
+      return if icushop.blank?
+      icushop.disable_javascript
+    end
+  end
+
   class SaveOfferStatJob
     include Sidekiq::Worker
     sidekiq_options queue: 'stats'
@@ -288,7 +299,7 @@ module ShopWorker
       shop.iana_timezone = payload['iana_timezone']
       shop.money_format = payload['money_format']
       if payload['shopify_plan_name'] != shop.shopify_plan_name
-        $customerio.identify(id: shop.id, email: shop.email, shopify_plan: payload['shopify_plan_name'], app_plan_name: shop.plan&.name, active: shop.active?, created_at: shop.created_at.to_i, updated_at: Time.now.to_i, status: "installed")
+        # $customerio.identify(id: shop.id, email: shop.email, shopify_plan: payload['shopify_plan_name'], app_plan_name: shop.plan&.name, active: shop.active?, created_at: shop.created_at.to_i, updated_at: Time.now.to_i, status: "installed")
         ShopEvent.create(shop_id: shop.id, title: "Shopify Plan Changed", body: "From #{shop.shopify_plan_name} (#{shop.shopify_plan_internal_name}) to #{payload['shopify_plan_name']} (#{payload['shopify_plan_internal_name']})", revenue_impact: 0)
         if shop.shopify_plan_name == "frozen"
           should_republish = true
