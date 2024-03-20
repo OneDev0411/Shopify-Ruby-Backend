@@ -17,7 +17,7 @@ import {useShopState} from "../../../contexts/ShopContext.jsx";
 // Advanced Tab
 export function FourthTab(props) {
     const { offer, updateOffer, updateNestedAttributeOfOffer } = useContext(OfferContext);
-    const { shopSettings } = useShopState();
+    const { shopSettings, themeAppExtension } = useShopState();
     const handleChange = useCallback((newChecked) => updateOffer("save_as_default_setting", newChecked), []);
     const handleProductDomSelector = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting",  "custom_product_page_dom_selector"), []);
     const handleProductDomAction = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_product_page_dom_action"), []);
@@ -27,7 +27,7 @@ export function FourthTab(props) {
     const handleAjaxDomAction = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "advanced_placement_setting", "custom_ajax_dom_action"), []);
     const handleOfferCss = useCallback((newValue) => updateNestedAttributeOfOffer(newValue, "custom_css"), []);
 
-    const isLegacy = props.themeAppExtension.theme_version !== '2.0' || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true';
+    const isLegacy = themeAppExtension.theme_version !== '2.0' || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true';
 
     const [themeAppUrl, setThemeAppUrl] = useState('');
 
@@ -69,8 +69,8 @@ export function FourthTab(props) {
             { !isLegacy && offer.in_ajax_cart &&
               (
                 <div style={{marginBottom: "10px"}} className="polaris-banner-container">
-                    <Banner title="You are using Shopify's Theme Editor" status={props.themeAppExtension?.theme_app_embed ? 'success' : 'warning'}>
-                        {!props.themeAppExtension?.theme_app_embed ?
+                    <Banner title="You are using Shopify's Theme Editor" status={themeAppExtension?.theme_app_embed ? 'success' : 'warning'}>
+                        {!themeAppExtension?.theme_app_embed ?
                             <>
                                 <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
                                 <p><Link

@@ -35,7 +35,7 @@ import {useShopState} from "../../../contexts/ShopContext.jsx";
 
 export function SecondTab(props) {
     const { offer, setOffer, updateOffer, updateNestedAttributeOfOffer } = useContext(OfferContext);
-    const { shopSettings } = useShopState();
+    const { shopSettings, themeAppExtension } = useShopState();
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
 
@@ -59,7 +59,7 @@ export function SecondTab(props) {
     const [templateImagesURL, setTemplateImagesURL] = useState({});
     const [storedThemeNames, setStoredThemeName] = useState([]);
 
-    const isLegacy = props.themeAppExtension.theme_version !== '2.0' || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true';
+    const isLegacy = themeAppExtension.theme_version !== '2.0' || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true';
 
     useEffect(() => {
         fetch(`/api/v2/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
@@ -708,7 +708,7 @@ export function SecondTab(props) {
                 </div>
             )}
 
-            {(selected === "ajax" && !props.themeAppExtension?.theme_app_embed && !isLegacy) && (
+            {(selected === "ajax" && !themeAppExtension?.theme_app_embed && !isLegacy) && (
               <div style={{marginBottom: "10px"}} className="polaris-banner-container">
                   <Banner title="You are using Shopify's Theme Editor" tone='warning'>
                       <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
