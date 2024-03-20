@@ -22,6 +22,7 @@
     "@shopify/shopify-app-session-storage-postgresql": "^1.1.7",
     "@vitejs/plugin-react": "4.0",
     "axios": "^1.4.0",
+    "firebase": "^10.8.1",
     "react": "^18.2",
     "react-color": "^2.19.3",
     "react-dom": "^18.2",
@@ -30,22 +31,23 @@
     "react-query": "^3.36",
     "react-redux": "^8.1.0",
     "react-router-dom": "^6.4",
+    "react-siema": "^1.0.1",
     "react-slick": "^0.29.0",
+    "siema": "^1.5.1",
     "slick-carousel": "^1.8.1",
     "tinycolor2": "^1.6.0",
-    "react-siema": "^1.0.1",
-    "siema": "^1.5.1",
-    "vite": "^4.3"
+    "vite": "^4.3",
+    "web-vitals": "3.5.2-soft-navs-16"
   },
   "devDependencies": {
-    "history": "^5.3.0",
-    "jsdom": "^22.0",
-    "prettier": "^2.6.0",
     "eslint": "^8.23.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-next": "12.2.5",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "history": "^5.3.0",
+    "jsdom": "^22.0",
+    "prettier": "^2.6.0",
     "vi-fetch": "^0.6.1"
   }
 }

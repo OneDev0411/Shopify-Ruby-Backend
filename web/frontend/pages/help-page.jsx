@@ -10,9 +10,18 @@ import {
 import { HelpLinks } from "../shared/constants/HelpPageLinks";
 
 import ModalChoosePlan from '../components/modal_ChoosePlan';
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
 
 export default function HelpPage() {
     const [active, setActive] = useState(false);
+
+    useEffect(()=> {
+        onLCP(traceStat, {reportSoftNavs: true});
+        onFID(traceStat, {reportSoftNavs: true});
+        onCLS(traceStat, {reportSoftNavs: true});
+      }, []);
+    
     const handleClose = useCallback(() => {
         setActive(false);
       }, []);

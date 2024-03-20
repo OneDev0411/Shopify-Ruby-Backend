@@ -1,6 +1,7 @@
 import { authenticatedFetch } from "@shopify/app-bridge-utils";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { Redirect } from "@shopify/app-bridge/actions";
+import { beginTrace, endTrace } from "../services/firebase/perf";
 
 /**
  * A hook that returns an auth-aware fetch function.
@@ -26,7 +27,14 @@ export function useAuthenticatedFetch(host) {
     const headers = new Headers(options.headers);
     headers.append('SourceApp', "icu-polaris");
     options.headers = headers;
-    const response = await fetchFunction(uriWithHost, options);
+    let response;
+    if(url.includes('https://web.incartupsell.com')) {
+      const trace = beginTrace(new URL(url).pathname);
+      response = await fetchFunction(uriWithHost, options);
+      endTrace(trace);
+    } else {
+      response = await fetchFunction(uriWithHost, options);
+    }
     checkHeadersForReauthorization(response.headers, app);
     return response;
   };
