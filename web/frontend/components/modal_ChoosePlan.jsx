@@ -26,13 +26,15 @@ const ModalChoosePlan = () => {
       }
     }
 
-    fetch('api/v2/merchant/is_subscription_unpaid', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ shop: shopAndHost.shop })
-    }).then(response => response.json()).then((response) => { setIsSubscriptionUnpaid(response.subscription_not_paid) });
+    if(isSubscriptionUnpaid === null) {
+      fetch('api/v2/merchant/is_subscription_unpaid', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ shop: shopAndHost.shop })
+      }).then(response => response.json()).then((response) => { setIsSubscriptionUnpaid(response.subscription_not_paid) });
+    }
 
   }, [])
 
