@@ -1265,7 +1265,7 @@ class Shop < ApplicationRecord
     if (!self.theme_app_extension.theme_app_complete || self.theme_app_extension.theme_version != '2.0') && ENV['ENABLE_THEME_APP_EXTENSION']&.downcase != 'true'
       self.publish_async
     elsif !script_tag_id.nil?
-      self.disable_javascript
+      Sidekiq::Client.push('class' => 'ShopWorker::DisableJavaScriptJob', 'args' => [id], 'queue' => 'scripts', 'at' => Time.now.to_i)
     end
   end
 

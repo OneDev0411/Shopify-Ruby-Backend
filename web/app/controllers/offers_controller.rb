@@ -34,7 +34,6 @@ class OffersController < AuthenticatedController
     end
 
     if offer.save
-      $customerio.track(@icushop.id, 'offer created')
 
       @icushop.publish_or_delete_script_tag
 
