@@ -1206,49 +1206,58 @@ class Shop < ApplicationRecord
   end
 
   def offer_data_with_stats_by_period(period)
-    data = []
+    start_date, end_date = period_hash_to_offers[period].values_at(:start_date, :end_date)
 
-    start_date = period_hash_to_offers[period][:start_date]
-    end_date = period_hash_to_offers[period][:end_date]
+    # Define the CTE with the proper WITH clause
+    combined_stats_cte = <<-SQL
+      WITH combined_stats AS (
+        SELECT
+          d.offer_id,
+          SUM(d.times_clicked) AS total_clicks,
+          SUM(d.times_loaded) AS total_views,
+          SUM(e.amount) FILTER (WHERE e.action = 'sale') AS total_revenue
+        FROM
+          daily_stats d
+          LEFT JOIN offer_events e ON d.offer_id = e.offer_id AND e.created_at BETWEEN '#{start_date}' AND '#{end_date}'
+        WHERE
+          d.created_at BETWEEN '#{start_date}' AND '#{end_date}'
+          AND d.shop_id = #{self.id} -- Assuming DailyStat has a shop_id column
+        GROUP BY
+          d.offer_id
+      )
+    SQL
 
-    # First before join to the offers table, get daily_stats and offer_events
-    # data which their created_at is between start_date and end_date
-    daily_stats_subquery = DailyStat
-      .select('offer_id, SUM(times_clicked) as total_clicks, SUM(times_loaded) as total_views')
-      .where(created_at: start_date..end_date)
-      .group(:offer_id)
+    # Main query referencing the CTE
+    query = <<-SQL
+      #{combined_stats_cte}
+      SELECT
+        o.id, o.shop_id, o.title, o.active, o.created_at,
+        COALESCE(cs.total_clicks, 0) AS total_clicks,
+        COALESCE(cs.total_views, 0) AS total_views,
+        COALESCE(cs.total_revenue, 0) AS total_revenue
+      FROM
+        offers o
+        LEFT OUTER JOIN combined_stats cs ON cs.offer_id = o.id
+      WHERE
+        o.shop_id = #{self.id}
+      ORDER BY
+        total_revenue DESC
+      LIMIT 3
+    SQL
 
-    offer_events_subquery = OfferEvent
-      .select('offer_id, SUM(amount) as total_revenue')
-      .where(created_at: start_date..end_date)
-      .where(action: 'sale')
-      .group(:offer_id)
-
-    # Reorder the offers data due to the default query of offer model
-    # If the data isn't reordered, the query result is wrong due to two order queries
-    # one is the default order by position_order and another one is a order by total_revenue
-    offers
-    .reorder('')
-    .joins("LEFT OUTER JOIN (#{daily_stats_subquery.to_sql}) ds ON ds.offer_id = offers.id")
-    .joins("LEFT OUTER JOIN (#{offer_events_subquery.to_sql}) oe ON oe.offer_id = offers.id")
-    .select('offers.id, offers.shop_id, offers.title, offers.active, offers.created_at, offers.offerable_type,
-            COALESCE(ds.total_clicks, 0) AS total_clicks,
-            COALESCE(ds.total_views, 0) AS total_views,
-            COALESCE(oe.total_revenue, 0) as total_revenue')
-    .group('offers.id, ds.total_clicks, ds.total_views, oe.total_revenue')
-    .order('total_revenue DESC')
-    .limit(3)
-    .each do |offer|
-      data << {
-        id: offer.id,
-        title: offer.title,
-        status: offer.active,
-        clicks: offer.total_clicks,
-        views: offer.total_views,
-        revenue: offer.total_revenue,
-        created_at: offer.created_at.to_datetime,
+    # Execute the query
+    data = ActiveRecord::Base.connection.execute(query).map do |offer|
+      {
+        id: offer['id'],
+        title: offer['title'],
+        status: offer['active'],
+        clicks: offer['total_clicks'],
+        views: offer['total_views'],
+        revenue: offer['total_revenue'],
+        created_at: offer['created_at']
       }
     end
+
     return data
   end
 
