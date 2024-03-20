@@ -43,7 +43,6 @@ export default function HomePage() {
   const [error, setError] = useState(null);
 
   const navigateTo = useNavigate();
-  console.log(shop);
   const [isLegacy, setIsLegacy] = useState(
     themeAppExtension?.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true'
   );
