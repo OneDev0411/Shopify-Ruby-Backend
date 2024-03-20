@@ -23,7 +23,6 @@ import {useShopState} from "../contexts/ShopContext.jsx";
 export default function AnalyticsOffers() {
     const shopAndHost = useSelector((state) => state.shopAndHost);
     const [period, setPeriod] = useState('daily');
-    const { isSubscriptionUnpaid, setIsSubscriptionUnpaid } = useShopState();
     const [error, setError] = useState(null);
     const [showBanner, setShowBanner] = useState(false); 
     const setTimePeriod = useCallback((val) => {
@@ -39,14 +38,6 @@ export default function AnalyticsOffers() {
       setError('Some of your analytics data failed to load, so your stats may not be complete.');
       setShowBanner(true);
     };
-    useEffect(() => {
-      // in case of page refresh
-      if (isSubscriptionUnpaid === null) {
-        fetchShopData(shopAndHost.shop).then((data) => {
-          setIsSubscriptionUnpaid(data.subscription_not_paid)
-        });
-      }
-    }, [isSubscriptionUnpaid]);
 
     const options = [
       {label: 'Today', value: 'daily'},
