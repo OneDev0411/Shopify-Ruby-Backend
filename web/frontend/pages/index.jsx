@@ -94,7 +94,7 @@ export default function HomePage() {
           updateShopSettingsAttributes(data.offers_limit_reached, "offers_limit_reached");
 
           if (data.theme_app_extension) {
-            setIsLegacy(data.theme_app_extension.theme_version !== "2.0");
+            setIsLegacy(data.theme_app_extension.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
           }
           // notify intercom as soon as app is loaded and shop info is fetched
           notifyIntercom(data.shop);
