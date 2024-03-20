@@ -96,7 +96,7 @@ module Api
         #GET /api/v2/merchant/toggle_activation
         def toggle_activation
           @icushop.update_attribute(:activated, !@icushop.activated)
-          @icushop.force_purge_cache
+          Sidekiq::Client.push('class' => 'ShopWorker::ForcePurgeCacheJob', 'args' => [@icushop.id], 'queue' => 'shop', 'at' => Time.now.to_i)
           render "shops/toggle_activation"
         end
 
