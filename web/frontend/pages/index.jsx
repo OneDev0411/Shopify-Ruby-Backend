@@ -23,14 +23,29 @@ import ABTestBanner from "../components/ABTestBanner.jsx";
 export default function HomePage() {
   const app = useAppBridge();
   const shopAndHost = useSelector(state => state.shopAndHost);
-  const { shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers, shopSettings,
-    updateShopSettingsAttributes, setIsSubscriptionUnpaid } = useShopState();
-  const [themeAppExtension, setThemeAppExtension] = useState();
+
+  const {
+    shop,
+    setShop,
+    planName,
+    setPlanName,
+    trialDays,
+    setTrialDays,
+    hasOffers,
+    setHasOffers,
+    shopSettings,
+    updateShopSettingsAttributes,
+    themeAppExtension,
+    setThemeAppExtension,
+    setIsSubscriptionUnpaid} = useShopState()
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const navigateTo = useNavigate();
-  const [isLegacy, setIsLegacy] = useState(true);
+  const [isLegacy, setIsLegacy] = useState(
+    themeAppExtension?.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true'
+  );
 
   const handleOpenOfferPage = () => {
     navigateTo('/edit-offer', { state: { offerID: null } });

@@ -20,7 +20,7 @@ import {useShopState} from "../contexts/ShopContext.jsx";
 
 export default function EditPage() {
     const { offer, setOffer } = useContext(OfferContext);
-    const { shopSettings, setShopSettings } = useShopState();
+    const { shopSettings, setShopSettings, themeAppExtension, setThemeAppExtension } = useShopState();
     const { fetchOffer, saveOffer, createOffer } = useOffer();
     const { fetchShopSettings, updateShopSettings } = useShopSettings();
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -39,7 +39,6 @@ export default function EditPage() {
         isPending: "Launch Autopilot",
     });
     const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState({});
-    const [themeAppExtension, setThemeAppExtension] = useState();
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -348,7 +347,7 @@ export default function EditPage() {
                                     {selected == 1 ?
                                         // page was imported from components folder
                                         <SecondTab autopilotCheck={autopilotCheck} handleTabChange={changeTab}
-                                                   enableOrDisablePublish={enableOrDisablePublish} themeAppExtension={themeAppExtension}
+                                                   enableOrDisablePublish={enableOrDisablePublish}
                                         />
                                         : ""}
                                     {selected == 2 ?
@@ -360,7 +359,7 @@ export default function EditPage() {
                                     {selected == 3 ?
                                         // page was imported from components folder
                                         <FourthTab shopifysaveDraft={saveDraft} publishOffer={publishOffer}
-                                                   enablePublish={enablePublish} themeAppExtension={themeAppExtension}/>
+                                                   enablePublish={enablePublish} />
                                         : ""}
                                 </Tabs>
                             </div>
