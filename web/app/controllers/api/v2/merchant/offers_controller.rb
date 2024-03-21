@@ -20,7 +20,7 @@ module Api
             shopify_domain: @icushop.shopify_domain,
             offers: @icushop.offer_data_with_stats,
             offers_limit_reached: @icushop.offers_limit_reached?,
-            offers_limit: @icushop.subscription.offers_limit
+            offers_limit: @icushop.plan.offers_limit
           }
         end
 
