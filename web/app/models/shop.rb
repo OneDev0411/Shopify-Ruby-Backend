@@ -414,7 +414,7 @@ class Shop < ApplicationRecord
   #
   # Returns Boolean.
   def offers_limit_reached?
-    subscription.offers_limit <= active_offers.length
+    plan.present? && plan.offers_limit <= active_offers.length
   end
 
   # Public. TRUE if the shop has the multi_offer feature AND does not have any product or collection offers
