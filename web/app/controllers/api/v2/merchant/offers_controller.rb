@@ -16,7 +16,12 @@ module Api
 
         # POST /api/v2/merchant/offers_list
         def offers_list
-          render json: { shopify_domain: @icushop.shopify_domain, offers: @icushop.offer_data_with_stats }
+          render json: {
+            shopify_domain: @icushop.shopify_domain,
+            offers: @icushop.offer_data_with_stats,
+            offers_limit_reached: @icushop.offers_limit_reached?,
+            offers_limit: @icushop.subscription.offers_limit
+          }
         end
 
         # POST /api/v2/merchant/offer_stats

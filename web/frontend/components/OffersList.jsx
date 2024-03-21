@@ -25,6 +25,7 @@ import {CreateOfferCard} from "./CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 import ErrorPage from "../components/ErrorPage";
+import UpgradeSubscriptionModal from "./UpgradeSubscriptionModal.jsx";
 
 export function OffersList({ pageSize }) {
   const app = useAppBridge();
@@ -41,6 +42,10 @@ export function OffersList({ pageSize }) {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [modalActive, setModalActive] = useState(false);
+
+  const [offersLimitReached, setOffersLimitReached] = useState(false);
+  const [offersLimit, setOffersLimit] = useState();
+  const [openOffersModal, setOpenOffersModal] = useState(false);
 
   const toggleModal = useCallback(() => {
     setModalActive(!modalActive)
@@ -69,6 +74,8 @@ export function OffersList({ pageSize }) {
         // localStorage.setItem('icushopify_domain', data.shopify_domain);
         setOffersData(data.offers);
         setFilteredData(data.offers);
+        setOffersLimitReached(data.offers_limit_reached);
+        setOffersLimit(data.offers_limit);
         setIsLoading(false);
       }}).catch((error) => {
         setError(error);
@@ -127,7 +134,7 @@ export function OffersList({ pageSize }) {
     }
     setSortValue(value), []});
 
-  const promotedBulkActions = ((selectedResources.length == 1 && paginatedData.find(obj => obj['id'] === selectedResources[0])?.offerable_type == 'auto')) ? 
+  const promotedBulkActions = ((selectedResources.length === 1 && paginatedData.find(obj => obj['id'] === selectedResources[0])?.offerable_type == 'auto')) ?
   [
     {
       content: 'Publish',
@@ -139,30 +146,48 @@ export function OffersList({ pageSize }) {
       onAction: () => { createDuplicateOffer();},
     },
   ];
-  const bulkActions = ((selectedResources.length == 1 && paginatedData.find(obj => obj['id'] === selectedResources[0])?.offerable_type == 'auto')) ?
-  [
-    {
-      content: 'Unpublish',
-      onAction: () => deactivateSelectedOffer(),
-    },
-    {
-      content: 'Delete',
-      onAction: () => deleteSelectedOffer(),
-    },
-  ] : [
-    {
-      content: 'Publish',
-      onAction: () => activateSelectedOffer(),
-    },
-    {
-      content: 'Unpublish',
-      onAction: () => deactivateSelectedOffer(),
-    },
-    {
-      content: 'Delete',
-      onAction: () => deleteSelectedOffer(),
-    },
-  ];
+
+  let bulkActions = [];
+  if ((selectedResources.length === 1 && paginatedData.find(obj => obj['id'] === selectedResources[0])?.offerable_type == 'auto')) {
+    bulkActions =
+      [
+        {
+          content: 'Unpublish',
+          onAction: () => deactivateSelectedOffer(),
+        },
+        {
+          content: 'Delete',
+          onAction: () => deleteSelectedOffer(),
+        },
+      ]
+  } else if  (selectedResources.length > 1 && offersLimit === 1) {
+    bulkActions =
+      [
+        {
+          content: 'Unpublish',
+          onAction: () => deactivateSelectedOffer(),
+        },
+        {
+          content: 'Delete',
+          onAction: () => deleteSelectedOffer(),
+        },
+      ]
+  } else {
+    bulkActions = [
+      {
+        content: 'Publish',
+        onAction: () => activateSelectedOffer(),
+      },
+      {
+        content: 'Unpublish',
+        onAction: () => deactivateSelectedOffer(),
+      },
+      {
+        content: 'Delete',
+        onAction: () => deleteSelectedOffer(),
+      },
+    ];
+  }
 
   const filters = [
     {
@@ -265,26 +290,30 @@ export function OffersList({ pageSize }) {
   }
 
   function activateSelectedOffer() {
-    selectedResources.forEach(function (resource) {
-      let url = '/api/v2/merchant/offer_activate';
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ offer: { offer_id: resource }, shop: shopAndHost.shop })
-      })
-        .then((response) => response.json())
-        .then(() => {
-          const dataDup = [...offersData];
-          dataDup.find((o) => o.id == resource).status = true;
-          setOffersData([...dataDup]);
-          selectedResources.shift();
+    if (offersLimitReached) {
+      setOpenOffersModal(true);
+    } else {
+      selectedResources.forEach(function (resource) {
+        let url = '/api/v2/merchant/offer_activate';
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({offer: {offer_id: resource}, shop: shopAndHost.shop})
         })
-        .catch((error) => {
-          setError(error);
-        })
-    });
+          .then((response) => response.json())
+          .then(() => {
+            const dataDup = [...offersData];
+            dataDup.find((o) => o.id == resource).status = true;
+            setOffersData([...dataDup]);
+            selectedResources.shift();
+          })
+          .catch((error) => {
+            setError(error);
+          })
+      });
+    }
   }
 
   function deactivateSelectedOffer() {
@@ -416,6 +445,7 @@ export function OffersList({ pageSize }) {
         </>
       )}
       <div className="space-10"></div>
+      <UpgradeSubscriptionModal openModal={openOffersModal} setOpenModal={setOpenOffersModal} />
     </div>
   );
 

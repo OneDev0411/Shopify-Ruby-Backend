@@ -22,7 +22,7 @@ const UpgradeSubscriptionModal = ({ openModal, setOpenModal }) => {
       <Modal.Section>
         <p>
           You are currently at the limit for published offers. Click the button below to upgrade your
-          plan and get access to more offers and features!
+          plan and get access to unlimited offers and features!
         </p>
       </Modal.Section>
     </Modal>

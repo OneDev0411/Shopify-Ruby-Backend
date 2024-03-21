@@ -335,9 +335,9 @@ export default function EditPage() {
                                     fitted
                                 >
                                     { shopSettings?.offers_limit_reached && (
-                                      <Banner status="info">
+                                      <Banner status="warning">
                                           <p>You are currently at the limit for published offers. <Link
-                                            to="/subscription">Click here</Link> to upgrade your plan and get access to more offers and features!</p>
+                                            to="/subscription">Click here</Link> to upgrade your plan and get access to unlimited offers and features!</p>
                                       </Banner>
                                     )}
                                     <div className='space-4'></div>
