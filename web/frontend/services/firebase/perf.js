@@ -1,10 +1,8 @@
 import { getPerformance } from "firebase/performance";
 import { firebaseApp } from "./firebase";
 import { trace } from "firebase/performance";
-import { getAnalytics, logEvent } from "firebase/analytics";
 
 export const perf = getPerformance(firebaseApp);
-export const analytics = getAnalytics(firebaseApp);
 
 export const beginTrace = (
   metric
@@ -32,9 +30,6 @@ export const traceStat = (metric) => {
   }
   if (metric.name === 'FID') {
     startTime = metric.entries[0]?.startTime
-  }
-  if (metric.name === 'CLS') {
-    logEvent(analytics, 'CLS', { value: delta })
   }
   metricTrace.record(startTime, delta);
   // setTimeout(() => {
