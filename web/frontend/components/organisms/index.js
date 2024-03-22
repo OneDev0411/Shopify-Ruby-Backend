@@ -6,6 +6,7 @@ import DisplayConditions from "./display-conditions";
 import OfferBox from "./offer-box";
 import AppearanceColor from "./appearance-color";
 import OfferText from "./offer-text";
+import AdvancedSettings from "./advanced-settings";
 
 export {
     OfferProduct,
@@ -16,4 +17,5 @@ export {
     OfferBox,
     AppearanceColor,
     OfferText,
+    AdvancedSettings,
 };
