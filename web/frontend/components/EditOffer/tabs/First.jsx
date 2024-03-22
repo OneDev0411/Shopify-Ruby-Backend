@@ -4,6 +4,7 @@ import { OfferContext } from "../../../contexts/OfferContext.jsx";
 import { Button, LegacyStack, Spinner } from "@shopify/polaris";
 
 import { OfferContent, DisplayOptions, OfferProduct } from "../../organisms/index.js";
+import { LoadingSpinner } from "../../atoms/index.js";
 
 
 export function FirstTab(props) {
@@ -23,15 +24,7 @@ export function FirstTab(props) {
     return (
         <div id="first-tab-offer">
             {isLoading ? (
-                <div style={{
-                    overflow: 'hidden',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    minHeight: '100vh',
-                }}>
-                    <Spinner size="large" color="teal"/>
-                </div>
+                <LoadingSpinner />
             ) : (
                 <>
                     <OfferProduct

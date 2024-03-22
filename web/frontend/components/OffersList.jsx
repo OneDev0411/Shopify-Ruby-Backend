@@ -26,6 +26,7 @@ import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
 import ErrorPage from "../components/ErrorPage";
 import UpgradeSubscriptionModal from "./UpgradeSubscriptionModal.jsx";
+import { LoadingSpinner } from './atoms/index.js';
 
 export function OffersList({ pageSize }) {
   const app = useAppBridge();
@@ -352,17 +353,7 @@ export function OffersList({ pageSize }) {
   return (
     <div className="narrow-width-layout">
       {isLoading ? (
-        <div
-          style={{
-            overflow: "hidden",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "100vh",
-          }}
-        >
-          <Spinner size="large" color="teal" />
-        </div>
+        <LoadingSpinner />
       ) : (
         <>
           {offersData.length === 0 ? (

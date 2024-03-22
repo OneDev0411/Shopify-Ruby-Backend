@@ -1,15 +1,11 @@
 import {
-    Banner,
     Button,
     Checkbox,
     Grid,
-    Image,
     LegacyCard,
     LegacyStack,
     Modal,
-    RadioButton,
     Select,
-    Text
 } from "@shopify/polaris";
 import { useState, useCallback, useRef, useEffect, useContext } from "react";
 import React from "react";
@@ -22,6 +18,7 @@ import { OfferThemeOptions, OfferNewThemeOptions } from "../../../shared/constan
 import {OfferContext} from "../../../contexts/OfferContext.jsx";
 import {useShopState} from "../../../contexts/ShopContext.jsx";
 import { OfferPlacement } from "../../molecules/index.js";
+import { BannerContainer } from "../../atoms/index.js";
 
 const ChoosePlacement = (props) => {
     const { offer, updateOffer, updateNestedAttributeOfOffer } = useContext(OfferContext);
@@ -622,28 +619,31 @@ const ChoosePlacement = (props) => {
     return (
         <>
             {(!storedThemeNames?.includes(shopifyThemeName) && openBanner && isLegacy) && (
-                <div style={{marginBottom: "10px"}} className="polaris-banner-container">
-                    <Banner title="Unsupported Theme Detected" onDismiss={() => {
-                        setOpenBanner(!openBanner)
-                    }} tone='warning'>
-                        <p>Templates and default settings are unavailable for your theme.</p><br/>
-                        <p>Please follow <Link
-                            to="https://help.incartupsell.com/en/articles/8558593-how-to-manually-setup-an-offer-new-ui"
-                            target="_blank">this guide</Link> to add your selectors and actions in the Advanced Tab or
-                            contact support for assistance. We will be adding support for more themes regularly!</p>
-                    </Banner>
-                </div>
+                <BannerContainer
+                    title="Unsupported Theme Detected"
+                    onDismiss={() => {
+                    setOpenBanner(!openBanner);
+                    }}
+                    tone="warning"
+                >
+                    <p>Templates and default settings are unavailable for your theme.</p><br/>
+                    <p>Please follow <Link
+                        to="https://help.incartupsell.com/en/articles/8558593-how-to-manually-setup-an-offer-new-ui"
+                        target="_blank">this guide</Link> to add your selectors and actions in the Advanced Tab or
+                        contact support for assistance. We will be adding support for more themes regularly!</p>
+                </BannerContainer>
             )}
 
             {(selected === "ajax" && !themeAppExtension?.theme_app_embed && !isLegacy) && (
-              <div style={{marginBottom: "10px"}} className="polaris-banner-container">
-                  <Banner title="You are using Shopify's Theme Editor" tone='warning'>
-                      <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
-                      <p><Link
+                <BannerContainer
+                    title="You are using Shopify's Theme Editor"
+                    tone="warning"
+                >
+                    <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
+                    <p><Link
                         to={`https://${shopSettings.shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/ajax_cart_app_block`}
                         target="_blank">Click here</Link> to go to the theme editor</p>
-                  </Banner>
-              </div>
+                </BannerContainer>
             )}
 
             <LegacyCard title="Choose placement" sectioned>

@@ -32,6 +32,7 @@ import ErrorPage from "../components/ErrorPage.jsx"
 import UpgradeSubscriptionModal from "../components/UpgradeSubscriptionModal.jsx";
 import { onLCP, onFID, onCLS } from 'web-vitals';
 import { traceStat } from "../services/firebase/perf.js";
+import { LoadingSpinner } from "../components/atoms/index.js";
 
 const EditOfferView = () => {
   const { offer, setOffer, updateOffer } = useContext(OfferContext);
@@ -178,15 +179,7 @@ const EditOfferView = () => {
     <AppProvider i18n={[]}>
       <div className="page-space">
         {isLoading ? (
-          <div style={{
-              overflow: 'hidden',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: '100vh',
-          }}>
-            <Spinner size="large" color="teal"/>
-          </div>
+          <LoadingSpinner />
         ) : (
           <>
             <Page

@@ -21,6 +21,7 @@ import {useShopState} from "../contexts/ShopContext.jsx";
 import ABTestBanner from "../components/ABTestBanner.jsx";
 import { onLCP, onFID, onCLS } from 'web-vitals';
 import { traceStat } from "../services/firebase/perf.js";
+import { LoadingSpinner } from "../components/atoms/index.js";
 
 export default function HomePage() {
   const app = useAppBridge();
@@ -121,17 +122,7 @@ export default function HomePage() {
   return (
     <Page>
       {isLoading ? (
-        <div
-          style={{
-            overflow: "hidden",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "100vh",
-          }}
-        >
-          <Spinner size="large" color="teal" />
-        </div>
+        <LoadingSpinner />
       ) : (
         <>
           <ModalChoosePlan />

@@ -16,6 +16,7 @@ import ErrorPage from "../components/ErrorPage.jsx"
 import {useShopState} from "../contexts/ShopContext.jsx";
 import { onLCP, onFID, onCLS } from 'web-vitals';
 import { traceStat } from "../services/firebase/perf.js";
+import { LoadingSpinner } from "../components/atoms/index.js";
 
 export default function Subscription() {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -103,15 +104,7 @@ export default function Subscription() {
     <Page>
         <CustomTitleBar title='Billing' icon={BillingStatementDollarMajor}/>
         { isLoading ?  (
-          <div style={{
-            overflow: 'hidden',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: '100vh',
-          }}>
-            <Spinner size="large" color="teal"/>
-          </div>
+          <LoadingSpinner />
         ) : (
           <>
             <div className="auto-height paid-subscription">
