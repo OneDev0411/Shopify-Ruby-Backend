@@ -21,6 +21,7 @@ import {Link} from 'react-router-dom';
 import { OfferThemeOptions, OfferNewThemeOptions } from "../../../shared/constants/EditOfferOptions";
 import {OfferContext} from "../../../contexts/OfferContext.jsx";
 import {useShopState} from "../../../contexts/ShopContext.jsx";
+import { OfferPlacement } from "../../molecules/index.js";
 
 const ChoosePlacement = (props) => {
     const { offer, updateOffer, updateNestedAttributeOfOffer } = useContext(OfferContext);
@@ -724,333 +725,75 @@ const ChoosePlacement = (props) => {
                 </LegacyStack>
                 { isLegacy &&
                     (multipleDefaultSettings ? (
-                        (offer.in_product_page && offer.in_cart_page) ? (
-                            <>
-                                <hr className="legacy-card-hr legacy-card-hr-t20-b15"/>
-
-                                <div style={{paddingBottom: '12px'}}>
-                                    <Text variant="headingSm" as="h2">Where on this page would you like the offer to
-                                        appear?</Text>
-                                </div>
-                                <Grid>
-                                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 8}}>
-                                        <RadioButton
-                                            label="Use default settings for Product Page"
-                                            checked={offer.placement_setting?.default_product_page}
-                                            name="prod-settings"
-                                            onChange={(event) => handleDefaultSettingChange(event, 'product')}
-                                            disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                                        />
-                                    </Grid.Cell>
-                                </Grid>
-                                <Grid>
-                                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
-                                        <RadioButton
-                                            label="Use Template for Product Page"
-                                            checked={!offer.placement_setting?.default_product_page}
-                                            name="prod-settings"
-                                            onChange={(event) => handleUseTemplateChange(event, 'product')}
-                                            disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                                        />
-                                    </Grid.Cell>
-                                </Grid>
-                                {!offer.placement_setting?.default_product_page && !offer?.advanced_placement_setting?.advanced_placement_setting_enabled && (
-                                    <>
-                                        <div className="space-4"/>
-                                        <Image
-                                            source={templateImagesURL.product_page_image_1}
-                                            alt="Sample Image 1"
-                                            style={{
-                                                marginRight: '10px',
-                                                marginTop: '10px',
-                                                cursor: 'pointer',
-                                                width: '165px'
-                                            }}
-                                            className={themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_product_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                            onClick={() => handleImageClick('product_page', 1)}
-                                        />
-                                        <Image
-                                            source={templateImagesURL.product_page_image_2}
-                                            alt="Sample Image 2"
-                                            style={{
-                                                marginLeft: '10px',
-                                                marginRight: '10px',
-                                                cursor: 'pointer',
-                                                width: '165px'
-                                            }}
-                                            className={themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_product_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                            onClick={() => handleImageClick('product_page', 2)}
-                                        />
-                                        <Image
-                                            source={templateImagesURL.product_page_image_3}
-                                            alt="Sample Image 3"
-                                            style={{marginLeft: '10px', cursor: 'pointer', width: '165px'}}
-                                            className={themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_product_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                            onClick={() => handleImageClick('product_page', 3)}
-                                        />
-                                    </>
-                                )}
-                                <hr className="legacy-card-hr legacy-card-hr-t20-b15"/>
-                                <div style={{paddingBottom: '12px'}}>
-                                    <Text variant="headingSm" as="h2">Where on this page would you like the offer to
-                                        appear?</Text>
-                                </div>
-                                <Grid>
-                                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
-                                        <RadioButton
-                                            label="Use default settings for Cart Page"
-                                            checked={offer.placement_setting?.default_cart_page}
-                                            name="cart-settings"
-                                            onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
-                                            disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                                        />
-                                    </Grid.Cell>
-                                </Grid>
-                                <Grid>
-                                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
-                                        <RadioButton
-                                            label="Use Template for Cart Page"
-                                            checked={!offer.placement_setting?.default_cart_page}
-                                            name="cart-settings"
-                                            onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
-                                            disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                                        />
-                                    </Grid.Cell>
-                                </Grid>
-                                {!offer.placement_setting?.default_cart_page && !offer?.advanced_placement_setting?.advanced_placement_setting_enabled && (
-                                    <>
-                                        <div className="space-4"/>
-                                        <Image
-                                            source={templateImagesURL.cart_page_image_1}
-                                            alt="Sample Image 1"
-                                            style={{
-                                                marginRight: '10px',
-                                                marginTop: '10px',
-                                                cursor: 'pointer',
-                                                width: '165px'
-                                            }}
-                                            className={themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_cart_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                            onClick={() => handleImageClick('cart_page', 1)}
-                                        />
-                                        <Image
-                                            source={templateImagesURL.cart_page_image_2}
-                                            alt="Sample Image 2"
-                                            style={{
-                                                marginLeft: '10px',
-                                                marginRight: '10px',
-                                                cursor: 'pointer',
-                                                width: '165px'
-                                            }}
-                                            className={themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_cart_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                            onClick={() => handleImageClick('cart_page', 2)}
-                                        />
-                                        <Image
-                                            source={templateImagesURL.cart_page_image_3}
-                                            alt="Sample Image 3"
-                                            style={{marginLeft: '10px', cursor: 'pointer', width: '165px'}}
-                                            className={themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_cart_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                            onClick={() => handleImageClick('cart_page', 3)}
-                                        />
-                                    </>
-                                )}
-                            </>
-                        ) : (
-                            <>
-                                <hr className="legacy-card-hr legacy-card-hr-t20-b15"/>
-                                <div style={{paddingBottom: '12px'}}>
-                                    <Text variant="headingSm" as="h2">Where on this page would you like the offer to
-                                        appear?</Text>
-                                </div>
-                                <Grid>
-                                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
-                                        <RadioButton
-                                            label="Use default settings for Ajax Cart"
-                                            checked={offer.placement_setting?.default_ajax_cart}
-                                            onChange={(event) => handleDefaultSettingChange(event, 'ajax')}
-                                            disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                                            name="ajax-cart-settings"
-                                        />
-                                    </Grid.Cell>
-                                </Grid>
-                                <Grid>
-                                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
-                                        <RadioButton
-                                            label="Use Template for Ajax Cart"
-                                            checked={!offer.placement_setting?.default_ajax_cart}
-                                            onChange={(event) => handleUseTemplateChange(event, 'ajax')}
-                                            disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                                            name="ajax-cart-settings"
-                                        />
-                                    </Grid.Cell>
-                                </Grid>
-                                {shopSettings.default_template_settings?.templateForAjaxCart && (
-                                    <>
-                                        <div className="space-4"/>
-                                        <Image
-                                            source={templateImagesURL.ajax_cart_image_1}
-                                            alt="Sample Image 1"
-                                            style={{
-                                                marginRight: '10px',
-                                                marginTop: '10px',
-                                                cursor: 'pointer',
-                                                width: '165px'
-                                            }}
-                                            className={themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_ajax_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                            onClick={() => handleImageClick('ajax_cart', 1)}
-                                        />
-                                        <Image
-                                            source={templateImagesURL.ajax_cart_image_2}
-                                            alt="Sample Image 2"
-                                            style={{
-                                                marginLeft: '10px',
-                                                marginRight: '10px',
-                                                cursor: 'pointer',
-                                                width: '165px'
-                                            }}
-                                            className={themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_ajax_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                            onClick={() => handleImageClick('ajax_cart', 2)}
-                                        />
-                                        <Image
-                                            source={templateImagesURL.ajax_cart_image_3}
-                                            alt="Sample Image 3"
-                                            style={{marginLeft: '10px', cursor: 'pointer', width: '165px'}}
-                                            className={themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_ajax_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                            onClick={() => handleImageClick('ajax_cart', 3)}
-                                        />
-                                    </>
-                                )}
-
-                                <hr className="legacy-card-hr legacy-card-hr-t20-b15"/>
-                                <div style={{paddingBottom: '12px'}}>
-                                    <Text variant="headingSm" as="h2">Where on this page would you like the offer to
-                                        appear?</Text>
-                                </div>
-                                <Grid>
-                                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
-                                        <RadioButton
-                                            label="Use default settings for Cart Page"
-                                            checked={offer.placement_setting?.default_cart_page}
-                                            onChange={(event) => handleDefaultSettingSecondChange(event, 'cart')}
-                                            disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                                            name="cart-page-settings"
-                                        />
-                                    </Grid.Cell>
-                                </Grid>
-                                <Grid>
-                                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
-                                        <RadioButton
-                                            label="Use Template for Cart Page"
-                                            checked={!offer.placement_setting?.default_cart_page}
-                                            onChange={(event) => handleUseTemplateSecondChange(event, 'cart')}
-                                            disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                                            name="cart-page-settings"
-                                        />
-                                    </Grid.Cell>
-                                </Grid>
-                                {!offer.placement_setting?.default_cart_page && !offer?.advanced_placement_setting?.advanced_placement_setting_enabled && (
-                                    <>
-                                        <div className="space-4"/>
-                                        <Image
-                                            source={templateImagesURL.cart_page_image_1}
-                                            alt="Sample Image 1"
-                                            style={{
-                                                marginRight: '10px',
-                                                marginTop: '10px',
-                                                cursor: 'pointer',
-                                                width: '165px'
-                                            }}
-                                            className={themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_cart_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                            onClick={() => handleImageClick('cart_page', 1)}
-                                        />
-                                        <Image
-                                            source={templateImagesURL.cart_page_image_2}
-                                            alt="Sample Image 2"
-                                            style={{
-                                                marginLeft: '10px',
-                                                marginRight: '10px',
-                                                cursor: 'pointer',
-                                                width: '165px'
-                                            }}
-                                            className={themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_cart_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                            onClick={() => handleImageClick('cart_page', 2)}
-                                        />
-                                        <Image
-                                            source={templateImagesURL.cart_page_image_3}
-                                            alt="Sample Image 3"
-                                            style={{marginLeft: '10px', cursor: 'pointer', width: '165px'}}
-                                            className={themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_cart_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag'}
-                                            onClick={() => handleImageClick('cart_page', 3)}
-                                        />
-                                    </>
-                                )}
-                            </>
-                        )
-                        ) : (
                         <>
-                            <hr className="legacy-card-hr legacy-card-hr-t20-b15"/>
-                            <div style={{paddingBottom: '12px'}}>
-                                <Text variant="headingSm" as="h2">Where on this page would you like the offer to
-                                    appear?</Text>
-                            </div>
-                            <Grid>
-                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
-                                    <RadioButton
-                                        label="Use default settings"
-                                        checked={defaultSetting}
-                                        onChange={(event) => handleDefaultSettingChange(event, null)}
-                                        disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                                        name="product-settings"
-                                    />
-                                </Grid.Cell>
-                            </Grid>
-                            <Grid>
-                                <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 4, lg: 6, xl: 6}}>
-                                    <RadioButton
-                                        label="Use Template"
-                                        checked={useTemplate}
-                                        onChange={(event) => handleUseTemplateChange(event, null)}
-                                        disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                                        name="product-settings"
-                                    />
-                                </Grid.Cell>
-                            </Grid>
-                            {useTemplate && (
-                                <>
-                                    <div className="space-4"/>
-                                    <Image
-                                        source={insertedImage1}
-                                        alt="Sample Image 1"
-                                        style={{
-                                            marginRight: '10px',
-                                            marginTop: '10px',
-                                            cursor: 'pointer',
-                                            width: '165px'
-                                        }}
-                                        className={offer.in_cart_page ? (themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_cart_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (offer.in_product_page ? (themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_product_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (offer.in_ajax_cart ? (themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_ajax_id)?.position == 1 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : 'editOfferTabs_image_tag'))}
-                                        onClick={() => handleImageClick(null, 1)}
-                                    />
-                                    <Image
-                                        source={insertedImage2}
-                                        alt="Sample Image 2"
-                                        style={{
-                                            marginLeft: '10px',
-                                            marginRight: '10px',
-                                            cursor: 'pointer',
-                                            width: '165px'
-                                        }}
-                                        className={offer.in_cart_page ? (themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_cart_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (offer.in_product_page ? (themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_product_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (offer.in_ajax_cart ? (themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_ajax_id)?.position == 2 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : 'editOfferTabs_image_tag'))}
-                                        onClick={() => handleImageClick(null, 2)}
-                                    />
-                                    <Image
-                                        source={insertedImage3}
-                                        alt="Sample Image 3"
-                                        style={{marginLeft: '10px', cursor: 'pointer', width: '165px'}}
-                                        className={offer.in_cart_page ? (themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_cart_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (offer.in_product_page ? (themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_product_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : (offer.in_ajax_cart ? (themeTemplateData?.find(item => item['id'] === offer.placement_setting?.template_ajax_id)?.position == 3 ? 'editOfferTabs_image_clicked' : 'editOfferTabs_image_tag') : 'editOfferTabs_image_tag'))}
-                                        onClick={() => handleImageClick(null, 3)}
-                                    />
-                                </>
+                            {offer.in_product_page && offer.in_cart_page ? (
+                                <OfferPlacement
+                                    defalutLabel="Use default settings for Product Page"
+                                    templateLabel="Use Template for Product Page"
+                                    isDefault={offer.placement_setting?.default_product_page}
+                                    radioName="prod-settings"
+                                    onChangeDefault={(event) => handleDefaultSettingChange(event, "product")}
+                                    onChangeTemplate={(event) => handleUseTemplateChange(event, "product")}
+                                    disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                                    images={[
+                                        templateImagesURL.product_page_image_1,
+                                        templateImagesURL.product_page_image_2,
+                                        templateImagesURL.product_page_image_3,
+                                    ]}
+                                    onClickImage={(position) => handleImageClick("product_page", position)}
+                                    placementPosition={themeTemplateData?.find((item) => item["id"] === offer.placement_setting?.template_product_id)?.position}
+                                />
+                            ) : (
+                                <OfferPlacement
+                                    defalutLabel="Use default settings for Ajax Cart"
+                                    templateLabel="Use Template for Ajax Cart"
+                                    isDefault={offer.placement_setting?.default_ajax_cart}
+                                    radioName="ajax-cart-settings"
+                                    onChangeDefault={(event) => handleDefaultSettingChange(event, "ajax")}
+                                    onChangeTemplate={(event) => handleUseTemplateChange(event, "ajax")}
+                                    disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                                    images={[
+                                        templateImagesURL.ajax_cart_image_1,
+                                        templateImagesURL.ajax_cart_image_2,
+                                        templateImagesURL.ajax_cart_image_3,
+                                    ]}
+                                    showImages={shopSettings.default_template_settings?.templateForAjaxCart}
+                                    onClickImage={(position) => handleImageClick("ajax_cart", position)}
+                                    placementPosition={themeTemplateData?.find((item) => item["id"] === offer.placement_setting?.template_ajax_id)?.position}
+                                />
                             )}
+                            <OfferPlacement
+                                defalutLabel="Use default settings for Cart Page"
+                                templateLabel="Use Template for Cart Page"
+                                isDefault={offer.placement_setting?.default_cart_page}
+                                radioName="cart-settings"
+                                onChangeDefault={(event) => handleDefaultSettingSecondChange(event, "cart")}
+                                onChangeTemplate={(event) => handleUseTemplateSecondChange(event, "cart")}
+                                disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                                images={[
+                                    templateImagesURL.cart_page_image_1,
+                                    templateImagesURL.cart_page_image_2,
+                                    templateImagesURL.cart_page_image_3,
+                                ]}
+                                onClickImage={(position) => handleImageClick("cart_page", position)}
+                                placementPosition={themeTemplateData?.find((item) => item["id"] === offer.placement_setting?.template_cart_id)?.position}
+                            />
                         </>
+                    ) : (
+                        <OfferPlacement
+                            defalutLabel="Use default settings"
+                            templateLabel="Use Template"
+                            isDefault={defaultSetting}
+                            isTemplate={useTemplate}
+                            radioName="product-settings"
+                            onChangeDefault={(event) =>handleDefaultSettingChange(event, null)}
+                            onChangeTemplate={(event) => handleUseTemplateChange(event, null)}
+                            disabled={offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                            images={[insertedImage1, insertedImage2, insertedImage3]}
+                            showImages={useTemplate}
+                            onClickImage={(position) => handleImageClick(null, position)}
+                            placementPosition={offer.in_cart_page ? themeTemplateData?.find((item) => item["id"] === offer.placement_setting?.template_cart_id)?.position : offer.in_product_page ? themeTemplateData?.find((item) => item["id"] === offer.placement_setting?.template_product_id)?.position : offer.in_ajax_cart ? themeTemplateData?.find((item) => item["id"] === offer.placement_setting?.template_ajax_id)?.position : 0}
+                        />
                     ))
                 }
 

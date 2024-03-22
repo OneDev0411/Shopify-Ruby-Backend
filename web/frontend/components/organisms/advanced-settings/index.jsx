@@ -2,13 +2,12 @@ import {
     LegacyCard,
     TextField,
     Checkbox,
-    Select,
     Text,
 } from "@shopify/polaris";
 import {useCallback, useContext} from "react";
 import React from "react";
-import { DOMActionOptions } from "../../../shared/constants/DOMActionOptions";
 import {OfferContext} from "../../../contexts/OfferContext.jsx";
+import { DomAction } from "../../molecules/index.js";
 
 const AdvancedSettings = () => {
     const { offer, updateOffer, updateNestedAttributeOfOffer } = useContext(OfferContext);
@@ -31,76 +30,35 @@ const AdvancedSettings = () => {
                         <br/><br/><br/>
                     </>
                 )}
-                <div>
-                    <div style={{paddingBottom: '10px'}}>
-                        <Text variant="headingSm" as="h2">Product page</Text>
-                    </div>
-                    <TextField
-                        label="DOM Selector" 
-                        value={offer?.advanced_placement_setting?.custom_product_page_dom_selector}
-                        onChange={handleProductDomSelector} type="text" 
-                        disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                    />
-                    <div className="space-4"/>
+                <DomAction
+                    title="Product page"
+                    actionId="productDomAction"
+                    selectorValue={offer?.advanced_placement_setting?.custom_product_page_dom_selector}
+                    actionValue={offer?.advanced_placement_setting?.custom_product_page_dom_action}
+                    onChangeSelector={handleProductDomSelector}
+                    onChangeAction={handleProductDomAction}
+                    disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                />
 
-                    <Select
-                        label="DOM action"
-                        id="productDomAction"
-                        options={DOMActionOptions}
-                        onChange={handleProductDomAction}
-                        value={offer?.advanced_placement_setting?.custom_product_page_dom_action}
-                        disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                    />
-                </div>
-                <hr className="legacy-card-hr" />
+                <DomAction
+                    title="Cart page"
+                    actionId="cartDomAction"
+                    selectorValue={offer?.advanced_placement_setting?.custom_cart_page_dom_selector}
+                    actionValue={offer?.advanced_placement_setting?.custom_cart_page_dom_action}
+                    onChangeSelector={handleCartDomSelector}
+                    onChangeAction={handleCartDomAction}
+                    disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                />
 
-                <div>
-                    <div style={{paddingBottom: '10px'}}>
-                        <Text variant="headingSm" as="h2">Cart page</Text>
-                    </div>
-                    <TextField
-                        label="DOM Selector" 
-                        value={offer?.advanced_placement_setting?.custom_cart_page_dom_selector}
-                        onChange={handleCartDomSelector} 
-                        disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                    />
-                    <div className="space-4"/>
-                    <Select
-                        label="DOM action"
-                        id="productDomAction"
-                        options={DOMActionOptions}
-                        onChange={handleCartDomAction}
-                        value={offer?.advanced_placement_setting?.custom_cart_page_dom_action}
-                        disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                    />
-
-                </div>
-                <hr className="legacy-card-hr" />
-
-                <div>
-                    <div style={{paddingBottom: '10px'}}>
-                        <Text variant="headingSm" as="h2">AJAX/Slider cart</Text>
-                    </div>
-                    <TextField
-                        label="DOM Selector" 
-                        value={offer?.advanced_placement_setting?.custom_ajax_dom_selector}
-                        onChange={handleAjaxDomSelector} 
-                        disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                    />
-                    <div className="space-4"/>
-
-                    <Select
-                        label="DOM action"
-                        id="productDomAction"
-                        options={DOMActionOptions}
-                        onChange={handleAjaxDomAction}
-                        value={offer?.advanced_placement_setting?.custom_ajax_dom_action}
-                        disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
-                    />
-                    <div className="space-4"/>
-                </div>
-
-                <hr className="legacy-card-hr" />
+                <DomAction
+                    title="AJAX/Slider cart"
+                    actionId="ajaxDomAction"
+                    selectorValue={offer?.advanced_placement_setting?.custom_ajax_dom_selector}
+                    actionValue={offer?.advanced_placement_setting?.custom_ajax_dom_action}
+                    onChangeSelector={handleAjaxDomSelector}
+                    onChangeAction={handleAjaxDomAction}
+                    disabled={!offer?.advanced_placement_setting?.advanced_placement_setting_enabled}
+                />
 
                 <div>
                     <div style={{paddingBottom: '10px'}}>
