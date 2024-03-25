@@ -267,7 +267,7 @@ unless Rails.env.production?
       name: "Dawn",
       type: "cart",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_1.png",
       action: 'before',
       selector: '#cart'
     },
@@ -275,7 +275,7 @@ unless Rails.env.production?
       name: "Dawn",
       type: "cart",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_2.png",
       action: 'before',
       selector: '.cart__ctas'
     },
@@ -283,7 +283,7 @@ unless Rails.env.production?
       name: "Dawn",
       type: "cart",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_3.png",
       action: 'after',
       selector: '.cart__ctas'
     },
@@ -291,7 +291,7 @@ unless Rails.env.production?
       name: "Dawn",
       type: "product",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_1.png",
       action: 'after',
       selector: '.product-form'
     },
@@ -299,7 +299,7 @@ unless Rails.env.production?
       name: "Dawn",
       type: "product",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_2.png",
       action: 'before',
       selector: '.product-form__buttons'
     },
@@ -307,7 +307,7 @@ unless Rails.env.production?
       name: "Dawn",
       type: "product",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_3.png",
       action: 'before',
       selector: '.product-form__quantity'
     },
@@ -315,7 +315,7 @@ unless Rails.env.production?
       name: "Dawn",
       type: "ajax",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_1.png",
       action: 'before',
       selector: '#cart-notification-product'
     },
@@ -323,7 +323,7 @@ unless Rails.env.production?
       name: "Dawn",
       type: "ajax",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_2.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -331,7 +331,7 @@ unless Rails.env.production?
       name: "Dawn",
       type: "ajax",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_3.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -343,7 +343,7 @@ unless Rails.env.production?
       name: "Colorblock",
       type: "cart",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_1.png",
       action: 'before',
       selector: '#cart'
     },
@@ -351,7 +351,7 @@ unless Rails.env.production?
       name: "Colorblock",
       type: "cart",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_2.png",
       action: 'before',
       selector: '.cart__ctas'
     },
@@ -359,7 +359,7 @@ unless Rails.env.production?
       name: "Colorblock",
       type: "cart",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_3.png",
       action: 'after',
       selector: '.cart__ctas'
     },
@@ -367,7 +367,7 @@ unless Rails.env.production?
       name: "Colorblock",
       type: "product",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_1.png",
       action: 'before',
       selector: '.product-form'
     },
@@ -375,7 +375,7 @@ unless Rails.env.production?
       name: "Colorblock",
       type: "product",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_2.png",
       action: 'before',
       selector: '.product-form__buttons'
     },
@@ -383,7 +383,7 @@ unless Rails.env.production?
       name: "Colorblock",
       type: "product",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_3.png",
       action: 'after',
       selector: '.product-form__buttons'
     },
@@ -391,7 +391,7 @@ unless Rails.env.production?
       name: "Colorblock",
       type: "ajax",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_1.png",
       action: 'before',
       selector: '#cart-notification-product'
     },
@@ -399,7 +399,7 @@ unless Rails.env.production?
       name: "Colorblock",
       type: "ajax",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_2.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -407,7 +407,7 @@ unless Rails.env.production?
       name: "Colorblock",
       type: "ajax",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_3.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -419,7 +419,7 @@ unless Rails.env.production?
       name: "Publisher",
       type: "cart",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_1.png",
       action: 'before',
       selector: '#cart'
     },
@@ -427,7 +427,7 @@ unless Rails.env.production?
       name: "Publisher",
       type: "cart",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_2.png",
       action: 'before',
       selector: '#cart__ctas'
     },
@@ -435,7 +435,7 @@ unless Rails.env.production?
       name: "Publisher",
       type: "cart",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_3.png",
       action: 'after',
       selector: '#cart__ctas'
     },
@@ -443,7 +443,7 @@ unless Rails.env.production?
       name: "Publisher",
       type: "product",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_1.png",
       action: 'after',
       selector: '.product-form'
     },
@@ -451,7 +451,7 @@ unless Rails.env.production?
       name: "Publisher",
       type: "product",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_2.png",
       action: 'before',
       selector: '.product-form__quantity'
     },
@@ -459,7 +459,7 @@ unless Rails.env.production?
       name: "Publisher",
       type: "product",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_3.png",
       action: 'after',
       selector: '.product-form__quantity'
     },
@@ -467,7 +467,7 @@ unless Rails.env.production?
       name: "Publisher",
       type: "ajax",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_1.png",
       action: 'before',
       selector: '.cart-item:first'
     },
@@ -475,7 +475,7 @@ unless Rails.env.production?
       name: "Publisher",
       type: "ajax",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_2.png",
       action: 'prepend',
       selector: '.drawer__footer'
     },
@@ -483,7 +483,7 @@ unless Rails.env.production?
       name: "Publisher",
       type: "ajax",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_3.png",
       action: 'prepend',
       selector: '.drawer__footer'
     },
@@ -496,7 +496,7 @@ unless Rails.env.production?
       name: "Crave",
       type: "cart",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_1.png",
       action: 'before',
       selector: '#cart'
     },
@@ -504,7 +504,7 @@ unless Rails.env.production?
       name: "Crave",
       type: "cart",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_2.png",
       action: 'before',
       selector: '.cart__ctas'
     },
@@ -512,7 +512,7 @@ unless Rails.env.production?
       name: "Crave",
       type: "cart",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_3.png",
       action: 'after',
       selector: '.cart__ctas'
     },
@@ -520,7 +520,7 @@ unless Rails.env.production?
       name: "Crave",
       type: "product",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_1.png",
       action: 'after',
       selector: '.product-form'
     },
@@ -528,7 +528,7 @@ unless Rails.env.production?
       name: "Crave",
       type: "product",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_2.png",
       action: 'before',
       selector: '.product-form__buttons'
     },
@@ -536,7 +536,7 @@ unless Rails.env.production?
       name: "Crave",
       type: "product",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_3.png",
       action: 'after',
       selector: '.product-form__buttons'
     },
@@ -544,7 +544,7 @@ unless Rails.env.production?
       name: "Crave",
       type: "ajax",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_1.png",
       action: 'before',
       selector: '#cart-notification-product'
     },
@@ -552,7 +552,7 @@ unless Rails.env.production?
       name: "Crave",
       type: "ajax",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_2.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -560,7 +560,7 @@ unless Rails.env.production?
       name: "Crave",
       type: "ajax",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_3.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -573,7 +573,7 @@ unless Rails.env.production?
       name: "Studio",
       type: "cart",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_1.png",
       action: 'before',
       selector: '#cart'
     },
@@ -581,7 +581,7 @@ unless Rails.env.production?
       name: "Studio",
       type: "cart",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_2.png",
       action: 'before',
       selector: '.cart__ctas'
     },
@@ -589,7 +589,7 @@ unless Rails.env.production?
       name: "Studio",
       type: "cart",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_3.png",
       action: 'after',
       selector: '.cart__ctas'
     },
@@ -597,7 +597,7 @@ unless Rails.env.production?
       name: "Studio",
       type: "product",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_1.png",
       action: 'after',
       selector: '.product-form'
     },
@@ -605,7 +605,7 @@ unless Rails.env.production?
       name: "Studio",
       type: "product",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_2.png",
       action: 'before',
       selector: '.product-form__buttons'
     },
@@ -613,7 +613,7 @@ unless Rails.env.production?
       name: "Studio",
       type: "product",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_3.png",
       action: 'after',
       selector: '.product-form__buttons'
     },
@@ -621,7 +621,7 @@ unless Rails.env.production?
       name: "Studio",
       type: "ajax",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_1.png",
       action: 'before',
       selector: '#cart-notification-product'
     },
@@ -629,7 +629,7 @@ unless Rails.env.production?
       name: "Studio",
       type: "ajax",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_2.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -637,7 +637,7 @@ unless Rails.env.production?
       name: "Studio",
       type: "ajax",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_3.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -650,7 +650,7 @@ unless Rails.env.production?
       name: "Taste",
       type: "cart",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_1.png",
       action: 'before',
       selector: '#cart'
     },
@@ -658,7 +658,7 @@ unless Rails.env.production?
       name: "Taste",
       type: "cart",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_2.png",
       action: 'before',
       selector: '.cart__ctas'
     },
@@ -666,7 +666,7 @@ unless Rails.env.production?
       name: "Taste",
       type: "cart",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_3.png",
       action: 'after',
       selector: '.cart__ctas'
     },
@@ -674,7 +674,7 @@ unless Rails.env.production?
       name: "Taste",
       type: "product",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_1.png",
       action: 'after',
       selector: '.product-form'
     },
@@ -682,7 +682,7 @@ unless Rails.env.production?
       name: "Taste",
       type: "product",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_2.png",
       action: 'before',
       selector: '.product-form__buttons'
     },
@@ -690,7 +690,7 @@ unless Rails.env.production?
       name: "Taste",
       type: "product",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_3.png",
       action: 'after',
       selector: '.product-form__buttons'
     },
@@ -698,7 +698,7 @@ unless Rails.env.production?
       name: "Taste",
       type: "ajax",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_1.png",
       action: 'before',
       selector: '#cart-notification-product'
     },
@@ -706,7 +706,7 @@ unless Rails.env.production?
       name: "Taste",
       type: "ajax",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_2.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -714,7 +714,7 @@ unless Rails.env.production?
       name: "Taste",
       type: "ajax",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_3.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -727,7 +727,7 @@ unless Rails.env.production?
       name: "Spotlight",
       type: "cart",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_1.png",
       action: 'before',
       selector: '#cart'
     },
@@ -735,7 +735,7 @@ unless Rails.env.production?
       name: "Spotlight",
       type: "cart",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_2.png",
       action: 'before',
       selector: '.cart__ctas'
     },
@@ -743,7 +743,7 @@ unless Rails.env.production?
       name: "Spotlight",
       type: "cart",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_3.png",
       action: 'after',
       selector: '.cart__ctas'
     },
@@ -751,7 +751,7 @@ unless Rails.env.production?
       name: "Spotlight",
       type: "product",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_1.png",
       action: 'after',
       selector: '.product-form'
     },
@@ -759,7 +759,7 @@ unless Rails.env.production?
       name: "Spotlight",
       type: "product",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_2.png",
       action: 'before',
       selector: '.product-form__buttons'
     },
@@ -767,7 +767,7 @@ unless Rails.env.production?
       name: "Spotlight",
       type: "product",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_3.png",
       action: 'after',
       selector: '.product-form__buttons'
     },
@@ -775,7 +775,7 @@ unless Rails.env.production?
       name: "Spotlight",
       type: "ajax",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_1.png",
       action: 'before',
       selector: '#cart-notification-product'
     },
@@ -783,7 +783,7 @@ unless Rails.env.production?
       name: "Spotlight",
       type: "ajax",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_2.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -791,7 +791,7 @@ unless Rails.env.production?
       name: "Spotlight",
       type: "ajax",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_3.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -804,7 +804,7 @@ unless Rails.env.production?
       name: "Ride",
       type: "cart",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_1.png",
       action: 'before',
       selector: '#cart'
     },
@@ -812,7 +812,7 @@ unless Rails.env.production?
       name: "Ride",
       type: "cart",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_2.png",
       action: 'before',
       selector: '.cart__ctas'
     },
@@ -820,7 +820,7 @@ unless Rails.env.production?
       name: "Ride",
       type: "cart",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_3.png",
       action: 'after',
       selector: '.cart__ctas'
     },
@@ -828,7 +828,7 @@ unless Rails.env.production?
       name: "Ride",
       type: "product",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_1.png",
       action: 'after',
       selector: '.product-form'
     },
@@ -836,7 +836,7 @@ unless Rails.env.production?
       name: "Ride",
       type: "product",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_2.png",
       action: 'before',
       selector: '.product-form__buttons'
     },
@@ -844,7 +844,7 @@ unless Rails.env.production?
       name: "Ride",
       type: "product",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_3.png",
       action: 'after',
       selector: '.product-form__buttons'
     },
@@ -852,7 +852,7 @@ unless Rails.env.production?
       name: "Ride",
       type: "ajax",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_1.png",
       action: 'before',
       selector: '#cart-notification-product'
     },
@@ -860,7 +860,7 @@ unless Rails.env.production?
       name: "Ride",
       type: "ajax",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_2.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -868,7 +868,7 @@ unless Rails.env.production?
       name: "Ride",
       type: "ajax",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_3.png",
       action: 'after',
       selector: '.cart-notification-product'
     },
@@ -881,7 +881,7 @@ unless Rails.env.production?
       name: "Origin",
       type: "cart",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_1.png",
       action: 'before',
       selector: '#cart'
     },
@@ -889,7 +889,7 @@ unless Rails.env.production?
       name: "Origin",
       type: "cart",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_2.png",
       action: 'before',
       selector: '#cart__ctas'
     },
@@ -897,7 +897,7 @@ unless Rails.env.production?
       name: "Origin",
       type: "cart",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_3.png",
       action: 'after',
       selector: '#cart__ctas'
     },
@@ -905,7 +905,7 @@ unless Rails.env.production?
       name: "Origin",
       type: "product",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_1.png",
       action: 'after',
       selector: '.product-form'
     },
@@ -913,7 +913,7 @@ unless Rails.env.production?
       name: "Origin",
       type: "product",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_2.png",
       action: 'before',
       selector: '.product-form__quantity'
     },
@@ -921,7 +921,7 @@ unless Rails.env.production?
       name: "Origin",
       type: "product",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_3.png",
       action: 'after',
       selector: '.product-form__quantity'
     },
@@ -929,7 +929,7 @@ unless Rails.env.production?
       name: "Origin",
       type: "ajax",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_1.png",
       action: 'before',
       selector: '.cart-item:first'
     },
@@ -937,7 +937,7 @@ unless Rails.env.production?
       name: "Origin",
       type: "ajax",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_2.png",
       action: 'prepend',
       selector: '.drawer__footer'
     },
@@ -945,7 +945,7 @@ unless Rails.env.production?
       name: "Origin",
       type: "ajax",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_3.png",
       action: 'prepend',
       selector: '.drawer__footer'
     },
@@ -958,7 +958,7 @@ unless Rails.env.production?
       name: "Sense",
       type: "cart",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_1.png",
       action: 'before',
       selector: '.cart-items'
     },
@@ -966,7 +966,7 @@ unless Rails.env.production?
       name: "Sense",
       type: "cart",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_2.png",
       action: 'before',
       selector: '.cart__ctas'
     },
@@ -974,7 +974,7 @@ unless Rails.env.production?
       name: "Sense",
       type: "cart",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_3.png",
       action: 'after',
       selector: '.cart__ctas'
     },
@@ -982,7 +982,7 @@ unless Rails.env.production?
       name: "Sense",
       type: "product",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_1.png",
       action: 'before',
       selector: "[class*='product__description']"
     },
@@ -990,7 +990,7 @@ unless Rails.env.production?
       name: "Sense",
       type: "product",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_2.png",
       action: 'before',
       selector: '.product-form__quantity'
     },
@@ -998,7 +998,7 @@ unless Rails.env.production?
       name: "Sense",
       type: "product",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_3.png",
       action: 'after',
       selector: '.product-form__quantity'
     },
@@ -1006,7 +1006,7 @@ unless Rails.env.production?
       name: "Sense",
       type: "ajax",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_1.png",
       action: 'before',
       selector: '#cart-notification-product'
     },
@@ -1014,7 +1014,7 @@ unless Rails.env.production?
       name: "Sense",
       type: "ajax",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_2.png",
       action: 'before',
       selector: '#cart-notification-button'
     },
@@ -1022,7 +1022,7 @@ unless Rails.env.production?
       name: "Sense",
       type: "ajax",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_3.png",
       action: 'before',
       selector: '#cart-notification-button'
     },
@@ -1035,7 +1035,7 @@ unless Rails.env.production?
       name: "Craft",
       type: "cart",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_1.png",
       action: 'before',
       selector: '.cart-items'
     },
@@ -1043,7 +1043,7 @@ unless Rails.env.production?
       name: "Craft",
       type: "cart",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_2.png",
       action: 'before',
       selector: '.cart__ctas'
     },
@@ -1051,7 +1051,7 @@ unless Rails.env.production?
       name: "Craft",
       type: "cart",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_3.png",
       action: 'after',
       selector: '.cart__ctas'
     },
@@ -1059,7 +1059,7 @@ unless Rails.env.production?
       name: "Craft",
       type: "product",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_1.png",
       action: 'before',
       selector: "[class*='product__description']"
     },
@@ -1067,7 +1067,7 @@ unless Rails.env.production?
       name: "Craft",
       type: "product",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_2.png",
       action: 'before',
       selector: '.product-form__quantity'
     },
@@ -1075,7 +1075,7 @@ unless Rails.env.production?
       name: "Craft",
       type: "product",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_3.png",
       action: 'after',
       selector: '.product-form__quantity'
     },
@@ -1083,7 +1083,7 @@ unless Rails.env.production?
       name: "Craft",
       type: "ajax",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_1.png",
       action: 'before',
       selector: '#cart-notification-product'
     },
@@ -1091,7 +1091,7 @@ unless Rails.env.production?
       name: "Craft",
       type: "ajax",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_2.png",
       action: 'before',
       selector: '#cart-notification-button'
     },
@@ -1099,7 +1099,7 @@ unless Rails.env.production?
       name: "Craft",
       type: "ajax",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_3.png",
       action: 'before',
       selector: '#cart-notification-button'
     },
@@ -1113,14 +1113,14 @@ unless Rails.env.production?
       type: "cart",
       position: 1,
       action: 'before',
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_1.png",
       selector: '.cart-items'
     },
     {
       name: "Refresh",
       type: "cart",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_2.png",
       action: 'before',
       selector: '.cart__ctas'
     },
@@ -1128,7 +1128,7 @@ unless Rails.env.production?
       name: "Refresh",
       type: "cart",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/cart_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/cart_page_image_3.png",
       action: 'after',
       selector: '.cart__ctas'
     },
@@ -1136,7 +1136,7 @@ unless Rails.env.production?
       name: "Refresh",
       type: "product",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_1.png",
       action: 'before',
       selector: "[class*='product__description']"
     },
@@ -1144,7 +1144,7 @@ unless Rails.env.production?
       name: "Refresh",
       type: "product",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_2.png",
       action: 'before',
       selector: '.product-form__quantity'
     },
@@ -1152,7 +1152,7 @@ unless Rails.env.production?
       name: "Refresh",
       type: "product",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/product_page_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/product_page_image_3.png",
       action: 'after',
       selector: '.product-form__quantity'
     },
@@ -1160,7 +1160,7 @@ unless Rails.env.production?
       name: "Refresh",
       type: "ajax",
       position: 1,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_1.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_1.png",
       action: 'prepend',
       selector: '#CartDrawer-Form'
     },
@@ -1168,7 +1168,7 @@ unless Rails.env.production?
       name: "Refresh",
       type: "ajax",
       position: 2,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_2.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_2.png",
       action: 'before',
       selector: '#cart-notification-button'
     },
@@ -1176,7 +1176,7 @@ unless Rails.env.production?
       name: "Refresh",
       type: "ajax",
       position: 3,
-      image_url: "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/placement-images/ajax_cart_image_3.png",
+      image_url: "https://incartupsell-assets.b-cdn.net/Images/ajax_cart_image_3.png",
       action: 'before',
       selector: '#cart-notification-button'
     },
