@@ -726,7 +726,7 @@
                                   {
                                       id: 1,
                                       title: 'Test Product',
-                                      medium_image_url: 'https://incartupsell-assets.b-cdn.net/Images/billing-ICU-Logo-Small.png',
+                                      medium_image_url: 'https://assets.incartupsell.com/images/billing-ICU-Logo-Small.png',
                                       available_json_variants: [
                                           {
                                               unparenthesized_price: '$99.99',

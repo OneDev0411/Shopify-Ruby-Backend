@@ -128,7 +128,7 @@ export default function HomePage() {
           <ModalChoosePlan />
           <CustomTitleBar
             title="In Cart Upsell & Cross Sell"
-            image={"https://incartupsell-assets.b-cdn.net/Images/ICU-Logo-Small.png"}
+            image={"https://assets.incartupsell.com/images/ICU-Logo-Small.png"}
             buttonText={"Create offer"}
             handleButtonClick={handleOpenOfferPage}
           />

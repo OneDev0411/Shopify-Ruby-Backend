@@ -96,7 +96,7 @@ export function Partners() {
                               width:'60%',
                               marginBottom:'15px',
                               }}
-                              source="https://incartupsell-assets.b-cdn.net/Images/5-star.png"
+                              source="https://assets.incartupsell.com/images/5-star.png"
                             />
                             <Button url={partner.app_url} target="blank">View on Shopify App Store</Button>
                             </VerticalStack>

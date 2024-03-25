@@ -7,7 +7,7 @@ export default function NotFound() {
         <Card.Section>
           <EmptyState
             heading="There is no page at this address"
-            image="https://incartupsell-assets.b-cdn.net/Images/empty-state.svg"
+            image="https://assets.incartupsell.com/images/empty-state.svg"
           >
             <p>
               Check the URL and try again, or use the search bar to find what

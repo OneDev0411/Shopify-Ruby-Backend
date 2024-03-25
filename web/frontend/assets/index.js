@@ -1,11 +1,11 @@
 const helpImage =
-  "https://incartupsell-assets.b-cdn.net/Images/help.svg";
+  "https://assets.incartupsell.com/images/help.svg";
 
 const homeImage =
-  "https://incartupsell-assets.b-cdn.net/Images/business-plan.svg";
+  "https://assets.incartupsell.com/images/business-plan.svg";
 
 const billingImg =
-  "https://incartupsell-assets.b-cdn.net/Images/billing-ICU-Logo-Small.png";
+  "https://assets.incartupsell.com/images/billing-ICU-Logo-Small.png";
 
 
 const CHAT_APP_ID = import.meta.env.VITE_REACT_APP_INTERCOM_APP_ID;
