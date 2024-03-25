@@ -436,6 +436,10 @@ class Product < ApplicationRecord
   end
 
   def cache_product_key
-    $redis_cache.set("shopify_product_#{shopify_id}", 1)
+    begin
+      $redis_cache.set("shopify_product_#{shopify_id}", 1)
+    rescue => e
+      Rails.logger.error "Redis Error, #{e.class}: #{e.message}"
+    end
   end
 end

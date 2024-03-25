@@ -80,7 +80,13 @@ class Shop < ApplicationRecord
       action: 'install',
       source: 'icu-redesign_shop_setup'
     )
-    $redis_cache.del("shopify_uninstalled_#{self.myshopify_domain}")
+
+    begin
+      $redis_cache.del("shopify_uninstalled_#{self.myshopify_domain}")
+    rescue => e
+      Rails.logger.error "Redis Error, #{e.class}: #{e.message}"
+    end
+
     async_setup
     signup_for_referral_program
     select_plan('trial_plan')
@@ -1495,12 +1501,19 @@ class Shop < ApplicationRecord
   def remove_cache_keys_for_uninstalled_shop
     ids = shopify_products_and_collections_ids
 
-    $redis_cache.del(*ids) unless ids.blank?
+    begin
+      $redis_cache.del(*ids) unless ids.blank?
+    rescue => e
+      Rails.logger.error "Redis Error, #{e.class}: #{e.message}"
+    end
   end
 
   def store_cache_keys_on_reinstall
     ids = shopify_products_and_collections_ids
-
-    $redis_cache.mset(*ids) unless ids.blank?
+    begin
+      $redis_cache.mset(*ids) unless ids.blank?
+    rescue => e
+      Rails.logger.error "Redis Error, #{e.class}: #{e.message}"
+    end
   end
 end
