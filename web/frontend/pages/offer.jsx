@@ -64,7 +64,7 @@ export default function Offers() {
             ): (
               <CustomTitleBar
                 title="In Cart Upsell & Cross Sell"
-                image={"https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/ICU-Logo-Small.png"}
+                image={"https://assets.incartupsell.com/images/ICU-Logo-Small.png"}
               />
             )}
             <Layout>

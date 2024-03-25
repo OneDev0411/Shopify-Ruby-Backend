@@ -26,7 +26,7 @@ export default function ConfirmCharge() {
                 <Card>
                   <Stack distribution="center">
                     <Image 
-                        source="https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/woohoo.png"
+                        source="https://assets.incartupsell.com/images/woohoo.png"
                     />
                     </Stack>
                     <Stack distribution="center">
