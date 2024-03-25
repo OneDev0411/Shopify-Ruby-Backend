@@ -385,7 +385,7 @@ class Subscription < ApplicationRecord
     end
   end
 
-  def unsubscribe_merchants(should_nil_id)
+  def unsubscribe_merchants(should_nullify_id)
     if shop.in_trial_period? && !self.free_plan_after_trial&.positive?
       self.update(free_plan_after_trial: true)
     end
@@ -393,7 +393,7 @@ class Subscription < ApplicationRecord
     shop.plan = Plan.find_by(internal_name: 'free_plan')
     shop.unpublish_extra_offers
 
-    if should_nil_id
+    if should_nullify_id
       self.update(offers_limit: 1, shopify_charge_id: nil)
     else
       self.update(offers_limit: 1)
