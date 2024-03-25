@@ -29,7 +29,7 @@ export function Reviews() {
               <br />
             </div>
             <Stack distribution="center">
-              <Image source="https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/5-star.png" distribution="center" />
+              <Image source="https://incartupsell-assets.b-cdn.net/Images/5-star.png" distribution="center" />
             </Stack>
           </div>
         </Card>
@@ -48,7 +48,7 @@ export function Reviews() {
               <br />
             </div>
             <Stack distribution="center">
-              <Image source="https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/5-star.png" distribution="center" />
+              <Image source="https://incartupsell-assets.b-cdn.net/Images/5-star.png" distribution="center" />
             </Stack>
           </div>
         </Card>
@@ -67,7 +67,7 @@ export function Reviews() {
               <br />
             </div>
             <Stack distribution="center">
-              <Image source="https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/5-star.png" distribution="center" />
+              <Image source="https://incartupsell-assets.b-cdn.net/Images/5-star.png" distribution="center" />
             </Stack>
           </div>
         </Card>

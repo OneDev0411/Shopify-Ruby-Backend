@@ -100,7 +100,7 @@ const Summary = (props) => {
                       <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 2, lg: 5, xl: 5}}>
                           <div style={{paddingTop: 16, float: "right"}}>
                             <Image
-                                source='https://incartupsell.nyc3.cdn.digitaloceanspaces.com/offer-images/Offers.svg'
+                                source='https://incartupsell-assets.b-cdn.net/Images/Offers.svg'
                                 alt="icu offers image"
                                 width={111}
                             />

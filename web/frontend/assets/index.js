@@ -1,11 +1,11 @@
 const helpImage =
-  "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/support-images/help.svg";
+  "https://incartupsell-assets.b-cdn.net/Images/help.svg";
 
 const homeImage =
-  "https://incartupsell.nyc3.cdn.digitaloceanspaces.com/plan-images/business-plan.svg";
+  "https://incartupsell-assets.b-cdn.net/Images/business-plan.svg";
 
 const billingImg =
-  "https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/billing-ICU-Logo-Small.png";
+  "https://incartupsell-assets.b-cdn.net/Images/billing-ICU-Logo-Small.png";
 
 
 const CHAT_APP_ID = import.meta.env.VITE_REACT_APP_INTERCOM_APP_ID;
