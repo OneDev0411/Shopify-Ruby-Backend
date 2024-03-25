@@ -366,19 +366,19 @@ class Subscription < ApplicationRecord
   end
 
   def shopify_subscription_status
-    shop.activate_session
+    self.shop.activate_session
     begin
       charge_response = ShopifyAPI::RecurringApplicationCharge.find(id: self.shopify_charge_id)
       if charge_response.status != 'active'
         self.remove_recurring_charge
 
         if self.plan&.internal_name == 'plan_based_billing'
-          unsubscribe_merchants(false)
+          self.unsubscribe_merchants(false)
         end
       end
     rescue StandardError => e
       if e.message.include?("Not Found")
-        unsubscribe_merchants(true)
+        self.unsubscribe_merchants(true)
       else
         ErrorNotifier.call(e)
       end
@@ -386,12 +386,12 @@ class Subscription < ApplicationRecord
   end
 
   def unsubscribe_merchants(should_nullify_id)
-    if shop.in_trial_period? && !self.free_plan_after_trial&.positive?
+    if self.shop.in_trial_period? && !self.free_plan_after_trial&.positive?
       self.update(free_plan_after_trial: true)
     end
 
-    shop.plan = Plan.find_by(internal_name: 'free_plan')
-    shop.unpublish_extra_offers
+    self.shop.plan = Plan.find_by(internal_name: 'free_plan')
+    self.shop.unpublish_extra_offers
 
     if should_nullify_id
       self.update(offers_limit: 1, shopify_charge_id: nil)
