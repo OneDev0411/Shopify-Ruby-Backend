@@ -391,7 +391,7 @@ class Subscription < ApplicationRecord
     end
 
     self.shop.plan = Plan.find_by(internal_name: 'free_plan')
-    self.shop.unpublish_extra_offers
+    self.shop.unpublish_extra_offers if self.shop.offers.present? && self.shop.offers.where(active: true).size > 1
 
     if should_nullify_id
       self.update(offers_limit: 1, shopify_charge_id: nil)
