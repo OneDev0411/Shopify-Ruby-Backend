@@ -3,7 +3,6 @@ import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from 'react-router-dom';
 
 import {Layout, Page} from '@shopify/polaris';
-import {AddProductMajor} from '@shopify/polaris-icons';
 
 import {CustomTitleBar, OffersList} from '../components';
 import {useAuthenticatedFetch} from "../hooks";
@@ -56,7 +55,7 @@ export default function Offers() {
           <Page>
             {hasOffers ? (
               <CustomTitleBar
-                image={AddProductMajor}
+                image={"https://assets.incartupsell.com/images/ICU-Logo-Small.png"}
                 title='Offers'
                 buttonText='Create offer'
                 handleButtonClick={handleOpenOfferPage}
