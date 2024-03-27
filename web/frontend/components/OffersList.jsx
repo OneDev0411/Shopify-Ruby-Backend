@@ -135,7 +135,8 @@ export function OffersList({ pageSize }) {
     }
     setSortValue(value), []});
 
-  const promotedBulkActions = ((selectedResources.length === 1 && paginatedData.find(obj => obj['id'] === selectedResources[0])?.offerable_type == 'auto')) ?
+  const isAutopilot = paginatedData.find(obj => obj['id'] === selectedResources[0])?.offerable_type === 'auto'
+  const promotedBulkActions = (selectedResources.length === 1 && isAutopilot) ?
   [
     {
       content: 'Publish',
@@ -149,19 +150,7 @@ export function OffersList({ pageSize }) {
   ];
 
   let bulkActions = [];
-  if ((selectedResources.length === 1 && paginatedData.find(obj => obj['id'] === selectedResources[0])?.offerable_type == 'auto')) {
-    bulkActions =
-      [
-        {
-          content: 'Unpublish',
-          onAction: () => deactivateSelectedOffer(),
-        },
-        {
-          content: 'Delete',
-          onAction: () => deleteSelectedOffer(),
-        },
-      ]
-  } else if  (selectedResources.length > 1 && offersLimit === 1) {
+  if ((selectedResources.length === 1 && isAutopilot) || (selectedResources.length > 1 && offersLimit === 1)) {
     bulkActions =
       [
         {
