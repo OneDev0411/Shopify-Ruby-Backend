@@ -25,8 +25,6 @@ export default function Settings() {
     const [formData, setFormData] = useState({});
     const app = useAppBridge();
     const [error, setError] = useState(null);
-    const [message, setMessage] = useState('Loading...')
-    const [button, setButton] = useState('Loading...')
 
     useEffect(()=> {
         onLCP(traceStat, {reportSoftNavs: true});
@@ -63,22 +61,6 @@ export default function Settings() {
     }, [])
 
     useEffect(() => {
-        const fetchData = async () => {
-            fetchShopSettings()
-              .then((response) => { return response.json() })
-              .then((data) => {
-                setMessage(data.shop_settings.activated ? 'The store front widget is activated.' : 'The store front widget is deactivated.');
-                setButton(data.shop_settings.activated ? 'Deactivate' : 'Activate');
-              })
-              .catch((error) => {
-              console.log('Error fetching Shop data:', error);
-            })
-          };
-      
-        fetchData();       
-      }, []);
-
-    useEffect(() => {
         fetchCurrentShop();
       }, []);
 
@@ -98,14 +80,15 @@ export default function Settings() {
         })
             .then((response) => { return response.json(); })
             .then((data) => {
-                if (data.message.indexOf('App activated') > -1) {
-                    setMessage('The store front widget is activated.')
-                    setButton('Deactivate')
-                }
-                else if (data.message.indexOf('App deactivated') > -1) {
-                    setMessage('The store front widget is deactivated.')
-                    setButton('Activate')
-                }
+                const toastOptions = {
+                    message: data.message,
+                    duration: 3000,
+                    isError: false,
+                };
+                const toastNotice = Toast.create(app, toastOptions);
+                toastNotice.dispatch(Toast.Action.SHOW);
+                // This caused the user to be logged out of the app
+                window.location.reload();
             })
             .catch((error) => {
                 const toastOptions = {
@@ -157,7 +140,7 @@ export default function Settings() {
             <Page>
                 <ModalChoosePlan />
                 <CustomTitleBar title='Settings' icon={SettingsMajor} buttonText='Save' handleButtonClick={handleSave} />
-                <FrontWidgetSection message={message} button={button} toggleActivation={toggleActivation} />
+                <FrontWidgetSection shopSettings={shopSettings} toggleActivation={toggleActivation} />
                 <div className="space-4"></div>
                 <Grid>
                     <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }}>
