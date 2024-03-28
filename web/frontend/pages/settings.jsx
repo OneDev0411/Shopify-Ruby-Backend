@@ -140,7 +140,7 @@ export default function Settings() {
             <Page>
                 <ModalChoosePlan />
                 <CustomTitleBar title='Settings' icon={SettingsMajor} buttonText='Save' handleButtonClick={handleSave} />
-                <FrontWidgetSection shopSettings={shopSettings} toggleActivation={toggleActivation} />
+                <FrontWidgetSection isStatusActive={shopSettings?.activated} toggleActivation={toggleActivation} />
                 <div className="space-4"></div>
                 <Grid>
                     <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }}>
