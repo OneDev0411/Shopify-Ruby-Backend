@@ -3,7 +3,6 @@ import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from 'react-router-dom';
 
 import {Layout, Page} from '@shopify/polaris';
-import {AddProductMajor} from '@shopify/polaris-icons';
 
 import {CustomTitleBar, OffersList} from '../components';
 import {useAuthenticatedFetch} from "../hooks";
@@ -14,21 +13,28 @@ import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatu
 import { fetchShopData } from "../services/actions/shop";
 import {useShopState} from "../contexts/ShopContext.jsx";
 import ABTestBanner from '../components/ABTestBanner';
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
 
 export default function Offers() {
   const shopAndHost = useSelector(state => state.shopAndHost);
   const navigateTo = useNavigate();
-  const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
+  const { setIsSubscriptionUnpaid } = useShopState();
   const [error, setError] = useState(null);
   const { hasOffers, setHasOffers, shopSettings, updateShopSettingsAttributes } = useShopState();
-  const reduxDispatch = useDispatch();
 
+  useEffect(()=> {
+    onLCP(traceStat, {reportSoftNavs: true});
+    onFID(traceStat, {reportSoftNavs: true});
+    onCLS(traceStat, {reportSoftNavs: true});
+  }, []);
+  
   useEffect(() => {
     fetchShopData(shopAndHost.shop)
       .then((data) => {
         updateShopSettingsAttributes(data.offers_limit_reached, "offers_limit_reached");
         setHasOffers(data.has_offers);
-        reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
+        setIsSubscriptionUnpaid(data.subscription_not_paid);
       })
       .catch((error) => {
         setError(error);
@@ -44,12 +50,12 @@ export default function Offers() {
 
     return (
       <>
-        { isSubscriptionUnpaid && <ModalChoosePlan /> }
+        <ModalChoosePlan />
         <div className="min-height-container">
           <Page>
             {hasOffers ? (
               <CustomTitleBar
-                image={AddProductMajor}
+                image={"https://assets.incartupsell.com/images/ICU-Logo-Small.png"}
                 title='Offers'
                 buttonText='Create offer'
                 handleButtonClick={handleOpenOfferPage}
@@ -57,7 +63,7 @@ export default function Offers() {
             ): (
               <CustomTitleBar
                 title="In Cart Upsell & Cross Sell"
-                image={"https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/ICU-Logo-Small.png"}
+                image={"https://assets.incartupsell.com/images/ICU-Logo-Small.png"}
               />
             )}
             <Layout>

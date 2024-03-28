@@ -14,19 +14,27 @@ import { useAuthenticatedFetch } from "../hooks";
 import { isSubscriptionActive } from "../services/actions/subscription";
 import ErrorPage from "../components/ErrorPage.jsx"
 import {useShopState} from "../contexts/ShopContext.jsx";
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
+import { LoadingSpinner } from "../components/atoms/index.js";
 
 export default function Subscription() {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [currentSubscription, setCurrentSubscription] = useState(null);
-    const { planName, setPlanName, trialDays, setTrialDays } = useShopState()
+    const { planName, setPlanName, trialDays, setTrialDays, isSubscriptionUnpaid, setIsSubscriptionUnpaid } = useShopState()
     const [activeOffersCount, setActiveOffersCount] = useState();
     const [unpublishedOfferIds, setUnpublishedOfferIds] = useState();
     const app = useAppBridge();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [isSubscriptionUnpaid, setIsSubscriptionUnpaid] = useState(false);
 
+    useEffect(()=> {
+      onLCP(traceStat, {reportSoftNavs: true});
+      onFID(traceStat, {reportSoftNavs: true});
+      onCLS(traceStat, {reportSoftNavs: true});
+    }, []);
+    
     async function handlePlanChange (internal_name) {
         let redirect = Redirect.create(app);
 
@@ -96,15 +104,7 @@ export default function Subscription() {
     <Page>
         <CustomTitleBar title='Billing' icon={BillingStatementDollarMajor}/>
         { isLoading ?  (
-          <div style={{
-            overflow: 'hidden',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: '100vh',
-          }}>
-            <Spinner size="large" color="teal"/>
-          </div>
+          <LoadingSpinner />
         ) : (
           <>
             <div className="auto-height paid-subscription">

@@ -100,7 +100,7 @@ module Graphable
       '3-months' => { start_date: (Date.today.beginning_of_month - 2.months), end_date: Date.today.end_of_month },
       '6-months' => { start_date: (Date.today.beginning_of_month - 5.months), end_date: Date.today.end_of_month },
       'yearly' => { start_date: Date.today.beginning_of_year, end_date: Date.today.end_of_year },
-      'all' => { start_date: self.offers.present? ? self.offers.sort.first.created_at.to_date : nil, end_date: Date.today.end_of_month }
+      'all' => { start_date: self.created_at, end_date: Date.today.end_of_month }
     }
   end
 
@@ -174,73 +174,57 @@ module Graphable
 
   # Calculate stat data for each kind of stat
   def calculate_offer_stat(period, stat_field)
-    total_stat = 0
     period_hash = construct_period_hash
-
+  
     start_date = period_hash[period][:start_date]
     last = period_hash[period][:last]
-    interval = period_hash[period][:interval]
 
-    if daily_stats.present?
-      while (start_date <= last) do
-        if (start_date + interval > last)
-          end_date = last
-        else
-          end_date = start_date + interval
-        end
+    # Fetch the sum of stat_field for the entire period in one query
+    total_stat = DailyStat.where(shop_id: self.id).where('created_at >= ? and created_at <= ?', start_date, last).sum(stat_field)
 
-        total_stat += daily_stats.where('created_at >= ? and created_at < ?', start_date, end_date).sum(stat_field)
-
-        start_date = start_date + interval
-      end
-    end
     total_stat
   end
 
   def orders_stats(period)
-    results = []
+    period_trunc = {
+      'daily' => 'hour',
+      'weekly' => 'day',
+      'monthly' => 'week',
+      '3-months' => 'month',
+      '6-months' => 'month',  # Handle as special case if needed
+      'yearly' => 'month',
+      'all' => 'month'
+    }
 
     period_hash = construct_period_hash
-
     start_date = period_hash[period][:start_date]
     last = period_hash[period][:last]
-    interval = period_hash[period][:interval]
 
-    # Get all orders data which created_at is between start_date and last
-    # i.e. the Bigger DataSet of the entire reporting range.
-    all_orders = orders.where('created_at >= ? and created_at < ?', start_date, last)
+    grouped_orders = Order.where(shop_id: self.id, created_at: start_date..last)
+                          .group("date_trunc('#{period_trunc[period]}', created_at)")
+                          .count
 
-    if all_orders.present?
-      i = 0;
-      total = 0
-      while (start_date <= last) do
-
-        if (start_date + interval > last)
-          end_date = last
-        else
-          end_date = start_date + interval
-        end
-
-        label_hash = construct_lable_hash(start_date, end_date)
-
-        results[i]
-        results[i] = {
-          key: label_hash[period].call(start_date, end_date),
-          value: 0
-        }
-
-        # Get the count of orders which fall between reporting interval's time range
-        # i.e. a subset of all orders separated by time intervals
-        stats = all_orders.where('created_at >= ? and created_at < ?', start_date, end_date).count
-
-        results[i][:value] = stats
-        total += stats
-
-        start_date = start_date + interval
-        i+=1;
-      end
+    results = grouped_orders.map do |date, count|
+      {
+        key: format_label_for_period(date, period),
+        value: count
+      }
     end
-    {results: results, orders_total: total}
+
+    { results: results, orders_total: results.sum { |r| r[:value] } }
+  end
+
+  def format_label_for_period(date, period)
+    case period
+    when 'hourly'
+      date.in_time_zone.strftime("%Y-%m-%d %H:%M")
+    when 'daily', 'weekly'
+      date.in_time_zone.strftime("%Y-%m-%d")
+    when 'monthly', '3-months', '6-months', 'yearly'
+      date.in_time_zone.strftime("%Y-%m")
+    else
+      date.in_time_zone.to_s
+    end
   end
 
   def clicks_stats(period)
@@ -377,7 +361,7 @@ module Graphable
       '3-months' => { interval: 1.month, start_date: (Date.today.beginning_of_month - 2.months), last: Date.today.end_of_month },
       '6-months' => { interval: 2.months, start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
       'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
-      'all' => { interval: 6.months, start_date: self.orders.present? ? self.orders.sort.first.created_at.to_date : nil, last: Date.today.end_of_month }
+      'all' => { interval: 6.months, start_date: self.created_at, last: Date.today.end_of_month }
     }
   end
 

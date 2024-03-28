@@ -18,20 +18,25 @@ import {
   AbTestingData,
   ClickThroughtRateData
 } from "../components";
+import {useShopState} from "../contexts/ShopContext.jsx";
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
 
 export default function AnalyticsOffers() {
     const shopAndHost = useSelector((state) => state.shopAndHost);
     const [period, setPeriod] = useState('daily');
-    const isSubscriptionUnpaid = useSelector(
-      (state) => state.subscriptionPaidStatus.isSubscriptionUnpaid
-    );
-    const reduxDispatch = useDispatch();
     const [error, setError] = useState(null);
     const [showBanner, setShowBanner] = useState(false); 
     const setTimePeriod = useCallback((val) => {
       setPeriod(val)
     },[]);
 
+    useEffect(()=> {
+      onLCP(traceStat, {reportSoftNavs: true});
+      onFID(traceStat, {reportSoftNavs: true});
+      onCLS(traceStat, {reportSoftNavs: true});
+    }, []);
+    
     const handleDismiss = () => {
       setError(null);
       setShowBanner(false);
@@ -41,14 +46,6 @@ export default function AnalyticsOffers() {
       setError('Some of your analytics data failed to load, so your stats may not be complete.');
       setShowBanner(true);
     };
-    useEffect(() => {
-      // in case of page refresh
-      if (isSubscriptionUnpaid === null) {
-        fetchShopData(shopAndHost.shop).then((data) => {
-          reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
-        });
-      }
-    }, [isSubscriptionUnpaid]);
 
     const options = [
       {label: 'Today', value: 'daily'},
@@ -62,7 +59,7 @@ export default function AnalyticsOffers() {
 
     return (
       <Page>
-        { isSubscriptionUnpaid && <ModalChoosePlan /> }
+        <ModalChoosePlan />
          <CustomTitleBar title='Analytics' icon={AnalyticsMinor} />
           { error && showBanner && (
             <Banner title="Data Failed To Load" onDismiss={(handleDismiss)}>

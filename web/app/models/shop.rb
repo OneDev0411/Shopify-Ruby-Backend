@@ -27,6 +27,50 @@ class Shop < ApplicationRecord
   include ActionView::Helpers::DateHelper
   include ShopWorker
 
+  def shop_selection_and_setup
+    puts "After Create"
+    
+    # Fetch all shops matching either shopify_domain or myshopify_domain
+    matching_shops = Shop.where("shopify_domain = :domain OR myshopify_domain = :domain", domain: self.shopify_domain).order(created_at: :desc)
+    shops = matching_shops.select { |shop| shop.shopify_domain == self.shopify_domain }
+    puts "Shop Count: #{shops.count}"
+    
+     # Separate the current shop and old shop based on the domains
+    current_shop = shops.first
+    puts "New shop found...." if current_shop
+
+    old_shop = matching_shops.find { |shop| shop.myshopify_domain == self.shopify_domain }
+    puts "Old shop found...." if old_shop
+
+    # this is the case when 2 shops exists with the same shopify_domain so we are delelting the second shop
+    # which is the newer/current shop and re enabling the previous/original one.
+    if shops.count > 1
+      current_shop = shops.second
+      old_shop = shops.first
+    end
+
+    # This  will return shop acc to the shopify domain, it is receving through params.
+    # Will return the shop if it finds through shopify_domain, otherwise if shop can be find through
+    # myshopify_domain, means that user is re-installing the old shop, so we will enable the old shop,
+    # and deletes the newly created shop.
+
+    if shops.count > 1 || (old_shop.present? && !old_shop.id.eql?(current_shop&.id))
+      puts 'Im IN...'
+      token = current_shop.shopify_token
+      scopes = current_shop.access_scopes
+      puts 'Destroying Shop !!!'
+      current_shop&.destroy_completely
+      puts 'Re enabling old shop...'
+      old_shop.enable_reinstalled_shop(self.shopify_domain, token, scopes)
+      puts 'Shop Setup completed in re enable'
+      return
+    end
+    self.update(is_shop_active: true)
+
+    self.shop_setup
+    puts 'Shop Setup completed on first install'
+  end
+
   def shop_setup
     self.update(is_shop_active: true)
     ShopAction.create(
@@ -36,7 +80,13 @@ class Shop < ApplicationRecord
       action: 'install',
       source: 'icu-redesign_shop_setup'
     )
-    $redis_cache.del("shopify_uninstalled_#{self.myshopify_domain}")
+
+    begin
+      $redis_cache.del("shopify_uninstalled_#{self.myshopify_domain}")
+    rescue => e
+      Rails.logger.error "Redis Error, #{e.class}: #{e.message}"
+    end
+
     async_setup
     signup_for_referral_program
     select_plan('trial_plan')
@@ -370,7 +420,7 @@ class Shop < ApplicationRecord
   #
   # Returns Boolean.
   def offers_limit_reached?
-    subscription.offers_limit <= active_offers.length
+    plan.present? && plan.offers_limit <= active_offers.length
   end
 
   # Public. TRUE if the shop has the multi_offer feature AND does not have any product or collection offers
@@ -659,12 +709,13 @@ class Shop < ApplicationRecord
   end
 
   def active?
+    activated &&
     uninstalled_at.blank? &&
-      shopify_token.present? &&
-      shopify_plan_name != 'cancelled' &&
-      shopify_plan_name != 'frozen' &&
-      shopify_plan_name != 'dormant' &&
-      is_shop_active
+    shopify_token.present? &&
+    shopify_plan_name != 'cancelled' &&
+    shopify_plan_name != 'frozen' &&
+    shopify_plan_name != 'dormant' &&
+    is_shop_active
   end
 
   # the customer has uninstalled the app
@@ -1205,49 +1256,58 @@ class Shop < ApplicationRecord
   end
 
   def offer_data_with_stats_by_period(period)
-    data = []
+    start_date, end_date = period_hash_to_offers[period].values_at(:start_date, :end_date)
 
-    start_date = period_hash_to_offers[period][:start_date]
-    end_date = period_hash_to_offers[period][:end_date]
+    # Define the CTE with the proper WITH clause
+    combined_stats_cte = <<-SQL
+      WITH combined_stats AS (
+        SELECT
+          d.offer_id,
+          SUM(d.times_clicked) AS total_clicks,
+          SUM(d.times_loaded) AS total_views,
+          SUM(e.amount) FILTER (WHERE e.action = 'sale') AS total_revenue
+        FROM
+          daily_stats d
+          LEFT JOIN offer_events e ON d.offer_id = e.offer_id AND e.created_at BETWEEN '#{start_date}' AND '#{end_date}'
+        WHERE
+          d.created_at BETWEEN '#{start_date}' AND '#{end_date}'
+          AND d.shop_id = #{self.id} -- Assuming DailyStat has a shop_id column
+        GROUP BY
+          d.offer_id
+      )
+    SQL
 
-    # First before join to the offers table, get daily_stats and offer_events
-    # data which their created_at is between start_date and end_date
-    daily_stats_subquery = DailyStat
-      .select('offer_id, SUM(times_clicked) as total_clicks, SUM(times_loaded) as total_views')
-      .where(created_at: start_date..end_date)
-      .group(:offer_id)
+    # Main query referencing the CTE
+    query = <<-SQL
+      #{combined_stats_cte}
+      SELECT
+        o.id, o.shop_id, o.title, o.active, o.created_at,
+        COALESCE(cs.total_clicks, 0) AS total_clicks,
+        COALESCE(cs.total_views, 0) AS total_views,
+        COALESCE(cs.total_revenue, 0) AS total_revenue
+      FROM
+        offers o
+        LEFT OUTER JOIN combined_stats cs ON cs.offer_id = o.id
+      WHERE
+        o.shop_id = #{self.id}
+      ORDER BY
+        total_revenue DESC
+      LIMIT 3
+    SQL
 
-    offer_events_subquery = OfferEvent
-      .select('offer_id, SUM(amount) as total_revenue')
-      .where(created_at: start_date..end_date)
-      .where(action: 'sale')
-      .group(:offer_id)
-
-    # Reorder the offers data due to the default query of offer model
-    # If the data isn't reordered, the query result is wrong due to two order queries
-    # one is the default order by position_order and another one is a order by total_revenue
-    offers
-    .reorder('')
-    .joins("LEFT OUTER JOIN (#{daily_stats_subquery.to_sql}) ds ON ds.offer_id = offers.id")
-    .joins("LEFT OUTER JOIN (#{offer_events_subquery.to_sql}) oe ON oe.offer_id = offers.id")
-    .select('offers.id, offers.shop_id, offers.title, offers.active, offers.created_at, offers.offerable_type,
-            COALESCE(ds.total_clicks, 0) AS total_clicks,
-            COALESCE(ds.total_views, 0) AS total_views,
-            COALESCE(oe.total_revenue, 0) as total_revenue')
-    .group('offers.id, ds.total_clicks, ds.total_views, oe.total_revenue')
-    .order('total_revenue DESC')
-    .limit(3)
-    .each do |offer|
-      data << {
-        id: offer.id,
-        title: offer.title,
-        status: offer.active,
-        clicks: offer.total_clicks,
-        views: offer.total_views,
-        revenue: offer.total_revenue,
-        created_at: offer.created_at.to_datetime,
+    # Execute the query
+    data = ActiveRecord::Base.connection.execute(query).map do |offer|
+      {
+        id: offer['id'],
+        title: offer['title'],
+        status: offer['active'],
+        clicks: offer['total_clicks'],
+        views: offer['total_views'],
+        revenue: offer['total_revenue'],
+        created_at: offer['created_at']
       }
     end
+
     return data
   end
 
@@ -1255,7 +1315,7 @@ class Shop < ApplicationRecord
     if (!self.theme_app_extension.theme_app_complete || self.theme_app_extension.theme_version != '2.0') && ENV['ENABLE_THEME_APP_EXTENSION']&.downcase != 'true'
       self.publish_async
     elsif !script_tag_id.nil?
-      self.disable_javascript
+      Sidekiq::Client.push('class' => 'ShopWorker::DisableJavaScriptJob', 'args' => [id], 'queue' => 'scripts', 'at' => Time.now.to_i)
     end
   end
 
@@ -1441,12 +1501,19 @@ class Shop < ApplicationRecord
   def remove_cache_keys_for_uninstalled_shop
     ids = shopify_products_and_collections_ids
 
-    $redis_cache.del(*ids) unless ids.blank?
+    begin
+      $redis_cache.del(*ids) unless ids.blank?
+    rescue => e
+      Rails.logger.error "Redis Error, #{e.class}: #{e.message}"
+    end
   end
 
   def store_cache_keys_on_reinstall
     ids = shopify_products_and_collections_ids
-
-    $redis_cache.mset(*ids) unless ids.blank?
+    begin
+      $redis_cache.mset(*ids) unless ids.blank?
+    rescue => e
+      Rails.logger.error "Redis Error, #{e.class}: #{e.message}"
+    end
   end
 end

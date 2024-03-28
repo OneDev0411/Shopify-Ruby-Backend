@@ -4,7 +4,6 @@ import {useNavigate} from 'react-router-dom';
 
 import { Banner, Grid, Layout, Page, Spinner} from "@shopify/polaris";
 
-import { useAuthenticatedFetch } from "../hooks";
 import { isSubscriptionActive } from "../services/actions/subscription";
 import { fetchShopData } from "../services/actions/shop";
 
@@ -18,22 +17,44 @@ import { CHAT_APP_ID } from "../assets/index.js";
 import ErrorPage from "../components/ErrorPage.jsx"
 
 import ModalChoosePlan from "../components/modal_ChoosePlan.jsx";
-import { setIsSubscriptionUnpaid } from "../store/reducers/subscriptionPaidStatusSlice.js";
 import {useShopState} from "../contexts/ShopContext.jsx";
 import ABTestBanner from "../components/ABTestBanner.jsx";
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
+import { LoadingSpinner } from "../components/atoms/index.js";
 
 export default function HomePage() {
   const app = useAppBridge();
   const shopAndHost = useSelector(state => state.shopAndHost);
-  const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
-  const reduxDispatch = useDispatch();
-  const { shop, setShop, planName, setPlanName, trialDays, setTrialDays, hasOffers, setHasOffers, shopSettings, updateShopSettingsAttributes } = useShopState()
-  const [themeAppExtension, setThemeAppExtension] = useState();
+
+  const {
+    shop,
+    setShop,
+    planName,
+    setPlanName,
+    trialDays,
+    setTrialDays,
+    hasOffers,
+    setHasOffers,
+    shopSettings,
+    updateShopSettingsAttributes,
+    themeAppExtension,
+    setThemeAppExtension,
+    setIsSubscriptionUnpaid} = useShopState()
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const navigateTo = useNavigate();
-  const [isLegacy, setIsLegacy] = useState(true);
+  const [isLegacy, setIsLegacy] = useState(
+    themeAppExtension?.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true'
+  );
+
+  useEffect(()=> {
+    onLCP(traceStat, {reportSoftNavs: true});
+    onFID(traceStat, {reportSoftNavs: true});
+    onCLS(traceStat, {reportSoftNavs: true});
+  }, []);
 
   const handleOpenOfferPage = () => {
     navigateTo('/edit-offer', { state: { offerID: null } });
@@ -62,57 +83,52 @@ export default function HomePage() {
   
   useEffect(() => {
     let redirect = Redirect.create(app);
+
+    if (shop.id) {
+      setIsLoading(false)
+      return
+    }
     setIsLoading(true);
     fetchShopData(shopAndHost.shop)
       .then((data) => {
         if (data.redirect_to) {
           redirect.dispatch(Redirect.Action.APP, data.redirect_to);
-      } else {
-        setHasOffers(data.has_offers);
-        setThemeAppExtension(data.theme_app_extension);
-        setShop(data.shop);
-        setPlanName(data.plan);
-        setTrialDays(data.days_remaining_in_trial);
-        updateShopSettingsAttributes(data.offers_limit_reached, "offers_limit_reached");
-        reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
+        } else {
+          setHasOffers(data.has_offers);
+          setThemeAppExtension(data.theme_app_extension);
+          setShop(data.shop);
+          setPlanName(data.plan);
+          setTrialDays(data.days_remaining_in_trial);
+          setIsSubscriptionUnpaid(data.subscription_not_paid)
+          updateShopSettingsAttributes(data.offers_limit_reached, "offers_limit_reached");
 
-        if (data.theme_app_extension) {
-          setIsLegacy(data.theme_app_extension.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
-        }
-        
+          if (data.theme_app_extension) {
+            setIsLegacy(data.theme_app_extension.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
+          }
           // notify intercom as soon as app is loaded and shop info is fetched
           notifyIntercom(data.shop);
           setIsLoading(false);
-      }})
+        }
+      })
       .catch((error) => {
         setError(error);
         setIsLoading(false);
         console.log("Error", error);
       })
-  }, [setShop, setPlanName, setTrialDays, reduxDispatch])
+  }, [])
 
   if (error) { return < ErrorPage showBranding={true} />; }
 
   return (
     <Page>
       {isLoading ? (
-        <div
-          style={{
-            overflow: "hidden",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "100vh",
-          }}
-        >
-          <Spinner size="large" color="teal" />
-        </div>
+        <LoadingSpinner />
       ) : (
         <>
-          {isSubscriptionUnpaid && <ModalChoosePlan />}
+          <ModalChoosePlan />
           <CustomTitleBar
             title="In Cart Upsell & Cross Sell"
-            image={"https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/ICU-Logo-Small.png"}
+            image={"https://assets.incartupsell.com/images/ICU-Logo-Small.png"}
             buttonText={"Create offer"}
             handleButtonClick={handleOpenOfferPage}
           />

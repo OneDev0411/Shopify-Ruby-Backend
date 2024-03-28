@@ -3,16 +3,16 @@ import {
     SettingsMajor
 } from '@shopify/polaris-icons';
 import { useAppBridge } from '@shopify/app-bridge-react'
-import React, {useState, useEffect, useCallback, useContext} from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import { useAuthenticatedFetch, useShopSettings } from "../hooks";
 import {SETTINGS_DEFAULTS, useShopState} from "../contexts/ShopContext.jsx";
 import {useDispatch, useSelector} from 'react-redux';
 import { Redirect, Toast } from '@shopify/app-bridge/actions';
 import { Partners, SettingTabs, CustomTitleBar } from "../components";
-import ErrorPage from "../components/ErrorPage.jsx"
-import ModalChoosePlan from '../components/modal_ChoosePlan'
-import { fetchShopData } from '../services/actions/shop';
-import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatusSlice';
+import ErrorPage from "../components/ErrorPage.jsx";
+import ModalChoosePlan from '../components/modal_ChoosePlan';
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
 
 export default function Settings() {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -23,8 +23,15 @@ export default function Settings() {
     const app = useAppBridge();
     const [error, setError] = useState(null);
 
-    const isSubscriptionUnpaid = useSelector(state => state.subscriptionPaidStatus.isSubscriptionUnpaid);
-    const reduxDispatch = useDispatch();
+    useEffect(()=> {
+        onLCP(traceStat, {reportSoftNavs: true});
+        onFID(traceStat, {reportSoftNavs: true});
+        onCLS(traceStat, {reportSoftNavs: true});
+      }, []);
+      
+    useEffect(() => {
+        fetchCurrentShop();
+    }, []);
 
     const fetchCurrentShop = useCallback(async () => {
         let redirect = Redirect.create(app);
@@ -49,29 +56,6 @@ export default function Settings() {
                 console.log("Error > ", error);
             })
     }, [])
-
-    useEffect(() => {
-        if (shopSettings.shop_id === undefined) {
-            fetchCurrentShop()
-        } else {
-            setFormData({
-                productDomSelector: shopSettings?.custom_product_page_dom_selector,
-                productDomAction: shopSettings?.custom_product_page_dom_action,
-                cartDomSelector: shopSettings?.custom_cart_page_dom_selector,
-                cartDomAction: shopSettings?.custom_cart_page_dom_action,
-                ajaxDomSelector: shopSettings?.custom_ajax_dom_selector,
-                ajaxDomAction: shopSettings?.custom_ajax_dom_action,
-            })
-        }
-
-        // in case of page refresh
-        if (isSubscriptionUnpaid === null) {
-            fetchShopData(shopAndHost.shop).then((data) => {
-                reduxDispatch(setIsSubscriptionUnpaid(data.subscription_not_paid));
-            });
-        }
-
-    }, [fetchCurrentShop]);
 
     const handleFormChange = (value, id) => {
         setFormData({
@@ -147,7 +131,7 @@ export default function Settings() {
     return (
         <>
             <Page>
-                { isSubscriptionUnpaid && <ModalChoosePlan /> }
+                <ModalChoosePlan />
                 <CustomTitleBar title='Settings' icon={SettingsMajor} buttonText='Save' handleButtonClick={handleSave} />
                 <LegacyCard sectioned>
                     {(shopSettings?.activated) ? (

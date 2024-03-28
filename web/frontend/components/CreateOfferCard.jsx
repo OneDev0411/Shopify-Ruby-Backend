@@ -8,7 +8,7 @@ import {
   Modal,
   Text,
   VerticalStack,
-  VideoThumbnail, Tabs, LegacyCard, Layout,
+  VideoThumbnail, Tabs, LegacyCard, Layout, Banner,
 } from "@shopify/polaris";
 import { CHAT_APP_ID, homeImage } from "../assets/index.js";
 import {useLocation, useNavigate} from "react-router-dom";
@@ -202,10 +202,20 @@ function VideoModal({ active, handleClose }) {
 }
 
 export function ThemeAppCard({ shopData, themeAppExtension}) {
-  const [active, setActive] = useState(false);
+  const [open, setOpen] = useState(true);
 
-  const handleOpen = useCallback(() => setActive(true), []);
-  const handleClose = useCallback(() => setActive(false), []);
+  const closeBanner = () => {
+    setOpen(false);
+    localStorage.setItem('theme_banner', 'dismissed');
+  }
+
+  useEffect(() => {
+    let isBannerDismissed = localStorage.getItem('theme_banner');
+
+    if (isBannerDismissed) {
+      setOpen(false);
+    }
+  }, [])
 
   const contentInfo = (tab) => {
     return  <VerticalStack inlineAlign="center">
@@ -227,7 +237,7 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
               <ol>
               {!tab.content.includes('Ajax') ?
                 <>
-                  <li>Click on the <b>{tabs.buttonName}</b> button below, a new tab will open up, and the app block will be automatically added for you.</li>
+                  <li>Click on the <b>{tab.buttonName}</b> button below, a new tab will open up, and the app block will be automatically added for you.</li>
                   <li>
                     You will see the placement of any currently published offers, or if you don't have any published, a placeholder offer will show you the widget position. If you are happy with it, skip to step 4.
                   </li>
@@ -240,7 +250,6 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
               </ol>
             </Text>
           </div>
-          <VideoModal active={active} handleClose={handleClose} />
         </div>
         <div className="center-btn" style={{marginBottom: '42px'}}>
           <ButtonGroup>
@@ -312,6 +321,13 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
     (availableTabs.length > 0) &&
     <Layout.Section>
       <div style={{marginBottom: '47px'}}>
+        { open && (
+          <div style={{marginBottom: '10px'}}>
+            <Banner onDismiss={closeBanner} status={"warning"}>
+              In Cart Upsell is moving to Theme App Extension blocks. Please see below to enable the blocks in your theme.
+            </Banner>
+          </div>
+        )}
         <AlphaCard>
           <div className="offer-tabs-no-padding">
             <Tabs tabs={availableTabs} selected={selected} onSelect={handleTabChange} fitted>

@@ -17,10 +17,12 @@ import {Toast} from '@shopify/app-bridge/actions';
 import ErrorPage from "../components/ErrorPage.jsx"
 import {useShopSettings} from "../hooks/useShopSettings.js";
 import {useShopState} from "../contexts/ShopContext.jsx";
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
 
 export default function EditPage() {
     const { offer, setOffer } = useContext(OfferContext);
-    const { shopSettings, setShopSettings } = useShopState();
+    const { shopSettings, setShopSettings, themeAppExtension, setThemeAppExtension } = useShopState();
     const { fetchOffer, saveOffer, createOffer } = useOffer();
     const { fetchShopSettings, updateShopSettings } = useShopSettings();
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -39,7 +41,6 @@ export default function EditPage() {
         isPending: "Launch Autopilot",
     });
     const [initialOfferableProductDetails, setInitialOfferableProductDetails] = useState({});
-    const [themeAppExtension, setThemeAppExtension] = useState();
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -47,13 +48,16 @@ export default function EditPage() {
 
     const offerID = location?.state?.offerID;
 
-    let advanced_placement_setting = {}
+    useEffect(()=> {
+        onLCP(traceStat, {reportSoftNavs: true});
+        onFID(traceStat, {reportSoftNavs: true});
+        onCLS(traceStat, {reportSoftNavs: true});
+      }, []);
 
     //Call on initial render
     useEffect(() => {
         let redirect = Redirect.create(app);
         if (location?.state?.offerID == null) {
-            setIsLoading(true);
             // fetching shop settings
             fetchShopSettings({admin: null})
                 .then((response) => {
@@ -73,11 +77,9 @@ export default function EditPage() {
                     };
 
                     setOffer(newOffer);
-                    setIsLoading(false);
                 })
                 .catch((error) => {
                     setError(error);
-                    setIsLoading(false);
                     console.log("Error > ", error);
                 })
 
@@ -99,20 +101,19 @@ export default function EditPage() {
                 }
                 setOffer({...data});
                 setInitialOfferableProductDetails(data.offerable_product_details);
+                setIsLoading(false);
 
-                  fetchShopSettings({admin: null})
+                fetchShopSettings({admin: null})
                   .then((response) => {
                       return response.json()
                   })
                   .then((data) => {
                       updateSettingsOrRedirect(data)
                       setUpdatePreviousAppOffer(!updatePreviousAppOffer);
-                      setIsLoading(false);
                   })
                   .catch((error) => {
                     setError(error);
-                      setIsLoading(false);
-                      console.log("Error > ", error);
+                    console.log("Error > ", error);
                   })
             })
             .catch((error) => {
@@ -120,7 +121,6 @@ export default function EditPage() {
                 setIsLoading(false);
                 console.log("Error > ", error);
             })
-            setIsLoading(true);
         }
         return function cleanup() {
             setOffer(OFFER_DEFAULTS);
@@ -335,9 +335,9 @@ export default function EditPage() {
                                     fitted
                                 >
                                     { shopSettings?.offers_limit_reached && (
-                                      <Banner status="info">
+                                      <Banner status="warning">
                                           <p>You are currently at the limit for published offers. <Link
-                                            to="/subscription">Click here</Link> to upgrade your plan and get access to more offers and features!</p>
+                                            to="/subscription">Click here</Link> to upgrade your plan and get access to unlimited offers and features!</p>
                                       </Banner>
                                     )}
                                     <div className='space-4'></div>
@@ -354,7 +354,7 @@ export default function EditPage() {
                                     {selected == 1 ?
                                         // page was imported from components folder
                                         <SecondTab autopilotCheck={autopilotCheck} handleTabChange={changeTab}
-                                                   enableOrDisablePublish={enableOrDisablePublish} themeAppExtension={themeAppExtension}
+                                                   enableOrDisablePublish={enableOrDisablePublish}
                                         />
                                         : ""}
                                     {selected == 2 ?
@@ -365,8 +365,8 @@ export default function EditPage() {
                                         : ""}
                                     {selected == 3 ?
                                         // page was imported from components folder
-                                        <FourthTab shopifysaveDraft={saveDraft} publishOffer={publishOffer}
-                                                   enablePublish={enablePublish} themeAppExtension={themeAppExtension}/>
+                                        <FourthTab saveDraft={saveDraft} publishOffer={publishOffer}
+                                                   enablePublish={enablePublish} />
                                         : ""}
                                 </Tabs>
                             </div>

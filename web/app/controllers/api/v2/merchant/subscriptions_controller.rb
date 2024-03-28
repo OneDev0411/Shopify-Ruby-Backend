@@ -11,6 +11,11 @@ module Api
           render "subscriptions/current_subscription"
         end
 
+        # POST api/v2/merchant/is_subscription_unpaid
+        def is_subscription_unpaid
+          render json: { subscription_not_paid: @subscription.subscription_not_paid }
+        end
+
         # PUT api/v2/merchant/subscription
         def update
           @plan = Plan.find_by(internal_name: subscription_params[:plan_internal_name])
