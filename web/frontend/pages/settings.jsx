@@ -13,6 +13,9 @@ import ErrorPage from "../components/ErrorPage.jsx";
 import ModalChoosePlan from '../components/modal_ChoosePlan';
 import { onLCP, onFID, onCLS } from 'web-vitals';
 import { traceStat } from "../services/firebase/perf.js";
+import ErrorPage from "../components/ErrorPage.jsx"
+import {useShopState} from "../contexts/ShopContext.jsx";
+import FrontWidgetSection from "../components/FrontWidgetSection.jsx"
 
 export default function Settings() {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -22,6 +25,8 @@ export default function Settings() {
     const [formData, setFormData] = useState({});
     const app = useAppBridge();
     const [error, setError] = useState(null);
+    const [message, setMessage] = useState('Loading...')
+    const [button, setButton] = useState('Loading...')
 
     useEffect(()=> {
         onLCP(traceStat, {reportSoftNavs: true});
@@ -57,6 +62,26 @@ export default function Settings() {
             })
     }, [])
 
+    useEffect(() => {
+        const fetchData = async () => {
+            fetchShopSettings()
+              .then((response) => { return response.json() })
+              .then((data) => {
+                setMessage(data.shop_settings.activated ? 'The store front widget is activated.' : 'The store front widget is deactivated.');
+                setButton(data.shop_settings.activated ? 'Deactivate' : 'Activate');
+              })
+              .catch((error) => {
+              console.log('Error fetching Shop data:', error);
+            })
+          };
+      
+        fetchData();       
+      }, []);
+
+    useEffect(() => {
+        fetchCurrentShop();
+      }, []);
+
     const handleFormChange = (value, id) => {
         setFormData({
             ...formData,
@@ -73,15 +98,14 @@ export default function Settings() {
         })
             .then((response) => { return response.json(); })
             .then((data) => {
-                const toastOptions = {
-                    message: data.message,
-                    duration: 3000,
-                    isError: false,
-                };
-                const toastNotice = Toast.create(app, toastOptions);
-                toastNotice.dispatch(Toast.Action.SHOW);
-                window.location.reload();
-
+                if (data.message.indexOf('App activated') > -1) {
+                    setMessage('The store front widget is activated.')
+                    setButton('Deactivate')
+                }
+                else if (data.message.indexOf('App deactivated') > -1) {
+                    setMessage('The store front widget is deactivated.')
+                    setButton('Activate')
+                }
             })
             .catch((error) => {
                 const toastOptions = {
@@ -133,30 +157,7 @@ export default function Settings() {
             <Page>
                 <ModalChoosePlan />
                 <CustomTitleBar title='Settings' icon={SettingsMajor} buttonText='Save' handleButtonClick={handleSave} />
-                <LegacyCard sectioned>
-                    {(shopSettings?.activated) ? (
-                        <Grid>
-                            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 10, xl: 4 }}>
-                                <p>This app is activated</p>
-                            </Grid.Cell>
-                            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 2, xl: 4 }}>
-                                <div style={{ display: 'flex', justifyContent: 'end' }}>
-                                    <Button onClick={toggleActivation}>Deactivate</Button>
-                                </div>
-                            </Grid.Cell>
-                        </Grid>) : (
-                        <Grid>
-                            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 10, xl: 4 }}>
-                                <p>This app is deactivated</p>
-                            </Grid.Cell>
-                            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 2, xl: 4 }}>
-                                <div style={{ display: 'flex', justifyContent: 'end' }}>
-                                    <Button onClick={toggleActivation}>Activate</Button>
-                                </div>
-                            </Grid.Cell>
-                        </Grid>
-                    )}
-                </LegacyCard>
+                <FrontWidgetSection message={message} button={button} toggleActivation={toggleActivation} />
                 <div className="space-4"></div>
                 <Grid>
                     <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }}>
