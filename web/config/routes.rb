@@ -21,6 +21,18 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v2 do
       namespace :merchant, defaults: { format: 'json' } do
+        #Session Storage Endpoints Routes
+        resources :sessions, only: [:create, :show, :destroy] do
+          collection do
+            post :store_session, action: :create
+            delete :delete_sessions, action: :delete_multiple
+            get :find_by_shop, action: :find_sessions_by_shop
+          end
+          member do
+            get :load_session, action: show
+            delete :delete_session, action: :delete
+          end
+        end
         post 'offers/load_ab_analytics', to: 'offers#ab_analytics'
         post 'element_search', to: 'products#element_search'
         post 'load_offer_details', to: 'offers#load_offer_details'
@@ -43,7 +55,6 @@ Rails.application.routes.draw do
         get 'enable_autopilot_status', to: 'shops#enable_autopilot_status'
         get 'ab_test_banner_page', to: 'shops#ab_test_banner_page'
         get 'ab_test_banner_click', to: 'shops#ab_test_banner_click'
-
         post 'offers_list', to: 'offers#offers_list'
         post 'offer_stats', to: 'offers#offer_stats'
         post 'offers_list_by_period', to: 'offers#offers_list_by_period'
