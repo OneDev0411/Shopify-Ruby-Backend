@@ -13,8 +13,6 @@ import ErrorPage from "../components/ErrorPage.jsx";
 import ModalChoosePlan from '../components/modal_ChoosePlan';
 import { onLCP, onFID, onCLS } from 'web-vitals';
 import { traceStat } from "../services/firebase/perf.js";
-import ErrorPage from "../components/ErrorPage.jsx"
-import {useShopState} from "../contexts/ShopContext.jsx";
 import FrontWidgetSection from "../components/FrontWidgetSection.jsx"
 
 export default function Settings() {
@@ -59,10 +57,6 @@ export default function Settings() {
                 console.log("Error > ", error);
             })
     }, [])
-
-    useEffect(() => {
-        fetchCurrentShop();
-      }, []);
 
     const handleFormChange = (value, id) => {
         setFormData({
