@@ -134,13 +134,13 @@ class Offer < ApplicationRecord
     elsif offerable_type =='collection'
       offerable_shopify_title || collection.try(:title) || '(Collection Deleted From Store)'
     elsif offerable_type == 'multi'
-      @my_offerable_product_details&.first[:title] || ''
+      @my_offerable_product_details&.first&.dig(:title) || ''
     end
   end
 
   def offerable_price
     if offerable_type == 'multi'
-      @my_offerable_product_details&.first[:price] || 0.0
+      @my_offerable_product_details&.first&.dig(:price) || 0.0
     elsif offerable_type == 'collection'
       if collection.nil? || collection.products.empty?
         0.0
@@ -164,7 +164,7 @@ class Offer < ApplicationRecord
 
   def offerable_compare_at_price
     if offerable_type == 'multi'
-      @my_offerable_product_details&.first[:compare_at_price] || 0.0
+      @my_offerable_product_details&.first&.dig(:compare_at_price) || 0.0
     elsif offerable_type == 'collection'
       if collection.nil? || collection.products.empty?
         0.0
@@ -691,6 +691,8 @@ class Offer < ApplicationRecord
   #
   # Returns float.
   def average_product_price
+    return 0.0 unless @my_offerable_product_details&.any?
+
     prices = @my_offerable_product_details.map { |d| d[:price].to_f }
     prices.reduce(:+).to_f / prices.size # average
   end
