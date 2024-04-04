@@ -29,7 +29,7 @@ Rails.application.routes.draw do
             get :find_by_shop, action: :find_sessions_by_shop
           end
           member do
-            get :load_session, action: show
+            get :load_session, action: :show
             delete :delete_session, action: :delete
           end
         end
