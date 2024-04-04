@@ -95,8 +95,8 @@ module Api
 
         #GET /api/v2/merchant/toggle_activation
         def toggle_activation
-          @icushop.update_attribute(:activated, !@icushop.activated)
-          Sidekiq::Client.push('class' => 'ShopWorker::ForcePurgeCacheJob', 'args' => [@icushop.id], 'queue' => 'shop', 'at' => Time.now.to_i)
+          job = @icushop.activated ? enqueue_job('DisableJavaScriptJob') : enqueue_job('ForcePurgeCacheJob')
+          @icushop.update_columns(activated: !@icushop.activated, publish_job: job)
           render "shops/toggle_activation"
         end
 
@@ -285,6 +285,12 @@ module Api
           { 'css_options' => { 'main' => opts, 'button' => opts, 'text' => opts,
                                'image' => opts, 'custom' => opts } }
         end
+
+        def enqueue_job(title)
+          Sidekiq::Client.push('class' => "ShopWorker::#{title}", 'args' => [@icushop.id], 
+                               'queue' => 'shop', 'at' => Time.now.to_i)
+        end
+
       end
     end
   end

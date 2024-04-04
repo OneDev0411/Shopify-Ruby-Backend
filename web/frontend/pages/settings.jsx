@@ -81,8 +81,7 @@ export default function Settings() {
                 };
                 const toastNotice = Toast.create(app, toastOptions);
                 toastNotice.dispatch(Toast.Action.SHOW);
-                // This caused the user to be logged out of the app
-                window.location.reload();
+                updateShopSettingsAttributes(!shopSettings.activated,'activated');
             })
             .catch((error) => {
                 const toastOptions = {
