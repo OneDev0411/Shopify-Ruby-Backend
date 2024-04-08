@@ -31,7 +31,7 @@ module Shopifable
   #
   # Returns boolean.
   def async_setup
-    fetch_shopify_settings
+    Sidekiq::Client.push('class' => 'ShopWorker::FetchShopifySettingsJob', 'args' => [id], 'queue' => 'shop', 'at' => Time.now.to_i)
     Sidekiq::Client.push('class' => 'ShopWorker::EnsureInCartUpsellWebhooksJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i)
     Sidekiq::Client.push('class' => 'ShopWorker::CreateScriptTagJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i)
     Sidekiq::Client.push('class' => 'ShopWorker::FetchOrdersJob', 'args' => [id], 'queue' => 'default', 'at' => Time.now.to_i)
@@ -248,7 +248,7 @@ module Shopifable
       graphql = %{ { products(first: 20, query:"title:*#{query}*") { edges { node { id title featuredImage { transformedSrc(maxHeight: 50, maxWidth: 50) }  } } } } }
     end
     res = HTTParty.post(graphql_url, headers: api_headers, body: { query: graphql, variables: ''}.to_json)
-    res.parsed_response['data']['products']['edges'].map { |prod|
+    res&.parsed_response.dig('data', 'products', 'edges')&.map { |prod|
       {
         id: prod['node']['id'].gsub("gid://shopify/Product/","").to_i,
         title: prod.dig("node", "title"),
@@ -634,7 +634,7 @@ module Shopifable
       Rails.logger.info("Enqueuing to ShopWorker::CreateScriptTagJob for shop # #{self.id} : #{self.shopify_domain}")
       Sidekiq::Client.push('class' => 'ShopWorker::CreateScriptTagJob', 'args' => [self.id], 'queue' => 'default', 'at' => Time.now.to_i)
     end
-   
+
     update_column(soft_purge_only, opts[:soft_purge_only]) if opts[:soft_purge_only]
     tag_updated
   end
@@ -715,15 +715,16 @@ module Shopifable
     if keys_without_ajax.length.positive?
       keys_without_ajax.each do |key|
         next blocks_added unless (key == 'templates/product.json' && theme_app_extension.product_block_added) ||
-          (key == 'templates/cart.json' && theme_app_extension.cart_block_added) ||
-          (key == 'templates/collection.json' && theme_app_extension.collection_block_added)
+          (key == 'templates/cart.json' && theme_app_extension.cart_block_added)
 
         blocks_added += 1
       end
     end
 
-    unless (!theme_app_extension&.theme_app_complete && ((blocks_added == keys_without_ajax.length) &&
-      ((keys.include?('ajax') && theme_app_embed) || keys.exclude?('ajax')))) && offers.present?
+    all_blocks_enabled = ((blocks_added == keys_without_ajax.length) &&
+      ((keys.include?('ajax') && theme_app_extension&.theme_app_embed) || keys.exclude?('ajax')))
+
+    if !theme_app_extension&.theme_app_complete && ((all_blocks_enabled && offers.present?) || offers.blank?)
       theme_app_extension.update(theme_app_complete: true)
 
       unless script_tag_id.nil? && self.theme_app_extension.theme_version != '2.0'
@@ -743,12 +744,6 @@ module Shopifable
       keys.push('templates/product.json')
     end
 
-    unless offers.find { |off|
-      !(off.rules_json.find { |rule| rule['item_type'] == 'collection' }).nil?
-    }.nil?
-      keys.push('templates/collection.json')
-    end
-
     unless offers.find(&:in_ajax_cart).nil?
       keys.push('ajax')
     end
@@ -762,7 +757,7 @@ module Shopifable
     app_blocks_added = []
     app_blocks_supported = 0
     assets = []
-    keys = %w[templates/product.json templates/cart.json templates/collection.json]
+    keys = %w[templates/product.json templates/cart.json]
 
     shopify_theme = ShopifyAPI::Theme.all.map{ |t| t if t.role == 'main' }.compact.first
 
@@ -802,17 +797,14 @@ module Shopifable
     asset = JSON.parse(asset.value || '')
     blocks = asset['current']['blocks']
 
-    return if blocks.nil?
-
-    block_found = nil
+    if blocks.nil?
+      self.theme_app_extension.update(theme_app_embed: false)
+      return
+    end
 
     blocks.each do |_block_id, block|
-      if block['type'].include?("app_block_embed/#{ENV['SHOPIFY_ICU_EXTENSION_APP_ID']}")
-        block_found = block
-      end
-
-      if block_found.nil?
-        self.theme_app_extension.update(theme_app_embed: block_found['disabled'])
+      if block['type'].include?("ajax_cart_app_block/#{ENV['SHOPIFY_ICU_EXTENSION_APP_ID']}")
+        self.theme_app_extension.update(theme_app_embed: !block['disabled'])
         break
       end
     end
@@ -1057,9 +1049,6 @@ module Shopifable
           if asset_key == 'templates/cart.json'
             self.theme_app_extension.update(cart_block_added: true)
           end
-          if asset_key == 'templates/collection.json'
-            self.theme_app_extension.update(collection_block_added: true)
-          end
           app_blocks_added.push(asset_key)
           break
         end
@@ -1075,10 +1064,6 @@ module Shopifable
 
     unless app_blocks_added.include?('templates/cart.json')
       self.theme_app_extension.update(cart_block_added: false)
-    end
-
-    unless app_blocks_added.include?('templates/collection.json')
-      self.theme_app_extension.update(collection_block_added: false)
     end
   end
 end

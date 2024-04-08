@@ -3,35 +3,45 @@ import {
     SettingsMajor
 } from '@shopify/polaris-icons';
 import { useAppBridge } from '@shopify/app-bridge-react'
-import { useSelector } from 'react-redux';
-import React, { useState, useEffect, useCallback } from "react";
+import React, {useState, useEffect, useCallback} from "react";
+import { useAuthenticatedFetch, useShopSettings } from "../hooks";
+import {SETTINGS_DEFAULTS, useShopState} from "../contexts/ShopContext.jsx";
+import {useDispatch, useSelector} from 'react-redux';
 import { Redirect, Toast } from '@shopify/app-bridge/actions';
 import { Partners, SettingTabs, CustomTitleBar } from "../components";
-import { useAuthenticatedFetch } from "../hooks";
+import ErrorPage from "../components/ErrorPage.jsx";
+import ModalChoosePlan from '../components/modal_ChoosePlan';
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
 
 export default function Settings() {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
-    const [currentShop, setCurrentShop] = useState(null);
+    const { fetchShopSettings, updateShopSettings } = useShopSettings();
+    const { shopSettings, setShopSettings, updateShopSettingsAttributes } = useShopState();
     const [formData, setFormData] = useState({});
     const app = useAppBridge();
+    const [error, setError] = useState(null);
+
+    useEffect(()=> {
+        onLCP(traceStat, {reportSoftNavs: true});
+        onFID(traceStat, {reportSoftNavs: true});
+        onCLS(traceStat, {reportSoftNavs: true});
+      }, []);
+      
+    useEffect(() => {
+        fetchCurrentShop();
+    }, []);
 
     const fetchCurrentShop = useCallback(async () => {
         let redirect = Redirect.create(app);
-
-        fetch(`/api/merchant/shop_settings`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ shop: shopAndHost.shop, admin: null }),
-        })
+        fetchShopSettings({admin: null})
             .then((response) => { return response.json() })
             .then((data) => {
                 if (data.redirect_to) {
                     redirect.dispatch(Redirect.Action.APP, data.redirect_to);
                 }
-                setCurrentShop(data.shop_settings);
+                setShopSettings(data.shop_settings);
                 setFormData({
                     productDomSelector: data.shop_settings?.custom_product_page_dom_selector,
                     productDomAction: data.shop_settings?.custom_product_page_dom_action,
@@ -42,13 +52,10 @@ export default function Settings() {
                 })
             })
             .catch((error) => {
+                setError(error);
                 console.log("Error > ", error);
             })
     }, [])
-
-    useEffect(() => {
-        fetchCurrentShop()
-    }, [fetchCurrentShop]);
 
     const handleFormChange = (value, id) => {
         setFormData({
@@ -57,38 +64,8 @@ export default function Settings() {
         });
     };
 
-    //Called whenever the shop changes in any child component
-    function updateShop(updatedValue, ...updatedKey) {
-        if(updatedKey.length == 1) {
-            setCurrentShop(previousState => {
-                return { ...previousState, [updatedKey[0]]: updatedValue };
-            });
-        }
-        else if(updatedKey.length == 2) {
-            setCurrentShop(previousState => ({
-                ...previousState,
-                [updatedKey[0]]: {
-                    ...previousState[updatedKey[0]],
-                    [updatedKey[1]]: updatedValue 
-                }
-            }));
-        }
-        else if(updatedKey.length == 3) {
-            setCurrentShop(previousState => ({
-                ...previousState,
-                [updatedKey[0]]: {
-                    ...previousState[updatedKey[0]],
-                    [updatedKey[1]]: {
-                        ...previousState[updatedKey[0]][updatedKey[1]],
-                        [updatedKey[2]]: updatedValue
-                    }
-                }
-            }));
-        }
-    }
-
     const toggleActivation = async () => {
-        fetch(`/api/merchant/toggle_activation?shop=${shopAndHost.shop}`, {
+        fetch(`/api/v2/merchant/toggle_activation?shop=${shopAndHost.shop}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -107,24 +84,25 @@ export default function Settings() {
                 // window.location.reload();
             })
             .catch((error) => {
-                console.log("Error", error);
+                const toastOptions = {
+                    message: 'An error occurred. Please try again later.',
+                    duration: 3000,
+                    isError: true,
+                };
+                const toastError = Toast.create(app, toastOptions);
+                toastError.dispatch(Toast.Action.SHOW, toastOptions);
+                console.log("Error:", error);
             })
     }
 
     const handleSave = async () => {
-        setCurrentShop(prev => {
+        setShopSettings(prev => {
             let data = {
                 ...prev, custom_product_page_dom_selector: formData.productDomSelector, custom_product_page_dom_action: formData.productDomAction,
                 custom_cart_page_dom_selector: formData.cartDomSelector, custom_cart_page_dom_action: formData.cartDomAction, custom_ajax_dom_selector: formData.ajaxDomSelector,
                 custom_ajax_dom_action: formData.ajaxDomAction
             }
-            fetch('/api/merchant/update_shop_settings', {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ shop_attr: data, shop: shopAndHost.shop, admin: data.admin, json: true }),
-            })
+            updateShopSettings(data)
                 .then((response) => { return response.json(); })
                 .then((data) => {
                     const toastOptions = {
@@ -148,12 +126,15 @@ export default function Settings() {
         });
     }
 
+    if (error) { return < ErrorPage showBranding={true} />; }
+
     return (
         <>
             <Page>
+                <ModalChoosePlan />
                 <CustomTitleBar title='Settings' icon={SettingsMajor} buttonText='Save' handleButtonClick={handleSave} />
                 <LegacyCard sectioned>
-                    {(currentShop?.activated) ? (
+                    {(shopSettings?.activated) ? (
                         <Grid>
                             <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 10, xl: 4 }}>
                                 <p>This app is activated</p>
@@ -190,7 +171,7 @@ export default function Settings() {
                     <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }}>
                         <LegacyCard sectioned columnSpan={{ md: 6, lg: 6, xl: 6 }}>
                             {/* Tabs */}
-                            {currentShop ? <SettingTabs formData={formData} currentShop={currentShop} updateShop={updateShop} handleFormChange={handleFormChange} /> : 'Loading...'}
+                            {shopSettings ? <SettingTabs formData={formData} currentShop={shopSettings} updateShop={updateShopSettingsAttributes} handleFormChange={handleFormChange} /> : 'Loading...'}
                         </LegacyCard>
                     </Grid.Cell>
                 </Grid>

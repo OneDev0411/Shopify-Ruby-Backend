@@ -4,27 +4,30 @@ namespace :shoptrack do
   task check_shop_keys: :environment do
     #   Check redis for uninstalled shop keys
     # Check keys to ensure the shops were properly uninstalled
-    uninstalled_keys = $redis_cache.keys("shopify_uninstalled*")
+    begin
+      uninstalled_keys = $redis_cache.keys("shopify_uninstalled*")
 
+      if uninstalled_keys.length >= 1
 
-    if uninstalled_keys.length >= 1
+        uninstalled_values = $redis_cache.mget(uninstalled_keys)
 
-      uninstalled_values = $redis_cache.mget(uninstalled_keys)
+        shopify_domains = uninstalled_keys.each_with_index.map {|key, value|
+          shopify_domain = key.gsub("shopify_uninstalled_", "")
+          uninstall_timestamp = uninstalled_values[value]
+          # Format of the time stamp is unix
+          [shopify_domain, uninstall_timestamp]
+        }
 
-      shopify_domains = uninstalled_keys.each_with_index.map {|key, value|
-        shopify_domain = key.gsub("shopify_uninstalled_", "")
-        uninstall_timestamp = uninstalled_values[value]
-        # Format of the time stamp is unix
-        [shopify_domain, uninstall_timestamp]
-      }
+        shopify_domains.each {|pair |
+          # Should should run hours be an environment variable
+          if has_time_elapsed(pair[1], 400) && !is_shop_uninstalled(pair[0], pair[1])
+            Sidekiq::Client.push('class' => 'ShopWorker::MarkShopAsCancelledJob', 'args' => [domain], 'queue' => 'low', 'at' => Time.now.to_i + 10)
+          end
+        }
 
-      shopify_domains.each {|pair |
-        # Should should run hours be an environment variable
-        if has_time_elapsed(pair[1], 400) && !is_shop_uninstalled(pair[0], pair[1])
-          Sidekiq::Client.push('class' => 'ShopWorker::MarkShopAsCancelledJob', 'args' => [domain], 'queue' => 'low', 'at' => Time.now.to_i + 10)
-        end
-      }
-
+      end
+    rescue => e
+      Rails.logger.error "Redis Error, #{e.class}: #{e.message}"
     end
   end
 

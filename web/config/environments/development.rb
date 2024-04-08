@@ -9,7 +9,7 @@ Rails.application.configure do
     config.hosts
   rescue
     []
-  end << /[-\w.]+\.ngrok\.io/, /[-\w.]+\.trycloudflare\.com/, /[-\w.]+\.chipotle-software\.org/, 'localhost'
+  end << /[-\w.]+\.ngrok\.io/, /[-\w.]+\.trycloudflare\.com/, /[-\w.]+\.chipotle-software\.org/, 'localhost', /[-\w.]+\.myshopify\.com/
 
   config.hosts << URI(ENV.fetch('DEV_MOB_HOST', '')).host if ENV.fetch('DEV_MOB_HOST', '').present?
   # Settings specified here will take precedence over those in config/application.rb.

@@ -24,8 +24,11 @@ import {
 import {CreateOfferCard} from "./CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
+import ErrorPage from "../components/ErrorPage";
+import UpgradeSubscriptionModal from "./UpgradeSubscriptionModal.jsx";
+import { LoadingSpinner } from './atoms/index.js';
 
-export function OffersList() {
+export function OffersList({ pageSize }) {
   const app = useAppBridge();
   const [isLoading, setIsLoading] = useState(true);
   const [taggedWith, setTaggedWith] = useState('');
@@ -33,11 +36,17 @@ export function OffersList() {
   const [offersData, setOffersData] = useState([]);
   const [sortValue, setSortValue] = useState('today');
   const [filteredData, setFilteredData] = useState([]);
+  const [error, setError] = useState(null);
+
   const shopAndHost = useSelector(state => state.shopAndHost);
   const fetch = useAuthenticatedFetch(shopAndHost.host);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [modalActive, setModalActive] = useState(false);
+
+  const [offersLimitReached, setOffersLimitReached] = useState(false);
+  const [offersLimit, setOffersLimit] = useState();
+  const [openOffersModal, setOpenOffersModal] = useState(false);
 
   const toggleModal = useCallback(() => {
     setModalActive(!modalActive)
@@ -45,7 +54,7 @@ export function OffersList() {
 
   useEffect(() => {
     let redirect = Redirect.create(app);
-    fetch('/api/merchant/offers_list', {
+    fetch('/api/v2/merchant/offers_list', {
       method: 'POST',
       mode: 'cors',
       cache: 'no-cache',
@@ -66,14 +75,17 @@ export function OffersList() {
         // localStorage.setItem('icushopify_domain', data.shopify_domain);
         setOffersData(data.offers);
         setFilteredData(data.offers);
+        setOffersLimitReached(data.offers_limit_reached);
+        setOffersLimit(data.offers_limit);
         setIsLoading(false);
       }}).catch((error) => {
+        setError(error);
         console.log('Fetch error >> ', error);
       });
   }, []);
 
   // Pagination configuration
-  const itemsPerPage = 5;
+  const itemsPerPage = pageSize || 5;
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -123,7 +135,8 @@ export function OffersList() {
     }
     setSortValue(value), []});
 
-  const promotedBulkActions = ((selectedResources.length == 1 && paginatedData.find(obj => obj['id'] === selectedResources[0])?.offerable_type == 'auto')) ? 
+  const isAutopilot = paginatedData.find(obj => obj['id'] === selectedResources[0])?.offerable_type === 'auto'
+  const promotedBulkActions = (selectedResources.length === 1 && isAutopilot) ?
   [
     {
       content: 'Publish',
@@ -135,30 +148,36 @@ export function OffersList() {
       onAction: () => { createDuplicateOffer();},
     },
   ];
-  const bulkActions = ((selectedResources.length == 1 && paginatedData.find(obj => obj['id'] === selectedResources[0])?.offerable_type == 'auto')) ?
-  [
-    {
-      content: 'Unpublish',
-      onAction: () => deactivateSelectedOffer(),
-    },
-    {
-      content: 'Delete',
-      onAction: () => deleteSelectedOffer(),
-    },
-  ] : [
-    {
-      content: 'Publish',
-      onAction: () => activateSelectedOffer(),
-    },
-    {
-      content: 'Unpublish',
-      onAction: () => deactivateSelectedOffer(),
-    },
-    {
-      content: 'Delete',
-      onAction: () => deleteSelectedOffer(),
-    },
-  ];
+
+  let bulkActions = [];
+  if ((selectedResources.length === 1 && isAutopilot) || (selectedResources.length > 1 && offersLimit === 1)) {
+    bulkActions =
+      [
+        {
+          content: 'Unpublish',
+          onAction: () => deactivateSelectedOffer(),
+        },
+        {
+          content: 'Delete',
+          onAction: () => deleteSelectedOffer(),
+        },
+      ]
+  } else {
+    bulkActions = [
+      {
+        content: 'Publish',
+        onAction: () => activateSelectedOffer(),
+      },
+      {
+        content: 'Unpublish',
+        onAction: () => deactivateSelectedOffer(),
+      },
+      {
+        content: 'Delete',
+        onAction: () => deleteSelectedOffer(),
+      },
+    ];
+  }
 
   const filters = [
     {
@@ -213,7 +232,7 @@ export function OffersList() {
     selectedResources.forEach(function (resource) {
       if(paginatedData.find(obj => obj['id'] === resource)?.offerable_type != 'auto')
       {
-        let url = `/api/merchant/offers/${resource}/duplicate`;
+        let url = `/api/v2/merchant/offers/${resource}/duplicate`;
         fetch(url, {
           method: 'POST',
           headers: {
@@ -228,6 +247,7 @@ export function OffersList() {
             selectedResources.shift();
           })
         .catch(() => {
+          setError(error);
         })
       }
       else {
@@ -239,7 +259,7 @@ export function OffersList() {
 
   function deleteSelectedOffer() {
     selectedResources.forEach(function (resource) {
-      let url = `/api/merchant/offers/${resource}`;
+      let url = `/api/v2/merchant/offers/${resource}`;
       fetch(url, {
         method: 'DELETE',
         headers: {
@@ -254,36 +274,41 @@ export function OffersList() {
           selectedResources.shift();
         })
         .catch((error) => {
+          setError(error);
         })
     });
   }
 
   function activateSelectedOffer() {
-    selectedResources.forEach(function (resource) {
-      let url = '/api/merchant/offer_activate';
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ offer: { offer_id: resource }, shop: shopAndHost.shop })
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          const dataDup = [...offersData];
-          dataDup.find((o) => o.id == resource).status = true;
-
-          setOffersData([...dataDup]);
-          selectedResources.shift();
+    if (offersLimitReached) {
+      setOpenOffersModal(true);
+    } else {
+      selectedResources.forEach(function (resource) {
+        let url = '/api/v2/merchant/offer_activate';
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({offer: {offer_id: resource}, shop: shopAndHost.shop})
         })
-        .catch((error) => {
-        })
-    });
+          .then((response) => response.json())
+          .then(() => {
+            const dataDup = [...offersData];
+            dataDup.find((o) => o.id == resource).status = true;
+            setOffersData([...dataDup]);
+            selectedResources.shift();
+          })
+          .catch((error) => {
+            setError(error);
+          })
+      });
+    }
   }
 
   function deactivateSelectedOffer() {
     selectedResources.forEach(function (resource) {
-      let url = '/api/merchant/offer_deactivate';
+      let url = '/api/v2/merchant/offer_deactivate';
       fetch(url, {
         method: 'POST',
         headers: {
@@ -300,6 +325,7 @@ export function OffersList() {
           selectedResources.shift();
         })
         .catch((error) => {
+          setError(error);
         })
     });
   }
@@ -311,20 +337,12 @@ export function OffersList() {
     navigateTo('/edit-offer-view', { state: { offerID: offer_id } });
   }
 
+  if (error) { return < ErrorPage showBranding={false} />; 
+}
   return (
     <div className="narrow-width-layout">
       {isLoading ? (
-        <div
-          style={{
-            overflow: "hidden",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "100vh",
-          }}
-        >
-          <Spinner size="large" color="teal" />
-        </div>
+        <LoadingSpinner />
       ) : (
         <>
           {offersData.length === 0 ? (
@@ -407,6 +425,7 @@ export function OffersList() {
         </>
       )}
       <div className="space-10"></div>
+      <UpgradeSubscriptionModal openModal={openOffersModal} setOpenModal={setOpenOffersModal} />
     </div>
   );
 

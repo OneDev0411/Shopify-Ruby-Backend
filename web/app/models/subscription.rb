@@ -148,7 +148,7 @@ class Subscription < ApplicationRecord
             else
               (plan.price_in_cents / 100.0).round(2)
             end
-    test_mode = icushop.admin? || Rails.env.development?
+    test_mode = icushop.admin? || Rails.env.development? || ENV["SUBSCRIPTION_TEST_MODE"]&.downcase == 'true'
     opts = {
       recurring_application_charge: {
         name: "In Cart Upsell - #{plan.name}",
@@ -167,7 +167,7 @@ class Subscription < ApplicationRecord
     begin
       url = "https://#{icushop.shopify_domain}/admin/api/#{SHOPIFY_API_VERSION}/recurring_application_charges.json"
       res = HTTParty.post(url, body: opts.to_json, headers: icushop.api_headers)
-      update shopify_charge_id: res['recurring_application_charge']['id']
+      update shopify_charge_id: res['recurring_application_charge']['id'], status: 'pending_charge_approval'
       # res.get('recurring_application_charge.confirmation_url')
       res['recurring_application_charge']['confirmation_url']
     rescue StandardError => e
@@ -363,5 +363,47 @@ class Subscription < ApplicationRecord
   def update_subscription(plan)
     update_attribute(:offers_limit, plan.offers_limit)
     update_attribute(:views_limit, plan.views_limit)
+  end
+
+  def shopify_subscription_status
+    self.shop.activate_session
+    begin
+      charge_response = ShopifyAPI::RecurringApplicationCharge.find(id: self.shopify_charge_id)
+      if charge_response.status != 'active'
+        self.remove_recurring_charge
+
+        if self.plan&.internal_name == 'plan_based_billing'
+          self.unsubscribe_merchants(false)
+        end
+      end
+    rescue StandardError => e
+      if e.message.include?("Not Found")
+        self.unsubscribe_merchants(true)
+      else
+        ErrorNotifier.call(e)
+      end
+    end
+  end
+
+  def unsubscribe_merchants(should_nullify_id)
+    if self.shop.in_trial_period? && !self.free_plan_after_trial&.positive?
+      self.update(free_plan_after_trial: true)
+    end
+
+    self.shop.plan = Plan.find_by(internal_name: 'free_plan')
+    self.shop.unpublish_extra_offers if self.shop.offers.present? && self.shop.offers.where(active: true).size > 1
+
+    if should_nullify_id
+      self.update(offers_limit: 1, shopify_charge_id: nil)
+    else
+      self.update(offers_limit: 1)
+    end
+  end
+
+  def subscription_not_paid
+    self&.plan&.internal_name == 'plan_based_billing' &&
+      self&.shopify_charge_id.nil? &&
+      self&.status == 'approved' &&
+      self.shop.is_shop_active
   end
 end

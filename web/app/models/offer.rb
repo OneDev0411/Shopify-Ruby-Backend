@@ -18,7 +18,7 @@ class Offer < ApplicationRecord
   has_one :advanced_placement_setting, dependent: :destroy
   accepts_nested_attributes_for :advanced_placement_setting
 
-  after_save :populate_object_from_shopify
+  after_save :populate_object_from_shopify_in_background
 
   after_create :assign_initial_position_order
   attr_accessor :offerable_name
@@ -134,13 +134,13 @@ class Offer < ApplicationRecord
     elsif offerable_type =='collection'
       offerable_shopify_title || collection.try(:title) || '(Collection Deleted From Store)'
     elsif offerable_type == 'multi'
-      @my_offerable_product_details&.first[:title] || ''
+      @my_offerable_product_details&.first&.dig(:title) || ''
     end
   end
 
   def offerable_price
     if offerable_type == 'multi'
-      @my_offerable_product_details&.first[:price] || 0.0
+      @my_offerable_product_details&.first&.dig(:price) || 0.0
     elsif offerable_type == 'collection'
       if collection.nil? || collection.products.empty?
         0.0
@@ -164,7 +164,7 @@ class Offer < ApplicationRecord
 
   def offerable_compare_at_price
     if offerable_type == 'multi'
-      @my_offerable_product_details&.first[:compare_at_price] || 0.0
+      @my_offerable_product_details&.first&.dig(:compare_at_price) || 0.0
     elsif offerable_type == 'collection'
       if collection.nil? || collection.products.empty?
         0.0
@@ -426,7 +426,9 @@ class Offer < ApplicationRecord
       save_as_default_setting: save_as_default_setting,
       advanced_placement_setting: advanced_placement_setting,
       custom_css: custom_css,
+      offers_limit_reached: shop.offers_limit_reached?
     }
+
     # todo: hide title from published version
     res[:winning_version] = winner if winner.present?
     if offerable_type == 'auto'
@@ -689,6 +691,8 @@ class Offer < ApplicationRecord
   #
   # Returns float.
   def average_product_price
+    return 0.0 unless @my_offerable_product_details&.any?
+
     prices = @my_offerable_product_details.map { |d| d[:price].to_f }
     prices.reduce(:+).to_f / prices.size # average
   end
@@ -705,6 +709,13 @@ class Offer < ApplicationRecord
         item.get_details_after_create if item.title.blank?
       end
     end
+  end
+
+  # Private. Get all the info for a Product or Collection related to a rule (trigger).
+  #
+  # Return. Boolean.
+  def populate_object_from_shopify_in_background
+    Sidekiq::Client.push('class' => 'ShopWorker::OfferPopulatorJob', 'args' => [self.id], 'queue' => 'products', 'at' => Time.now.to_i)
   end
 
   # Public. Give us what collections are we using in the rules.

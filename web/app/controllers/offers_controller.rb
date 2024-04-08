@@ -34,7 +34,6 @@ class OffersController < AuthenticatedController
     end
 
     if offer.save
-      $customerio.track(@icushop.id, 'offer created')
 
       @icushop.publish_or_delete_script_tag
 
@@ -44,7 +43,7 @@ class OffersController < AuthenticatedController
     end
   end
 
-  # POST  api/offers/:id/update/:shop_id(.:format)
+  # POST  api/v2/offers/:id/update/:shop_id(.:format)
   # The CURRENT offer update method
   def update_from_builder
     offer = @icushop.offers.find_by(id: params[:id])

@@ -1,7 +1,7 @@
 import {Link,Icon,Modal, LegacyCard, Page, Layout, Image, LegacyStack, Grid, List} from "@shopify/polaris";
 import {helpImage} from "../assets";
 import {HintMajor} from '@shopify/polaris-icons';
-import {useRef, useState, useCallback} from 'react';
+import {useRef, useState, useCallback, useEffect} from 'react';
 import "../components/stylesheets/mainstyle.css";
 import { CustomTitleBar } from "../components";
 import {
@@ -9,8 +9,19 @@ import {
 } from '@shopify/polaris-icons';
 import { HelpLinks } from "../shared/constants/HelpPageLinks";
 
+import ModalChoosePlan from '../components/modal_ChoosePlan';
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
+
 export default function HelpPage() {
     const [active, setActive] = useState(false);
+
+    useEffect(()=> {
+        onLCP(traceStat, {reportSoftNavs: true});
+        onFID(traceStat, {reportSoftNavs: true});
+        onCLS(traceStat, {reportSoftNavs: true});
+      }, []);
+    
     const handleClose = useCallback(() => {
         setActive(false);
       }, []);
@@ -20,6 +31,7 @@ export default function HelpPage() {
 
   return (
     <Page>
+      <ModalChoosePlan />
       <CustomTitleBar title='Help' icon={QuestionMarkMinor} />
       <Layout>
             <Layout.Section>

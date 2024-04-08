@@ -1,32 +1,60 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from 'react-redux';
-import {Link, useNavigate} from 'react-router-dom';
+import {useDispatch, useSelector} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
 
 import { Banner, Grid, Layout, Page, Spinner} from "@shopify/polaris";
 
-import { useAuthenticatedFetch } from "../hooks";
 import { isSubscriptionActive } from "../services/actions/subscription";
+import { fetchShopData } from "../services/actions/shop";
+
 import { CustomTitleBar, OffersList, OrderOverTimeData, TotalSalesData } from "../components";
 
 import "../components/stylesheets/mainstyle.css";
 import {ThemeAppCard} from "../components/CreateOfferCard.jsx";
 import {Redirect} from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
+import { CHAT_APP_ID } from "../assets/index.js";
+import ErrorPage from "../components/ErrorPage.jsx"
+
+import ModalChoosePlan from "../components/modal_ChoosePlan.jsx";
+import {useShopState} from "../contexts/ShopContext.jsx";
+import ABTestBanner from "../components/ABTestBanner.jsx";
+import { onLCP, onFID, onCLS } from 'web-vitals';
+import { traceStat } from "../services/firebase/perf.js";
+import { LoadingSpinner } from "../components/atoms/index.js";
 
 export default function HomePage() {
   const app = useAppBridge();
   const shopAndHost = useSelector(state => state.shopAndHost);
-  const fetch = useAuthenticatedFetch(shopAndHost.host);
 
-  const [currentShop, setCurrentShop] = useState(null);
-  const [planName, setPlanName] = useState();
-  const [trialDays, setTrialDays] = useState();
-  const [hasOffers, setHasOffers] = useState();
-  const [themeAppExtension, setThemeAppExtension] = useState();
+  const {
+    shop,
+    setShop,
+    planName,
+    setPlanName,
+    trialDays,
+    setTrialDays,
+    hasOffers,
+    setHasOffers,
+    shopSettings,
+    updateShopSettingsAttributes,
+    themeAppExtension,
+    setThemeAppExtension,
+    setIsSubscriptionUnpaid} = useShopState()
+
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const navigateTo = useNavigate();
-  const [isLegacy, setIsLegacy] = useState(true);
+  const [isLegacy, setIsLegacy] = useState(
+    themeAppExtension?.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true'
+  );
+
+  useEffect(()=> {
+    onLCP(traceStat, {reportSoftNavs: true});
+    onFID(traceStat, {reportSoftNavs: true});
+    onCLS(traceStat, {reportSoftNavs: true});
+  }, []);
 
   const handleOpenOfferPage = () => {
     navigateTo('/edit-offer', { state: { offerID: null } });
@@ -38,7 +66,7 @@ export default function HomePage() {
 
   const notifyIntercom = (icu_shop) => {
     window.Intercom('boot', {
-      app_id: window.CHAT_APP_ID,
+      app_id: CHAT_APP_ID,
       id: icu_shop.id,
       email: icu_shop.email,
       phone: icu_shop.phone_number,
@@ -55,71 +83,57 @@ export default function HomePage() {
   
   useEffect(() => {
     let redirect = Redirect.create(app);
+
+    if (shop.id) {
+      setIsLoading(false)
+      return
+    }
     setIsLoading(true);
-    fetch(`/api/merchant/current_shop?shop=${shopAndHost.shop}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then( (response) => { return response.json(); })
-      .then( (data) => {
+    fetchShopData(shopAndHost.shop)
+      .then((data) => {
         if (data.redirect_to) {
           redirect.dispatch(Redirect.Action.APP, data.redirect_to);
-      } else {
-        setHasOffers(data.has_offers);
-        setThemeAppExtension(data.theme_app_extension);
-        setCurrentShop(data.shop);
-        setPlanName(data.plan);
-        setTrialDays(data.days_remaining_in_trial);
+        } else {
+          setHasOffers(data.has_offers);
+          setThemeAppExtension(data.theme_app_extension);
+          setShop(data.shop);
+          setPlanName(data.plan);
+          setTrialDays(data.days_remaining_in_trial);
+          setIsSubscriptionUnpaid(data.subscription_not_paid)
+          updateShopSettingsAttributes(data.offers_limit_reached, "offers_limit_reached");
 
-        if (data.theme_app_extension) {
-          setIsLegacy(data.theme_app_extension.theme_version === "Vintage");
+          if (data.theme_app_extension) {
+            setIsLegacy(data.theme_app_extension.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
+          }
+          // notify intercom as soon as app is loaded and shop info is fetched
+          notifyIntercom(data.shop);
+          setIsLoading(false);
         }
-
-        // notify intercom as soon as app is loaded and shop info is fetched
-        notifyIntercom(data.shop);
-        setIsLoading(false);
-      }})
-      .catch((error) => {
-        console.log("error", error);
       })
-  }, [setCurrentShop, setPlanName, setTrialDays])
+      .catch((error) => {
+        setError(error);
+        setIsLoading(false);
+        console.log("Error", error);
+      })
+  }, [])
+
+  if (error) { return < ErrorPage showBranding={true} />; }
 
   return (
     <Page>
       {isLoading ? (
-        <div
-          style={{
-            overflow: "hidden",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "100vh",
-          }}
-        >
-          <Spinner size="large" color="teal" />
-        </div>
+        <LoadingSpinner />
       ) : (
         <>
+          <ModalChoosePlan />
           <CustomTitleBar
             title="In Cart Upsell & Cross Sell"
-            image={"https://in-cart-upsell.nyc3.cdn.digitaloceanspaces.com/images/ICU-Logo-Small.png"}
+            image={"https://assets.incartupsell.com/images/ICU-Logo-Small.png"}
             buttonText={"Create offer"}
             handleButtonClick={handleOpenOfferPage}
           />
           <Layout>
-            <Layout.Section>
-              <div className="banner-btn">
-                <Banner
-                  action={{content: 'Take the survey', onAction: handleOpenGoogleForm }}
-                  status="info"
-                >
-                  <p>We're delighted to welcome you to the new & improved In Cart Upsell & Cross-Sell! If you encounter any unexpected issues or need assistance with the new User Interface, please don't hesitate to contact our support team. Additionally, if you can spare 5 minutes, we'd greatly appreciate your feedback. Thank you!</p>
-                </Banner>
-              </div>
-            </Layout.Section>
-            {isSubscriptionActive(currentShop?.subscription) && planName!=='free' && trialDays>0 &&
+            {isSubscriptionActive(shop?.subscription) && planName!=='free' && trialDays>0 &&
               <Layout.Section>
                 <Banner status="info">
                   <p>{ trialDays } days remaining for the trial period</p>
@@ -127,21 +141,19 @@ export default function HomePage() {
               </Layout.Section>
             }
 
-            {!isLegacy && (
-              <ThemeAppCard
-                shopData={currentShop}
-                themeAppExtension={themeAppExtension}
-              />
-            )}
+              {shopSettings?.offers_limit_reached && (
+                <Layout.Section>
+                  <ABTestBanner />
+                </Layout.Section>
+              )}
 
-            {planName ==='free' && (
-              <Layout.Section>
-                <Banner status="info">
-                  <p>You are currently on the free plan and only one offer can be published at a time. <Link
-                    to="/subscription">Click here</Link> to see the features available or to upgrade your plan</p>
-                </Banner>
-              </Layout.Section>
-            )}
+              {!isLegacy && (
+                <ThemeAppCard
+                  shopData={shop}
+                  themeAppExtension={themeAppExtension}
+                />
+              )}
+
               <Layout.Section>
                 <OffersList />
                 {hasOffers && (

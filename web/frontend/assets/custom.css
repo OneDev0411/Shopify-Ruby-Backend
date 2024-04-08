@@ -16,3 +16,65 @@
 .polaris-banner-container .Polaris-Banner {
   background-color: #fff1b894;
 }
+
+.recommended-current {
+  top: 18px;
+  position: absolute;
+  color: #8C9196;
+}
+
+.subscription-subtitle {
+  margin-top: -8px;
+  line-height: 18px;
+}
+
+.my-24 {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.pl-10 {
+  padding-left: 10px;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.mt-14 {
+  margin-top: 14px;
+}
+
+.mt-28 {
+  margin-top: 28px;
+}
+
+.paid-subscription .Polaris-LegacyCard {
+  position: relative;
+  padding-top: 20px;
+}
+
+.paid-subscription .Polaris-Text--root.Polaris-Text--headingMd, .paid-subscription .bold {
+  font-weight: bold;
+}
+
+.paid-subscription .subscription-feature {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.paid-subscription .subscription-desc {
+  font-weight: 400;
+  color: #8C9196;
+  margin-bottom: 10px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalAddProduct } from './modal_AddProduct';
 import { useAuthenticatedFetch } from "../hooks";
+import ErrorPage from "../components/ErrorPage.jsx"
 
 export function SelectCollectionsModal(props) {
   const shopAndHost = useSelector(state => state.shopAndHost);
@@ -10,10 +11,11 @@ export function SelectCollectionsModal(props) {
   const [collectionData, setCollectionData] = useState("");
   const [resourceListLoading, setResourceListLoading] = useState(false);
   const [query, setQuery] = useState("");
+  const [error, setError] = useState(null);
 
   function updateQuery (childData) {
     setResourceListLoading(true);
-    fetch(`/api/merchant/element_search`, {
+    fetch(`/api/v2/merchant/element_search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -32,7 +34,8 @@ export function SelectCollectionsModal(props) {
         setResourceListLoading(false);
     })
     .catch((error) => {
-        console.log("Error > ", error);
+      setError(error);
+      console.log("Error > ", error);
     })
 
     setQuery(childData);
@@ -40,7 +43,7 @@ export function SelectCollectionsModal(props) {
 
   function getCollections() {
     setResourceListLoading(true);
-    fetch(`/api/merchant/element_search`, {
+    fetch(`/api/v2/merchant/element_search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +62,8 @@ export function SelectCollectionsModal(props) {
         setResourceListLoading(false);
     })
     .catch((error) => {
-        console.log("# Error getProducts > ", JSON.stringify(error));
+      setError(error);
+      console.log("# Error getProducts > ", JSON.stringify(error));
     })
   }
 
@@ -80,6 +84,8 @@ export function SelectCollectionsModal(props) {
   useEffect(() => {
    getCollections();
   }, []);
+
+  // if (error) { return < ErrorPage />; }
 
   return (
     <>

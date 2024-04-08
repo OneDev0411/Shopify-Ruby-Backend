@@ -27,7 +27,7 @@ class Product < ApplicationRecord
       if variants_json.present?
         variants_json.first['price']
       else
-        variants.empty? ? 0.0 : variants.first['price']
+        0.0
       end
     end
   end
@@ -436,6 +436,10 @@ class Product < ApplicationRecord
   end
 
   def cache_product_key
-    $redis_cache.set("shopify_product_#{shopify_id}", 1)
+    begin
+      $redis_cache.set("shopify_product_#{shopify_id}", 1)
+    rescue => e
+      Rails.logger.error "Redis Error, #{e.class}: #{e.message}"
+    end
   end
 end

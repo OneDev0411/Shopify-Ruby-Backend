@@ -32,7 +32,29 @@ export const getShopOffersStats = async (shopify_domain, period) => {
     });
     return response;
     } catch (error) {
-      console.error('An error occurred while making the API call:', error);
+      console.log('An error occurred while making the API call:', error);
       return null; 
     }
+}
+
+
+export async function fetchShopData(shop) {
+  try {
+    const response = await fetch(`/api/v2/merchant//current_shop?shop=${shop}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch shop data:", error);
+    throw error;
+  }
 }

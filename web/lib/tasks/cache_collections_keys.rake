@@ -18,6 +18,10 @@ namespace :cache_collections_keys do
 
   def set_collections_redis_keys(type, shopify_ids)
     redis_data = shopify_ids.map { |id| ["shopify_#{type}_#{id}", 1] }
-    $redis_cache.mset(*redis_data.flatten)
+    begin
+      $redis_cache.mset(*redis_data.flatten)
+    rescue => e
+      Rails.logger.error "Redis Error, #{e.class}: #{e.message}"
+    end
   end
 end
