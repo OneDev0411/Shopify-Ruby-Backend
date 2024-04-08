@@ -72,12 +72,6 @@ class Shop < ApplicationRecord
   end
 
   def shop_setup
-    self.update(is_shop_active: true)
-    self.shop_setup
-    puts 'Shop Setup completed on first install'
-  end
-
-  def shop_setup
     ShopAction.create(
       shop_id: self.id,
       action_timestamp: Time.now.utc.to_i,
