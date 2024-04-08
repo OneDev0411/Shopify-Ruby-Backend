@@ -19,7 +19,7 @@ class Shop < ApplicationRecord
   has_many :shop_action, dependent: :destroy
 
   before_create :set_up_for_shopify
-  after_create :shop_setup
+  after_create :shop_selection_and_setup
 
   include Shopifable
   include Graphable
@@ -72,7 +72,6 @@ class Shop < ApplicationRecord
   end
 
   def shop_setup
-    self.update(is_shop_active: true)
     ShopAction.create(
       shop_id: self.id,
       action_timestamp: Time.now.utc.to_i,
@@ -98,14 +97,29 @@ class Shop < ApplicationRecord
   # Never use this method on un-install app.
 
   def destroy_completely
-    subscription.delete if subscription.present?
-    products.delete_all if products.any?
-    offers.delete_all if offers.any?
+    subscription&.delete
+    products&.delete_all
+    offers&.delete_all
+    shop_events&.delete_all
+    shop_actions = ShopAction.where(shop_id: self.id)
+    shop_actions.delete_all if shop_actions.any?
+    pending_jobs&.delete_all
+    theme_app_extension&.delete 
     begin
       destroy
+      puts 'Shop Destroyed.'
     rescue => error
-      ErrorNotifier.call(error)
+
+      # if due to any unknown error new shop decline to delete we will change it shopify domain so when
+      # fetch shop on re installed is called, one shop with the shopify domain exists and can be returned
+      # that will be the original/old one. We are changing domain for the new one.
+      # Later on production we can see why these shops were not deleted due to any possible associaiton that
+      # were not deleted above due to which this shop couldn't be destroyed.
+
+      self.update_column(:shopify_domain, "#{self.shopify_domain}_deletable")
+      puts "Shop couldn't be destroyed #{error}"
     end
+
   end
 
   def active_offers
@@ -757,6 +771,7 @@ class Shop < ApplicationRecord
       
       if subscription.present?
         subscription.status = 'approved'
+        subscription.shopify_charge_id = nil
         subscription.save
       end
     rescue => e
