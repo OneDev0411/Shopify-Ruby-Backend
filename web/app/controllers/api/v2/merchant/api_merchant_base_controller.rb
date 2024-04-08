@@ -16,11 +16,10 @@ module Api
 
         def find_shop
           if params[:shop].present?
-            shop = Shop.find_by(shopify_domain: params['shop'])
+            @icushop = Shop.find_by(shopify_domain: params['shop'])
           else
-            shop = Shop.find(params['shop_id'])
+            @icushop = Shop.find(params['shop_id'])
           end
-          @icushop = Shop.fetch_shop(shop.shopify_domain)
         end
 
         def ensure_plan
