@@ -172,10 +172,12 @@ export const OFFER_DEFAULTS = {
       borderStyle: 'none',
       borderWidth: 0,
       borderRadius: 0,
+      borderColor: "#000"
     },
     text: {
       fontFamily: "Arial",
       fontSize: '16px',
+      color: "#000"
     },
     button: {
       color: "#FFFFFF",
@@ -183,6 +185,7 @@ export const OFFER_DEFAULTS = {
       fontFamily: "Arial",
       fontSize: "16px",
       borderRadius: 0,
+      borderColor: "#000"
     },
   },
   custom_css: '',
