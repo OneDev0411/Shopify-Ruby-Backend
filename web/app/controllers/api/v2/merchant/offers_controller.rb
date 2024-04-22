@@ -32,7 +32,11 @@ module Api
             offer = Offer.where(shop_id: @icushop.id).limit(1).first
           end
 
-          render json: {offer: offer.library_json}
+          if offer.blank?
+            render json: {offer: nil}
+          else
+            render json: {offer: offer.library_json}
+          end
         end
 
         # POST /api/v2/merchant/offer_stats

@@ -23,7 +23,7 @@ import {TitleBar, useAppBridge} from "@shopify/app-bridge-react";
 import {Toast} from "@shopify/app-bridge/actions";
 import {CustomTitleBar} from "../components/index.js";
 import {LoadingSpinner} from "../components/atoms/index.js";
-import {OFFER_DEFAULTS} from "../shared/constants/EditOfferOptions.js";
+import {OFFER_DEFAULTS, OFFER_PLACEHOLDER} from "../shared/constants/EditOfferOptions.js";
 import {Link} from "react-router-dom";
 
 export default function OffersAppearance() {
@@ -59,21 +59,26 @@ export default function OffersAppearance() {
             'Content-Type': 'application/json',
           },
         }).then(resp => resp.json())
-          .then(offerData => {
+          .then(response => {
+            let offerData = response;
 
             if (offerData.offer) {
               offerData.offer.css_options = data.shop_settings.css_options
               setOffer(offerData.offer);
-
-              if (offerData.offer.offerable_product_details.length > 0) {
-                updateCheckKeysValidity('text', offerData.offer.text_a.replace("{{ product_title }}", offerData.offer.offerable_product_details[0]?.title));
-              }
-              updateCheckKeysValidity('cta', offerData.offer.cta_a);
-
-              combinedCss()
-              setTimeout(function(){ setCarouselLoading(false) }, 500);
-              setIsLoading(false);
+            } else {
+              offerData.offer = OFFER_PLACEHOLDER;
+              offerData.offer.css_options = data.shop_settings.css_options
+              setOffer(OFFER_PLACEHOLDER)
             }
+
+            if (offerData.offer.offerable_product_details.length > 0) {
+              updateCheckKeysValidity('text', offerData.offer.text_a.replace("{{ product_title }}", offerData.offer.offerable_product_details[0]?.title));
+            }
+            updateCheckKeysValidity('cta', offerData.offer.cta_a);
+
+            combinedCss()
+            setTimeout(function(){ setCarouselLoading(false) }, 500);
+            setIsLoading(false);
           })
 
       })
