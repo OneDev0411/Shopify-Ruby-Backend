@@ -139,12 +139,16 @@ const DisplayConditions = (props) => {
 
                         <hr className="legacy-card-hr legacy-card-hr-t20-b15"/>
                         <LegacyStack vertical>
-                            <Checkbox
-                                label="Disable checkout button until offer is accepted (only available in cart page, won't show on ajax)"
-                                helpText="This is useful for products that can only be purchased in pairs."
-                                checked={offer.must_accept}
-                                onChange={handleDisableCheckoutBtn}
-                            />
+                            { offer.in_cart_page &&
+                                (
+                                    <Checkbox
+                                        label="Disable checkout button until offer is accepted (only available in cart page, won't show on ajax)"
+                                        helpText="This is useful for products that can only be purchased in pairs."
+                                        checked={offer.must_accept}
+                                        onChange={handleDisableCheckoutBtn}
+                                    />
+                                )
+                            }
                             <Checkbox
                                 label="If the offer requirements are no longer met. Remove the item from the cart."
                                 checked={offer.remove_if_no_longer_valid}
