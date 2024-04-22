@@ -62,10 +62,6 @@ module Api
           @icushop.stats_from = opts['stats_from'].present? ? Time.parse(opts['stats_from']) : nil
           @icushop.default_template_settings = opts['default_template_settings'].to_h
 
-          puts "stitch"
-          puts opts['multi_layout'].present?
-          puts opts['update_all_offers']
-          puts opts['update_all_offers'].present?
           if opts['multi_layout'].present?
             @icushop.multi_layout = opts['multi_layout']
           end
@@ -100,8 +96,6 @@ module Api
           end
 
           if opts['update_all_offers']
-            puts "multi-lays"
-            puts opts['multi_layout']
             @icushop.offers.update_all(css_options: opts['css_options'], multi_layout: opts['multi_layout'])
           end
 

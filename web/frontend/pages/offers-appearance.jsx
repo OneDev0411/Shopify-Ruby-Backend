@@ -48,12 +48,10 @@ export default function OffersAppearance() {
   useEffect(() => {
     setIsLoading(true);
     setCarouselLoading(true);
-    console.log('1', shopSettings)
     fetchShopSettings({admin: null})
       .then((response) => response.json() )
       .then((data) => {
         setShopSettings(data.shop_settings);
-        console.log('2', shopSettings)
 
         fetch(`/api/v2/merchant/single_offer?shop=${data.shop_settings.shopify_domain}`, {
           method: 'GET',
@@ -62,7 +60,6 @@ export default function OffersAppearance() {
           },
         }).then(resp => resp.json())
           .then(offerData => {
-            console.log('3', shopSettings, data)
 
             if (offerData.offer) {
               offerData.offer.css_options = data.shop_settings.css_options
@@ -238,7 +235,6 @@ export default function OffersAppearance() {
     newShop.css_options = offer.css_options
     newShop.multi_layout = offer.multi_layout;
 
-    console.log(updateAll, 'hitp')
     if (updateAll) {
       newShop.update_all_offers = true;
     } else {

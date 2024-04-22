@@ -77,7 +77,7 @@ export default function EditPage() {
                     };
 
                     newOffer.css_options = data.shop_settings.css_options
-                    console.log(data.shop_settings.multi_layout, 'cheech')
+
                     if (data.shop_settings.multi_layout) {
                         newOffer.multi_layout = data.shop_settings.multi_layout
                     }
