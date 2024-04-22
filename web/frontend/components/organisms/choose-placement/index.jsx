@@ -176,6 +176,7 @@ const ChoosePlacement = (props) => {
 
 
     const handleSelectChange = useCallback((value) => {
+        props.changeDisableCheckoutInfo('');
         if (value === "cartpage") {
             updateOffer("in_cart_page", true);
             updateOffer("in_product_page", false);
