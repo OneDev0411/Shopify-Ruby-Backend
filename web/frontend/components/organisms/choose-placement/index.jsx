@@ -200,6 +200,7 @@ const ChoosePlacement = (props) => {
             updateOffer("in_cart_page", true);
             updateOffer("in_product_page", false);
             updateOffer("in_ajax_cart", true);
+            props.changeDisableCheckoutInfo("(only available in cart page, won't show on ajax)");
         }
         setSelected(value);
     }, []);

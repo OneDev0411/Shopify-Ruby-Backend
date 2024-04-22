@@ -142,7 +142,7 @@ const DisplayConditions = (props) => {
                             { offer.in_cart_page &&
                                 (
                                     <Checkbox
-                                        label="Disable checkout button until offer is accepted (only available in cart page, won't show on ajax)"
+                                        label={`Disable checkout button until offer is accepted ${props.disableCheckoutInfo}`}
                                         helpText="This is useful for products that can only be purchased in pairs."
                                         checked={offer.must_accept}
                                         onChange={handleDisableCheckoutBtn}
