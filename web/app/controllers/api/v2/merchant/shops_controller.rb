@@ -62,6 +62,14 @@ module Api
           @icushop.stats_from = opts['stats_from'].present? ? Time.parse(opts['stats_from']) : nil
           @icushop.default_template_settings = opts['default_template_settings'].to_h
 
+          puts "stitch"
+          puts opts['multi_layout'].present?
+          puts opts['update_all_offers']
+          puts opts['update_all_offers'].present?
+          if opts['multi_layout'].present?
+            @icushop.multi_layout = opts['multi_layout']
+          end
+
           # ADMIN OPTS
           if @admin
             @icushop.review = opts['review']
@@ -90,6 +98,13 @@ module Api
           else
             @message = @icushop.errors.full_messages.first
           end
+
+          if opts['update_all_offers']
+            puts "multi-lays"
+            puts opts['multi_layout']
+            @icushop.offers.update_all(css_options: opts['css_options'], multi_layout: opts['multi_layout'])
+          end
+
           render "shops/update_shop_settings"
         end
 
@@ -255,7 +270,7 @@ module Api
         def shop_params
           all_names = Shop.column_names + ['date_min', 'date_max', 'canonical_domain',
                                            'path_to_cart', 'has_branding', 'custom_theme_css',
-                                           'image', 'stats_from', css_options,
+                                           'image', 'stats_from', css_options, 'update_all_offers', 'multi_layout',
                                            'default_template_settings': [:defaultSettingsForProductPage, :defaultSettingsForAjaxCart, :defaultSettingsForCartPage, :templateForProductPage, :templateForAjaxCart, :templateForCartPage]]
           params.require('shop_attr').permit(all_names)
         end

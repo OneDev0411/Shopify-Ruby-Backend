@@ -3,7 +3,7 @@ module Api
   module V2
     module Merchant
       class OffersController < ApiMerchantBaseController
-        before_action :find_shop, only: [:offer_settings, :update_from_builder, :offers_list, :offer_stats, :offers_list_by_period, :activate, :deactivate, :duplicate, :destroy, :ab_analytics]
+        before_action :find_shop, only: [:offer_settings, :update_from_builder, :offers_list, :offer_stats, :offers_list_by_period, :activate, :deactivate, :duplicate, :destroy, :ab_analytics, :single_offer]
         before_action :set_offer, only: [:load_offer_details, :shopify_ids_from_rule]
         before_action :ensure_plan, only: [:offer_settings, :update_from_builder, :offers_list, :activate, :deactivate, :duplicate, :destroy, :ab_analytics]
 
@@ -22,6 +22,17 @@ module Api
             offers_limit_reached: @icushop.offers_limit_reached?,
             offers_limit: @icushop.plan.offers_limit
           }
+        end
+
+        # GET /api/v2/merchant/single_offer
+        def single_offer
+          offer = Offer.where(shop_id: @icushop.id, active: true).limit(1).first
+
+          if offer.blank?
+            offer = Offer.where(shop_id: @icushop.id).limit(1).first
+          end
+
+          render json: {offer: offer.library_json}
         end
 
         # POST /api/v2/merchant/offer_stats

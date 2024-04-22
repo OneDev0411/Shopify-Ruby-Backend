@@ -6,9 +6,29 @@ export const SETTINGS_DEFAULTS = {
   shop_id: undefined,
   offer_css: '',
   css_options: {
-    main: {},
-    text: {},
-    button: {},
+    main: {
+      color: "#2B3D51",
+      backgroundColor: "#ECF0F1",
+      marginTop: '0px',
+      marginBottom: '0px',
+      borderStyle: 'none',
+      borderWidth: 0,
+      borderRadius: 0,
+      borderColor: "#000"
+    },
+    text: {
+      fontFamily: "Arial",
+      fontSize: '16px',
+      color: "#000"
+    },
+    button: {
+      color: "#FFFFFF",
+      backgroundColor: "#2B3D51",
+      fontFamily: "Arial",
+      fontSize: "16px",
+      borderRadius: 0,
+      borderColor: "#000"
+    },
   }
 }
 

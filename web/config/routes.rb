@@ -55,6 +55,7 @@ Rails.application.routes.draw do
         get 'enable_autopilot_status', to: 'shops#enable_autopilot_status'
         get 'ab_test_banner_page', to: 'shops#ab_test_banner_page'
         get 'ab_test_banner_click', to: 'shops#ab_test_banner_click'
+        get 'single_offer', to: 'offers#single_offer'
         post 'offers_list', to: 'offers#offers_list'
         post 'offer_stats', to: 'offers#offer_stats'
         post 'offers_list_by_period', to: 'offers#offers_list_by_period'

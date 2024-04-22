@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_02_01_181410) do
+ActiveRecord::Schema[7.0].define(version: 2024_04_22_134716) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -519,6 +519,18 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_181410) do
     t.index ["offer_id"], name: "index_rules_on_offer_id"
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.string "session_id"
+    t.string "shop_domain"
+    t.string "state"
+    t.boolean "is_online"
+    t.string "access_token"
+    t.string "scope"
+    t.datetime "expires"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "setups", force: :cascade do |t|
     t.bigint "shop_id"
     t.jsonb "details"
@@ -680,6 +692,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_181410) do
     t.integer "orders_through_offers", default: 0, null: false
     t.jsonb "default_template_settings"
     t.boolean "is_shop_active"
+    t.string "multi_layout"
     t.index ["created_at"], name: "index_shops_on_created_at"
     t.index ["uninstalled_at"], name: "index_shops_on_uninstalled_at"
   end

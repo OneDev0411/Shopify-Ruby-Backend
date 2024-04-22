@@ -78,3 +78,24 @@
   display: grid;
   grid-template-columns: 1fr 2fr;
 }
+
+.title-bar-secondary-button {
+  float: right;
+}
+
+.title-bar-button.title-button-alt, .title-bar-button.title-button-alt button {
+  width: 100%;
+  height: 100%
+}
+
+@media (max-width: 489px) {
+  .title-bar-secondary-button {
+    float: none;
+    width: fit-content;
+    margin: 0 auto;
+  }
+
+  .title-bar-button.title-button-alt, .title-bar-button.title-button-alt button {
+    width: auto;
+  }
+}
