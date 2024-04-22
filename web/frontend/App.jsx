@@ -51,6 +51,10 @@ export default function App() {
                   destination: "/settings",
                 },
                 {
+                  label: "Offers Look & Feel",
+                  destination: "/offers-appearance",
+                },
+                {
                   label: "Help",
                   destination: "/help-page",
                 },

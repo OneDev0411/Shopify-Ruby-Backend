@@ -99,6 +99,66 @@ export const EditOfferTabs = [
   },
 ];
 
+export const OFFER_PLACEHOLDER = {
+  theme: 'custom',
+  show_product_image: true,
+  multi_layout: 'stack',
+  id: 1,
+  css_options: {
+    main: {
+      color: "#2B3D51",
+      backgroundColor: "#ECF0F1",
+      marginTop: '0px',
+      marginBottom: '0px',
+      borderStyle: 'none',
+      borderWidth: 0,
+      borderRadius: 0,
+    },
+    text: {
+      fontFamily: "Arial",
+      fontSize: '16px',
+    },
+    button: {
+      color: "#FFFFFF",
+      backgroundColor: "#2B3D51",
+      fontFamily: "Arial",
+      fontSize: "16px",
+      borderRadius: 0,
+    },
+  },
+  show_product_price: true,
+  show_nothanks: false,
+  text_a: 'Would you like to add a {{ product_title }}?',
+  link_to_product: false,
+  show_compare_at_price: false,
+  offerable_product_shopify_ids: [],
+  show_quantity_selector: true,
+  show_spinner: false,
+  cta_a: 'Add to Cart',
+  shop: {
+    path_to_cart: '/'
+  },
+  offerable_product_details: [
+    {
+      id: 1,
+      title: 'Test Product',
+      medium_image_url: 'assets.incartupsell.com/images/billing-ICU-Logo-Small.png',
+      available_json_variants: [
+        {
+          unparenthesized_price: '$99.99',
+          currencies: [
+            {
+              label: 'USD',
+              price: '99.99',
+              compare_at_price: '99.99'
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
 export const OFFER_DEFAULTS = {
   offerId: undefined,
   ajax_cart: '',

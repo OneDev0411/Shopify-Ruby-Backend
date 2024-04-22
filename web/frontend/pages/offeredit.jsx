@@ -9,7 +9,7 @@ export default function OfferEditPage() {
         title='Edit Offer'
         primaryAction={{
           content: 'Save',
-          onAction: () => console.log("Primary action"),
+          onAction: () => updateShopSettings(`#${hexColor}`, "css_options", `${comp}`, `${property}`),
         }}
         secondaryActions={[
           {

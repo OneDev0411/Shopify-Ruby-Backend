@@ -66,7 +66,7 @@ export default function EditPage() {
                 .then((data) => {
                     updateSettingsOrRedirect(data)
 
-                    let newOffer = {...offer};
+                    const newOffer = {...offer};
                     newOffer.advanced_placement_setting = {
                       custom_product_page_dom_selector: data.shop_settings.custom_product_page_dom_selector,
                       custom_product_page_dom_action: data.shop_settings.custom_product_page_dom_action,
@@ -76,6 +76,11 @@ export default function EditPage() {
                       custom_ajax_dom_action: data.shop_settings.custom_ajax_dom_action,
                     };
 
+                    newOffer.css_options = data.shop_settings.css_options
+
+                    if (data.shop_settings.multi_layout) {
+                        newOffer.multi_layout = data.shop_settings.multi_layout
+                    }
                     setOffer(newOffer);
                 })
                 .catch((error) => {
