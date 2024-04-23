@@ -30,10 +30,10 @@ class PlanRedis
     @price = price
     @plan_set = plan_set
     @features = features
-    @is_visible = options[:is_visible]
-    @is_active = options[:is_active]
-    @created_at = Time.now
-    @updated_at = Time.now
+    @created_at = Time.now.to_s
+    @updated_at = Time.now.to_s
+    @is_visible = options[:is_visible].nil? ? true : options[:is_visible]
+    @is_active = options[:is_active].nil? ? true : options[:is_active]
   end
 
 # Read
@@ -42,20 +42,22 @@ class PlanRedis
   def save
     return unless valid?
 
-    flat_plan = flatten_hash_from(create_hash)
+    flat_plan = flatten_hash_from(create_hash(['errors', 'validation_context']))
     $redis_plans_cache.hset(key, flatten_hash_from(flat_plan))
   end
 
   private
 
-  def create_hash
-    hash = {}
+  def create_hash(exclude_keys = [])
     self.instance_variables.each_with_object({}) do |var, hash|
-      next if var.to_s == '@key'
+      next if exclude_keys.include?(var.to_s[/(?<=@)(\w+)/])
 
-      hash[var.to_s.delete('@')] = self.instance_variable_get(var)
+      if self.instance_variable_get(var).is_a? Array
+        hash[var.to_s.delete('@')] = self.instance_variable_get(var)
+      else
+        hash[var.to_s.delete('@')] = self.instance_variable_get(var).to_s
+      end
     end
-    hash
   end
 
   # Flattens the plan hash such that it can be saved to the redis cache
