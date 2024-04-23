@@ -201,7 +201,8 @@ const ChoosePlacement = (props) => {
             updateOffer("in_cart_page", true);
             updateOffer("in_product_page", false);
             updateOffer("in_ajax_cart", true);
-            props.changeDisableCheckoutInfo("(only available in cart page, won't show on ajax)");
+            props.changeDisableCheckoutInfo("(This feature will only function on cart page offers, \
+                will not function with offers in the Ajax Cart/Cart drawer)");
         }
         setSelected(value);
     }, []);
