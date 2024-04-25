@@ -243,9 +243,9 @@ module Shopifable
 
   def shopify_graphql_product_search(query)
     if query.empty?
-      graphql = %{ { products(first: 20, query:"#{query}") { edges { node { id title featuredImage { transformedSrc(maxHeight: 50, maxWidth: 50) }  } } } } }
+      graphql = %{ { products(first: 20, query:"status:active AND #{query}") { edges { node { id title featuredImage { transformedSrc(maxHeight: 50, maxWidth: 50) }  } } } } }
     else
-      graphql = %{ { products(first: 20, query:"title:*#{query}*") { edges { node { id title featuredImage { transformedSrc(maxHeight: 50, maxWidth: 50) }  } } } } }
+      graphql = %{ { products(first: 20, query:"status:active AND title:*#{query}*") { edges { node { id title featuredImage { transformedSrc(maxHeight: 50, maxWidth: 50) }  } } } } }
     end
     res = HTTParty.post(graphql_url, headers: api_headers, body: { query: graphql, variables: ''}.to_json)
     res&.parsed_response.dig('data', 'products', 'edges')&.map { |prod|
