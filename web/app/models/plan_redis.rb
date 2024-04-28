@@ -21,9 +21,9 @@ class PlanRedis
 
   validates :updated_at, presence: true
 
-  validates :features, presence: true
+  validates :features, presence: true, allow_blank: true
 
-  def initialize(key:, price:, plan_set:, features: [], **options)
+  def initialize(key:, price:, plan_set: 'default', features: [], **options)
     @key = key
     # Pulls the string after the colon to save the name
     @name = key[/(?<=:)(\w+)/]
@@ -32,17 +32,21 @@ class PlanRedis
     @features = features
     @created_at = Time.now.to_s
     @updated_at = Time.now.to_s
-    @is_visible = options[:is_visible].nil? ? true : options[:is_visible]
+    @is_visible = options[:is_visible].nil? ? false : options[:is_visible]
     @is_active = options[:is_active].nil? ? true : options[:is_active]
     save
   end
 
   # Clones the plan with the provided key and saves the copy
-  def duplicate
+  def duplicate(name = 'Clone')
     new_plan = clone
-    new_plan.key = "#{new_plan.key}_clone"
-    new_plan.key = "#{new_plan.name}_clone"
+    new_plan.update_name(name)
     new_plan.save
+  end
+
+  def update_name(name)
+    @key = @key.sub(/:\w+/, name)
+    @name = name
   end
 
   def save
@@ -95,7 +99,7 @@ class PlanRedis
   # Fetches first plan found based on provided key
   def self.get_plan(key)
     plan_hash = $redis_plans_cache.hgetall(key)
-    some_hash = unflatten_hash_from(plan_hash)
+    some_hash = recreate_hash_from(plan_hash)
 
     # PlanRedis.new(key: key, price: plan_hash['price'], plan_set: plan_hash)
     PlanRedis.new(key: some_hash['key'], price: some_hash['price'], plan_set: some_hash['plan_set'],
@@ -104,7 +108,7 @@ class PlanRedis
   end
 
   # Unflattens the hash obtained from redis
-  def self.unflatten_hash_from(hash)
+  def self.recreate_hash_from(hash)
 
     hash.each_with_object({}) do |(key, value), memo|
       if key.include?('[')
@@ -139,13 +143,13 @@ class PlanRedis
   private
 
   def create_hash(exclude_keys = [])
-    self.instance_variables.each_with_object({}) do |var, hash|
+    instance_variables.each_with_object({}) do |var, hash|
       next if exclude_keys.include?(var.to_s[/(?<=@)(\w+)/])
 
-      if self.instance_variable_get(var).is_a? Array
-        hash[var.to_s.delete('@')] = self.instance_variable_get(var)
+      if instance_variable_get(var).is_a? Array
+        hash[var.to_s.delete('@')] = instance_variable_get(var)
       else
-        hash[var.to_s.delete('@')] = self.instance_variable_get(var).to_s
+        hash[var.to_s.delete('@')] = instance_variable_get(var).to_s
       end
     end
   end
