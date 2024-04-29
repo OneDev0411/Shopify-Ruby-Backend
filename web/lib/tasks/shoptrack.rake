@@ -54,6 +54,21 @@ namespace :shoptrack do
     end
   end
 
+  desc 'A one time task to initialize tracking of the plan and plan sets of active shops'
+  task initialize_shop_plan_tracking: :environment do
+    puts 'initializing shop plan tracking'
+
+    Shop.where(is_shop_active: true).each do |shop|
+      # Using the shopify plan name and internal plan name to compose a key,
+      # we find the matching plan and create an entry
+      plan_name = shop.shopify_plan_name.gsub(/\s/, '_')
+      key_prefix = shop.plan.name.capitalize
+
+      plan = PlanRedis.get_with_fields({ key: "#{key_prefix}:#{plan_name}" })
+      ShopPlan.new(key: shop.id, plan_key: plan.key, plan_set: plan.plan_set)
+    end
+  end
+
   private
 
   def is_shop_uninstalled(domain, uninstall_timestamp)
