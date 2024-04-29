@@ -742,6 +742,9 @@ class Shop < ApplicationRecord
                      shopify_token: nil, shopify_domain: "#{shopify_domain}_OLD", access_scopes: 'uninstalled',
                      is_shop_active: false)
 
+      # TODO: Move to old repo
+      ShopPlan.delete_instance(id)
+
       if subscription.present?
         ShopEvent.create(shop_id: id, title: 'Cancelled', 
                          revenue_impact: (subscription.price_in_cents / 100.0 * -1))
@@ -1236,7 +1239,9 @@ class Shop < ApplicationRecord
 
   def select_plan(plan_internal_name)
     plan = Plan.find_by(internal_name: plan_internal_name)
+
     old_shop = Shop.find_by(myshopify_domain: shopify_domain)
+
     if (old_shop.present? && old_shop.id!=self.id && old_shop.in_trial_period?) || !old_shop.present?
       subscription = self.subscription || Subscription.new
       subscription.plan = plan
@@ -1244,7 +1249,14 @@ class Shop < ApplicationRecord
       subscription.status = 'approved'
       subscription.update_subscription(plan)
       subscription.save
+
+      # Set trial
+      # Fetch visible trial redis plan instance
+      redis_plan = PlanRedis.get_with_fields({ name: 'Trial_Plan' })
+      # Save plan data
+      ShopPlan.new(key: id, plan_key: redis_plan.key, plan_set: redis_plan.plan_set)
     end
+
     if !plan.nil? and plan.free_plan?
       self.unpublish_extra_offers if self.offers.present?
     end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require 'active_model'
 class ShopPlan
+  # TODO: Move to old repo
   include ActiveModel::Validations
 
   attr_accessor :key, :plan_set, :plan_key, :updated_at
@@ -41,6 +42,9 @@ class ShopPlan
     save
   end
 
+  def self.delete_instance(key)
+    $redis_plans_cache.del("Shop_Plan:#{key}")
+  end
 
   # Query
 

@@ -54,6 +54,7 @@ namespace :shoptrack do
     end
   end
 
+  # TODO: Move to old repo
   desc 'A one time task to initialize tracking of the plan and plan sets of active shops'
   task initialize_shop_plan_tracking: :environment do
     puts 'initializing shop plan tracking'
