@@ -29,11 +29,6 @@ module Api
             @plan = new_plan if new_plan.present?
           end
 
-          if @plan.internal_name == 'plan_based_billing' && @plan.id != 19
-            new_plan = Plan.find_by(id: 19)
-            @plan = new_plan if new_plan.present?
-          end
-
           if @plan.id == @subscription.plan_id && @subscription.status == 'approved' && !@subscription.subscription_not_paid
             @message = 'Your subscription was already updated!'
             render "subscriptions/update"
@@ -66,6 +61,9 @@ module Api
               @subscription.status = 'approved'
             end
           end
+
+          redis_plan = PlanRedis.get_plan( "#{@plan.name.capitalize}:#{@icushop.shopify_plan_name.gsub(/\s/, '_')}")
+          ShopPlan.new(key: shop.id, plan_key: redis_plan.key, plan_set: redis_plan.plan_set)
 
           @subscription.save
 
