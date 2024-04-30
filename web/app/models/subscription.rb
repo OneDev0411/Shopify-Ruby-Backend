@@ -95,20 +95,17 @@ class Subscription < ApplicationRecord
   end
 
   def revenue_cents
-    if plan.try(:internal_name) == 'plan_based_billing'
-      if Subscription.usage_charge_schedule[:monthly_price][shop.shopify_plan_name].nil?
+    redis_plan = PlanRedis.get_plan(ShopPlan.get_one(shop.id)['plan_key'])
+
+    if redis_plan.price.to_f.zero?
         Rollbar.error("No usage charge for plan #{shop.shopify_plan_name}")
-        0
-      else
-        Subscription.usage_charge_schedule[:monthly_price][shop.shopify_plan_name] * 100
-      end
     else
-      price_in_cents
+      redis_plan.price.to_f * 100.0
     end
   end
 
   def next_bill_amount
-    Subscription.usage_charge_schedule[:monthly_price][shop.shopify_plan_name]
+    PlanRedis.get_plan(ShopPlan.get_one(shop.id)['plan_key']).to_f
   end
 
   def calculate_monthly_usage_charge
@@ -116,7 +113,7 @@ class Subscription < ApplicationRecord
     raise 'Does not use plan-based billing' unless plan.try(:internal_name) == 'plan_based_billing'
 
     bill_description = "#{shop.shopify_plan_name} plan"
-    bill_amount = Subscription.usage_charge_schedule[:monthly_price][shop.shopify_plan_name] || 0
+    bill_amount = next_bill_amount || 0
     if discount_percent.present? && discount_percent.positive?
       factor = (100 - discount_percent) / 100.0
       bill_amount = (bill_amount * factor).round(2)
@@ -403,7 +400,7 @@ class Subscription < ApplicationRecord
   def subscription_not_paid
     ((self&.plan&.internal_name == 'plan_based_billing' &&
       self&.shopify_charge_id.nil? &&
-      self&.status == 'approved') || ShopPlan.get_one_with_id(@shop.id).blank?) &&
+      self&.status == 'approved') || ShopPlan.get_one_with_id(shop.id).blank?) &&
       self.shop.is_shop_active
   end
 end
