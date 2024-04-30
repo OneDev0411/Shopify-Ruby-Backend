@@ -74,6 +74,14 @@ Rails.application.routes.draw do
         delete '/offers/:id', to: 'offers#destroy'
         post 'offer/shopify_ids_from_rule', to: 'offers#shopify_ids_from_rule'
         get 'active_theme_for_dafault_template', to: 'shops#active_theme_for_dafault_template'
+
+        get 'plans', to: 'plans#index'
+        get 'plans/:key', to: 'plans#view'
+        post 'plans', to: 'plans#create'
+        patch 'plans', to: 'plans#update'
+        post 'plans/clone', to: 'plans#duplicate'
+        post 'plans/filter', to: 'plans#filter'
+
       end
     end
   end
