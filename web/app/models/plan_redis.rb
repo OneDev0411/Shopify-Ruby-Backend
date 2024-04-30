@@ -58,12 +58,12 @@ class PlanRedis < RedisHashObject
   # @return [Array<PlanRedis>]
   def self.get_with_fields(fields = {})
     # get list of keys
-    key_list = all_keys
+    key_list = all_keys('Plan:*')
     # iterate over keys to match fields required
     key_list.map { |key|
       # for each key the values must match
       stringed_fields = fields.stringify_keys
-      found_hash = $redis_plans_cache.mapped_hmget(key, stringed_fields.keys)
+      found_hash = $redis_plans_cache.mapped_hmget(key, *stringed_fields.keys)
       get_plan(key) if found_hash == stringed_fields
     }.compact
   end
