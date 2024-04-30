@@ -401,9 +401,9 @@ class Subscription < ApplicationRecord
   end
 
   def subscription_not_paid
-    self&.plan&.internal_name == 'plan_based_billing' &&
+    ((self&.plan&.internal_name == 'plan_based_billing' &&
       self&.shopify_charge_id.nil? &&
-      self&.status == 'approved' &&
+      self&.status == 'approved') || ShopPlan.get_one_with_id(@shop.id).blank?) &&
       self.shop.is_shop_active
   end
 end

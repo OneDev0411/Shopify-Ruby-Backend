@@ -117,6 +117,10 @@ class ShopPlan
     keys
   end
 
+  def self.get_one_with_id(shop_id)
+    get_one("Shop_Plan:#{shop_id}")
+  end
+
   private
 
   def create_hash(exclude_keys = [])
