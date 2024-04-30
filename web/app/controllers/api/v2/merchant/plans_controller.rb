@@ -9,7 +9,7 @@ module Api
         def index
           return unless @admin
 
-          plan_list = PlanRedis.all_plans
+          plan_list = PlanRedis.all
           render json: plan_list
         end
 
@@ -54,7 +54,7 @@ module Api
         def filter
         # plans by shop
 
-          plans_list = PlanRedis.get_plans(plan_filter_params)
+          plans_list = PlanRedis.get_with_fields(plan_filter_params)
 
           render json: plans_list, status: :ok
         end
