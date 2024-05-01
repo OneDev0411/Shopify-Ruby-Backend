@@ -65,8 +65,9 @@ namespace :shoptrack do
       plan_name = shop.shopify_plan_name.gsub(/\s/, '_')
       key_prefix = shop.plan.name.capitalize
 
-      plan = PlanRedis.get_with_fields({ key: "#{key_prefix}:#{plan_name}" })
-      ShopPlan.new(key: shop.id, plan_key: plan.key, plan_set: plan.plan_set)
+      plan = PlanRedis.get_with_fields({ key: "#{key_prefix}:#{plan_name}" }).first
+
+      ShopPlan.new(shop_id: shop.id, plan_key: plan.key, plan_set: plan.plan_set)
     end
   end
 

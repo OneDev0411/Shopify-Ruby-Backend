@@ -1252,9 +1252,9 @@ class Shop < ApplicationRecord
 
       # Set trial
       # Fetch visible trial redis plan instance
-      redis_plan = PlanRedis.get_with_fields({ name: 'Trial_Plan' })
+      redis_plan = PlanRedis.get_plan('Plan:Free:Trial_Plan')
       # Save plan data
-      ShopPlan.new(key: id, plan_key: redis_plan.key, plan_set: redis_plan.plan_set)
+      ShopPlan.new(shop_id: id, plan_key: redis_plan.key, plan_set: redis_plan.plan_set)
     end
 
     if !plan.nil? and plan.free_plan?
