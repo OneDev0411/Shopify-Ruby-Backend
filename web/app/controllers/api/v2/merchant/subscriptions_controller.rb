@@ -112,6 +112,17 @@ module Api
           redirect_to(ShopifyAPI::Auth.embedded_app_url(params[:host] || encrypted_shop_path), allow_other_host: true)
         end
 
+        # GET api/v2/merchant/subscription/load_plans
+        def load_plans
+
+          shop_plan = ShopPlan.get_one_with_id(@subscription.shop.id)
+          plan_data = PlanRedis.get_plan(shop_plan[:plan_key])
+
+          plan_list = PlanRedis.get_with_fields({ plan_set: plan_data[:plan_set] })
+
+          render json: { plan_list: plan_list, plan_data: plan_data }
+        end
+
         private
         # Only allow a trusted parameter "white list" through.
         def subscription_params
