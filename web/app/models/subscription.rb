@@ -138,7 +138,7 @@ class Subscription < ApplicationRecord
   end
 
   # public
-  def create_recurring_charge(plan, icushop, confirm_subscription_url)
+  def create_recurring_charge(plan, icushop, confirm_subscription_url, plan_key)
     price = if discount_percent.present? && discount_percent.positive?
               factor = (100 - discount_percent) / 100.0
               (plan.price_in_cents * factor / 100.0).round(2)
@@ -157,9 +157,18 @@ class Subscription < ApplicationRecord
     }
     if plan.id == 19
       opts[:recurring_application_charge][:capped_amount] = '99.99'
-      opts[:recurring_application_charge][:terms] = 'Depending on your Shopify plan. Basic Shopify: $19.99/mo, ' \
-                                                    'Shopify: $29.99/mo, Advanced Shopify: $59.99/mo, ' \
-                                                    'Shopify Plus: $99.99/mo'
+      # TODO replace terms pricing
+
+      split_key = plan_key.split(':').take(2).join(':')
+
+      plan_basic = PlanRedis.get_one("#{split_key}:Basic_Shopify").price
+      plan_reg = PlanRedis.get_one("#{split_key}:Basic_Shopify").price
+      plan_adv = PlanRedis.get_one("#{split_key}:Basic_Shopify").price
+      plan_plus = PlanRedis.get_one("#{split_key}:Basic_Shopify").price
+
+      opts[:recurring_application_charge][:terms] = "Depending on your Shopify plan. Basic Shopify: #{plan_basic}/mo, " \
+                                                    "Shopify: #{plan_reg}/mo, Advanced Shopify: #{plan_adv}/mo, " \
+                                                    "Shopify Plus: #{plan_plus}/mo"
     end
     begin
       url = "https://#{icushop.shopify_domain}/admin/api/#{SHOPIFY_API_VERSION}/recurring_application_charges.json"

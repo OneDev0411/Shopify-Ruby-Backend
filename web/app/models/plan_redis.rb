@@ -24,6 +24,7 @@ class PlanRedis < RedisHashObject
   validates :features, presence: true, allow_blank: true
 
   def initialize(key:, price:, plan_set: 'default', features: [], **options)
+    # Ensure key naming convention is Plan:[OUR_PLAN_NAME]:[SHOPIFY_PLAN_NAME]
     super(key: key)
     # Pulls the string after the colon to save the name
     @name = key[/(?<=:)(\w+)/]
@@ -45,8 +46,9 @@ class PlanRedis < RedisHashObject
   end
 
   def update_name(name)
-    @key = @key.sub(/:\w+/, name)
+    @key = @key.split(':').append(name.gsub(' ', '_')).join(':')
     @name = name
+    save
   end
 
 
@@ -76,5 +78,9 @@ class PlanRedis < RedisHashObject
     PlanRedis.new(key: some_hash['key'], price: some_hash['price'], plan_set: some_hash['plan_set'],
                   features: some_hash['features'],
                   is_visible: some_hash['is_visible'], is_active: some_hash['is_active'])
+  end
+
+  def self.get_with_pattern(i)
+    # code here
   end
 end
