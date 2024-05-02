@@ -33,7 +33,13 @@ namespace :plan do
         price: 19.99
       },
       {
+        key: 'Plan:Free:Trial_Plan',
+        price: 0,
+        plan_set: ''
+      },
+      {
         key: 'Plan:Free:Free',
+        plan_set: '',
         price: 0
       }
     ].each do |plan|
