@@ -6,30 +6,39 @@ namespace :plan do
     [
       {
         key: 'Plan:Flex:Shopify_Plus',
+        plan_set: 'flex',
+        is_visible: true,
+        is_active: true,
         price: 99.99
       },
       {
         key: 'Plan:Flex:Advanced_Shopify',
+        plan_set: 'flex',
+        is_visible: true,
+        is_active: true,
         price: 59.99
       },
       {
         key: 'Plan:Flex:Shopify',
-        price: 9.99
+        plan_set: 'flex',
+        is_visible: true,
+        is_active: true,
+        price: 29.99
       },
       {
         key: 'Plan:Flex:Basic_Shopify',
+        plan_set: 'flex',
+        is_visible: true,
+        is_active: true,
         price: 19.99
-      },
-      {
-        key: 'Plan:Free:Trial_Plan',
-        price: 0
       },
       {
         key: 'Plan:Free:Free',
         price: 0
       }
     ].each do |plan|
-      PlanRedis.new(key: plan[:key], price: plan[:price])
+      PlanRedis.new(key: plan[:key], price: plan[:price], plan_set: plan[:plan_set],
+                    is_visible: plan[:is_visible], is_active: plan[:is_active])
       count += 1
     end
     puts "added #{count} plans"
