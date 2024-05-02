@@ -89,6 +89,7 @@ class Shop < ApplicationRecord
     async_setup
     signup_for_referral_program
     select_plan('trial_plan')
+    initialize_shop_plan_tracking
     track_installation
   end
 
@@ -735,7 +736,6 @@ class Shop < ApplicationRecord
   # the customer has uninstalled the app
   def mark_as_cancelled
     begin
-      unpublish_all_offers
       # This needs to go in a delayed job
       # Order.where(shop_id: self.id).delete_all
       update_columns(uninstalled_at: Time.now.utc, myshopify_domain: shopify_domain,
@@ -746,12 +746,13 @@ class Shop < ApplicationRecord
       ShopPlan.delete_instance(id)
 
       if subscription.present?
-        ShopEvent.create(shop_id: id, title: 'Cancelled', 
+        ShopEvent.create(shop_id: id, title: 'Cancelled',
                          revenue_impact: (subscription.price_in_cents / 100.0 * -1))
         subscription.status = 'cancelled'
         subscription.save
         puts 'Cancelling Subscription...'
       end
+      unpublish_all_offers
       track_uninstallation
       remove_cache_keys_for_uninstalled_shop
       # Finally, delete from FirstPromoter as we don't want to pay commission against this shop anymore
@@ -1237,6 +1238,22 @@ class Shop < ApplicationRecord
     self.update(unpublished_offer_ids: nil)
   end
 
+  def initialize_shop_plan_tracking
+    puts 'Adding shop plan info to redis..'
+    puts in_trial_period?
+    if in_trial_period?
+      puts 'In trial period'
+      # Set trial
+      # Fetch visible trial redis plan instance
+      redis_plan = PlanRedis.get_plan('Plan:Free:Trial_Plan')
+      current_plan_set = PlanRedis.get_with_fields({ is_visible: 'true', is_active: 'true' }).first&.plan_set
+      puts redis_plan.inspect
+      puts current_plan_set
+      # Save plan data
+      ShopPlan.new(shop_id: id, plan_key: redis_plan.key, plan_set: current_plan_set)
+    end
+  end
+
   def select_plan(plan_internal_name)
     plan = Plan.find_by(internal_name: plan_internal_name)
 
@@ -1250,11 +1267,6 @@ class Shop < ApplicationRecord
       subscription.update_subscription(plan)
       subscription.save
 
-      # Set trial
-      # Fetch visible trial redis plan instance
-      redis_plan = PlanRedis.get_plan('Plan:Free:Trial_Plan')
-      # Save plan data
-      ShopPlan.new(shop_id: id, plan_key: redis_plan.key, plan_set: redis_plan.plan_set)
     end
 
     if !plan.nil? and plan.free_plan?
