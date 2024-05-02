@@ -64,7 +64,7 @@ class RedisHashObject
 
   # Fetches first hash found based on provided key
   def self.get_one(key)
-    hash_data = $redis_plans_cache.hgetall(key)
+    hash_data = $redis_plans_cache.hgetall("#{key}")
     recreate_hash_from(hash_data)
   end
 

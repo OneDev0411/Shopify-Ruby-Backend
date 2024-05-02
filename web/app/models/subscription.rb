@@ -157,14 +157,13 @@ class Subscription < ApplicationRecord
     }
     if plan.id == 19
       opts[:recurring_application_charge][:capped_amount] = '99.99'
-      # TODO replace terms pricing
 
       split_key = plan_key.split(':').take(2).join(':')
 
-      plan_basic = PlanRedis.get_one("#{split_key}:Basic_Shopify").price
-      plan_reg = PlanRedis.get_one("#{split_key}:Basic_Shopify").price
-      plan_adv = PlanRedis.get_one("#{split_key}:Basic_Shopify").price
-      plan_plus = PlanRedis.get_one("#{split_key}:Basic_Shopify").price
+      plan_basic = PlanRedis.get_one("#{split_key}:Basic_Shopify")['price']
+      plan_reg = PlanRedis.get_one("#{split_key}:Shopify_Plus")['price']
+      plan_adv = PlanRedis.get_one("#{split_key}:Advanced_Shopify")['price']
+      plan_plus = PlanRedis.get_one("#{split_key}:Shopify")['price']
 
       opts[:recurring_application_charge][:terms] = "Depending on your Shopify plan. Basic Shopify: #{plan_basic}/mo, " \
                                                     "Shopify: #{plan_reg}/mo, Advanced Shopify: #{plan_adv}/mo, " \
@@ -409,7 +408,7 @@ class Subscription < ApplicationRecord
   def subscription_not_paid
     ((self&.plan&.internal_name == 'plan_based_billing' &&
       self&.shopify_charge_id.nil? &&
-      self&.status == 'approved') || ShopPlan.get_one_with_id(shop.id).blank?) &&
+      self&.status == 'approved') || ShopPlan.get_one_with_id(shop.id.to_s).blank?) &&
       self.shop.is_shop_active
   end
 end

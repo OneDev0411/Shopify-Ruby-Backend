@@ -48,7 +48,7 @@ Rails.application.routes.draw do
         get 'current_subscription', to: 'subscriptions#current_subscription'
         post 'is_subscription_unpaid', to: 'subscriptions#is_subscription_unpaid'
         get 'subscription/confirm_charge', to: 'subscriptions#confirm_charge', as: :confirm_charge
-        get 'subscription/load_plans', 'subscriptions#load_plans'
+        get 'subscription/load_plans', to: 'subscriptions#load_plans'
         get 'partners', to: 'partners#index'
         get 'shop_info' => 'shops#shop_info'
         get 'autopilot_details', to: 'shops#autopilot_details'

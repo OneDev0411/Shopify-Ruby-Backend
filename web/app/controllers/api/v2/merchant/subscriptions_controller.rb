@@ -102,7 +102,7 @@ module Api
               Rollbar.error('Subscription Save Error', @subscription.errors)
               @success = false
             end
-          rescue Exception => e
+          rescue StandardError => e
             Rollbar.error('Charge Confirmation Error', e)
             @success = false
           end
@@ -116,14 +116,23 @@ module Api
         def load_plans
 
           shop_plan = ShopPlan.get_one_with_id(@subscription.shop.id)
-          plan_data = PlanRedis.get_plan(shop_plan[:plan_key])
 
-          plan_list = PlanRedis.get_with_fields({ plan_set: plan_data[:plan_set] })
+          plan_list =
+            if shop_plan.present?
+              PlanRedis.get_with_fields({ plan_set: shop_plan['plan_set'] })
+            else
+              PlanRedis.get_with_fields({ is_visible: 'true', is_active: 'true' })
+            end
+
+          plan_data = plan_list.map do |plan|
+            plan if plan.key.include?(@subscription.shop.shopify_plan_name.gsub(' ', '_'))
+          end.first
 
           render json: { plan_list: plan_list, plan_data: plan_data }
         end
 
         private
+
         # Only allow a trusted parameter "white list" through.
         def subscription_params
           params.require(:subscription).permit(:plan_id, :plan_internal_name, :plan_key)
