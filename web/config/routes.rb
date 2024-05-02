@@ -48,6 +48,7 @@ Rails.application.routes.draw do
         get 'current_subscription', to: 'subscriptions#current_subscription'
         post 'is_subscription_unpaid', to: 'subscriptions#is_subscription_unpaid'
         get 'subscription/confirm_charge', to: 'subscriptions#confirm_charge', as: :confirm_charge
+        get 'subscription/load_plans', to: 'subscriptions#load_plans'
         get 'partners', to: 'partners#index'
         get 'shop_info' => 'shops#shop_info'
         get 'autopilot_details', to: 'shops#autopilot_details'
@@ -74,6 +75,14 @@ Rails.application.routes.draw do
         delete '/offers/:id', to: 'offers#destroy'
         post 'offer/shopify_ids_from_rule', to: 'offers#shopify_ids_from_rule'
         get 'active_theme_for_dafault_template', to: 'shops#active_theme_for_dafault_template'
+
+        get 'plans', to: 'plans#index'
+        get 'plans/:key', to: 'plans#view'
+        post 'plans', to: 'plans#create'
+        patch 'plans', to: 'plans#update'
+        post 'plans/clone', to: 'plans#duplicate'
+        post 'plans/filter', to: 'plans#filter'
+
       end
     end
   end

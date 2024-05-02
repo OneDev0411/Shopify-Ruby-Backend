@@ -89,6 +89,7 @@ class Shop < ApplicationRecord
     async_setup
     signup_for_referral_program
     select_plan('trial_plan')
+    initialize_shop_plan_tracking
     track_installation
   end
 
@@ -735,20 +736,23 @@ class Shop < ApplicationRecord
   # the customer has uninstalled the app
   def mark_as_cancelled
     begin
-      unpublish_all_offers
       # This needs to go in a delayed job
       # Order.where(shop_id: self.id).delete_all
       update_columns(uninstalled_at: Time.now.utc, myshopify_domain: shopify_domain,
                      shopify_token: nil, shopify_domain: "#{shopify_domain}_OLD", access_scopes: 'uninstalled',
                      is_shop_active: false)
 
+      # TODO: Move to old repo
+      ShopPlan.delete_instance(id)
+
       if subscription.present?
-        ShopEvent.create(shop_id: id, title: 'Cancelled', 
+        ShopEvent.create(shop_id: id, title: 'Cancelled',
                          revenue_impact: (subscription.price_in_cents / 100.0 * -1))
         subscription.status = 'cancelled'
         subscription.save
         puts 'Cancelling Subscription...'
       end
+      unpublish_all_offers
       track_uninstallation
       remove_cache_keys_for_uninstalled_shop
       # Finally, delete from FirstPromoter as we don't want to pay commission against this shop anymore
@@ -1234,9 +1238,27 @@ class Shop < ApplicationRecord
     self.update(unpublished_offer_ids: nil)
   end
 
+  def initialize_shop_plan_tracking
+    puts 'Adding shop plan info to redis..'
+    puts in_trial_period?
+    if in_trial_period?
+      puts 'In trial period'
+      # Set trial
+      # Fetch visible trial redis plan instance
+      redis_plan = PlanRedis.get_plan('Plan:Free:Trial_Plan')
+      current_plan_set = PlanRedis.get_with_fields({ is_visible: 'true', is_active: 'true' }).first&.plan_set
+      puts redis_plan.inspect
+      puts current_plan_set
+      # Save plan data
+      ShopPlan.new(shop_id: id, plan_key: redis_plan.key, plan_set: current_plan_set)
+    end
+  end
+
   def select_plan(plan_internal_name)
     plan = Plan.find_by(internal_name: plan_internal_name)
+
     old_shop = Shop.find_by(myshopify_domain: shopify_domain)
+
     if (old_shop.present? && old_shop.id!=self.id && old_shop.in_trial_period?) || !old_shop.present?
       subscription = self.subscription || Subscription.new
       subscription.plan = plan
@@ -1244,7 +1266,9 @@ class Shop < ApplicationRecord
       subscription.status = 'approved'
       subscription.update_subscription(plan)
       subscription.save
+
     end
+
     if !plan.nil? and plan.free_plan?
       self.unpublish_extra_offers if self.offers.present?
     end
