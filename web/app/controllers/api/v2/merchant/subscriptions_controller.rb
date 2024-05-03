@@ -128,7 +128,7 @@ module Api
             plan if plan.key.include?(@subscription.shop.shopify_plan_name.gsub(' ', '_'))
           end.first
 
-          render json: { plan_list: plan_list, plan_data: plan_data }
+          render json: { plan_data: plan_data }
         end
 
         private

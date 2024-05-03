@@ -36,7 +36,6 @@ export default function Subscription() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPlan, setCurrentPlan] = useState({})
-  const [planList, setPlanList] = useState([])
 
   useEffect(() => {
     onLCP(traceStat, {reportSoftNavs: true});
@@ -118,7 +117,6 @@ export default function Subscription() {
           return response.json();
         })
         .then((data) => {
-          setPlanList(data.plan_list);
           setCurrentPlan(data.plan_data);
         })
         .catch((error) => {
@@ -229,12 +227,8 @@ export default function Subscription() {
                             <div className="pricing-grid">
                               <p><b>Shopify Subscription</b></p>
                               <p><b>In Cart Upsell & Cross Sell Unlimited price</b></p>
-                              {planList?.map(plan =>
-                                <>
-                                  <p className="mt-14">{plan.key.split(':')[2].replace('_', ' ')}</p>
-                                  <p className="mt-14">{plan.price}/mo</p>
-                                </>
-                              )}
+                              <p className="mt-14">{currentPlan.key.split(':')[2].replace('_', ' ')}</p>
+                              <p className="mt-14">{currentPlan.price}/mo</p>
                             </div>
                           </div>
 
