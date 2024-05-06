@@ -33,7 +33,7 @@ export default function Subscription() {
   const [activeOffersCount, setActiveOffersCount] = useState();
   const [unpublishedOfferIds, setUnpublishedOfferIds] = useState();
   const app = useAppBridge();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPlan, setCurrentPlan] = useState({})
 
@@ -99,11 +99,13 @@ export default function Subscription() {
           setActiveOffersCount(data.active_offers_count);
           setUnpublishedOfferIds(data.unpublished_offer_ids)
           setIsSubscriptionUnpaid(data.subscription_not_paid)
+          fetchPlanData()
         })
         .catch((error) => {
           setError(error);
           console.log("error", error);
         })
+    setIsLoading(false)
   }, []);
 
   const fetchPlanData = useCallback(() => {
@@ -127,7 +129,6 @@ export default function Subscription() {
 
   useEffect(() => {
     fetchSubscription();
-    fetchPlanData()
   }, [fetchSubscription]);
 
   if (error) {
