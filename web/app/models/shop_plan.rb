@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 require 'active_model'
 class ShopPlan < RedisHashObject
-  # TODO: Move to old repo
   include ActiveModel::Validations
 
-  attr_accessor :shop_id, :plan_set, :plan_key, :updated_at
+  attr_accessor :shop_id, :plan_set, :plan_key, :updated_at, :is_active
 
   validates :key, presence: true
 
@@ -19,6 +18,7 @@ class ShopPlan < RedisHashObject
     @plan_set = plan_set
     @plan_key = plan_key
     @updated_at = Time.now.to_s
+    @is_active = true
     save
   end
 
@@ -28,6 +28,11 @@ class ShopPlan < RedisHashObject
 
   def self.get_one_with_id(shop_id)
     get_one("Shop_Plan:#{shop_id}")
+  end
+
+  def self.toggle_activation(shop_id)
+    $redis_plans_cache.hset("Shop_Plan:#{shop_id}", 'is_active', @is_active.to_s)
+    # @is_active = !@is_active
   end
 
   private
