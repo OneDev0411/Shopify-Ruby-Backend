@@ -124,7 +124,7 @@ module Api
               PlanRedis.get_with_fields({ is_visible: 'true', is_active: 'true' })
             end
 
-          plan_data = plan_list.map do |plan|
+          plan_data = plan_list.filter do |plan|
             plan if plan.key.include?(@subscription.shop.shopify_plan_name.gsub(' ', '_'))
           end.first
 
