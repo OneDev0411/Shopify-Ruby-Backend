@@ -29,13 +29,13 @@ class Shop < ApplicationRecord
 
   def shop_selection_and_setup
     puts "After Create"
-    
+
     # Fetch all shops matching either shopify_domain or myshopify_domain
     matching_shops = Shop.where("shopify_domain = :domain OR myshopify_domain = :domain", domain: self.shopify_domain).order(created_at: :desc)
     shops = matching_shops.select { |shop| shop.shopify_domain == self.shopify_domain }
     puts "Shop Count: #{shops.count}"
-    
-     # Separate the current shop and old shop based on the domains
+
+    # Separate the current shop and old shop based on the domains
     current_shop = shops.first
     puts "New shop found...." if current_shop
 
@@ -105,7 +105,7 @@ class Shop < ApplicationRecord
     shop_actions = ShopAction.where(shop_id: self.id)
     shop_actions.delete_all if shop_actions.any?
     pending_jobs&.delete_all
-    theme_app_extension&.delete 
+    theme_app_extension&.delete
     begin
       destroy
       puts 'Shop Destroyed.'
@@ -131,7 +131,6 @@ class Shop < ApplicationRecord
     setups.last || {}
   end
 
-
   def offerable_types
     if platform == 'shopify'
       [['Single Product', 'product'], ['All Items In Collection', 'collection']]
@@ -153,32 +152,32 @@ class Shop < ApplicationRecord
 
   def has_custom_theme?
     custom_bg_color.present? ||
-    custom_text_color.present? ||
-    custom_button_bg_color.present? ||
-    custom_button_text_color.present?
+      custom_text_color.present? ||
+      custom_button_bg_color.present? ||
+      custom_button_text_color.present?
   end
 
   def custom_theme
     bg_color = if custom_bg_color.present?
-      custom_bg_color.starts_with?('#') ? custom_bg_color : "##{custom_bg_color}"
-    else
-      '#ECF0F1'
-    end
+                 custom_bg_color.starts_with?('#') ? custom_bg_color : "##{custom_bg_color}"
+               else
+                 '#ECF0F1'
+               end
     text_color = if custom_text_color.present?
-      custom_text_color.starts_with?('#') ? custom_text_color : "##{custom_text_color}"
-    else
-      '#ECF0F1'
-    end
+                   custom_text_color.starts_with?('#') ? custom_text_color : "##{custom_text_color}"
+                 else
+                   '#ECF0F1'
+                 end
     button_bg_color = if custom_button_bg_color.present?
-      custom_button_bg_color.starts_with?('#') ? custom_button_bg_color : "##{custom_button_bg_color}"
-    else
-      '#ECF0F1'
-    end
+                        custom_button_bg_color.starts_with?('#') ? custom_button_bg_color : "##{custom_button_bg_color}"
+                      else
+                        '#ECF0F1'
+                      end
     button_text_color = if custom_button_text_color.present?
-      custom_button_text_color.starts_with?('#') ? custom_button_text_color : "##{custom_button_text_color}"
-    else
-      '#ECF0F1'
-    end
+                          custom_button_text_color.starts_with?('#') ? custom_button_text_color : "##{custom_button_text_color}"
+                        else
+                          '#ECF0F1'
+                        end
     {
       bg_color: bg_color,
       text_color: text_color,
@@ -189,23 +188,24 @@ class Shop < ApplicationRecord
 
   def custom_theme_css
     ".nudge-offer.custom{ background-color: #{custom_theme[:bg_color]};" \
-    "color: #{custom_theme[:text_color]}; } .nudge-offer.custom input.bttn," \
-    ".nudge-offer.custom button.bttn{ background-color: #{custom_theme[:button_bg_color]};" \
-    "color: #{custom_theme[:button_text_color]};}"
+      "color: #{custom_theme[:text_color]}; } .nudge-offer.custom input.bttn," \
+      ".nudge-offer.custom button.bttn{ background-color: #{custom_theme[:button_bg_color]};" \
+      "color: #{custom_theme[:button_text_color]};}"
   end
 
   # Public. Gathers products and collections shopify's ids. Used to determine if an incoming
   #         'product/collection changed' webhook is one we care about - ie. if it is used in an offer
   # Return map.
   def offerable_products_and_collections
-    product_ids    = []
+    product_ids = []
     collection_ids = []
     offers.each do |offer|
       if offer.offerable_type == 'product'
         product_ids << offer.offerable_shopify_id
       elsif offer.offerable_type == 'multi' || offer.offerable_type == 'auto'
         product_ids += offer.offerable_product_shopify_ids
-      else #offer.offerable_type == "collection"
+      else
+        # offer.offerable_type == "collection"
         collection_ids << offer.offerable_shopify_id
       end
       (offer.rules_json || []).each do |rule|
@@ -301,7 +301,7 @@ class Shop < ApplicationRecord
 
   # Public. DOM element to anchor the offer on the popup drawer
   def ajax_dom_selector
-    custom_ajax_dom_selector.present? ? custom_ajax_dom_selector :  ".ajaxcart__row:first"
+    custom_ajax_dom_selector.present? ? custom_ajax_dom_selector : ".ajaxcart__row:first"
   end
 
   # Public. Where to put offer relative to the ajax_dom_selector: 'prepend', 'append', 'after' or 'before'
@@ -343,7 +343,7 @@ class Shop < ApplicationRecord
   end
 
   def regex_safe_path_to_cart
-    path_to_cart.gsub('/','\/')
+    path_to_cart.gsub('/', '\/')
   end
 
   def should_upgrade_to_starter?
@@ -356,7 +356,7 @@ class Shop < ApplicationRecord
 
   def should_upgrade_to_professional?
     ((subscription.try(:price_in_cents) || 0) > 1200) &&
-    ((subscription.try(:price_in_cents) || 0) < 3900) && offers.count > 0
+      ((subscription.try(:price_in_cents) || 0) < 3900) && offers.count > 0
   end
 
   def should_upgrade_to_enterprise?
@@ -428,7 +428,7 @@ class Shop < ApplicationRecord
 
   def has_default_colors?
     custom_bg_color == '#ECF0F1' && custom_text_color == '#2B3D51' &&
-    custom_button_bg_color == '#2B3D51' && custom_button_text_color == '#ffffff'
+      custom_button_bg_color == '#2B3D51' && custom_button_text_color == '#ffffff'
   end
 
   # Public: Check if number of active offers are below plan's limit.
@@ -440,7 +440,7 @@ class Shop < ApplicationRecord
 
   # Public. TRUE if the shop has the multi_offer feature AND does not have any product or collection offers
   def only_has_multi?
-    has_multi? && (offers.map(&:offerable_type) & ['product','collection'] == [])
+    has_multi? && (offers.map(&:offerable_type) & ['product', 'collection'] == [])
   end
 
   # Public. Set the Wizard's token and upload the changes
@@ -456,25 +456,25 @@ class Shop < ApplicationRecord
   def save_wizard_from_api(data)
     Rails.logger.error data
     self.custom_bg_color = if data['custom_colors']['bg_color'].starts_with?('#') && data['custom_colors']['bg_color'].length > 2
-      data['custom_colors']['bg_color']
-    elsif data['custom_colors']['bg_color'].length > 2
-      "##{data['custom_colors']['bg_color']}"
-    end
+                             data['custom_colors']['bg_color']
+                           elsif data['custom_colors']['bg_color'].length > 2
+                             "##{data['custom_colors']['bg_color']}"
+                           end
     self.custom_button_bg_color = if data['custom_colors']['button_bg_color'].starts_with?('#') && data['custom_colors']['button_bg_color'].length > 2
-      data['custom_colors']['button_bg_color']
-    elsif data['custom_colors']['button_bg_color'].length > 2
-      "##{data['custom_colors']['button_bg_color']}"
-    end
+                                    data['custom_colors']['button_bg_color']
+                                  elsif data['custom_colors']['button_bg_color'].length > 2
+                                    "##{data['custom_colors']['button_bg_color']}"
+                                  end
     self.custom_text_color = if data['custom_colors']['text_color'].starts_with?('#') && data['custom_colors']['text_color'].length > 2
-      data['custom_colors']['text_color']
-    elsif data['custom_colors']['text_color'].length > 2
-      "##{data['custom_colors']['text_color']}"
-    end
+                               data['custom_colors']['text_color']
+                             elsif data['custom_colors']['text_color'].length > 2
+                               "##{data['custom_colors']['text_color']}"
+                             end
     self.custom_button_text_color = if data['custom_colors']['button_text_color'].starts_with?('#') && data['custom_colors']['button_text_color'].length > 2
-      data['custom_colors']['button_text_color']
-    elsif data['custom_colors']['button_text_color'].length > 2
-      "##{data['custom_colors']['button_text_color']}"
-    end
+                                      data['custom_colors']['button_text_color']
+                                    elsif data['custom_colors']['button_text_color'].length > 2
+                                      "##{data['custom_colors']['button_text_color']}"
+                                    end
 
     if data['css_classes']
       self.extra_css_classes = data['css_classes']['layout']
@@ -484,11 +484,11 @@ class Shop < ApplicationRecord
     end
     self.uses_ajax_cart = data['ajax']
     if self.uses_ajax_cart
-      self.custom_ajax_dom_selector = data['selector'].gsub('"',"'")
-      self.custom_ajax_dom_action = data['position'].gsub('"',"'")
+      self.custom_ajax_dom_selector = data['selector'].gsub('"', "'")
+      self.custom_ajax_dom_action = data['position'].gsub('"', "'")
     else
-      self.custom_cart_page_dom_selector = data['selector'].gsub('"',"'")
-      self.custom_cart_page_dom_action = data['position'].gsub('"',"'")
+      self.custom_cart_page_dom_selector = data['selector'].gsub('"', "'")
+      self.custom_cart_page_dom_action = data['position'].gsub('"', "'")
     end
     self.wizard_completed_at = Time.now
     self.wizard_token = nil
@@ -505,16 +505,16 @@ class Shop < ApplicationRecord
     end
     if product.nil?
       product = if products.empty?
-        activate_session
-        remote = ShopifyAPI::Product.all.first
-        return nil if remote.nil?
-        json = JSON.parse(remote.original_state.to_json)
-        new_p = Product.create(shop_id: id, shopify_id: json['id'])
-        new_p.update_with_data(json)
-        new_p
-      else
-        products.first
-      end
+                  activate_session
+                  remote = ShopifyAPI::Product.all.first
+                  return nil if remote.nil?
+                  json = JSON.parse(remote.original_state.to_json)
+                  new_p = Product.create(shop_id: id, shopify_id: json['id'])
+                  new_p.update_with_data(json)
+                  new_p
+                else
+                  products.first
+                end
     end
     product
   end
@@ -527,12 +527,12 @@ class Shop < ApplicationRecord
     return [] if collection_shopify_ids.blank?
 
     current_collections = Collection.where(shopify_id: collection_shopify_ids)
-    current_collections.map { |c| { collection_id: c.shopify_id, products: c.collects_json} }
+    current_collections.map { |c| { collection_id: c.shopify_id, products: c.collects_json } }
   end
 
   def collections_shopify_ids_in_active_offers
-    offers_with_rules = offers.active.filter{ |o| o.rules_json&.present? }
-    coll_shopify_ids  = offers_with_rules.map(&:active_collections_shopify_ids)
+    offers_with_rules = offers.active.filter { |o| o.rules_json&.present? }
+    coll_shopify_ids = offers_with_rules.map(&:active_collections_shopify_ids)
     coll_shopify_ids.flatten.compact.uniq
   end
 
@@ -573,7 +573,7 @@ class Shop < ApplicationRecord
   def self.update_stackpath_token
     Rollbar.info 'Updating Stackpath Token'
     options = {
-      headers: {'Content-Type' => 'application/json', 'accept' => 'application/json'},
+      headers: { 'Content-Type' => 'application/json', 'accept' => 'application/json' },
       body: {
         client_id: ENV['STACKPATH_PUT_CLIENT_ID'],
         client_secret: ENV['STACKPATH_PUT_CLIENT_SECRET'],
@@ -606,10 +606,10 @@ class Shop < ApplicationRecord
       }
       options = {
         headers: query_headers,
-        body: {'items': [
-          {url: "https://spcdn.incartupsell.com/#{s3_filename}", recursive: true},
-          {url: "//q8d6j5r5.stackpathcdn.com/#{s3_filename}" },
-          {url: "//q8d6j5r5.stackpathcdn.com/#{s3_filename}?shop=#{shopify_domain}"}]}.to_json
+        body: { 'items': [
+          { url: "https://spcdn.incartupsell.com/#{s3_filename}", recursive: true },
+          { url: "//q8d6j5r5.stackpathcdn.com/#{s3_filename}" },
+          { url: "//q8d6j5r5.stackpathcdn.com/#{s3_filename}?shop=#{shopify_domain}" }] }.to_json
       }
       gw_url = "https://gateway.stackpath.com/cdn/v1/stacks/#{ENV['STACKPATH_STACK_ID']}/purge"
       res = HTTParty.post(gw_url, options)
@@ -634,7 +634,7 @@ class Shop < ApplicationRecord
         end
       end
       cdn_url = 'https://gateway.stackpath.com/cdn/v1/stacks/' \
-                "#{ENV['STACKPATH_STACK_ID']}/purge/#{res['id']}"
+        "#{ENV['STACKPATH_STACK_ID']}/purge/#{res['id']}"
       progress_query = HTTParty.get(cdn_url, headers: query_headers)
       cycle = 0;
       while (progress_query['progress'].nil? && cycle < 5) || progress_query['progress'] < 1
@@ -714,7 +714,7 @@ class Shop < ApplicationRecord
     needed = shopify_token.blank?
     begin
       session = activate_session
-      client=ShopifyAPI::Clients::Graphql::Admin.new(session: session)
+      client = ShopifyAPI::Clients::Graphql::Admin.new(session: session)
       ShopifyAPI::Webhooks::Registry.get_webhook_id(topic: "products/create", client: client)
 
     rescue ActiveResource::UnauthorizedAccess
@@ -725,12 +725,12 @@ class Shop < ApplicationRecord
 
   def active?
     activated &&
-    uninstalled_at.blank? &&
-    shopify_token.present? &&
-    shopify_plan_name != 'cancelled' &&
-    shopify_plan_name != 'frozen' &&
-    shopify_plan_name != 'dormant' &&
-    is_shop_active
+      uninstalled_at.blank? &&
+      shopify_token.present? &&
+      shopify_plan_name != 'cancelled' &&
+      shopify_plan_name != 'frozen' &&
+      shopify_plan_name != 'dormant' &&
+      is_shop_active
   end
 
   # the customer has uninstalled the app
@@ -743,7 +743,7 @@ class Shop < ApplicationRecord
                      is_shop_active: false)
 
       # TODO: Move to old repo
-      ShopPlan.delete_instance(id)
+      ShopPlan.toggle_activation(id)
 
       if subscription.present?
         ShopEvent.create(shop_id: id, title: 'Cancelled',
@@ -766,13 +766,13 @@ class Shop < ApplicationRecord
   def enable_reinstalled_shop(s_domain, s_token, a_scopes)
     begin
       update_columns(shopify_domain: s_domain,
-      myshopify_domain: nil,
-      installed_at: Time.now.utc,
-      uninstalled_at: nil,
-      access_scopes: a_scopes,
-      is_shop_active: true,
-      shopify_token: s_token)
-      
+                     myshopify_domain: nil,
+                     installed_at: Time.now.utc,
+                     uninstalled_at: nil,
+                     access_scopes: a_scopes,
+                     is_shop_active: true,
+                     shopify_token: s_token)
+
       if subscription.present?
         subscription.status = 'approved'
         subscription.shopify_charge_id = nil
@@ -785,11 +785,10 @@ class Shop < ApplicationRecord
     store_cache_keys_on_reinstall
   end
 
-
   def signup_for_referral_program
     # First Promoter is the referral platform that we are using for referral tracking purposes
     customer = customer_by_shopify_domain
-	  if customer.present? && !customer.is_referral_tracked #&& plan.internal_name == "plan_based_billing"
+    if customer.present? && !customer.is_referral_tracked #&& plan.internal_name == "plan_based_billing"
       response_code, response_body = ReferralIntegrations::FirstPromoter.signup_referral(
         customer.shopify_domain,
         customer.referral_code
@@ -813,9 +812,9 @@ class Shop < ApplicationRecord
       response_code, response_body = ReferralIntegrations::FirstPromoter.delete_referral(customer.shopify_domain)
       if response_code == 200
         ShopEvent.create(shop_id: id,
-                          title: "Lead Deleted from FirstPromoter", 
-                          body: "Response: #{response_body}", 
-                          revenue_impact: (subscription.price_in_cents / 100.0 * -1))
+                         title: "Lead Deleted from FirstPromoter",
+                         body: "Response: #{response_body}",
+                         revenue_impact: (subscription.price_in_cents / 100.0 * -1))
       end
     end
   end
@@ -841,7 +840,7 @@ class Shop < ApplicationRecord
   end
 
   def defaults_set_for_cart_type
-    ((defaults_set_for || '').split(" (")[1] || "").gsub(/\)$/,'')
+    ((defaults_set_for || '').split(" (")[1] || "").gsub(/\)$/, '')
   end
 
   # Public. Creates an "Auto" offer, only one offer of this type by Store
@@ -863,7 +862,7 @@ class Shop < ApplicationRecord
         offerable_product_shopify_ids: [12321]
       }
       offer = Offer.create(offer_opts)
-      offer.offerable_product_shopify_ids = (autopilot_companions.map{|c| [c[0], c[1].map(&:first)] }.flatten + autopilot_bestsellers).uniq
+      offer.offerable_product_shopify_ids = (autopilot_companions.map { |c| [c[0], c[1].map(&:first)] }.flatten + autopilot_bestsellers).uniq
       offer.save
       offer
     end
@@ -885,14 +884,14 @@ class Shop < ApplicationRecord
                                      [-1]
                                    end
     products.where("published_status = 'present' OR published_status is null").
-             where('most_popular_companions is not null').where('orders_count > 2').
-             where("shopify_id NOT IN (?)",excluded_product_shopify_ids).active.map{ |p|
+      where('most_popular_companions is not null').where('orders_count > 2').
+      where("shopify_id NOT IN (?)", excluded_product_shopify_ids).active.map { |p|
       if p.most_popular_companions.present?
         filtered_companion_ids = products.where("published_status = 'present' OR published_status is null").
-                                        where(shopify_id: p.most_popular_companions.map(&:first)).
-                                        where("shopify_id NOT IN (?)",excluded_product_shopify_ids).
-                                        map{|p| p.shopify_id if p.available_json_variants.present? }.compact
-        filtered_companions = p.most_popular_companions.map{|c| c if filtered_companion_ids.member?(c[0]) }.compact
+          where(shopify_id: p.most_popular_companions.map(&:first)).
+          where("shopify_id NOT IN (?)", excluded_product_shopify_ids).
+          map { |p| p.shopify_id if p.available_json_variants.present? }.compact
+        filtered_companions = p.most_popular_companions.map { |c| c if filtered_companion_ids.member?(c[0]) }.compact
         [p.shopify_id, filtered_companions]
       end
     }.compact
@@ -900,11 +899,11 @@ class Shop < ApplicationRecord
 
   def autopilot_bestsellers
     my_products = if auto_offer.excluded_tags.present?
-      products.where("published_status = 'present' OR published_status is null").active.where("not regexp_split_to_array(tags, E\', \') @> ARRAY[?]", auto_offer.excluded_tags).order('orders_count DESC nulls last').limit(25)
-    else
-      products.where("published_status = 'present' OR published_status is null").active.order('orders_count DESC nulls last').limit(25)
-    end
-    my_products.map{|p| p if p.available_json_variants.present? }.compact.map(&:shopify_id)
+                    products.where("published_status = 'present' OR published_status is null").active.where("not regexp_split_to_array(tags, E\', \') @> ARRAY[?]", auto_offer.excluded_tags).order('orders_count DESC nulls last').limit(25)
+                  else
+                    products.where("published_status = 'present' OR published_status is null").active.order('orders_count DESC nulls last').limit(25)
+                  end
+    my_products.map { |p| p if p.available_json_variants.present? }.compact.map(&:shopify_id)
   end
 
   def has_pro_features?
@@ -1007,7 +1006,7 @@ class Shop < ApplicationRecord
       admin: admin
     }
     if opts[:include_sample_products]
-      settings[:sample_products] = products.where('title is not null').limit(5).map{|p| p.offerable_details.merge({offer_id: 1})}
+      settings[:sample_products] = products.where('title is not null').limit(5).map { |p| p.offerable_details.merge({ offer_id: 1 }) }
     end
     if custom_theme_template.present?
       settings[:custom_theme_template] = custom_theme_template
@@ -1020,39 +1019,39 @@ class Shop < ApplicationRecord
       offer_css
     else
       str = "";
-      #dont need to do custom color scheme here, it is included somewhere else
-      if(css_options['main']['borderWidth'].to_i > 0)
+      # dont need to do custom color scheme here, it is included somewhere else
+      if (css_options['main']['borderWidth'].to_i > 0)
         str += ".nudge-offer{ border: #{css_options['main']['borderWidth']}px #{css_options['main']['borderStyle']} #{css_options['main']['borderColor']}; } "
       end
-      if(css_options['main']['borderRadius'].to_i != 4)
+      if (css_options['main']['borderRadius'].to_i != 4)
         str += ".nudge-offer{ border-radius: #{css_options['main']['borderRadius']}px; } "
       end
-      if(css_options['main']['marginTop'].to_i > 0)
+      if (css_options['main']['marginTop'].to_i > 0)
         str += ".nudge-offer{ margin-top: #{css_options['main']['marginTop']}; } "
       end
-      if(css_options['main']['marginBottom'].to_i > 0)
+      if (css_options['main']['marginBottom'].to_i > 0)
         str += ".nudge-offer{ margin-bottom: #{css_options['main']['marginBottom']}; } "
       end
-      if(css_options['main']['borderWidth'].to_i > 0)
+      if (css_options['main']['borderWidth'].to_i > 0)
         str += ".nudge-offer{ border: #{css_options['main']['borderWidth']}px #{css_options['main']['borderStyle']} #{css_options['main']['borderColor']}; border-radius: #{css_options['main']['borderRadius']}px; } "
       end
       str += ".nudge-offer.multi form input.bttn, #nudge-offer.multi form button.bttn, #nudge-offer input.bttn, #nudge-offer button.bttn{ ";
-      if(css_options['button']['borderRadius'].to_i != 4)
+      if (css_options['button']['borderRadius'].to_i != 4)
         str += "border-radius: #{css_options['button']['borderRadius']}px; ";
       end
-      if(css_options['button']['fontWeight'].present? && css_options['button']['fontWeight'] != 'bold')
+      if (css_options['button']['fontWeight'].present? && css_options['button']['fontWeight'] != 'bold')
         str += "font-weight: #{css_options['button']['fontWeight']}; ";
       end
-      if(css_options['button']['fontFamily'] != 'inherit' && css_options['button']['fontFamily'].present?)
+      if (css_options['button']['fontFamily'] != 'inherit' && css_options['button']['fontFamily'].present?)
         str += "font-family: #{css_options['button']['fontFamily']}; "
       end
-      if(css_options['button']['textTransform'] != 'inherit' && css_options['button']['textTransform'].present?)
+      if (css_options['button']['textTransform'] != 'inherit' && css_options['button']['textTransform'].present?)
         str += "text-transform: #{css_options['button']['textTransform']}; "
       end
-      if(css_options['button']['fontSize'] != 'inherit' && css_options['button']['fontSize'].present?)
+      if (css_options['button']['fontSize'] != 'inherit' && css_options['button']['fontSize'].present?)
         str += "font-size: #{css_options['button']['fontSize']}; "
       end
-      if(css_options['button']['letterSpacing'] != 'inherit' && css_options['button']['letterSpacing'].present?)
+      if (css_options['button']['letterSpacing'] != 'inherit' && css_options['button']['letterSpacing'].present?)
         str += "letter-spacing: #{css_options['button']['letterSpacing']}; "
       end
       if (css_options['button']['width'] != 'auto' && css_options['button']['width'].present?)
@@ -1142,7 +1141,7 @@ class Shop < ApplicationRecord
       defaults_set_for: defaults_set_for,
       presets_for_theme: presets_for_theme,
       has_branding: subscription.try(:has_branding) || false,
-      pending_jobs: pending_jobs.map{|j| {readable_description: j.readable_description} }.uniq,
+      pending_jobs: pending_jobs.map { |j| { readable_description: j.readable_description } }.uniq,
       last_refreshed_at: last_refreshed_at || my_last_refresh.try(:created_at),
       last_refresh_result: last_refresh_result || my_last_refresh.try(:result_message),
       subscription_id: subscription.try(:id),
@@ -1213,7 +1212,7 @@ class Shop < ApplicationRecord
     ShopifyApp.configuration.api_version
   end
 
-  #Unpublish all offers except first when merchant switches to free plan
+  # Unpublish all offers except first when merchant switches to free plan
   def unpublish_extra_offers
     first_active_offer_id = self.unpublished_offer_ids? ? self.unpublished_offer_ids.last : self.offers.active.first&.id
     if first_active_offer_id.present?
@@ -1225,7 +1224,7 @@ class Shop < ApplicationRecord
     end
   end
 
-  #Unpublish active offers
+  # Unpublish active offers
   def unpublish_active_offers
     active_ids = offers.active.pluck(:id)
     self.offers.where(active: true).update_all({ published_at: nil, active: false })
@@ -1241,16 +1240,24 @@ class Shop < ApplicationRecord
   def initialize_shop_plan_tracking
     puts 'Adding shop plan info to redis..'
     puts in_trial_period?
+
+    shop_plan = ShopPlan.get_one_with_id(id)
+
     if in_trial_period?
       puts 'In trial period'
       # Set trial
       # Fetch visible trial redis plan instance
       redis_plan = PlanRedis.get_plan('Plan:Free:Trial_Plan')
+
       current_plan_set = PlanRedis.get_with_fields({ is_visible: 'true', is_active: 'true' }).first&.plan_set
       puts redis_plan.inspect
       puts current_plan_set
       # Save plan data
-      ShopPlan.new(shop_id: id, plan_key: redis_plan.key, plan_set: current_plan_set)
+      if shop_plan.present?
+        shop_plan.is_active = 'true'
+      else
+        ShopPlan.new(shop_id: id, plan_key: redis_plan.key, plan_set: current_plan_set)
+      end
     end
   end
 
@@ -1281,16 +1288,16 @@ class Shop < ApplicationRecord
       .select('offers.id, offers.shop_id, offers.title, offers.active, offers.total_clicks, offers.total_views, offers.total_revenue, offers.created_at, offers.offerable_type')
       .group('offers.id')
       .each do |offer|
-        data << {
-          id: offer.id,
-          title: offer.title,
-          status: offer.active,
-          clicks: offer.total_clicks,
-          views: offer.total_views,
-          revenue: offer.total_revenue,
-          created_at: offer.created_at.to_datetime,
-          offerable_type: offer.offerable_type,
-        }
+      data << {
+        id: offer.id,
+        title: offer.title,
+        status: offer.active,
+        clicks: offer.total_clicks,
+        views: offer.total_views,
+        revenue: offer.total_revenue,
+        created_at: offer.created_at.to_datetime,
+        offerable_type: offer.offerable_type,
+      }
     end
     return data
   end
@@ -1362,14 +1369,14 @@ class Shop < ApplicationRecord
   def proxy_offers
     offers = []
 
-    self.offers.where(active: true).each do | offer |
+    self.offers.where(active: true).each do |offer|
       new_offer = {
         id: offer.id,
         rules: offer.rules_json,
-        text_a:  (offer.offer_text || ''),
-        text_b:  (offer.offer_text_alt || ''),
-        cta_a:  offer.offer_cta,
-        cta_b:  offer.offer_cta_alt,
+        text_a: (offer.offer_text || ''),
+        text_b: (offer.offer_text_alt || ''),
+        cta_a: offer.offer_cta,
+        cta_b: offer.offer_cta_alt,
         css: offer.offer_css,
         show_product_image: offer.show_product_image,
         product_image_size: offer.product_image_size || 'medium',
@@ -1380,16 +1387,16 @@ class Shop < ApplicationRecord
           extra_css_classes: self.extra_css_classes,
         },
         show_nothanks: offer.show_nothanks || false,
-        calculated_image_url:  offer.calculated_image_url ,
+        calculated_image_url: offer.calculated_image_url,
         hide_variants_wrapper: offer.offerable_type == 'product' && offer.product.available_json_variants.count == 1,
         show_variant_price: offer.show_variant_price || false,
         uses_ab_test: offer.uses_ab_test?,
         ruleset_type: offer.ruleset_type,
-        offerable_type:  offer.offerable_type,
+        offerable_type: offer.offerable_type,
         offerable_product_shopify_ids: offer.offerable_product_shopify_ids.compact,
         offerable_product_details: offer.offerable_product_details(true, true),
         checkout_after_accepted: offer.checkout_after_accepted || false,
-        discount_code:  offer.discount_target_type == 'code' ? offer.discount_code : false,
+        discount_code: offer.discount_target_type == 'code' ? offer.discount_code : false,
         stop_showing_after_accepted: offer.stop_showing_after_accepted || false,
         products_to_remove: offer.product_ids_to_remove,
         show_powered_by: self.subscription.has_branding,
@@ -1413,10 +1420,10 @@ class Shop < ApplicationRecord
         redirect_to_product: self.has_redirect_to_product? && offer.redirect_to_product?,
         show_product_price: offer.show_product_price?,
         show_product_title: offer.show_product_title?,
-        in_cart_page:  offer.in_cart_page?,
-        in_ajax_cart:  offer.in_ajax_cart?,
-        in_product_page:  offer.in_product_page?,
-        css_options:  offer.css_options || {},
+        in_cart_page: offer.in_cart_page?,
+        in_ajax_cart: offer.in_ajax_cart?,
+        in_product_page: offer.in_product_page?,
+        css_options: offer.css_options || {},
         custom_css: offer.custom_css
       }
 
@@ -1430,9 +1437,9 @@ class Shop < ApplicationRecord
       end
 
       if self.has_recharge && offer.recharge_subscription_id.present?
-        new_offer[:has_recharge]             = self.has_recharge && offer.recharge_subscription_id.present?
-        new_offer[:interval_unit]            = offer.interval_unit
-        new_offer[:interval_frequency]       = offer.interval_frequency.to_i
+        new_offer[:has_recharge] = self.has_recharge && offer.recharge_subscription_id.present?
+        new_offer[:interval_unit] = offer.interval_unit
+        new_offer[:interval_frequency] = offer.interval_frequency.to_i
         new_offer[:recharge_subscription_id] = offer.recharge_subscription_id.to_i
       end
 
@@ -1483,10 +1490,10 @@ class Shop < ApplicationRecord
   # Returns. String.
   def script_tag_body
     valid_offers = if self.activated?
-      active_and_valid_offers
-    else
-      []
-    end
+                     active_and_valid_offers
+                   else
+                     []
+                   end
     assigns = { library_string: library_string, icushop: self, offers: valid_offers }
     JsController.render('js/library', assigns: assigns)
   end
