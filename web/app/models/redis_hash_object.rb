@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 require 'active_model'
 class RedisHashObject
-  # TODO: Move to old repo
   include ActiveModel::Validations
 
   attr_accessor :key, :updated_at
@@ -53,10 +52,10 @@ class RedisHashObject
     }.compact
   end
 
-  # Fetches all plans
-  def self.all
+  # Fetches all objects
+  def self.all(pattern =  '*')
     # get list of keys
-    key_list = all_keys
+    key_list = all_keys(pattern)
     key_list.map { |key|
       get_one(key)
     }.compact
