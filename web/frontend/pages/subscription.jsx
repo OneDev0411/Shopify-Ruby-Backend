@@ -105,7 +105,6 @@ export default function Subscription() {
           setError(error);
           console.log("error", error);
         })
-    setIsLoading(false)
   }, []);
 
   const fetchPlanData = useCallback(() => {
@@ -119,7 +118,9 @@ export default function Subscription() {
           return response.json();
         })
         .then((data) => {
+          console.log(data.plan_data)
           setCurrentPlan(data.plan_data);
+          setIsLoading(false)
         })
         .catch((error) => {
           setError(error);
