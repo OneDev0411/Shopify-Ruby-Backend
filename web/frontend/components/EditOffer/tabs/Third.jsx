@@ -26,7 +26,7 @@ export function ThirdTab(props) {
                 <LegacyStack distribution="center">
                     <ButtonGroup>
                         <Button onClick={() => props.saveDraft()}>Save Draft</Button>
-                        <Button primary disabled={props.enablePublish} onClick={() => props.publishOffer()}>Publish</Button>
+                        <Button primary onClick={() => props.publishOffer()}>Publish</Button>
                     </ButtonGroup>
                 </LegacyStack>
                 )}

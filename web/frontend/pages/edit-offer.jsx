@@ -20,6 +20,7 @@ import {useShopState} from "../contexts/ShopContext.jsx";
 import { onLCP, onFID, onCLS } from 'web-vitals';
 import { traceStat } from "../services/firebase/perf.js";
 import UpgradeSubscriptionModal from "../components/UpgradeSubscriptionModal.jsx";
+import AddOfferableModal from "../components/AddOfferableModal.jsx";
 
 export default function EditPage() {
     const { offer, setOffer } = useContext(OfferContext);
@@ -47,6 +48,7 @@ export default function EditPage() {
 
     const [updatePreviousAppOffer, setUpdatePreviousAppOffer] = useState(false);
     const [openOffersModal, setOpenOffersModal] = useState(false);
+    const [openAddOfferableModal, setOpenAddOfferableModal] = useState(false);
 
     const offerID = location?.state?.offerID;
 
@@ -301,7 +303,9 @@ export default function EditPage() {
     ];
 
     function publishOffer() {
-        if (shopSettings?.offers_limit_reached && offer.publish_status !== 'published') {
+        if (enablePublish) {
+            setOpenAddOfferableModal(true);
+        } else if (shopSettings?.offers_limit_reached && offer.publish_status !== 'published') {
             setOpenOffersModal(true);
         } else {
             save(true);
@@ -331,7 +335,7 @@ export default function EditPage() {
                 <Page
                     backAction={{content: 'Offers', url: '/offer'}}
                     title="Create new offer"
-                    primaryAction={{content: 'Publish', disabled: enablePublish, onClick: publishOffer}}
+                    primaryAction={{content: 'Publish', onClick: publishOffer}}
                     secondaryActions={[{content: 'Save Draft', disabled: false, onAction: () => saveDraft()}]}
                     style={{overflow: 'hidden'}}
                 >
@@ -406,6 +410,7 @@ export default function EditPage() {
                     </Layout>
                 </Page>
             )}
+            <AddOfferableModal openModal={openAddOfferableModal} setOpenModal={setOpenAddOfferableModal} />
             <UpgradeSubscriptionModal openModal={openOffersModal} setOpenModal={setOpenOffersModal} />
         </div>
     );
