@@ -7,7 +7,7 @@ import { Banner, Grid, Layout, Page, Spinner} from "@shopify/polaris";
 import { isSubscriptionActive } from "../services/actions/subscription";
 import { fetchShopData } from "../services/actions/shop";
 
-import { CustomTitleBar, OffersList, OrderOverTimeData, TotalSalesData } from "../components";
+import { CustomTitleBar, OffersList, OrderOverTimeData, TotalSalesData, TotalUpSellsData } from "../components";
 
 import "../components/stylesheets/mainstyle.css";
 import {ThemeAppCard} from "../components/CreateOfferCard.jsx";
@@ -159,10 +159,13 @@ export default function HomePage() {
                 {hasOffers && (
                   <Grid>
                     <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-                      <TotalSalesData period='monthly' title={true} />
+                      <TotalSalesData period='30-days' title={true} />
                     </Grid.Cell>
                     <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
-                      <OrderOverTimeData period='monthly' title={true} />
+                      <TotalUpSellsData period='30-days' title={true} />
+                    </Grid.Cell>
+                    <Grid.Cell columnSpan={{xs: 6, sm: 3, md: 8, lg: 4, xl: 4}}>
+                      <OrderOverTimeData period='30-days' title={true} />
                     </Grid.Cell>
                   </Grid>
                 )}

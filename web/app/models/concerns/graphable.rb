@@ -91,65 +91,40 @@ module Graphable
       offer.update_column :position_order, new_position
     end
   end
-
-  def period_hash_to_offers
-    {
-      'daily' => { start_date: DateTime.now.beginning_of_day, end_date: DateTime.now.end_of_day },
-      'weekly' => { start_date: Date.today - 7.days, end_date: (Date.today - 1.day) },
-      'monthly' => { start_date: (Date.today.beginning_of_month - 1.month), end_date: (Date.today-1.months).end_of_month },
-      '3-months' => { start_date: (Date.today.beginning_of_month - 2.months), end_date: Date.today.end_of_month },
-      '6-months' => { start_date: (Date.today.beginning_of_month - 5.months), end_date: Date.today.end_of_month },
-      'yearly' => { start_date: Date.today.beginning_of_year, end_date: Date.today.end_of_year },
-      'all' => { start_date: self.created_at, end_date: Date.today.end_of_month }
-    }
+  def sales_stats(period, mode)
+    $redis_stats_cache.hget("use:cache:#{self.id}", 'analytics') == '1' ? cached_sales_stats(period) : db_sales_stats(period)
+  end
+  
+  def upsells_stats(period, mode)
+     $redis_stats_cache.hget("use:cache:#{self.id}", 'analytics') == '1' ? cached_upsells_stats(period) : db_upsells_stats(period)
   end
 
-  def sales_stats(period)
-    results = []
+  def clicks_stats(period, mode)
+    $redis_stats_cache.hget("use:cache:#{self.id}", 'analytics') == '1' ? cached_clicks_stats(period) : db_clicks_stats(period)
+  end
 
-    period_hash = construct_period_hash
+  def orders_stats(period, mode)
+    $redis_stats_cache.hget("use:cache:#{self.id}", 'analytics') == '1' ? cached_orders_stats(period) : db_orders_stats(period)
+  end
 
-    start_date = period_hash[period][:start_date]
-    last = period_hash[period][:last]
-    interval = period_hash[period][:interval]
+  # Get stats data for times_loaded
+  def offers_stats_times_loaded(period, mode)
+    $redis_stats_cache.hget("use:cache:#{self.id}", 'analytics') == '1' ? cached_offers_stats_times_loaded(period) : db_offers_stats_times_loaded(period)
+  end
 
-    offer_events = OfferEvent.sales_within_given_range(start_date, last, self.id).to_a
+  # Get stats data for times_clicked
+  def offers_stats_times_clicked(period, mode)
+    $redis_stats_cache.hget("use:cache:#{self.id}", 'analytics') == '1' ? cached_offers_stats_times_clicked(period) : db_offers_stats_times_clicked(period)
+  end
 
-    i = 0
-    total = 0
-    while (start_date <= last) do
-      end_date = start_date + interval > last ? last : start_date + interval
+  # Get stats data for times_checkedout
+  def offers_stats_times_checkedout(period, mode)
+    $redis_stats_cache.hget("use:cache:#{self.id}", 'analytics') == '1' ? cached_offers_stats_times_checkedout(period) : db_offers_stats_times_checkedout(period)
+  end
 
-      label_hash = construct_lable_hash(start_date, end_date)
-
-      results[i] = {
-        key: label_hash[period].call(start_date, end_date),
-        value: 0
-      }
-
-      quantities = []
-      prices = []
-
-      offer_events_in_range = offer_events.select { |oe| oe.created_at >= start_date && oe.created_at < end_date }
-
-      offer_events_in_range.each do |offer_event|
-        next if start_date == end_date
-
-        item_variants = offer_event.payload["item_variants"]
-
-        quantities.concat(item_variants.map { |item| item["quantity"] })
-        prices.concat(item_variants.map { |item| item["price"].to_f })
-      end
-
-      sum = prices.zip(quantities).sum { |price, quantity| price * quantity }
-      results[i][:value] = sum
-      total += sum
-
-      start_date += interval
-      i += 1
-    end
-
-    { results: results, sales_total: total}
+  # Get stats data for times_converted
+  def offers_stats_times_converted(period, mode)
+    $redis_stats_cache.hget("use:cache:#{self.id}", 'analytics') == '1' ? cached_offers_stats_times_converted(period) : db_offers_stats_times_converted(period)
   end
 
   # Get stats data for click_revenue
@@ -157,130 +132,14 @@ module Graphable
     calculate_offer_stat(period, :click_revenue)
   end
 
-  # Get stats data for times_loaded
-  def offers_stats_times_loaded(period)
-    calculate_offer_stat(period, :times_loaded)
-  end
-
-  # Get stats data for times_clicked
-  def offers_stats_times_clicked(period)
-    calculate_offer_stat(period, :times_clicked)
-  end
-
-  # Get stats data for times_checkedout
-  def offers_stats_times_checkedout(period)
-    calculate_offer_stat(period, :times_checkedout)
-  end
-
   # Calculate stat data for each kind of stat
   def calculate_offer_stat(period, stat_field)
-    period_hash = construct_period_hash
-  
-    start_date = period_hash[period][:start_date]
-    last = period_hash[period][:last]
+    start_date, end_date = self.period_to_date_range(period).values_at(:start_date, :end_date)
 
     # Fetch the sum of stat_field for the entire period in one query
-    total_stat = DailyStat.where(shop_id: self.id).where('created_at >= ? and created_at <= ?', start_date, last).sum(stat_field)
-
+    total_stat = DailyStat.where(shop_id: self.id).where('created_at >= ? and created_at <= ?', start_date, end_date).sum(stat_field)
+  
     total_stat
-  end
-
-  def orders_stats(period)
-    period_trunc = {
-      'daily' => 'hour',
-      'weekly' => 'day',
-      'monthly' => 'week',
-      '3-months' => 'month',
-      '6-months' => 'month',  # Handle as special case if needed
-      'yearly' => 'month',
-      'all' => 'month'
-    }
-
-    period_hash = construct_period_hash
-    start_date = period_hash[period][:start_date]
-    last = period_hash[period][:last]
-
-    grouped_orders = Order.where(shop_id: self.id, created_at: start_date..last)
-                          .group("date_trunc('#{period_trunc[period]}', created_at)")
-                          .count
-
-    results = grouped_orders.map do |date, count|
-      {
-        key: format_label_for_period(date, period),
-        value: count
-      }
-    end
-
-    { results: results, orders_total: results.sum { |r| r[:value] } }
-  end
-
-  def format_label_for_period(date, period)
-    case period
-    when 'hourly'
-      date.in_time_zone.strftime("%Y-%m-%d %H:%M")
-    when 'daily', 'weekly'
-      date.in_time_zone.strftime("%Y-%m-%d")
-    when 'monthly', '3-months', '6-months', 'yearly'
-      date.in_time_zone.strftime("%Y-%m")
-    else
-      date.in_time_zone.to_s
-    end
-  end
-
-  def clicks_stats(period)
-    results = []
-
-    period_hash = construct_period_hash
-
-    i = 0
-    start_date = period_hash[period]&.[](:start_date)
-    last = period_hash[period]&.[](:last)
-    interval = period_hash[period]&.[](:interval)
-
-    # This query calculates total clicks of all offers which exist in a shop and was updated from the previous one
-    # The previous query calculated total clicks of daily_stats for each filtered offer after filtering offers data
-    # with its associated daily_stats data by start_date and end_date but this query didn't get the correct offers data
-    # due to filter the offers. For instance an offer was created yesterday and selected "Today" in the time range
-    # dropdown the result of the previous query is nothing so the query was updated to get all offers data which exist
-    # in the shop and join its associated daily_stats data which its created_at is in the time range.
-    # The reason a LEFT OUTER JOIN is used instead of an INNER JOIN is because we want to include all offers,
-    # even those that may not have corresponding entries in the 'daily_stats' table within the specified date range.
-
-    # Get all offers data which created_at is between start_date and last outside the while loop to avoid repeated
-    # execution of the query in loop, and calculate total_clicks inside the loop again.
-    all_offers = offers
-      .joins('LEFT OUTER JOIN daily_stats ON daily_stats.offer_id = offers.id')
-      .where('daily_stats.created_at' => start_date..last)
-      .group('offers.id, daily_stats.created_at')
-      .select('offers.id, daily_stats.created_at, SUM(daily_stats.times_clicked) as total_clicks')
-
-    total = 0
-    while (start_date <= last) do
-      if (start_date + interval > last)
-        end_date = last
-      else
-        end_date = start_date + interval
-      end
-      label_hash = construct_lable_hash(start_date, end_date)
-      results[i] = {
-        key: label_hash[period]&.call(start_date, end_date),
-        value: 0
-      }
-      sum = 0
-
-      # Calculated total_clicks from all offers data
-      all_offers.each do |offer|
-        sum += offer.total_clicks if offer.created_in_between(start_date, end_date)
-      end
-
-      results[i][:value] = sum
-      total += sum
-
-      start_date = start_date + interval
-      i += 1;
-    end
-
-    { results: results, clicks_total: total }
   end
 
   def sale_stats
@@ -302,7 +161,7 @@ module Graphable
     { "offer_sale_weekly_value": offer_sale_weekly_value.sum, "offer_sale_weekly_diff": diff, "offer_sale_daily_value": offer_sale_daily_value.sum,
       "offer_sale_monthly_value": offer_sale_monthly_value.sum, "offer_sale_yearly_value": offer_sale_yearly_value.sum, "offer_sale_revenue":  offer_sale_revenue.sum}
   end
-
+  
   private
 
   # Private. Gather:
@@ -319,6 +178,218 @@ module Graphable
       diff         = difference_between_weeks(current_week, last_week)
       { "#{field}_total": total, "#{field}_diff": diff }
     end
+  end
+
+  def db_sales_stats(period)
+    start_date, end_date = self.period_to_date_range(period).values_at(:start_date, :end_date)
+
+    grouped_events = {}
+    OfferEvent.where(action: 'sale', created_at: start_date..end_date)
+      .joins(:offer)
+      .where(offers: { shop_id: self.id })
+      .group("date_trunc('#{period_trunc(period)}', offer_events.created_at)")
+      .order(Arel.sql("date_trunc('#{period_trunc(period)}', offer_events.created_at) DESC"))
+      .select("date_trunc('#{period_trunc(period)}', offer_events.created_at) as date, SUM(COALESCE((offer_events.payload->'calculated_total')::float, 0)) as total")
+      .each do |event, hash|
+        grouped_events[event.date.to_datetime] = event.total
+      end
+    
+    date_intervals(start_date, end_date, period).each do |date|
+      grouped_events[date] ||= 0
+    end
+    
+    results = grouped_events.sort_by { |key, value| key }.map do |date, count|
+      {
+        key: format_label_for_period(date, period),
+        value: count
+      }
+    end
+
+    { results: results, sales_total: results.sum { |r| r[:value] } }
+  end
+
+  def db_upsells_stats(period)
+    start_date, end_date = self.period_to_date_range(period).values_at(:start_date, :end_date)
+
+    grouped_events = {}
+    OfferEvent.where(action: 'sale', created_at: start_date..end_date)
+      .joins(:offer)
+      .where(offers: { shop_id: self.id })
+      .group("date_trunc('#{period_trunc(period)}', offer_events.created_at)")
+      .order(Arel.sql("date_trunc('#{period_trunc(period)}', offer_events.created_at) DESC"))
+      .select("date_trunc('#{period_trunc(period)}', offer_events.created_at) as date, sum(amount) as total")
+      .each do |event, hash|
+        grouped_events[event.date.to_datetime] = event.total
+      end
+
+    date_intervals(start_date, end_date, period).each do |date|
+      grouped_events[date] ||= 0
+    end
+    
+    results = grouped_events.sort_by { |key, value| key }.map do |date, count|
+      {
+        key: format_label_for_period(date, period),
+        value: count
+      }
+    end
+  
+    { results: results, upsells_total: results.sum { |r| r[:value] } }
+  end
+
+  def db_orders_stats(period)
+    start_date, end_date = self.period_to_date_range(period).values_at(:start_date, :end_date)
+  
+    grouped_orders = Order.where(shop_id: self.id, created_at: start_date..end_date)
+      .group("date_trunc('#{period_trunc(period)}', created_at)")
+      .order(Arel.sql("date_trunc('#{period_trunc(period)}', created_at) DESC"))
+      .count
+      .each_with_object({}) { |(date, count), object| object[date.to_datetime] = count }
+  
+    date_intervals(start_date, end_date, period).each do |date|
+      grouped_orders[date] ||= 0
+    end
+
+    results = grouped_orders.sort_by { |key, value| key }.map do |date, count|
+      {
+        key: format_label_for_period(date, period),
+        value: count
+      }
+    end
+  
+    { results: results, orders_total: results.sum { |r| r[:value] } }
+  end
+
+  def db_clicks_stats(period)
+    start_date, end_date = self.period_to_date_range(period).values_at(:start_date, :end_date)
+
+    grouped_clicks = OfferEvent.where(action: 'click', created_at: start_date..end_date)
+      .joins(offer: :shop)
+      .where(shop: { id: self.id })
+      .group("date_trunc('#{period_trunc(period)}', offer_events.created_at)")
+      .order(Arel.sql("date_trunc('#{period_trunc(period)}', offer_events.created_at) DESC"))
+      .count
+      .each_with_object({}) { |(date, count), object| object[date.to_datetime] = count }
+
+    date_intervals(start_date, end_date, period).each do |date|
+      grouped_clicks[date] ||= 0
+    end
+    
+    results = grouped_clicks.sort_by { |key, value| key }.map do |date, count|
+      {
+        key: format_label_for_period(date, period),
+        value: count
+      }
+    end
+  
+    { results: results, clicks_total: results.sum { |r| r[:value] } }
+  end
+
+  # Get stats data for click_revenue
+  def db_offers_stats_click_revenue(period)
+    calculate_offer_stat(period, :click_revenue)
+  end
+
+  # Get stats data for times_loaded
+  def db_offers_stats_times_loaded(period)
+    start_date, end_date = self.period_to_date_range(period).values_at(:start_date, :end_date)
+
+    total_stat = OfferStat.where(action: 'show', created_at: start_date..end_date)
+      .joins(:offer)
+      .where(offers: { shop_id: self.id })
+      .count
+
+    return total_stat
+  end
+
+  # Get stats data for times_clicked
+  def db_offers_stats_times_clicked(period)
+    start_date, end_date = self.period_to_date_range(period).values_at(:start_date, :end_date)
+
+    total_stat = OfferEvent.where(action: 'click', created_at: start_date..end_date)
+      .joins(:offer)
+      .where(offers: { shop_id: self.id })
+      .count
+
+    return total_stat
+  end
+
+  # Get stats data for times_checkedout
+  def db_offers_stats_times_checkedout(period)
+    start_date, end_date = self.period_to_date_range(period).values_at(:start_date, :end_date)
+
+    total_stat = OfferStat.where(action: 'checkout', created_at: start_date..end_date)
+      .joins(:offer)
+      .where(offers: { shop_id: self.id })
+      .count
+
+    return total_stat
+  end
+
+  # Get stats data for times_converted
+  def db_offers_stats_times_converted(period)
+    start_date, end_date = self.period_to_date_range(period).values_at(:start_date, :end_date)
+
+    total_stat = OfferEvent.where(action: 'sale', created_at: start_date..end_date)
+      .joins(:offer)
+      .where(offers: { shop_id: self.id })
+      .distinct
+      .count(:cart_token)
+
+    return total_stat
+  end
+
+  # Calculate stat data for each kind of stat
+  def db_calculate_offer_stat(period, stat_field)
+    start_date, end_date = self.period_to_date_range(period).values_at(:start_date, :end_date)
+
+    # Fetch the sum of stat_field for the entire period in one query
+    total_stat = DailyStat.where(shop_id: self.id).where('created_at >= ? and created_at <= ?', start_date, end_date).sum(stat_field)
+  
+    total_stat
+  end
+
+  def cached_sales_stats(period)
+    results = self.fetch_data_from_redis(['shop:sale:total'], period)
+    { results: results['shop:sale:total'], sales_total: results['shop:sale:total'].sum { |r| r[:value] } }
+  end
+  
+  def cached_upsells_stats(period)
+    results = self.fetch_data_from_redis(['shop:sale:upsell'], period)    
+    { results: results['shop:sale:upsell'], upsells_total: results['shop:sale:upsell'].sum { |r| r[:value] } }
+  end
+
+  def cached_clicks_stats(period)
+    results = self.fetch_data_from_redis(['shop:click:count'], period)
+    { results: results['shop:click:count'], clicks_total: results['shop:click:count'].sum { |r| r[:value] } }
+  end
+
+  def cached_orders_stats(period)
+    results = self.fetch_data_from_redis(['shop:order:count'], period)
+    { results: results['shop:order:count'], orders_total: results['shop:order:count'].sum { |r| r[:value] } }
+  end
+
+  # Get stats data for times_loaded
+  def cached_offers_stats_times_loaded(period)
+    results = self.fetch_data_from_redis(['shop:show:count'], period)
+    results['shop:show:count'].sum { |r| r[:value] }
+  end
+
+  # Get stats data for times_clicked
+  def cached_offers_stats_times_clicked(period)
+    results = self.fetch_data_from_redis(['shop:click:count'], period)
+    results['shop:click:count'].sum { |r| r[:value] }
+  end
+
+  # Get stats data for times_checkedout
+  def cached_offers_stats_times_checkedout(period)
+    results = self.fetch_data_from_redis(['shop:checkout:count'], period)
+    results['shop:checkout:count'].sum { |r| r[:value] }
+  end
+
+  # Get stats data for times_converted
+  def cached_offers_stats_times_converted(period)
+    results = self.fetch_data_from_redis(['shop:sale:count'], period)
+    results['shop:sale:count'].sum { |r| r[:value] }
   end
 
   # Private: calculate percentage difference between current week vs last week.
@@ -351,29 +422,5 @@ module Graphable
   def report_dates
     @report_dates ||= (created_at.in_time_zone(iana_timezone).to_date)..
                       (Time.now.in_time_zone(iana_timezone).to_date)
-  end
-
-  def construct_period_hash
-    {
-      'daily' => { interval: 6.hours, start_date: DateTime.now.beginning_of_day, last: DateTime.now.end_of_day },
-      'weekly' => { interval: 2.days, start_date: Date.today - 7.days, last: (Date.today - 1.day) },
-      'monthly' => { interval: 1.week, start_date: (Date.today.beginning_of_month - 1.month), last: (Date.today-1.months).end_of_month },
-      '3-months' => { interval: 1.month, start_date: (Date.today.beginning_of_month - 2.months), last: Date.today.end_of_month },
-      '6-months' => { interval: 2.months, start_date: (Date.today.beginning_of_month - 5.months), last: Date.today.end_of_month },
-      'yearly' => { interval: 3.months, start_date: Date.today.beginning_of_year, last: Date.today.end_of_year },
-      'all' => { interval: 6.months, start_date: self.created_at, last: Date.today.end_of_month }
-    }
-  end
-
-  def construct_lable_hash(start_date, end_date)
-    {
-      'daily' => ->(start_date, end_date) { "#{start_date.hour} - #{end_date.hour}" },
-      'weekly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
-      'monthly' => ->(start_date, end_date) { "#{start_date} - #{end_date}" },
-      '3-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
-      '6-months' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
-      'yearly' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" },
-      'all' => ->(start_date, end_date) { "#{start_date.month} - #{end_date.month} months of #{start_date.year}" }
-    }
   end
 end

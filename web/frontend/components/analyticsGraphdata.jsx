@@ -2,9 +2,12 @@ import {
     HorizontalStack,
     LegacyCard,
     VerticalStack,
+    Tooltip,
     Text,
+    Icon,
     Divider,
 } from '@shopify/polaris';
+import { InfoMinor } from '@shopify/polaris-icons';
 import React, { useEffect, useState } from 'react';
 import { PolarisVizProvider, StackedAreaChart } from '@shopify/polaris-viz';
 import { useAuthenticatedFetch } from "../hooks";
@@ -12,18 +15,90 @@ import { useSelector } from 'react-redux';
 import '@shopify/polaris-viz/build/esm/styles.css';
 import { Redirect } from '@shopify/app-bridge/actions';
 import { useAppBridge } from "@shopify/app-bridge-react";
+import { DateRangeOptions, defaultResults } from '../shared/constants/AnalyticsOptions';
 
+const getCardTitleByPeriod = (period) => DateRangeOptions.find((item) => item.value === period).label
+let formatter = Intl.NumberFormat('en', { notation: 'compact' });
+
+const PolarisChart = ({ cardTitle, chartTitle, tooltipText, total, loading, chartData, metric }) => {
+    return (
+
+        <PolarisVizProvider
+            themes={{
+                Default: {
+                    arc: {
+                        cornerRadius: 5,
+                        thickness: 50
+                    }
+                }
+            }}
+        >
+        <LegacyCard style={{ minHeight: 365 }} title={cardTitle} sectioned>
+        <div className='icu-card-content'>
+            <CustomTooltip title={tooltipText}>
+                <span style={{ fontSize: 'small' }}>{`What's this?`}</span>
+            </CustomTooltip>
+            <h3 className="report-money"><strong>{total}</strong></h3>
+            <div className="space-4"></div>
+            <p>{chartTitle} </p><br />
+            <div className="space-5"></div>
+            {loading ? (<StackedAreaChart
+                isAnimated={true}
+                data={[
+                    {
+                        "name": metric,
+                        "data": defaultResults
+                    },
+                ]}
+                legendPosition="left"
+                theme='Light'
+                state="loading"
+            /> ) : (
+                
+            <StackedAreaChart
+            isAnimated={true}
+            data={[
+                {
+                    "name": metric,
+                    "data": chartData
+                },
+            ]}
+            legendPosition="left"
+            theme='Light'
+        />
+            )}
+        </div>
+    </LegacyCard>
+        </PolarisVizProvider>
+    )
+}
+
+export function CustomTooltip({ title, children }) {
+    return (
+        <>
+            <Tooltip content={title}>
+                <div style={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+                    {children}
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Icon source={InfoMinor} color="base" />
+                    </div>
+                </div>
+            </Tooltip>
+        </>
+    );
+}
 
 export function TotalSalesData(props) {
     const app = useAppBridge();
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [salesTotal, setSalesTotal] = useState(0);
-    const [salesData, setSalesData] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [salesData, setSalesData] = useState(undefined);
+
     function getSalesData(period) {
         let redirect = Redirect.create(app);
-        if(loading) return;
+        if (loading) return;
         setLoading(true)
         fetch(`/api/v2/merchant/shop_sale_stats`, {
             method: 'POST',
@@ -37,9 +112,63 @@ export function TotalSalesData(props) {
                 if (data.redirect_to) {
                     redirect.dispatch(Redirect.Action.APP, data.redirect_to);
                 } else {
-                setSalesTotal(data.sales_stats.sales_total)
-                setSalesData(data.sales_stats.results);
-                }})
+                    setSalesTotal(data.sales_stats.sales_total)
+                    setSalesData(data.sales_stats.results);
+                    setLoading(false)
+                }
+            })
+            .catch((error) => {
+                if (props.onError) {
+                    props.onError(error);
+                }
+                setLoading(false)
+            });
+    }
+
+    useEffect(() => {
+        getSalesData(props.period);
+    }, [props.period])
+
+    return (
+        <PolarisChart
+            cardTitle={`${props.title ? getCardTitleByPeriod(props.period) : ''} Total Sales`}
+            chartTitle="SALES OVER TIME"
+            tooltipText="All sales generated from any orders containing an upsell/cross-sell product."
+            total={`$${salesTotal.toFixed(2)}`}
+            loading={loading}
+            chartData={salesData}
+            metric="Revenue"
+        />
+    );
+}
+
+export function TotalUpSellsData(props) {
+    const app = useAppBridge();
+    const shopAndHost = useSelector(state => state.shopAndHost);
+    const fetch = useAuthenticatedFetch(shopAndHost.host);
+    const [salesTotal, setSalesTotal] = useState(0);
+    const [salesData, setSalesData] = useState(defaultResults);
+    const [loading, setLoading] = useState(false);
+    function getSalesData(period) {
+        let redirect = Redirect.create(app);
+        if (loading) return;
+        setLoading(true)
+        fetch(`/api/v2/merchant/shop_upsell_stats`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ shop: shopAndHost.shop, period: period }),
+        })
+            .then((response) => { return response.json(); })
+            .then((data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                } else {
+                    setSalesTotal(data.upsells_stats.upsells_total)
+                    setSalesData(data.upsells_stats.results);
+                }
+            })
             .catch((error) => {
                 if (props.onError) {
                     props.onError(error);
@@ -54,41 +183,17 @@ export function TotalSalesData(props) {
     }, [props.period])
 
     return (
-        <PolarisVizProvider
-            themes={{
-                Default: {
-                    arc: {
-                        cornerRadius: 5,
-                        thickness: 50
-                    }
-                }
-            }}
-        >
-            <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Total Sales`} sectioned>
-                {salesData ? (<h3 className="report-money"><strong>${salesTotal}</strong></h3>) : null}
-                <div className="space-4"></div>
-                <p>SALES OVER TIME</p><br />
-                {loading ? "Loading..." : salesData ? (<StackedAreaChart
-                    isAnimated={true}
-                    comparisonMetric={{
-                        accessibilityLabel: 'trending up 6%',
-                        metric: '6%',
-                        trend: 'positive'
-                    }}
-                    data={[
-                        {
-                            "name": "Revenue",
-                            "data": salesData
-                        },
-                    ]}
-                    legendPosition="left"
-                    theme='Light'
-                />) : null}
-            </LegacyCard>
-        </PolarisVizProvider>
+        <PolarisChart
+            cardTitle={`${props.title ? getCardTitleByPeriod(props.period) : ''} Total Upsell Revenue`}
+            chartTitle="UPSELLS OVER TIME"
+            tooltipText="All revenue generated from only upsell/cross-sell products."
+            total={`$${salesTotal.toFixed(2)}`}
+            loading={loading}
+            chartData={salesData}
+            metric="Revenue"
+        />
     );
 }
-
 
 export function ConversionRate(props) {
     const app = useAppBridge();
@@ -120,15 +225,29 @@ export function ConversionRate(props) {
     function getOffersStatsTimesLoaded(period) {
         let redirect = Redirect.create(app);
         getOffersStats(
-            `/api/v2/merchant/shop_offers_stats_times_loaded`, 
-            period, 
+            `/api/v2/merchant/shop_offers_stats_times_loaded`,
+            period,
             (data) => {
                 if (data.redirect_to) {
                     redirect.dispatch(Redirect.Action.APP, data.redirect_to);
                 } else {
-                setTotalDisplayed(data.stat_times_loaded);
-                setConverted(data.orders_through_offers_count);
-            }});
+                    setTotalDisplayed(data.stat_times_loaded);
+                }
+            });
+    }
+
+    function getOffersStatsTimesConverted(period) {
+        let redirect = Redirect.create(app);
+        getOffersStats(
+            `/api/v2/merchant/shop_offers_stats_times_converted`,
+            period,
+            (data) => {
+                if (data.redirect_to) {
+                    redirect.dispatch(Redirect.Action.APP, data.redirect_to);
+                } else {
+                    setConverted(data.stat_times_converted);
+                }
+            });
     }
 
     function getOffersStatsTimesClicked(period) {
@@ -149,29 +268,35 @@ export function ConversionRate(props) {
 
     useEffect(() => {
         getOffersStatsTimesLoaded(props.period);
+        getOffersStatsTimesConverted(props.period);
         getOffersStatsTimesClicked(props.period);
         getOffersStatsTimesCheckedout(props.period);
     }, [props.period])
 
     return (
-        <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Conversion Rate`} sectioned>
-            <h3 className="report-money"><strong>{totalDisplayed > 0 ? ((converted / totalDisplayed) * 100).toFixed(2) : 0}%</strong></h3>
-            <div className="space-4"></div>
-            <p>CONVERSION FUNNEL</p><br />
-            <VerticalStack gap={"6"}>
-                <div height="50px">
-                    <span>Added to cart</span><span style={{ float: 'right' }}>{totalDisplayed > 0 ? ((addedToCart / totalDisplayed) * 100).toFixed(2) : 0}%</span>
-                    <div style={{ color: 'grey' }}>{addedToCart >= 0 ? addedToCart : 0} sessions</div>
-                </div>
-                <div height="50px">
-                    <span>Reached Checkout</span><span style={{ float: 'right' }}>{totalDisplayed > 0 ? ((reachedCheckout / totalDisplayed) * 100).toFixed(2) : 0}%</span>
-                    <div style={{ color: 'grey' }}>{reachedCheckout >= 0 ? reachedCheckout : 0} sessions</div>
-                </div>
-                <div height="50px">
-                    <span>Sessions converted</span><span style={{ float: 'right' }}>{totalDisplayed > 0 ? ((converted / totalDisplayed) * 100).toFixed(2) : 0}%</span>
-                    <div style={{ color: 'grey' }}>{converted >= 0 ? converted : 0} sessions</div>
-                </div>
-            </VerticalStack>
+        <LegacyCard style={{ minHeight: 365 }} title={`${props.title ? getCardTitleByPeriod(props.period) : ''} Conversion Rate`} sectioned>
+            <div className='icu-card-content'>
+                <CustomTooltip title="The percentage of users who moved to each step, compared to total views.">
+                    <span style={{ fontSize: 'small' }}>{`What's this?`}</span>
+                </CustomTooltip>
+                <h3 className="report-money"><strong>{totalDisplayed > 0 ? ((converted / totalDisplayed) * 100).toFixed(2) : 0}%</strong></h3>
+                <div className="space-4"></div>
+                <p>CONVERSION FUNNEL</p><br />
+                <VerticalStack gap={"6"}>
+                    <div height="50px">
+                        <span>Added to cart</span><span style={{ float: 'right' }}>{totalDisplayed > 0 ? ((addedToCart / totalDisplayed) * 100).toFixed(2) : 0}%</span>
+                        <div style={{ color: 'grey' }}>{addedToCart >= 0 ? addedToCart : 0} sessions</div>
+                    </div>
+                    <div height="50px">
+                        <span>Reached checkout</span><span style={{ float: 'right' }}>{totalDisplayed > 0 ? ((reachedCheckout / totalDisplayed) * 100).toFixed(2) : 0}%</span>
+                        <div style={{ color: 'grey' }}>{reachedCheckout >= 0 ? reachedCheckout : 0} sessions</div>
+                    </div>
+                    <div height="50px">
+                        <span>Sessions converted</span><span style={{ float: 'right' }}>{totalDisplayed > 0 ? ((converted / totalDisplayed) * 100).toFixed(2) : 0}%</span>
+                        <div style={{ color: 'grey' }}>{converted >= 0 ? converted : 0} sessions</div>
+                    </div>
+                </VerticalStack>
+            </div>
         </LegacyCard>
     );
 }
@@ -182,11 +307,11 @@ export function OrderOverTimeData(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [ordersTotal, setOrdersTotal] = useState(0);
-    const [ordersData, setOrdersData] = useState(null);
-    const [loading, setLoading] = useState(false); 
+    const [ordersData, setOrdersData] = useState(defaultResults);
+    const [loading, setLoading] = useState(false);
     function getOrdersData(period) {
         let redirect = Redirect.create(app);
-        if(loading) return;
+        if (loading) return;
         setLoading(true)
         fetch(`/api/v2/merchant/shop_orders_stats`, {
             method: 'POST',
@@ -200,9 +325,10 @@ export function OrderOverTimeData(props) {
                 if (data.redirect_to) {
                     redirect.dispatch(Redirect.Action.APP, data.redirect_to);
                 } else {
-                setOrdersTotal(data.orders_stats.orders_total)
-                setOrdersData(data.orders_stats.results)
-            }})
+                    setOrdersTotal(data.orders_stats.orders_total)
+                    setOrdersData(data.orders_stats.results)
+                }
+            })
             .catch((error) => {
                 if (props.onError) {
                     props.onError(error);
@@ -218,36 +344,16 @@ export function OrderOverTimeData(props) {
 
 
     return (
-        <PolarisVizProvider
-            themes={{
-                Default: {
-                    arc: {
-                        cornerRadius: 5,
-                        thickness: 50
-                    }
-                }
-            }}
-        >
-            <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Total Orders`} sectioned>
-                {ordersData ? (<h3 className="report-money"><strong>{ordersTotal}</strong></h3>) : null}
-                <div className="space-4"></div>
-                <p>ORDERS OVER TIME</p><br />
-                <div className="space-5"></div>
-                {loading ? "Loading..." : ordersData ? (<StackedAreaChart
-                    comparisonMetric={{
-                        accessibilityLabel: 'trending up 6%',
-                        metric: '6%',
-                        trend: 'positive'
-                    }}
-                    data={[{
-                        "name": "Orders",
-                        "data": ordersData
-                    }]}
-                    legendPosition="left"
-                    theme='Light'
-                />) : null}
-            </LegacyCard>
-        </PolarisVizProvider>
+
+        <PolarisChart
+            cardTitle={`${props.title ? getCardTitleByPeriod(props.period) : ''} Total Orders`}
+            chartTitle="ORDERS OVER TIME"
+            tooltipText="All orders containing an upsell/cross-sell product."
+            total={ordersTotal}
+            loading={loading}
+            chartData={ordersData}
+            metric="Orders"
+        />
     );
 
 }
@@ -274,8 +380,9 @@ export function TopPerformingOffersData(props) {
                 if (data.redirect_to) {
                     redirect.dispatch(Redirect.Action.APP, data.redirect_to);
                 } else {
-                setOffersData(data.offers);
-            }})
+                    setOffersData(data.offers);
+                }
+            })
             .catch((error) => {
                 if (props.onError) {
                     props.onError(error);
@@ -299,26 +406,36 @@ export function TopPerformingOffersData(props) {
                 }
             }}
         >
-            <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Top performing offers`} sectioned>
-                <div className="space-4"></div>
-                <VerticalStack align='center'>
-                    {
-                        offersData.map((item, idx) => {
-                            return (
-                                <div key={idx}>
-                                    <Divider />
-                                    <div style={{ padding: '16px 0' }}>
-                                        <HorizontalStack align="space-between">
-                                            <Text as="p">{item.title}</Text>
-                                            <Text as="p">{item.clicks} clicks</Text>
-                                            <Text as="p">$ {item.revenue}</Text>
-                                        </HorizontalStack>
+            <LegacyCard style={{ minHeight: 365 }} title={`${props.title ? getCardTitleByPeriod(props.period) : ''} Top Performing Offers`} sectioned>
+                <div className='icu-card-content'>
+
+                    <CustomTooltip title="Your highest revenue generating offers from only upsell/cross-sell products.">
+                        <span style={{ fontSize: 'small' }}>{`What's this?`}</span>
+                    </CustomTooltip>
+                    <div className="space-4"></div>
+                    <VerticalStack align='center'>
+                        {
+                            (offersData || []).map((item, idx) => {
+                                return (
+                                    <div key={idx}>
+                                        <Divider />
+                                        <div style={{ padding: '16px 0' }}>
+                                            <HorizontalStack align="space-between">
+                                                <div style={{ maxWidth: '20ch' }}>
+                                                    <Text truncate={true} as="p">{item.title}</Text>
+                                                </div>
+                                                <div style={{ maxWidth: '8ch' }}>
+                                                    <Text truncate={true} as="p">$ {formatter.format(parseFloat(item.revenue.toFixed(2)))}</Text>
+                                                </div>
+                                            </HorizontalStack>
+                                        </div>
                                     </div>
-                                </div>
-                            )
-                        })
-                    }
-                </VerticalStack>
+                                )
+                            })
+                        }
+                        {!offersData?.length && <Text as="p">{`No Offers to display for this time period.`}</Text>}
+                    </VerticalStack>
+                </div>
             </LegacyCard>
         </PolarisVizProvider>
     )
@@ -333,7 +450,7 @@ export function AbTestingData(props) {
     const [loading, setLoading] = useState(false);
     function getSalesData(period) {
         let redirect = Redirect.create(app);
-        if(loading) return;
+        if (loading) return;
         setLoading(true)
 
         fetch(`/api/v2/merchant/shop_sale_stats`, {
@@ -348,9 +465,10 @@ export function AbTestingData(props) {
                 if (data.redirect_to) {
                     redirect.dispatch(Redirect.Action.APP, data.redirect_to);
                 } else {
-                setSalesTotal(data.sales_stats.sales_total)
-                setSalesData(data.sales_stats.results);
-            }})
+                    setSalesTotal(data.sales_stats.sales_total)
+                    setSalesData(data.sales_stats.results);
+                }
+            })
             .catch((error) => {
                 if (props.onError) {
                     props.onError(error);
@@ -364,40 +482,16 @@ export function AbTestingData(props) {
         getSalesData(props.period);
     }, [props.period])
 
-
     return (
-        <PolarisVizProvider
-            themes={{
-                Default: {
-                    arc: {
-                        cornerRadius: 5,
-                        thickness: 50
-                    }
-                }
-            }}
-        >
-            <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} A/B testing`} sectioned>
-                {salesData ? (<h3 className="report-money"><strong>${salesTotal}</strong></h3>) : null}
-                <div className="space-4"></div>
-                <p>SALES OVER TIME</p><br />
-                {loading ? "Loading..." : salesData ? (<StackedAreaChart
-                    isAnimated={true}
-                    comparisonMetric={{
-                        accessibilityLabel: 'trending up 6%',
-                        metric: '6%',
-                        trend: 'positive'
-                    }}
-                    data={[
-                        {
-                            "name": "Revenue",
-                                "data": salesData
-                        },
-                    ]}
-                    legendPosition="left"
-                    theme='Light'
-                />) : null}
-            </LegacyCard>
-        </PolarisVizProvider>
+        <PolarisChart
+            cardTitle={`${props.title ? getCardTitleByPeriod(props.period) : ''} A/B testing`}
+            chartTitle="SALES OVER TIME"
+            tooltipText="All sales generated from any orders containing an upsell/cross-sell product."
+            total={`$${salesTotal.toFixed(2)}`}
+            loading={loading}
+            chartData={salesData}
+            metric="Revenue"
+        />
     );
 
 }
@@ -407,12 +501,12 @@ export function ClickThroughtRateData(props) {
     const shopAndHost = useSelector(state => state.shopAndHost);
     const fetch = useAuthenticatedFetch(shopAndHost.host);
     const [clicksTotal, setClicksTotal] = useState(0);
-    const [clicksData, setClicksData] = useState(null);
-    const [loading, setLoading] = useState(false); 
+    const [clicksData, setClicksData] = useState(defaultResults);
+    const [loading, setLoading] = useState(false);
 
     function getClicksData(period) {
         let redirect = Redirect.create(app);
-        if(loading) return;
+        if (loading) return;
         setLoading(true)
         fetch(`/api/v2/merchant/shop_clicks_stats`, {
             method: 'POST',
@@ -426,9 +520,10 @@ export function ClickThroughtRateData(props) {
                 if (data.redirect_to) {
                     redirect.dispatch(Redirect.Action.APP, data.redirect_to);
                 } else {
-                setClicksTotal(data.clicks_stats.clicks_total)
-                setClicksData(data.clicks_stats.results)
-            }})
+                    setClicksTotal(data.clicks_stats.clicks_total)
+                    setClicksData(data.clicks_stats.results)
+                }
+            })
             .catch((error) => {
                 if (props.onError) {
                     props.onError(error);
@@ -442,35 +537,14 @@ export function ClickThroughtRateData(props) {
     }, [props.period])
 
     return (
-        <PolarisVizProvider
-            themes={{
-                Default: {
-                    arc: {
-                        cornerRadius: 5,
-                        thickness: 50
-                    }
-                }
-            }}
-        >
-            <LegacyCard title={`${props.title ? `${props.period[0].toUpperCase()}${props.period.substring(1)} ` : ''} Click through rate`} sectioned>
-                {clicksData ? (<h3 className="report-money"><strong>{clicksTotal}</strong></h3>) : null}
-                <div className="space-4"></div>
-                <p>Clicks through rate over time</p><br />
-                <div className="space-5"></div>
-                {loading ? "Loading..." : clicksData ? (<StackedAreaChart
-                    comparisonMetric={{
-                        accessibilityLabel: 'trending up 6%',
-                        metric: '6%',
-                        trend: 'positive'
-                    }}
-                    data={[{
-                        "name": "Clicks through rate",
-                        "data": clicksData
-                    }]}
-                    legendPosition="left"
-                    theme='Light'
-                />) : null}
-            </LegacyCard>
-        </PolarisVizProvider>
+        <PolarisChart
+            cardTitle={`${props.title ? getCardTitleByPeriod(props.period) : ''} Total Clicks`}
+            chartTitle="CLICKS OVER TIME"
+            tooltipText="The number of users who clicked on your offers."
+            total={clicksTotal}
+            loading={loading}
+            chartData={clicksData}
+            metric="Clicks"
+        />
     );
 }

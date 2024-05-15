@@ -12,6 +12,7 @@ export { CustomTitleBar } from "./CustomTitleBar";
 export { GenericFooter} from "./GenericFooter";
 export {
   TotalSalesData,
+  TotalUpSellsData,
   ConversionRate,
   OrderOverTimeData,
   TopPerformingOffersData,

@@ -1281,81 +1281,231 @@ class Shop < ApplicationRecord
     end
     # subscription.update_attribute(:free_plan_after_trial, false)
   end
-
-  def offer_data_with_stats
-    data = []
-    offers
-      .select('offers.id, offers.shop_id, offers.title, offers.active, offers.total_clicks, offers.total_views, offers.total_revenue, offers.created_at, offers.offerable_type')
-      .group('offers.id')
-      .each do |offer|
-      data << {
-        id: offer.id,
-        title: offer.title,
-        status: offer.active,
-        clicks: offer.total_clicks,
-        views: offer.total_views,
-        revenue: offer.total_revenue,
-        created_at: offer.created_at.to_datetime,
-        offerable_type: offer.offerable_type,
-      }
-    end
-    return data
+  def offer_data_with_stats(page_size = 10)
+    return Offer.unscoped
+      .where(shop_id: self.id)
+      .order(active: :desc, total_revenue: :desc)
+      .limit(page_size)
+      .select([:id, :shop_id, :title, :active, :total_clicks, :total_views, :total_revenue, :created_at, :offerable_type])
+      .map do |offer|
+        {
+          id: offer.id,
+          title: offer.title,
+          status: offer.active,
+          clicks: offer.total_clicks,
+          views: offer.total_views,
+          revenue: offer.total_revenue,
+          created_at: offer.created_at.to_datetime,
+          offerable_type: offer.offerable_type
+        }
+      end
   end
 
-  def offer_data_with_stats_by_period(period)
-    start_date, end_date = period_hash_to_offers[period].values_at(:start_date, :end_date)
+  def offer_data_with_stats_by_period(period, mode)
+    $redis_stats_cache.hget("use:cache:#{self.id}", 'analytics') == '1' ? cached_offer_data_with_stats_by_period(period) : db_offer_data_with_stats_by_period(period)
+  end
+  
 
-    # Define the CTE with the proper WITH clause
-    combined_stats_cte = <<-SQL
-      WITH combined_stats AS (
-        SELECT
-          d.offer_id,
-          SUM(d.times_clicked) AS total_clicks,
-          SUM(d.times_loaded) AS total_views,
-          SUM(e.amount) FILTER (WHERE e.action = 'sale') AS total_revenue
-        FROM
-          daily_stats d
-          LEFT JOIN offer_events e ON d.offer_id = e.offer_id AND e.created_at BETWEEN '#{start_date}' AND '#{end_date}'
-        WHERE
-          d.created_at BETWEEN '#{start_date}' AND '#{end_date}'
-          AND d.shop_id = #{self.id} -- Assuming DailyStat has a shop_id column
-        GROUP BY
-          d.offer_id
-      )
-    SQL
 
-    # Main query referencing the CTE
-    query = <<-SQL
-      #{combined_stats_cte}
-      SELECT
-        o.id, o.shop_id, o.title, o.active, o.created_at,
-        COALESCE(cs.total_clicks, 0) AS total_clicks,
-        COALESCE(cs.total_views, 0) AS total_views,
-        COALESCE(cs.total_revenue, 0) AS total_revenue
-      FROM
-        offers o
-        LEFT OUTER JOIN combined_stats cs ON cs.offer_id = o.id
-      WHERE
-        o.shop_id = #{self.id}
-      ORDER BY
-        total_revenue DESC
-      LIMIT 3
-    SQL
-
-    # Execute the query
-    data = ActiveRecord::Base.connection.execute(query).map do |offer|
-      {
-        id: offer['id'],
-        title: offer['title'],
-        status: offer['active'],
-        clicks: offer['total_clicks'],
-        views: offer['total_views'],
-        revenue: offer['total_revenue'],
-        created_at: offer['created_at']
-      }
+  def date_intervals(start_date, end_date, interval)
+    if start_date.is_a?(String) 
+      start_date = start_date.to_datetime
     end
 
-    return data
+    if end_date.is_a?(String)
+      end_date = end_date.to_datetime
+    end
+    
+    dates = []
+    current_date = start_date
+
+    while current_date <= end_date
+      dates << current_date
+      case interval
+      when 'hourly'
+        current_date += Rational(1, 24) # Increment by one hour
+      when /(\d+)-days/
+        current_date += 1
+      else
+        current_date = current_date.next_month
+      end
+    end
+
+    dates.uniq
+  end
+
+  def period_trunc(period)
+    date_trunc = case period
+      when 'hourly'
+        'hour'
+      when /(\d+)-days/
+        'day'
+      else
+        'month'
+      end
+    return date_trunc
+  end
+
+  def format_label_for_period(date, period)
+    target_format = self.period_key_date_formats(period)[:target_format]
+    date.strftime(target_format)
+  end
+
+  def period_key_date_formats(period)
+    source_format = '%Y%m%d'
+    target_format = '%Y-%m-%d'
+    case period
+    when 'hourly'
+      source_format = "%Y%m%d%H"
+      target_format = "%-l%p"
+    when /(\d+)-days/
+      source_format = "%Y%m%d"
+      target_format = "%Y-%m-%d"
+    else
+      source_format = "%Y%m"
+      target_format = "%Y-%m"
+    end
+    return { source_format: source_format, target_format: target_format }
+  end
+
+  def period_to_date_range(period)
+    # Define the start date based on the time range
+    start_date = case period
+      when 'hourly'
+        (DateTime.now - 24.hours).beginning_of_hour
+      when /(\d+)-days/
+        # Extract the number of days from the time range
+        num_days = period.match(/(\d+)-days/)[1].to_i
+        num_days.days.ago.beginning_of_day.to_date
+      when /(\d+)-months/
+        # Extract the number of months from the time range
+        num_months = period.match(/(\d+)-months/)[1].to_i
+        num_months.months.ago.beginning_of_month.to_date
+      when 'previous-year'
+        Date.today.prev_year.beginning_of_year
+      when 'current-year'
+        Date.today.beginning_of_year
+      when 'all'
+        self.created_at.to_date # Adjust 'self.created_at' as needed
+      else
+        raise ArgumentError, "Invalid time range specified."
+      end
+  
+    end_date = case period
+      when 'hourly'
+        (DateTime.now.beginning_of_hour - 1.hour).end_of_hour
+      when /(\d+)-days/
+        Date.today.prev_day.end_of_day
+      when /(\d+)-months/
+        Date.today.prev_month.to_date.end_of_month.end_of_day
+      when 'previous-year'
+        Date.today.prev_year.end_of_year.end_of_day
+      when 'current-year'
+        Date.today.prev_day.end_of_day
+      when 'all'
+        Date.today.prev_month.to_date.end_of_month.end_of_day
+      else
+        raise ArgumentError, "Invalid time range specified."
+      end
+
+    interval = case period
+      when 'hourly'
+        1.hour
+      when /(\d+)-days/
+        1.day
+      else
+        1.month
+      end
+
+    return { start_date: start_date, end_date: end_date, interval: interval }
+  end
+
+  #consider creating another function which uses a LUA script to fetch to sum the values when only totals are required
+  def fetch_data_from_redis(actions, time_range, shop_id = self.id)
+    # Validate input
+    raise ArgumentError, "Actions must be an array" unless actions.is_a?(Array)
+
+    start_date, end_date, interval = self.period_to_date_range(time_range).values_at(:start_date, :end_date, :interval)
+    # Initialize a hash to keep track of the keys for each action
+    action_keys = Hash.new { |hash, key| hash[key] = [] }
+
+    # Collect all keys across actions
+    all_keys = []
+    actions.each do |action|
+      current_date = start_date
+      while current_date <= end_date
+        
+        key_suffix_format = self.period_key_date_formats(time_range)[:source_format]
+        key_suffix = current_date.strftime(key_suffix_format)
+        key = "#{action}:#{key_suffix}:#{shop_id}"
+        all_keys << key
+        action_keys[action] << key
+
+        # Increment by one day for hourly/daily/monthly, by one month otherwise
+        current_date += interval
+      end
+    end
+
+    # Use MGET to fetch all values at once
+    all_values = $redis_stats_cache.mget(*all_keys)
+
+    # Initialize a result hash to store counts for each action
+    results = {}
+
+    # Distribute the fetched values into individual lists for each action
+    action_keys.each do |action, keys|
+      value_type = "float"
+      if action.include?("count")
+        value_type = "int"
+      end
+      action_results = keys.each_with_index.map do |key, index|
+        global_index = all_keys.index(key) # Find the index of the key in the global all_keys array
+        date_string = key.split(":")[-2]
+        
+        date_format, target_format = self.period_key_date_formats(time_range).values_at(:source_format, :target_format)
+
+        ui_key = DateTime.strptime(date_string, date_format).strftime(target_format)
+
+        value = 0
+        
+        if value_type == "int"
+          value = all_values[global_index].to_i
+        else 
+          value = all_values[global_index].to_f
+        end
+
+        { key: ui_key, value: value } # Use the global index to fetch the corresponding value
+      end
+      results[action] = action_results
+    end
+  
+    results
+  end
+
+  def fetch_top_selling_offers(start_date, end_date = Date.today.end_of_day, shop_id = self.id)
+    # Validate input dates
+    raise ArgumentError, "start_date must be before end_date" unless start_date < end_date
+    
+    # Generate the Redis keys for the date range
+    keys = (start_date..end_date).map do |date|
+      "offer:sale:upsell:#{date.strftime("%Y%m%d")}:#{shop_id}"
+    end
+
+    # Temporary key for storing aggregated results
+    temp_aggregate_key = "temp:offer:sale:upsell:#{start_date.strftime("%Y%m%d")}-#{end_date.strftime("%Y%m%d")}:#{shop_id}"
+
+    # Use ZUNIONSTORE to aggregate data across the date range into the temporary key
+    # The number of keys is set to keys.length, and the aggregation method is set to sum the scores
+    $redis_stats_cache.zunionstore(temp_aggregate_key, keys, aggregate: 'SUM')
+
+    # Set an expiry for the temporary key to avoid clutter
+    $redis_stats_cache.expire(temp_aggregate_key, 10 * 60) # Expires after 10 minutes
+
+    # Fetch the top N offers from the aggregated set, e.g., top 10
+    top_offers = $redis_stats_cache.zrange(temp_aggregate_key, 0, 3, with_scores: true, rev: true)
+
+    # Convert the results to a more readable format [{id: offer_id, revenue: total_sales}]
+    top_offers.map { |offer_id, total_sales| {id: offer_id.to_f, revenue: total_sales} }
   end
 
   def publish_or_delete_script_tag
@@ -1468,6 +1618,30 @@ class Shop < ApplicationRecord
   end
 
   private
+
+  def db_offer_data_with_stats_by_period(period)
+    start_date, end_date = self.period_to_date_range(period).values_at(:start_date, :end_date)
+  
+    data = OfferEvent.joins(:offer).where(offers: { shop_id: self.id }, action: "sale", created_at: start_date..end_date)
+    .group(:offer_id, 'offers.title')
+    .order("SUM(offer_events.amount) DESC")
+    .limit(5)
+    .select("offer_events.offer_id as id, SUM(offer_events.amount) AS revenue, offers.title").to_a
+
+    return data
+  end
+
+  def cached_offer_data_with_stats_by_period(period)
+    start_date, end_date = self.period_to_date_range(period).values_at(:start_date, :end_date)
+  
+    top_offers = fetch_top_selling_offers(start_date, end_date)
+
+    offer_ids = top_offers.map { |offer| offer[:id] }
+    data = Offer.where(id: offer_ids).select([:id, :title]).map do |offer|
+      top_offers.find { |top_offer| top_offer[:id] == offer.id }.merge(title: offer.title)
+    end
+    return data
+  end
 
   # Private. get the index.js file from webpack (dev) or rendered.
   #

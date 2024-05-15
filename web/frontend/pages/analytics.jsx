@@ -11,11 +11,11 @@ import { fetchShopData } from '../services/actions/shop';
 import { setIsSubscriptionUnpaid } from '../store/reducers/subscriptionPaidStatusSlice';
 import {
   TotalSalesData,
+  TotalUpSellsData,
   ConversionRate,
   TopPerformingOffersData,
   OrderOverTimeData,
   CustomTitleBar,
-  AbTestingData,
   ClickThroughtRateData
 } from "../components";
 import {useShopState} from "../contexts/ShopContext.jsx";
@@ -47,16 +47,6 @@ export default function AnalyticsOffers() {
       setShowBanner(true);
     };
 
-    const options = [
-      {label: 'Today', value: 'daily'},
-      {label: 'Last week', value: 'weekly'},
-      {label: 'Last Month', value: 'monthly'},
-      {label: 'This 3 Months', value: '3-months'},
-      {label: 'This 6 Months', value: '6-months'},
-      {label: 'This year', value: 'yearly'},
-      {label: 'All time', value: 'all'},
-    ];
-
     return (
       <Page>
         <ModalChoosePlan />
@@ -81,15 +71,15 @@ export default function AnalyticsOffers() {
         <div id={"graphs"}>
           <Grid>
             <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 4, xl: 4 }}>
-              <TotalSalesData period={period} onError={handleError}/>
-              <AbTestingData period={period} onError={handleError}/>
+              <TotalSalesData period={period} onError={handleError} />
+              <ClickThroughtRateData period={period} onError={handleError}  />
             </Grid.Cell>
             <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 4, xl: 4 }}>
-              <ConversionRate period={period} onError={handleError}/>
-              <ClickThroughtRateData period={period} onError={handleError} />
+              <TotalUpSellsData period={period} onError={handleError} />
+              <ConversionRate period={period } onError={handleError} />
             </Grid.Cell>
             <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 4, xl: 4 }}>
-              <OrderOverTimeData period={period} onError={handleError}/>
+              <OrderOverTimeData period={period} onError={handleError} />
               <TopPerformingOffersData period={period} onError={handleError} />
             </Grid.Cell>
           </Grid>
