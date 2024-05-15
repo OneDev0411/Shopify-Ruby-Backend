@@ -32,8 +32,8 @@
     margin-bottom: var(--p-space-10);
 }
 .report-money{
-    margin-top: -15px;
     font-size: 1.5em;
+    margin-top: 0.35rem;
 }
 .mx-width{
     max-width: 100px;
@@ -227,4 +227,11 @@
 
 .video-intro-section > .Polaris-LegacyCard {
     width: 40rem;
+}
+#graphs .Polaris-LegacyCard {
+    min-height: 391px;
+}
+
+.icu-card-content {
+    margin-top: -15px;
 }
