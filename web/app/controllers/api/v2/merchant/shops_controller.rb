@@ -104,8 +104,8 @@ module Api
 
         #GET /api/v2/merchant/toggle_activation
         def toggle_activation
-          @icushop.update_attribute(:activated, !@icushop.activated)
-          Sidekiq::Client.push('class' => 'ShopWorker::ForcePurgeCacheJob', 'args' => [@icushop.id], 'queue' => 'shop', 'at' => Time.now.to_i)
+          job = @icushop.activated ? enqueue_job('DisableJavaScriptJob') : enqueue_job('ForcePurgeCacheJob')
+          @icushop.update_columns(activated: !@icushop.activated, publish_job: job)
           render "shops/toggle_activation"
         end
 
@@ -142,22 +142,33 @@ module Api
         # Gets shop sale stats. POST  /api/v2/merchant/shops_sale_stats
         def shop_sale_stats
           begin
-            @sales_stats = @icushop.sales_stats(params[:period])
+            @sales_stats = @icushop.sales_stats(params[:period], params[:mode])
             render "shops/shop_sale_stats"
           rescue StandardError => e
             Rails.logger.debug "Error Message: #{e.message}"
-            Rollbar.error("Error", e)
+            ErrorNotifier.call(e)
+          end
+        end
+
+        # Gets shop sale stats. POST  /api/v2/merchant/shops_upsell_stats
+        def shop_upsell_stats
+          begin
+            upsells_stats = @icushop.upsells_stats(params[:period], params[:mode])
+            render json: {upsells_stats: upsells_stats}
+          rescue StandardError => e
+            Rails.logger.debug "Error Message: #{e.message}"
+            ErrorNotifier.call(e)
           end
         end
 
         # Gets shop orders stats. POST  /api/v2/merchant/shops_orders_stats
         def shop_orders_stats
           begin
-            @orders_stats = @icushop.orders_stats(params[:period])
+            @orders_stats = @icushop.orders_stats(params[:period], params[:mode])
             render "shops/shop_orders_stats"
           rescue StandardError => e
             Rails.logger.debug "Error Message: #{e.message}"
-            Rollbar.error("Error", e)
+            ErrorNotifier.call(e)
           end
         end
 
@@ -169,7 +180,7 @@ module Api
             render "shops/shop_offers_stats_click_revenue"
           rescue StandardError => e
             Rails.logger.debug "Error Message: #{e.message}"
-            Rollbar.error("Error", e)
+            ErrorNotifier.call(e)
           end
         end
 
@@ -177,11 +188,11 @@ module Api
         # POST /api/v2/merchant/shop_offers_stats_times_loaded
         def shops_offers_stats_times_loaded
           begin
-            @stat_times_loaded = @icushop.offers_stats_times_loaded(params[:period])
+            @stat_times_loaded = @icushop.offers_stats_times_loaded(params[:period], params[:mode])
             render "shops/shop_offers_stats_times_loaded"
           rescue StandardError => e
             Rails.logger.debug "Error Message: #{e.message}"
-            Rollbar.error("Error", e)
+            ErrorNotifier.call(e)
           end
         end
 
@@ -189,11 +200,11 @@ module Api
         # POST /api/v2/merchant/shop_offers_stats_times_clicked
         def shops_offers_stats_times_clicked
           begin
-            @stat_times_clicked = @icushop.offers_stats_times_clicked(params[:period])
+            @stat_times_clicked = @icushop.offers_stats_times_clicked(params[:period], params[:mode])
             render "shops/shop_offers_stats_times_clicked"
           rescue StandardError => e
             Rails.logger.debug "Error Message: #{e.message}"
-            Rollbar.error("Error", e)
+            ErrorNotifier.call(e)
           end
         end
 
@@ -201,25 +212,63 @@ module Api
         # POST /api/v2/merchant/shop_offers_stats_times_checkedout
         def shops_offers_stats_times_checkedout
           begin
-            @stat_times_checkedout = @icushop.offers_stats_times_checkedout(params[:period])
+            @stat_times_checkedout = @icushop.offers_stats_times_checkedout(params[:period], params[:mode])
             render "shops/shop_offers_stats_times_checkedout"
           rescue StandardError => e
             Rails.logger.debug "Error Message: #{e.message}"
-            Rollbar.error("Error", e)
+            ErrorNotifier.call(e)
+          end
+        end
+
+        # Gets total times_checkedout of offers stats data
+        # POST /api/v2/merchant/shop_offers_stats_times_converted
+        def shops_offers_stats_times_converted
+          begin
+            @stat_times_converted = @icushop.offers_stats_times_converted(params[:period], params[:mode])
+            puts "stat_times_converted: #{@stat_times_converted}"
+            render json: {stat_times_converted: @stat_times_converted}
+          rescue StandardError => e
+            Rails.logger.debug "Error Message: #{e.message}"
+            ErrorNotifier.call(e)
           end
         end
 
         # Gets all clicks stats. POST   /api/v2/merchant/shops_clicks_stats
         def shop_clicks_stats
           begin
-            @clicks_stats = @icushop.clicks_stats(params[:period])
+            @clicks_stats = @icushop.clicks_stats(params[:period], params[:mode])
             render "shops/shop_clicks_stats"
           rescue StandardError => e
             Rails.logger.debug "Error Message: #{e.message}"
-            Rollbar.error("Error", e)
+            ErrorNotifier.call(e)
           end
         end
 
+        # Gets any active shop banners to be shown
+        def shop_banners
+          begin
+            banner_data = nil
+            if $redis_cache.get("shop:stats:linked:#{@icushop.id}") == '1'
+              banner_data = $redis_cache.get("icu:banner:stats:updated")
+            else 
+              if @icushop.access_scopes.include?('read_all_orders')
+                banner_data = $redis_cache.get("icu:banner:scope:approved")
+              else
+                banner_data = $redis_cache.get("icu:banner")
+              end
+            end
+            if !banner_data.nil?
+              banner_data  = JSON.parse(banner_data)
+            else 
+              banner_data = { active: false }
+            end
+            render json: banner_data
+          rescue StandardError => e
+            Rails.logger.debug "Error Message: #{e.message}"
+            ErrorNotifier.call(e)
+            render json: { active: false }
+          end
+        end
         # GET autopilot details of the shop GET /api/v2/merchant/autopilot_details
         def autopilot_details
           render json:
@@ -294,6 +343,12 @@ module Api
           { 'css_options' => { 'main' => opts, 'button' => opts, 'text' => opts,
                                'image' => opts, 'custom' => opts } }
         end
+
+        def enqueue_job(title)
+          Sidekiq::Client.push('class' => "ShopWorker::#{title}", 'args' => [@icushop.id], 
+                               'queue' => 'shop', 'at' => Time.now.to_i)
+        end
+
       end
     end
   end

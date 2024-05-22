@@ -95,20 +95,17 @@ class Subscription < ApplicationRecord
   end
 
   def revenue_cents
-    if plan.try(:internal_name) == 'plan_based_billing'
-      if Subscription.usage_charge_schedule[:monthly_price][shop.shopify_plan_name].nil?
+    redis_plan = PlanRedis.get_plan(ShopPlan.get_one(shop.id)['plan_key'])
+
+    if redis_plan.price.to_f.zero?
         Rollbar.error("No usage charge for plan #{shop.shopify_plan_name}")
-        0
-      else
-        Subscription.usage_charge_schedule[:monthly_price][shop.shopify_plan_name] * 100
-      end
     else
-      price_in_cents
+      redis_plan.price.to_f * 100.0
     end
   end
 
   def next_bill_amount
-    Subscription.usage_charge_schedule[:monthly_price][shop.shopify_plan_name]
+    PlanRedis.get_plan(ShopPlan.get_one(shop.id)['plan_key']).to_f
   end
 
   def calculate_monthly_usage_charge
@@ -116,7 +113,7 @@ class Subscription < ApplicationRecord
     raise 'Does not use plan-based billing' unless plan.try(:internal_name) == 'plan_based_billing'
 
     bill_description = "#{shop.shopify_plan_name} plan"
-    bill_amount = Subscription.usage_charge_schedule[:monthly_price][shop.shopify_plan_name] || 0
+    bill_amount = next_bill_amount || 0
     if discount_percent.present? && discount_percent.positive?
       factor = (100 - discount_percent) / 100.0
       bill_amount = (bill_amount * factor).round(2)
@@ -141,7 +138,7 @@ class Subscription < ApplicationRecord
   end
 
   # public
-  def create_recurring_charge(plan, icushop, confirm_subscription_url)
+  def create_recurring_charge(plan, icushop, confirm_subscription_url, plan_key)
     price = if discount_percent.present? && discount_percent.positive?
               factor = (100 - discount_percent) / 100.0
               (plan.price_in_cents * factor / 100.0).round(2)
@@ -160,9 +157,17 @@ class Subscription < ApplicationRecord
     }
     if plan.id == 19
       opts[:recurring_application_charge][:capped_amount] = '99.99'
-      opts[:recurring_application_charge][:terms] = 'Depending on your Shopify plan. Basic Shopify: $19.99/mo, ' \
-                                                    'Shopify: $29.99/mo, Advanced Shopify: $59.99/mo, ' \
-                                                    'Shopify Plus: $99.99/mo'
+
+      split_key = plan_key.split(':').take(2).join(':')
+
+      plan_basic = PlanRedis.get_one("#{split_key}:Basic_Shopify")['price']
+      plan_reg = PlanRedis.get_one("#{split_key}:Shopify_Plus")['price']
+      plan_adv = PlanRedis.get_one("#{split_key}:Advanced_Shopify")['price']
+      plan_plus = PlanRedis.get_one("#{split_key}:Shopify")['price']
+
+      opts[:recurring_application_charge][:terms] = "Depending on your Shopify plan. Basic Shopify: #{plan_basic}/mo, " \
+                                                    "Shopify: #{plan_reg}/mo, Advanced Shopify: #{plan_adv}/mo, " \
+                                                    "Shopify Plus: #{plan_plus}/mo"
     end
     begin
       url = "https://#{icushop.shopify_domain}/admin/api/#{SHOPIFY_API_VERSION}/recurring_application_charges.json"
@@ -401,9 +406,9 @@ class Subscription < ApplicationRecord
   end
 
   def subscription_not_paid
-    self&.plan&.internal_name == 'plan_based_billing' &&
+    ((self&.plan&.internal_name == 'plan_based_billing' &&
       self&.shopify_charge_id.nil? &&
-      self&.status == 'approved' &&
+      self&.status == 'approved') || ShopPlan.get_one_with_id(shop.id.to_s).blank?) &&
       self.shop.is_shop_active
   end
 end

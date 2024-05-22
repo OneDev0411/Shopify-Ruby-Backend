@@ -56,7 +56,7 @@ module Api
 
         def session_params
           @session_params = params.require(:session).permit(:session_id, :shop_domain, :state, 
-                                                            :is_online, :scope, :expires)
+                                                            :access_token, :is_online, :scope, :expires)
         end
 
         def set_session
@@ -64,7 +64,7 @@ module Api
         end
 
         def find_by_session_id
-          @session = Session.find_by_session_id(params[:id])
+          @session = Session.find_by_session_id(params[:session_id])
         end
 
         def find_by_session_ids

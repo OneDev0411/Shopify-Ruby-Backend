@@ -13,8 +13,12 @@ import ErrorPage from "../components/ErrorPage.jsx";
 import ModalChoosePlan from '../components/modal_ChoosePlan';
 import { onLCP, onFID, onCLS } from 'web-vitals';
 import { traceStat } from "../services/firebase/perf.js";
+
 import {OFFER_DEFAULTS, OFFER_PLACEHOLDER} from "../shared/constants/EditOfferOptions.js";
 import {OfferContext} from "../contexts/OfferContext.jsx";
+
+import FrontWidgetSection from "../components/FrontWidgetSection.jsx"
+
 
 export default function Settings() {
     const shopAndHost = useSelector(state => state.shopAndHost);
@@ -109,8 +113,7 @@ export default function Settings() {
                 };
                 const toastNotice = Toast.create(app, toastOptions);
                 toastNotice.dispatch(Toast.Action.SHOW);
-                // This caused the user to be logged out of the app
-                // window.location.reload();
+                updateShopSettingsAttributes(!shopSettings.activated,'activated');
             })
             .catch((error) => {
                 const toastOptions = {
@@ -168,30 +171,7 @@ export default function Settings() {
             <Page>
                 <ModalChoosePlan />
                 <CustomTitleBar title='Settings' icon={SettingsMajor} buttonText='Save' handleButtonClick={handleSave} />
-                <LegacyCard sectioned>
-                    {(shopSettings?.activated) ? (
-                        <Grid>
-                            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 10, xl: 4 }}>
-                                <p>This app is activated</p>
-                            </Grid.Cell>
-                            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 2, xl: 4 }}>
-                                <div style={{ display: 'flex', justifyContent: 'end' }}>
-                                    <Button onClick={toggleActivation}>Deactivate</Button>
-                                </div>
-                            </Grid.Cell>
-                        </Grid>) : (
-                        <Grid>
-                            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 10, xl: 4 }}>
-                                <p>This app is deactivated</p>
-                            </Grid.Cell>
-                            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 8, lg: 2, xl: 4 }}>
-                                <div style={{ display: 'flex', justifyContent: 'end' }}>
-                                    <Button onClick={toggleActivation}>Activate</Button>
-                                </div>
-                            </Grid.Cell>
-                        </Grid>
-                    )}
-                </LegacyCard>
+                <FrontWidgetSection isStatusActive={shopSettings?.activated} toggleActivation={toggleActivation} />
                 <div className="space-4"></div>
                 <div id="no-bg-LegacyCard">
                     <LegacyCard sectioned style={{ backgroundColor: "transparent" }}>

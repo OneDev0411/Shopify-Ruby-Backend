@@ -176,6 +176,7 @@ const ChoosePlacement = (props) => {
 
 
     const handleSelectChange = useCallback((value) => {
+        props.changeDisableCheckoutInfo('');
         if (value === "cartpage") {
             updateOffer("in_cart_page", true);
             updateOffer("in_product_page", false);
@@ -200,6 +201,8 @@ const ChoosePlacement = (props) => {
             updateOffer("in_cart_page", true);
             updateOffer("in_product_page", false);
             updateOffer("in_ajax_cart", true);
+            props.changeDisableCheckoutInfo("(This feature will only function on cart page offers, \
+                will not function with offers in the Ajax Cart/Cart drawer)");
         }
         setSelected(value);
     }, []);
