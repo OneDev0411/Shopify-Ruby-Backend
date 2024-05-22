@@ -145,7 +145,7 @@ export default function Carousel(props) {
 		    loop: true
 		  })
 		  if(!props.checkKeysValidity.selectedCarouselWidth) {
-		  	props.updateCheckKeysValidity("carouselWidth", mySiema.selectorWidth);
+		  	props.updateCheckKeysValidity("carouselWidth", props.carouselWidth || mySiema.selectorWidth);
 	  		props.updateCheckKeysValidity("selectedCarouselWidth", true);
 		  }
 		  prev = document.querySelector('.js-prev');
