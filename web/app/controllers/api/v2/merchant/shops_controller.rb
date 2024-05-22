@@ -22,6 +22,14 @@ module Api
           render "shops/current_shop"
         end
 
+        # Get /api/v2/merchant/theme_app_check
+        def theme_app_check
+          # Sidekiq::Client.push('class' => 'ShopWorker::ThemeUpdateJob', 'args' => [@shopify_domain, true], 'queue' => 'themes', 'at' => Time.now.to_i + 3)
+          # Sidekiq::Client.push('class' => 'ShopWorker::ThemeUpdateJob', 'args' => [@shopify_domain, true], 'queue' => 'themes', 'at' => Time.now.to_i + 6)
+          # Sidekiq::Client.push('class' => 'ShopWorker::ThemeUpdateJob', 'args' => [@shopify_domain, true], 'queue' => 'themes', 'at' => Time.now.to_i + 9)
+          head :ok and return
+        end
+
         def shop_info
           if @icushop.present?
             render json: {shop: @icushop, path_to_cart: @icushop.path_to_cart, canonical_domain: @icushop.canonical_domain, can_run_on_checkout_page: @icushop.can_run_on_checkout_page}

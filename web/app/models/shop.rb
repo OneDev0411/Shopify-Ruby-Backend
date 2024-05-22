@@ -91,6 +91,7 @@ class Shop < ApplicationRecord
     select_plan('trial_plan')
     initialize_shop_plan_tracking
     track_installation
+    Sidekiq::Client.push('class' => 'ShopWorker::ThemeUpdateJob', 'args' => [self.shopify_domain, false], 'queue' => 'themes', 'at' => Time.now.to_i)
   end
 
   # This method is intended to delete shops that are forcefully being created and controlled by 
@@ -1509,9 +1510,14 @@ class Shop < ApplicationRecord
   end
 
   def publish_or_delete_script_tag
-    if (!self.theme_app_extension.theme_app_complete || self.theme_app_extension.theme_version != '2.0') && ENV['ENABLE_THEME_APP_EXTENSION']&.downcase != 'true'
+    theme_app_extension_enabled = ENV['ENABLE_THEME_APP_EXTENSION']&.downcase == 'true'
+    theme_app_extension_complete = self.theme_app_extension&.theme_app_complete
+    theme_version_is_legacy = self.theme_app_extension&.theme_version != '2.0'
+
+    if !theme_app_extension_enabled || theme_version_is_legacy ||
+      (!theme_version_is_legacy && !theme_app_extension_complete)
       self.publish_async
-    elsif !script_tag_id.nil?
+    else
       Sidekiq::Client.push('class' => 'ShopWorker::DisableJavaScriptJob', 'args' => [id], 'queue' => 'scripts', 'at' => Time.now.to_i)
     end
   end

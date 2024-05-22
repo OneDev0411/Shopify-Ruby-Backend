@@ -209,6 +209,18 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
     localStorage.setItem('theme_banner', 'dismissed');
   }
 
+  const handleButtonChange = () => {
+    fetch(`/api/v2/merchant/theme_app_check?shop=${shopData.shopify_domain}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      }})
+      .then( (resp) => resp.json())
+      .then( () => {
+        return true
+      })
+  }
+
   useEffect(() => {
     let isBannerDismissed = localStorage.getItem('theme_banner');
 
@@ -218,16 +230,17 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
   }, [])
 
   const contentInfo = (tab) => {
+    if (!tab) return <></>;
     return  <VerticalStack inlineAlign="center">
       <div className="leadin-card">
         <div style={{marginBottom: '11px'}} className="center-content">
-          <Text variant="headingLg" as="h2" fontWeight="regular">
-            Enable In Cart Upsell & Cross-Sell in your theme editor.
+          <Text variant="headingLg" as="h2" fontWeight="bold">
+            Start here: Enable In Cart Upsell & Cross-Sell in your theme editor
           </Text>
         </div>
         <div style={{marginBottom: '35px'}} className="center-content">
           <Text variant="headingSm" as="p" fontWeight="regular" color="subdued">
-            In Cart Upsell & Cross-Sell uses App Blocks and App Embeds for ease of use, faster response times, and customization. Follow the steps below to get it all setup!
+            App Blocks show your store's theme exactly where to display your upsell offer
           </Text>
         </div>
         <div style={{marginBottom: '35px'}} className={"video-intro-section"}>
@@ -235,46 +248,35 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
           <div style={{marginBottom: '20px'}} className={"homepage-info"}>
             <Text variant="headingSm" as="p" fontWeight="regular" >
               <ol>
-              {!tab.content.includes('Ajax') ?
-                <>
-                  <li>Click on the <b>{tab.buttonName}</b> button below, a new tab will open up, and the app block will be automatically added for you.</li>
-                  <li>
-                    You will see the placement of any currently published offers, or if you don't have any published, a placeholder offer will show you the widget position. If you are happy with it, skip to step 4.
-                  </li>
-                  <li>To readjust the placement of the widget, simply drag and drop the app block from the <b>menu on the left-hand side</b> of the theme editor.</li>
-                </>
-              :
-                <li>Click on the <b>Enable App Embed</b> button below, the embed will be automatically toggled on for you.</li>
-              }
-                <li>Click <b>save</b>, and close this tab to return to the app, you’re done!</li>
+                <li>Click on the <b>{tab.buttonName}</b> button below, and the app block will be automatically added for you.</li>
+                <li>Click <b>save</b> in the top right of the page, close that tab, and you're done!</li>
               </ol>
             </Text>
           </div>
         </div>
         <div className="center-btn" style={{marginBottom: '42px'}}>
-          <ButtonGroup>
-            { !tab.title.includes('Embedded') ?
-              <Button primary
-                      url={`https://${shopData?.shopify_domain}/admin/themes/current/editor?template=${tab.handle}&addAppBlockId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/${tab.panelID}&target=mainSection`}
-                      target="_blank"
-              >
-                {tab.buttonName}
-              </Button>
-              :
-              <Button primary
-                      url={`https://${shopData?.shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/${tab.panelID}`}
-                      target="_blank"
-              >
-                {tab.buttonName}
-              </Button>
-            }
-            <Button
-              url="https://help.incartupsell.com/en/collections/6780837-help-articles-for-new-ui"
-              target="_blank"
+          { !tab.title.includes('Embedded') ?
+            <Button primary
+                    target="_blank"
+                    url={`https://${shopData?.shopify_domain}/admin/themes/current/editor?template=${tab.handle}&addAppBlockId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/${tab.panelID}&target=mainSection`}
+                    onClick={handleButtonChange}
             >
-              View Help Docs
+              {tab.buttonName}
             </Button>
-          </ButtonGroup>
+            :
+            <Button primary
+                    target="_blank"
+                    url={`https://${shopData?.shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/${tab.panelID}`}
+                    onClick={handleButtonChange}
+            >
+              {tab?.buttonName}
+            </Button>
+          }
+        </div>
+        <div className="center-btn">
+          <Text variant="headingSm" as="p" fontWeight="regular" color="subdued">
+            Tip: You can reposition the placement of your offer by dragging and dropping the app block!
+          </Text>
         </div>
       </div>
     </VerticalStack>
@@ -290,41 +292,42 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
   const tabs = [
     {
       id: 'product-page-embed',
-      content: 'Product Page',
+      content: 'Enable product page upsell',
       title: 'Product Page',
       showTab: !themeAppExtension?.product_block_added,
       panelID: 'product_app_block',
       handle: 'product',
-      buttonName: 'Add to Product Page'
+      buttonName: 'Enable product page upsell'
     },
     {
       id: 'cart-page-embed',
-      content: 'Cart Page',
+      content: 'Enable cart page upsell',
       title: 'Cart Page',
       showTab: !themeAppExtension?.cart_block_added,
       panelID: 'cart_app_block',
       handle: 'cart',
-      buttonName: 'Add to Cart Page'
+      buttonName: 'Enable cart page upsell'
     },
     {
       id: 'ajax-cart-embed',
-      content: 'Ajax Cart Page',
+      content: 'Enable ajax cart upsell',
       title: 'Embedded Apps settings',
       showTab: !themeAppExtension?.theme_app_embed,
       panelID: 'ajax_cart_app_block',
-      buttonName: 'Enable App Embed'
+      buttonName: 'Enable ajax cart upsell'
     },
   ];
   const availableTabs = tabs.filter( tab => tab.showTab);
 
+  if (availableTabs.length === 0) return <></>
+
   return (
-    (availableTabs.length > 0) &&
     <Layout.Section>
       <div style={{marginBottom: '47px'}}>
         { open && (
-          <div style={{marginBottom: '10px'}}>
+          <div style={{marginBottom: '10px', fontWeight: 500 }}>
             <Banner onDismiss={closeBanner} status={"warning"}>
-              In Cart Upsell is moving to Theme App Extension blocks. Please see below to enable the blocks in your theme.
+              Good news! In Cart Upsell now supports Theme App Extensions which makes offers display instantly. Enable now below!
             </Banner>
           </div>
         )}
@@ -341,4 +344,3 @@ export function ThemeAppCard({ shopData, themeAppExtension}) {
     </Layout.Section>
   )
 }
-
