@@ -2,6 +2,8 @@ import {Tabs, Card, TextField, Select, Checkbox} from '@shopify/polaris';
 import {useState, useCallback} from 'react';
 import React from "react";
 import { DOMActionOptions } from '../shared/constants/DOMActionOptions';
+import OffersAppearance from "./offersAppearance.jsx";
+import GlobalCss from "./globalCss.jsx";
 
 export function SettingTabs(props){
     // Tabs
@@ -87,6 +89,18 @@ export function SettingTabs(props){
                     </>
                 )}
             </>
+      },
+      {
+        id: 'global-appearance',
+        content: 'Global Appearance Settings',
+        panelID: 'global-appearance-content',
+        innerContent: <OffersAppearance/>
+      },
+      {
+        id: 'global-css',
+        content: 'Global CSS',
+        panelID: 'global-css-content',
+        innerContent: <GlobalCss/>
       }
     ];
 

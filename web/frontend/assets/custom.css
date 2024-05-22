@@ -99,3 +99,7 @@
     width: auto;
   }
 }
+
+.widget-visibility.appearance .nudge-offer.carousel {
+  padding: 8px 0 !important;
+}
