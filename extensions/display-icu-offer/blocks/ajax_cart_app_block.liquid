@@ -1,11 +1,33 @@
 <div id="nudge-offer-drawer">
 </div>
-
+<script type="module" src="{{ 'index.js' | asset_url }}" defer></script>
+<script>
+  const ajax_selector = '{{ block.settings.icu-ajax-selector }}';
+  const ajax_action = '{{ block.settings.icu-ajax-action }}';
+</script>
 {% schema %}
-  {
-    "name": "Ajax Cart Offers",
-    "target": "body",
-    "stylesheet": "index.css",
-    "javascript": "index.js"
-  }
+{
+  "name": "Ajax Cart Offers",
+  "target": "body",
+  "stylesheet": "index.css",
+  "settings": [
+    {
+      "label": "Ajax Cart Selector",
+      "id": "icu-ajax-selector",
+      "type": "text"
+    },
+    {
+      "label": "Ajax Cart Action",
+      "id": "icu-ajax-action",
+      "type": "select",
+      "options": [
+        { "label": "prepend", "value": "prepend" },
+        { "label": "append", "value": "append" },
+        { "label": "after", "value": "after" },
+        { "label": "before", "value": "before" }
+      ],
+      "default": "before"
+    }
+  ]
+}
 {% endschema %}

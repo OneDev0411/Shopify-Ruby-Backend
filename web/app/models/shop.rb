@@ -1614,6 +1614,7 @@ class Shop < ApplicationRecord
       has_shopify_multicurrency: self.enabled_presentment_currencies.present? && self.enabled_presentment_currencies.length > 0,
       show_spinner: self.show_spinner?,
       uses_customer_tags: self.uses_customer_tags? || false,
+      offer_css: self.offer_css
     }
   end
 
