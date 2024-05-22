@@ -104,8 +104,18 @@ module Api
 
         #GET /api/v2/merchant/toggle_activation
         def toggle_activation
-          job = @icushop.activated ? enqueue_job('DisableJavaScriptJob') : enqueue_job('ForcePurgeCacheJob')
-          @icushop.update_columns(activated: !@icushop.activated, publish_job: job)
+          theme_app_extension_enabled = ENV['ENABLE_THEME_APP_EXTENSION']&.downcase == 'true'
+          theme_app_extension_complete = @icushop.theme_app_extension&.theme_app_complete
+          theme_version_is_legacy = @icushop.theme_app_extension&.theme_version != '2.0'
+
+          if !theme_app_extension_enabled || theme_version_is_legacy ||
+            (!theme_version_is_legacy && !theme_app_extension_complete)
+            job = @icushop.activated ? enqueue_job('DisableJavaScriptJob') : enqueue_job('ForcePurgeCacheJob')
+            @icushop.update_columns(activated: !@icushop.activated, publish_job: job)
+          else
+            @icushop.update_column(activated, !@icushop.activated)
+          end
+
           render "shops/toggle_activation"
         end
 
