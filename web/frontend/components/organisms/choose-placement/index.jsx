@@ -43,7 +43,7 @@ const ChoosePlacement = (props) => {
     const [templateImagesURL, setTemplateImagesURL] = useState({});
     const [storedThemeNames, setStoredThemeName] = useState([]);
 
-    const isLegacy = themeAppExtension.theme_version !== '2.0' || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true';
+    const isLegacy = themeAppExtension?.theme_version !== '2.0' || (themeAppExtension?.theme_version === '2.0' && !themeAppExtension?.theme_app_complete);
 
     useEffect(() => {
         fetch(`/api/v2/merchant/active_theme_for_dafault_template?shop=${shopAndHost.shop}`, {
@@ -619,6 +619,18 @@ const ChoosePlacement = (props) => {
         handleCollectionsModal();
     }
 
+    const handleButtonChange = () => {
+        fetch(`/api/v2/merchant/theme_app_check?shop=${shopData.shopify_domain}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            }})
+          .then( (resp) => resp.json())
+          .then( () => {
+              return true
+          })
+    }
+
     return (
         <>
             {(!storedThemeNames?.includes(shopifyThemeName) && openBanner && isLegacy) && (
@@ -638,15 +650,19 @@ const ChoosePlacement = (props) => {
             )}
 
             {(selected === "ajax" && !themeAppExtension?.theme_app_embed && !isLegacy) && (
-                <BannerContainer
-                    title="You are using Shopify's Theme Editor"
-                    tone="warning"
-                >
-                    <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
-                    <p><Link
-                        to={`https://${shopSettings.shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/ajax_cart_app_block`}
-                        target="_blank">Click here</Link> to go to the theme editor</p>
-                </BannerContainer>
+              <div style={{marginBottom: "10px"}} className="polaris-banner-container">
+                  <Banner title="You are using Shopify's Theme Editor" tone='warning'>
+                      <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
+                      <p>
+                          <a onClick={handleButtonChange}
+                             target="_blank"
+                             href={`https://${shopSettings.shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/ajax_cart_app_block`}
+                          >
+                              Click here
+                          </a>&nbsp;to go to the theme editor
+                      </p>
+                  </Banner>
+              </div>
             )}
 
             <LegacyCard title="Choose placement" sectioned>

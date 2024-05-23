@@ -46,9 +46,7 @@ export default function HomePage() {
   const [error, setError] = useState(null);
 
   const navigateTo = useNavigate();
-  const [isLegacy, setIsLegacy] = useState(
-    themeAppExtension?.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true'
-  );
+  const [isLegacy, setIsLegacy] = useState(themeAppExtension?.theme_version !== '2.0');
 
   useEffect(()=> {
     onLCP(traceStat, {reportSoftNavs: true});
@@ -103,7 +101,7 @@ export default function HomePage() {
           updateShopSettingsAttributes(data.offers_limit_reached, "offers_limit_reached");
 
           if (data.theme_app_extension) {
-            setIsLegacy(data.theme_app_extension.theme_version !== "2.0" || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true');
+            setIsLegacy(data.theme_app_extension.theme_version !== '2.0');
           }
           // notify intercom as soon as app is loaded and shop info is fetched
           notifyIntercom(data.shop);

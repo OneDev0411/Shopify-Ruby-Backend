@@ -16,7 +16,7 @@ export function FourthTab(props) {
     const { offer, updateNestedAttributeOfOffer } = useContext(OfferContext);
     const { shopSettings, themeAppExtension } = useShopState();
 
-    const isLegacy = themeAppExtension.theme_version !== '2.0' || import.meta.env.VITE_ENABLE_THEME_APP_EXTENSION?.toLowerCase() !== 'true';
+    const isLegacy = themeAppExtension?.theme_version !== '2.0' || (themeAppExtension?.theme_version === '2.0' && !themeAppExtension?.theme_app_complete);
 
     const [themeAppUrl, setThemeAppUrl] = useState('');
 
@@ -40,39 +40,56 @@ export function FourthTab(props) {
         }
     }, [])
 
+    const handleButtonChange = () => {
+        fetch(`/api/v2/merchant/theme_app_check?shop=${shopData.shopify_domain}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            }})
+          .then( (resp) => resp.json())
+          .then( () => {
+              return true
+          })
+    }
+
     return (
         <>
             { !isLegacy && !offer.in_ajax_cart &&
               (
-                <BannerContainer
-                    title="You are using Shopify's Theme Editor"
-                    tone="warning"
-                >
-                    <p>Please use the theme editor to place the offers where you would like it.</p><br/>
-                    <p><Link
-                        to={themeAppUrl}
-                        target="_blank">Click here</Link> to go to the theme editor</p>
-                </BannerContainer>
+                <div style={{marginBottom: "10px"}} className="polaris-banner-container">
+                    <Banner title="You are using Shopify's Theme Editor"  tone='warning'>
+                        <p>Please use the theme editor to place the offers where you would like it.</p><br/>
+                        <p>
+                            <a onClick={handleButtonChange} href={themeAppUrl} target="_blank">
+                                Click here
+                            </a>&nbsp; to go to the theme editor
+                        </p>
+                    </Banner>
+                </div>
               )
             }
 
             { !isLegacy && offer.in_ajax_cart &&
               (
-                <BannerContainer
-                    title="You are using Shopify's Theme Editor"
-                    status={themeAppExtension?.theme_app_embed ? 'success' : 'warning'}
-                >
-                    {!themeAppExtension?.theme_app_embed ?
-                        <>
-                            <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
-                            <p><Link
-                            to={`https://${shopSettings.shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/ajax_cart_app_block`}
-                            target="_blank">Click here</Link> to go to theme editor</p>
-                        </>
-                    :
-                        <p>Advanced settings are no longer needed for Shopify's Theme Editor. You've already enabled the app, all you need to do is publish your offer and it will appear in your Ajax cart</p>
-                    }
-                </BannerContainer>
+                <div style={{marginBottom: "10px"}} className="polaris-banner-container">
+                    <Banner title="You are using Shopify's Theme Editor" status={themeAppExtension?.theme_app_embed ? 'success' : 'warning'}>
+                        {!themeAppExtension?.theme_app_embed ?
+                          <>
+                              <p>In order to show the offer in the Ajax Cart, you need to enable it in the Theme Editor.</p><br/>
+                              <p>
+                                  <a onClick={handleButtonChange}
+                                     href={`https://${shopSettings.shopify_domain}/admin/themes/current/editor?context=apps&template=product&activateAppId=${import.meta.env.VITE_SHOPIFY_ICU_EXTENSION_APP_ID}/ajax_cart_app_block`}
+                                     target="_blank"
+                                  >
+                                      Click here
+                                  </a>to go to theme editor
+                              </p>
+                          </>
+                          :
+                          <p>Advanced settings are no longer needed for Shopify's Theme Editor. You've already enabled the app, all you need to do is publish your offer and it will appear in your Ajax cart</p>
+                        }
+                    </Banner>
+                </div>
               )
             }
 

@@ -1,4 +1,33 @@
-# This file stores configurations for your Shopify app.
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-scopes = "read_orders,read_products,write_script_tags,read_themes"
+client_id = "474d0b01a3f282ae1c16f8150056907a"
+name = "In Cart Upsell & Cross-Sell"
+handle = "in-cart-upsell"
+application_url = "https://web.incartupsell.com/"
+embedded = true
 
+[build]
+include_config_on_deploy = true
+
+[auth]
+redirect_urls = [
+  "https://web.incartupsell.com/auth/callback",
+  "https://web.incartupsell.com/auth/shopify/callback",
+  "https://web.incartupsell.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-01"
+
+  [webhooks.privacy_compliance]
+  customer_deletion_url = "https://web.incartupsell.com/custom_webhooks/redact_customer"
+  customer_data_request_url = "https://web.incartupsell.com/custom_webhooks/request_customer"
+  shop_deletion_url = "https://web.incartupsell.com/custom_webhooks/redact_shop"
+
+[app_proxy]
+url = "https://web.incartupsell.com/js/offer"
+subpath = "in-cart-upsell"
+prefix = "apps"
+
+[pos]
+embedded = true

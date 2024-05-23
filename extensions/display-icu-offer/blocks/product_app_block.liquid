@@ -1,22 +1,43 @@
 {% if request.design_mode or request.visual_preview_mode  %}
-  <div class="icu-notice">
-    Only one App block is needed per page. If your offers are not showing up, first ensure that your offer is published.
-    Then, check the Placement Settings tab in your offer, to confirm that you have selected the correct page, you wish to display the offer on.
-  </div>
+    <div class="icu-notice">
+        Only one App block is needed per page. If your offers are not showing up, first ensure that your offer is published.
+        Then, check the Placement Settings tab in your offer, to confirm that you have selected the correct page, you wish to display the offer on.
+    </div>
 {% endif %}
 
-<div id="nudge-offer-list">
+<div id="nudge-offer-listings">
 </div>
-
+<script type="module" src="{{ 'index.js' | asset_url }}" defer></script>
+<script>
+  const block_selector = '{{ block.settings.icu-product-selector }}';
+  const block_action = '{{ block.settings.icu-product-action }}';
+</script>
 {% schema %}
-  {
-    "name": "Product Page Offers",
-    "target": "section",
-    "stylesheet": "index.css",
-    "javascript": "index.js",
-    "enabled_on": {
-      "templates": ["product"]
+{
+  "name": "Product Page Offers",
+  "target": "section",
+  "stylesheet": "index.css",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "label": "Product Page Selector",
+      "id": "icu-product-selector",
+      "type": "text"
+    },
+    {
+      "label": "Product Page Action",
+      "id": "icu-product-action",
+      "type": "select",
+      "options": [
+        { "label": "prepend", "value": "prepend" },
+        { "label": "append", "value": "append" },
+        { "label": "after", "value": "after" },
+        { "label": "before", "value": "before" }
+      ],
+      "default": "before"
     }
-  }
+  ]
+}
 {% endschema %}
-

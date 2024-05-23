@@ -22,6 +22,14 @@ module Api
           render "shops/current_shop"
         end
 
+        # Get /api/v2/merchant/theme_app_check
+        def theme_app_check
+          # Sidekiq::Client.push('class' => 'ShopWorker::ThemeUpdateJob', 'args' => [@shopify_domain, true], 'queue' => 'themes', 'at' => Time.now.to_i + 3)
+          # Sidekiq::Client.push('class' => 'ShopWorker::ThemeUpdateJob', 'args' => [@shopify_domain, true], 'queue' => 'themes', 'at' => Time.now.to_i + 6)
+          # Sidekiq::Client.push('class' => 'ShopWorker::ThemeUpdateJob', 'args' => [@shopify_domain, true], 'queue' => 'themes', 'at' => Time.now.to_i + 9)
+          head :ok and return
+        end
+
         def shop_info
           if @icushop.present?
             render json: {shop: @icushop, path_to_cart: @icushop.path_to_cart, canonical_domain: @icushop.canonical_domain, can_run_on_checkout_page: @icushop.can_run_on_checkout_page}
@@ -104,8 +112,18 @@ module Api
 
         #GET /api/v2/merchant/toggle_activation
         def toggle_activation
-          job = @icushop.activated ? enqueue_job('DisableJavaScriptJob') : enqueue_job('ForcePurgeCacheJob')
-          @icushop.update_columns(activated: !@icushop.activated, publish_job: job)
+          theme_app_extension_enabled = ENV['ENABLE_THEME_APP_EXTENSION']&.downcase == 'true'
+          theme_app_extension_complete = @icushop.theme_app_extension&.theme_app_complete
+          theme_version_is_legacy = @icushop.theme_app_extension&.theme_version != '2.0'
+
+          if !theme_app_extension_enabled || theme_version_is_legacy ||
+            (!theme_version_is_legacy && !theme_app_extension_complete)
+            job = @icushop.activated ? enqueue_job('DisableJavaScriptJob') : enqueue_job('ForcePurgeCacheJob')
+            @icushop.update_columns(activated: !@icushop.activated, publish_job: job)
+          else
+            @icushop.update_column(activated, !@icushop.activated)
+          end
+
           render "shops/toggle_activation"
         end
 
