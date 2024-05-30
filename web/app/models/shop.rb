@@ -890,7 +890,7 @@ class Shop < ApplicationRecord
       if p.most_popular_companions.present?
         filtered_companion_ids = products.where("published_status = 'present' OR published_status is null").
           where(shopify_id: p.most_popular_companions.map(&:first)).
-          where("shopify_id NOT IN (?)", excluded_product_shopify_ids).
+          where("shopify_id NOT IN (?)", excluded_product_shopify_ids).active.
           map { |p| p.shopify_id if p.available_json_variants.present? }.compact
         filtered_companions = p.most_popular_companions.map { |c| c if filtered_companion_ids.member?(c[0]) }.compact
         [p.shopify_id, filtered_companions]
