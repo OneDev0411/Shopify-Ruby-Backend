@@ -3,13 +3,13 @@ module Api
   module V2
     module Merchant
       class PlansController < ApiMerchantBaseController
-        before_action :find_shop, only: %i[index view create duplicate update destroy]
+        before_action :find_shop, :set_admin, only: %i[index view create duplicate update destroy]
 
         # ADMIN - Listing all plans READY TO TEST
         def index
           return unless @admin
 
-          plan_list = PlanRedis.all
+          plan_list = PlanRedis.all('Plan*')
           render json: plan_list
         end
 
