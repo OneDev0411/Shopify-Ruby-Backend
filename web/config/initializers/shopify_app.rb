@@ -8,7 +8,7 @@ ShopifyApp.configure do |config|
   config.after_authenticate_job = false
   config.api_version = ShopifyAPI::AdminVersions::LATEST_SUPPORTED_ADMIN_VERSION
   config.shop_session_repository = "Shop"
-  # config.reauth_on_access_scope_changes = true
+  config.reauth_on_access_scope_changes = true
   # DOMAIN_URL = ENV['DOMAIN_URL']
   # config.root_url = "#{DOMAIN_URL}/api"
   # config.login_url = "#{DOMAIN_URL}/api/auth"
