@@ -2,7 +2,7 @@
 ShopifyApp.configure do |config|
   config.application_name = "ICU and Cross-Sell App"
   config.old_secret = ""
-  config.scope = 'read_orders,read_products,write_script_tags,read_themes' # See shopify.app.toml for scopes
+  config.scope = 'read_orders,read_products,write_script_tags,read_themes,unauthenticated_read_product_listings' # See shopify.app.toml for scopes
   # Consult this page for more scope options: https://shopify.dev/api/usage/access-scopes
   config.embedded_app = true
   config.after_authenticate_job = false
